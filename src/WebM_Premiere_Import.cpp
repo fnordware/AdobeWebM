@@ -45,15 +45,6 @@ typedef PrSDKPPixCacheSuite PrCacheSuite;
 
 
 
-//#define PATH_LEN	255
-
-#ifdef PRWIN_ENV
-typedef HANDLE ThreadHandle;
-#else
-typedef pthread_t ThreadHandle;
-#endif
-
-
 #define NESTEGG_ERR_NONE 0
 #define NESTEGG_SUCCESS  1
 #define NESTEGG_ERR      (-1)
@@ -139,7 +130,7 @@ typedef struct
 	
 	nestegg_io				io;
 	nestegg					*nestegg_ctx;
-	unsigned int			track;
+	unsigned int			video_track;
 	int						codec_id;
 	unsigned int			time_mult;
 	
@@ -147,7 +138,8 @@ typedef struct
 	SPBasicSuite			*BasicSuite;
 	PrSDKPPixCreatorSuite	*PPixCreatorSuite;
 	PrCacheSuite			*PPixCacheSuite;
-	PrSDKPPix2Suite			*PPixSuite;
+	PrSDKPPixSuite			*PPixSuite;
+	PrSDKPPix2Suite			*PPix2Suite;
 	PrSDKTimeSuite			*TimeSuite;
 	PrSDKImporterFileManagerSuite *FileSuite;
 } ImporterLocalRec8, *ImporterLocalRec8Ptr, **ImporterLocalRec8H;
@@ -255,7 +247,7 @@ SDKOpenFile8(
 		localRecP->io.read = nestegg_read;
 		localRecP->io.seek = nestegg_seek;
 		localRecP->io.tell = nestegg_tell;
-		localRecP->track = 0;
+		localRecP->video_track = 0;
 		localRecP->time_mult = 1;
 		localRecP->nestegg_ctx = NULL;
 		
@@ -266,7 +258,8 @@ SDKOpenFile8(
 		{
 			localRecP->BasicSuite->AcquireSuite(kPrSDKPPixCreatorSuite, kPrSDKPPixCreatorSuiteVersion, (const void**)&localRecP->PPixCreatorSuite);
 			localRecP->BasicSuite->AcquireSuite(kPrSDKPPixCacheSuite, PrCacheVersion, (const void**)&localRecP->PPixCacheSuite);
-			localRecP->BasicSuite->AcquireSuite(kPrSDKPPix2Suite, kPrSDKPPix2SuiteVersion, (const void**)&localRecP->PPixSuite);
+			localRecP->BasicSuite->AcquireSuite(kPrSDKPPixSuite, kPrSDKPPixSuiteVersion, (const void**)&localRecP->PPixSuite);
+			localRecP->BasicSuite->AcquireSuite(kPrSDKPPix2Suite, kPrSDKPPix2SuiteVersion, (const void**)&localRecP->PPix2Suite);
 			localRecP->BasicSuite->AcquireSuite(kPrSDKTimeSuite, kPrSDKTimeSuiteVersion, (const void**)&localRecP->TimeSuite);
 			localRecP->BasicSuite->AcquireSuite(kPrSDKImporterFileManagerSuite, kPrSDKImporterFileManagerSuiteVersion, (const void**)&localRecP->FileSuite);
 		}
@@ -363,7 +356,7 @@ SDKOpenFile8(
 					
 					if(codec_id == NESTEGG_CODEC_VP8 || codec_id == NESTEGG_CODEC_VP9)
 					{
-						localRecP->track = track;
+						localRecP->video_track = track;
 						localRecP->codec_id = codec_id;
 					}
 				}
@@ -469,6 +462,7 @@ SDKCloseFile(
 
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKPPixCreatorSuite, kPrSDKPPixCreatorSuiteVersion);
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKPPixCacheSuite, PrCacheVersion);
+		localRecP->BasicSuite->ReleaseSuite(kPrSDKPPixSuite, kPrSDKPPixSuiteVersion);
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKPPix2Suite, kPrSDKPPix2SuiteVersion);
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKTimeSuite, kPrSDKTimeSuiteVersion);
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKImporterFileManagerSuite, kPrSDKImporterFileManagerSuiteVersion);
@@ -744,7 +738,7 @@ SDKGetInfo8(
 			nestegg *ctx = localRecP->nestegg_ctx;
 		
 			nestegg_video_params params;
-			int params_err = nestegg_track_video_params(ctx, localRecP->track, &params);
+			int params_err = nestegg_track_video_params(ctx, localRecP->video_track, &params);
 			
 			uint64_t scale;
 			nestegg_tstamp_scale(localRecP->nestegg_ctx, &scale);
@@ -753,7 +747,7 @@ SDKGetInfo8(
 			int dur_err = nestegg_duration(localRecP->nestegg_ctx, &duration);
 			unsigned int fps_num = 0;
 			unsigned int fps_den = 0;
-			webm_guess_framerate(localRecP->nestegg_ctx, localRecP->track, &fps_den, &fps_num);
+			webm_guess_framerate(localRecP->nestegg_ctx, localRecP->video_track, &fps_den, &fps_num);
 			
 			int frames = (duration * fps_num / fps_den) / 1000000000UL;
 			
@@ -775,7 +769,7 @@ SDKGetInfo8(
 				SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
 				SDKFileInfo8->vidInfo.imageWidth	= params.width;
 				SDKFileInfo8->vidInfo.imageHeight	= params.height;
-				SDKFileInfo8->vidInfo.depth			= 32;	// The bit depth of the video
+				SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
 				SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
 
 				//SDKFileInfo8->vidInfo.isStill = kPrTrue;
@@ -826,10 +820,7 @@ SDKCalcSize8(
 	imFileAccessRec8	*fileAccessRec8)
 {
 	// tell Premiere the file size
-	// use our replace function, which already works for both platforms
-	//calcSizeRec->sizeInBytes = ff_replace_seek(fileAccessRec8->fileref, 0, AVSEEK_SIZE);
-
-	//return malNoError;
+	
 	return imUnsupported;
 }
 
@@ -839,26 +830,39 @@ SDKPreferredFrameSize(
 	imStdParms					*stdparms, 
 	imPreferredFrameSizeRec		*preferredFrameSizeRec)
 {
-	prMALError			result	= malNoError;
+	prMALError			result	= imIterateFrameSizes;
 	ImporterLocalRec8H	ldataH	= reinterpret_cast<ImporterLocalRec8H>(preferredFrameSizeRec->inPrivateData);
 
 	stdparms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
 
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
-	// we store width and height in private data so we can produce it here
-	// we always return the full frame, perhaps out of laziness
-	switch(preferredFrameSizeRec->inIndex)
+
+	bool can_shrink = false; // doesn't look like we can decode a smaller frame
+
+	if(preferredFrameSizeRec->inIndex == 0)
 	{
-		case 0:
-			preferredFrameSizeRec->outWidth = localRecP->width;
-			preferredFrameSizeRec->outHeight = localRecP->height;
-			result = malNoError;
-			break;
-	
-		default:
-			result = imOtherErr;
+		preferredFrameSizeRec->outWidth = localRecP->width;
+		preferredFrameSizeRec->outHeight = localRecP->height;
 	}
+	else
+	{
+		// we store width and height in private data so we can produce it here
+		const int divisor = pow(2, preferredFrameSizeRec->inIndex);
+		
+		if(can_shrink &&
+			preferredFrameSizeRec->inIndex < 4 &&
+			localRecP->width % divisor == 0 &&
+			localRecP->height % divisor == 0 )
+		{
+			preferredFrameSizeRec->outWidth = localRecP->width / divisor;
+			preferredFrameSizeRec->outHeight = localRecP->height / divisor;
+		}
+		else
+			result = malNoError;
+	}
+
+	
 
 	stdparms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
 
@@ -956,28 +960,25 @@ SDKGetSourceVideo(
 			
 			uint64_t half_frame_time = (1000000000UL * fps_den / fps_num) / 2; // half-a-frame
 			
-			int seek_err = nestegg_track_seek(localRecP->nestegg_ctx, localRecP->track, tstamp);
+			
+			int seek_err = nestegg_track_seek(localRecP->nestegg_ctx, localRecP->video_track, tstamp);
 			
 			if(seek_err == NESTEGG_ERR_NONE)
 			{
 				bool first_frame = true;
 			
-				assert(localRecP->codec_id == nestegg_track_codec_id(localRecP->nestegg_ctx, localRecP->track));
+				assert(localRecP->codec_id == nestegg_track_codec_id(localRecP->nestegg_ctx, localRecP->video_track));
 			
 				const vpx_codec_iface_t *iface = (localRecP->codec_id == NESTEGG_CODEC_VP8 ? vpx_codec_vp8_dx() : vpx_codec_vp9_dx());
 				
 				vpx_codec_ctx_t decoder;
 				
 				vpx_codec_dec_cfg_t	cfg;
-				cfg.threads = 2;
+				cfg.threads = 8;
 				cfg.w = frameFormat->inFrameWidth;
 				cfg.h = frameFormat->inFrameHeight;
 				
-				//int dec_flags = VPX_CODEC_USE_ERROR_CONCEALMENT |
-				//				VPX_CODEC_USE_FRAME_THREADING |
-				//				VPX_CODEC_CAP_FRAME_THREADING;
-				
-				int dec_flags = 0;
+				int dec_flags = VPX_CODEC_USE_FRAME_THREADING | VPX_CODEC_CAP_FRAME_THREADING;
 				
 				vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder,
 																iface,
@@ -997,7 +998,7 @@ SDKGetSourceVideo(
 					unsigned char *data = NULL;
 					size_t length;
 					
-					bool frame_decoded = false;
+					bool reached_iframe = false;
 					
 					do{
 						if(pkt)
@@ -1011,17 +1012,16 @@ SDKGetSourceVideo(
 						if(read_result == NESTEGG_SUCCESS)
 						{
 							nestegg_packet_tstamp(pkt, &found_tstamp);
-							//found_tstamp = tstamp;
 							
 							unsigned int track;
 							nestegg_packet_track(pkt, &track);
 							
-							if(track == localRecP->track)
+							if(track == localRecP->video_track)
 							{
 								unsigned int chunks;
 								nestegg_packet_count(pkt, &chunks);
 							
-								for(int i=0; i < chunks && !frame_decoded && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK; i++)
+								for(int i=0; i < chunks && !reached_iframe && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK; i++)
 								{
 									data_err = nestegg_packet_data(pkt, i, &data, &length);
 									
@@ -1032,20 +1032,20 @@ SDKGetSourceVideo(
 									
 										vpx_codec_err_t peek_err = vpx_codec_peek_stream_info(iface, data, length, &stream_info);
 										
-										assert(first_frame || !stream_info.is_kf);
+										if(!first_frame && stream_info.is_kf)
+											reached_iframe = true;
 										
-										
-										decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
-										
-										if(decode_err == VPX_CODEC_OK)
+										if(!reached_iframe)
 										{
-											csSDK_int32 decodedFrame = ((found_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+											decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
 											
-											csSDK_int32 hopingforFrame = ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
-											assert(hopingforFrame == theFrame);
-											
-											if(decodedFrame == theFrame)
+											if(decode_err == VPX_CODEC_OK)
 											{
+												csSDK_int32 decodedFrame = ((found_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+												
+												csSDK_int32 hopingforFrame = ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+												assert(hopingforFrame == theFrame);
+												
 												vpx_codec_iter_t iter = NULL;
 												
 												vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
@@ -1059,7 +1059,7 @@ SDKGetSourceVideo(
 													char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 													csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
 													
-													localRecP->PPixSuite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
+													localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
 																									&Y_PixelAddress, &Y_RowBytes,
 																									&U_PixelAddress, &U_RowBytes,
 																									&V_PixelAddress, &V_RowBytes);
@@ -1073,10 +1073,7 @@ SDKGetSourceVideo(
 														
 														unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
 														
-														for(int x=0; x < img->d_w; x++)
-														{
-															*prY++ = *imgY++;
-														}
+														memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
 													}
 													
 													for(int y = 0; y < img->d_h / 2; y++)
@@ -1087,23 +1084,25 @@ SDKGetSourceVideo(
 														unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
 														unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
 														
-														for(int x=0; x < img->d_w / 2; x++)
-														{
-															*prU++ = *imgU++;
-															*prV++ = *imgV++;
-														}
+														memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
+														memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
 													}
 													
 													localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
 																								0,
 																								ppix,
-																								theFrame,
+																								decodedFrame,
 																								NULL,
 																								NULL);
-																								
-													*sourceVideoRec->outFrame = ppix;
 													
-													frame_decoded = true;
+													if(decodedFrame == theFrame)
+													{
+														*sourceVideoRec->outFrame = ppix;
+													}
+													else
+													{
+														localRecP->PPixSuite->Dispose(ppix);
+													}
 												}
 											}
 										}
@@ -1114,7 +1113,7 @@ SDKGetSourceVideo(
 						
 						first_frame = false;
 						
-					}while(!frame_decoded && read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK);
+					}while(!reached_iframe && read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK);
 					
 					
 					vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
@@ -1122,11 +1121,20 @@ SDKGetSourceVideo(
 					
 					if(pkt)
 						nestegg_free_packet(pkt);
+					
+					
+					if( !(read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK) )
+						result = imFileReadFailed;
 				}
+				else
+					result = imBadCodec;
 			}
+			else
+				result = imFileReadFailed;
 		}
+		else
+			result = imOtherErr;
 	}
-
 
 
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
