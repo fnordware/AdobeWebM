@@ -15,20 +15,23 @@
 
 extern "C" {
 
-#define VPX_CODEC_DISABLE_COMPAT 1
-#include "vpx_config.h"
+//#define VPX_DONT_DEFINE_STDINT_TYPES
+//#define VPX_CODEC_DISABLE_COMPAT 1
+//#include "vpx_config.h"
 #include "vpx/vpx_decoder.h"
-#include "vpx_ports/vpx_timer.h"
-#if CONFIG_VP8_DECODER || CONFIG_VP9_DECODER
+//#include "vpx_ports/vpx_timer.h"
+//#if CONFIG_VP8_DECODER || CONFIG_VP9_DECODER
 #include "vpx/vp8dx.h"
-#endif
-#if CONFIG_MD5
-#include "md5_utils.h"
-#endif
-#include "tools_common.h"
+//#endif
+//#if CONFIG_MD5
+//#include "md5_utils.h"
+//#endif
+//#include "tools_common.h"
 #include "nestegg/include/nestegg/nestegg.h"
-#define INT_TYPES_DEFINED
-#include "third_party/libyuv/include/libyuv/scale.h"
+//#define INT_TYPES_DEFINED
+//#include "third_party/libyuv/include/libyuv/scale.h"
+
+#include <vorbis/codec.h>
 
 }
 
@@ -127,11 +130,15 @@ typedef struct
 	csSDK_int32				height;
 	csSDK_int32				frameRateNum;
 	csSDK_int32				frameRateDen;
+	float					audioSampleRate;
+	int						numChannels;
 	
 	nestegg_io				io;
 	nestegg					*nestegg_ctx;
-	unsigned int			video_track;
-	int						codec_id;
+	int						video_track;
+	int						audio_track;
+	int						video_codec_id;
+	int						audio_codec_id;
 	unsigned int			time_mult;
 	
 	PlugMemoryFuncsPtr		memFuncs;
@@ -247,7 +254,8 @@ SDKOpenFile8(
 		localRecP->io.read = nestegg_read;
 		localRecP->io.seek = nestegg_seek;
 		localRecP->io.tell = nestegg_tell;
-		localRecP->video_track = 0;
+		localRecP->video_track = -1;
+		localRecP->audio_track = -1;
 		localRecP->time_mult = 1;
 		localRecP->nestegg_ctx = NULL;
 		
@@ -344,25 +352,30 @@ SDKOpenFile8(
 			unsigned int tracks;
 			nestegg_track_count(ctx, &tracks);
 			
-			int codec_id = -1;
-			
-			for(int track=0; track < tracks && codec_id == -1; track++)
+			for(int track=0; track < tracks; track++)
 			{
 				int track_type = nestegg_track_type(ctx, track);
 				
+				int codec_id = nestegg_track_codec_id(ctx, track);
+					
 				if(track_type == NESTEGG_TRACK_VIDEO)
 				{
-					codec_id = nestegg_track_codec_id(ctx, track);
-					
 					if(codec_id == NESTEGG_CODEC_VP8 || codec_id == NESTEGG_CODEC_VP9)
 					{
 						localRecP->video_track = track;
-						localRecP->codec_id = codec_id;
+						localRecP->video_codec_id = codec_id;
 					}
+				}
+				else if(track_type == NESTEGG_TRACK_AUDIO)
+				{
+					assert(codec_id == NESTEGG_CODEC_VORBIS);
+				
+					localRecP->audio_track = track;
+					localRecP->audio_codec_id = codec_id;
 				}
 			}
 			
-			if(codec_id == -1)
+			if(localRecP->video_track == -1 && localRecP->audio_track == -1)
 			{
 				result = imFileOpenFailed;
 			}
@@ -617,7 +630,7 @@ SDKGetIndPixelFormat(
 	imIndPixelFormatRec	*SDKIndPixelFormatRec) 
 {
 	prMALError	result	= malNoError;
-	ImporterLocalRec8H	ldataH	= reinterpret_cast<ImporterLocalRec8H>(SDKIndPixelFormatRec->privatedata);
+	//ImporterLocalRec8H	ldataH	= reinterpret_cast<ImporterLocalRec8H>(SDKIndPixelFormatRec->privatedata);
 
 	switch(idx)
 	{
@@ -737,14 +750,12 @@ SDKGetInfo8(
 		{
 			nestegg *ctx = localRecP->nestegg_ctx;
 		
-			nestegg_video_params params;
-			int params_err = nestegg_track_video_params(ctx, localRecP->video_track, &params);
-			
 			uint64_t scale;
 			nestegg_tstamp_scale(localRecP->nestegg_ctx, &scale);
 			
 			uint64_t duration;
 			int dur_err = nestegg_duration(localRecP->nestegg_ctx, &duration);
+			
 			unsigned int fps_num = 0;
 			unsigned int fps_den = 0;
 			webm_guess_framerate(localRecP->nestegg_ctx, localRecP->video_track, &fps_den, &fps_num);
@@ -762,46 +773,74 @@ SDKGetInfo8(
 				localRecP->time_mult = 1;
 			
 			
-			if(params_err == NESTEGG_ERR_NONE && dur_err == NESTEGG_ERR_NONE)
+			if(localRecP->video_track >= 0)
 			{
-				// Video information
-				SDKFileInfo8->hasVideo				= kPrTrue;
-				SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
-				SDKFileInfo8->vidInfo.imageWidth	= params.width;
-				SDKFileInfo8->vidInfo.imageHeight	= params.height;
-				SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
-				SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
+				nestegg_video_params params;
+				int params_err = nestegg_track_video_params(ctx, localRecP->video_track, &params);
+				
+				if(params_err == NESTEGG_ERR_NONE && dur_err == NESTEGG_ERR_NONE)
+				{
+					// Video information
+					SDKFileInfo8->hasVideo				= kPrTrue;
+					SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+					SDKFileInfo8->vidInfo.imageWidth	= params.width;
+					SDKFileInfo8->vidInfo.imageHeight	= params.height;
+					SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
+					SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
+					SDKFileInfo8->vidInfo.isStill		= kPrFalse;
+					SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
+					SDKFileInfo8->vidDuration			= frames * (fps_den / localRecP->time_mult);
+					SDKFileInfo8->vidScale				= fps_num / localRecP->time_mult;
+					SDKFileInfo8->vidSampleSize			= fps_den / localRecP->time_mult;
 
-				//SDKFileInfo8->vidInfo.isStill = kPrTrue;
-				//SDKFileInfo8->vidInfo.noDuration = imNoDurationStillDefault;
-				//SDKFileInfo8->vidDuration				= 1;
-				//SDKFileInfo8->vidScale				= 1;
-				//SDKFileInfo8->vidSampleSize			= 1;
-				SDKFileInfo8->vidInfo.isStill		= kPrFalse;
-				SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-				//SDKFileInfo8->vidDuration			= ((duration / fps_den) * (fps_num / 1000)) / localRecP->time_mult;
-				//SDKFileInfo8->vidDuration			= 48 * fps_den / localRecP->time_mult;
-				SDKFileInfo8->vidDuration			= frames * (fps_den / localRecP->time_mult);
-				SDKFileInfo8->vidScale				= fps_num / localRecP->time_mult;
-				SDKFileInfo8->vidSampleSize			= fps_den / localRecP->time_mult;
+					SDKFileInfo8->vidInfo.alphaType	= alphaNone;
 
-				SDKFileInfo8->vidInfo.alphaType	= alphaStraight;
+					SDKFileInfo8->vidInfo.pixelAspectNum = 1;
+					SDKFileInfo8->vidInfo.pixelAspectDen = 1;
 
-				SDKFileInfo8->vidInfo.pixelAspectNum = 1;
-				SDKFileInfo8->vidInfo.pixelAspectDen = 1;
+					// store some values we want to get without going to the file
+					localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
+					localRecP->height = SDKFileInfo8->vidInfo.imageHeight;
 
-				// not doing audio
-				SDKFileInfo8->hasAudio = kPrFalse;
-
-				// store some values we want to get without going to the file
-				localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
-				localRecP->height = SDKFileInfo8->vidInfo.imageHeight;
-
-				localRecP->frameRateNum = SDKFileInfo8->vidScale;
-				localRecP->frameRateDen = SDKFileInfo8->vidSampleSize;
+					localRecP->frameRateNum = SDKFileInfo8->vidScale;
+					localRecP->frameRateDen = SDKFileInfo8->vidSampleSize;
+				}
+				else
+					result = imBadFile;
 			}
 			else
-				result = imBadFile;
+				SDKFileInfo8->hasVideo = kPrFalse;
+			
+			
+			if(localRecP->audio_track >= 0)
+			{
+				nestegg_audio_params params;
+				int params_err = nestegg_track_audio_params(ctx, localRecP->audio_track, &params);
+				
+				if(params_err == NESTEGG_ERR_NONE && dur_err == NESTEGG_ERR_NONE)
+				{
+					// Audio information
+					SDKFileInfo8->hasAudio				= kPrTrue;
+					SDKFileInfo8->audInfo.numChannels	= params.channels;
+					SDKFileInfo8->audInfo.sampleRate	= params.rate;
+					SDKFileInfo8->audInfo.sampleType	= params.depth == 8 ? kPrAudioSampleType_8BitInt :
+															params.depth == 16 ? kPrAudioSampleType_16BitInt :
+															params.depth == 24 ? kPrAudioSampleType_24BitInt :
+															params.depth == 32 ? kPrAudioSampleType_32BitFloat :
+															params.depth == 64 ? kPrAudioSampleType_64BitFloat :
+															kPrAudioSampleType_8BitTwosInt;
+															
+					SDKFileInfo8->audDuration			= (uint64_t)params.rate * duration / 1000000000UL;
+					
+					
+					localRecP->audioSampleRate			= SDKFileInfo8->audInfo.sampleRate;
+					localRecP->numChannels				= SDKFileInfo8->audInfo.numChannels;
+				}
+				else
+					result = imBadFile;
+			}
+			else
+				SDKFileInfo8->hasAudio = kPrFalse;
 		}
 		else
 			result = imBadFile;
@@ -967,9 +1006,10 @@ SDKGetSourceVideo(
 			{
 				bool first_frame = true;
 			
-				assert(localRecP->codec_id == nestegg_track_codec_id(localRecP->nestegg_ctx, localRecP->video_track));
+				int codec_id = nestegg_track_codec_id(localRecP->nestegg_ctx, localRecP->video_track);
+				assert(localRecP->video_codec_id == codec_id);
 			
-				const vpx_codec_iface_t *iface = (localRecP->codec_id == NESTEGG_CODEC_VP8 ? vpx_codec_vp8_dx() : vpx_codec_vp9_dx());
+				const vpx_codec_iface_t *iface = (codec_id == NESTEGG_CODEC_VP8 ? vpx_codec_vp8_dx() : vpx_codec_vp9_dx());
 				
 				vpx_codec_ctx_t decoder;
 				
@@ -980,11 +1020,8 @@ SDKGetSourceVideo(
 				
 				int dec_flags = VPX_CODEC_USE_FRAME_THREADING | VPX_CODEC_CAP_FRAME_THREADING;
 				
-				vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder,
-																iface,
-																&cfg,
-																dec_flags);
-																
+				vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder, iface, &cfg, dec_flags);
+				
 				if(codec_err == VPX_CODEC_OK)
 				{
 					nestegg_packet *pkt = NULL;
@@ -1143,6 +1180,230 @@ SDKGetSourceVideo(
 }
 
 
+static prMALError 
+SDKImportAudio7(
+	imStdParms			*stdParms, 
+	imFileRef			SDKfileRef, 
+	imImportAudioRec7	*audioRec7)
+{
+	prMALError		result		= malNoError;
+
+	// privateData
+	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(audioRec7->privateData);
+	stdParms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
+	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
+
+
+	PrTime ticksPerSecond = 0;
+	localRecP->TimeSuite->GetTicksPerSecond(&ticksPerSecond);
+
+	assert(localRecP->io.userdata == SDKfileRef);
+	assert(localRecP->nestegg_ctx != NULL);
+
+	if(localRecP->nestegg_ctx != NULL)
+	{
+		uint64_t tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
+		
+		int ogg_packet_num = 0;
+		
+		unsigned int headers = 0;
+		
+		int count_err = nestegg_track_codec_data_count(localRecP->nestegg_ctx, localRecP->audio_track, &headers);
+		
+		if(count_err == NESTEGG_ERR_NONE && headers == 3)
+		{
+			vorbis_info vi;
+			vorbis_comment vc;
+			vorbis_dsp_state vd;
+			vorbis_block vb;
+			
+			vorbis_info_init(&vi);
+			vorbis_comment_init(&vc);
+			
+			
+			int v_err = NESTEGG_ERR_NONE;
+			
+			for(int h=0; h < headers && v_err == NESTEGG_ERR_NONE; h++)
+			{
+				unsigned char *data = NULL;
+				size_t length = 0;
+				
+				v_err = nestegg_track_codec_data(localRecP->nestegg_ctx, localRecP->audio_track,
+														h, &data, &length);
+														
+				if(v_err == NESTEGG_ERR_NONE)
+				{
+					ogg_packet packet;
+					
+					packet.packet = data;
+					packet.bytes = length;
+					packet.b_o_s = (h == 0);
+					packet.e_o_s = false;
+					packet.granulepos = 0;
+					packet.packetno = ogg_packet_num++;
+					
+					v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
+				}
+			}
+					
+			if(v_err == NESTEGG_ERR_NONE)
+			{
+				v_err = vorbis_synthesis_init(&vd, &vi);
+				
+				if(v_err == NESTEGG_ERR_NONE)
+					v_err = vorbis_block_init(&vd, &vb);
+				
+				v_err = nestegg_track_seek(localRecP->nestegg_ctx,
+											localRecP->video_track >= 0 ? localRecP->video_track : localRecP->audio_track,
+											tstamp);
+											
+				if(v_err == NESTEGG_ERR_NONE)
+				{
+					nestegg_packet *pkt = NULL;
+					
+					csSDK_uint32 samples_copied = 0;
+					csSDK_uint32 samples_left = audioRec7->size;
+					
+					uint64_t found_tstamp = 0;
+					
+					int read_result = NESTEGG_SUCCESS;
+					int data_err = NESTEGG_ERR_NONE;
+
+					do{
+						if(pkt)
+						{
+							nestegg_free_packet(pkt);
+							pkt = NULL;
+						}
+
+						read_result = nestegg_read_packet(localRecP->nestegg_ctx, &pkt);
+						
+						if(read_result == NESTEGG_SUCCESS)
+						{
+							nestegg_packet_tstamp(pkt, &found_tstamp);
+							
+							PrAudioSample packet_start = localRecP->audioSampleRate * found_tstamp / 1000000000UL;
+							PrAudioSample packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+							
+							if(packet_offset < 0)
+								packet_offset = 0;
+							
+							unsigned int track;
+							nestegg_packet_track(pkt, &track);
+							
+							if(track == localRecP->audio_track)
+							{
+								unsigned int chunks;
+								nestegg_packet_count(pkt, &chunks);
+							
+								for(int i=0; i < chunks && data_err == NESTEGG_ERR_NONE; i++)
+								{
+									unsigned char *data = NULL;
+									size_t length;
+									
+									data_err = nestegg_packet_data(pkt, i, &data, &length);
+									
+									if(data_err == NESTEGG_ERR_NONE)
+									{
+										ogg_packet packet;
+					
+										packet.packet = data;
+										packet.bytes = length;
+										packet.b_o_s = false;
+										packet.e_o_s = false;
+										packet.granulepos = -1;
+										packet.packetno = ogg_packet_num++;
+
+										int synth_err = vorbis_synthesis(&vb, &packet);
+										
+										if(synth_err == NESTEGG_ERR_NONE)
+										{
+											int block_err = vorbis_synthesis_blockin(&vd, &vb);
+											
+											if(block_err == NESTEGG_ERR_NONE)
+											{
+												float **pcm = NULL;
+												int samples;
+												
+												int synth_result = 1;
+												
+												while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+												{
+													int samples_to_copy = samples_left;
+													
+													if(packet_offset >= samples)
+													{
+														samples_to_copy = 0;
+													}
+													else if(samples_to_copy > (samples - packet_offset))
+													{
+														samples_to_copy = (samples - packet_offset);
+													}
+												
+													// how nice, audio samples are float, which happens to be what Premiere wants
+													for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
+													{
+														memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+													}
+													
+													samples_copied += samples_to_copy;
+													samples_left -= samples_to_copy;
+													
+													if(samples_to_copy > 0)
+														packet_offset = 0;
+													else
+														packet_offset -= samples;
+													
+													
+													synth_result = vorbis_synthesis_read(&vd, samples);
+												}
+											}
+										}
+										else
+											read_result = 0;
+									}
+								}
+							}
+						}
+						
+					}while(samples_left > 0 && read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE);
+
+					assert(samples_left == 0 && samples_copied == audioRec7->size);
+
+					if(pkt)
+						nestegg_free_packet(pkt);
+					
+					
+					if( !(read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE) )
+						result = imFileReadFailed;
+						
+					assert(result == malNoError);
+				}
+				else
+					result = imFileReadFailed;
+			}
+			else
+				result = imFileReadFailed;
+			
+			
+			vorbis_block_clear(&vb);
+			vorbis_dsp_clear(&vd);
+			vorbis_info_clear(&vi);
+			vorbis_comment_clear(&vc);
+		}
+		else
+			result = imFileReadFailed;
+	}
+	else
+		result = imOtherErr;
+		
+	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
+	
+	assert(result == malNoError);
+	
+	return result;
+}
+
 
 PREMPLUGENTRY DllExport xImportEntry (
 	csSDK_int32		selector, 
@@ -1231,6 +1492,12 @@ PREMPLUGENTRY DllExport xImportEntry (
 			result =	SDKGetSourceVideo(	stdParms,
 											reinterpret_cast<imFileRef>(param1),
 											reinterpret_cast<imSourceVideoRec*>(param2));
+			break;
+			
+		case imImportAudio7:
+			result =	SDKImportAudio7(	stdParms,
+											reinterpret_cast<imFileRef>(param1),
+											reinterpret_cast<imImportAudioRec7*>(param2));
 			break;
 
 		case imCreateAsyncImporter:
