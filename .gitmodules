@@ -1,3 +1,6 @@
 [submodule "ext/libvpx"]
 	path = ext/libvpx
 	url = http://git.chromium.org/webm/libvpx.git
+[submodule "ext/libwebp"]
+	path = ext/libwebp
+	url = http://git.chromium.org/webm/libwebp.git
