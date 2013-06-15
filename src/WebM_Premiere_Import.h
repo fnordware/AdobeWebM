@@ -1,18 +1,9 @@
 
-// Chyron_File_Import.h
-//
-// Premiere file importer for reading .chy files, which are really PNG or
-// QuickTime RLE (Animation codec) files.
-//
-// Also writes file's path to $(HOME)/ChyronAXISClip.txt when clip is double-clicked (SDKGetPrefs8)
-//
-// Written by Brendan Bolles <brendan@fnordware.com> for Bill Ferster <bferster@stagetools.com>
-// Part of the Chyron AXIS project
-//
 
 
-#ifndef CHYRONFILEIMPORT_H
-#define CHYRONFILEIMPORT_H
+
+#ifndef WEBM_PREMIERE_IMPORT_H
+#define WEBM_PREMIERE_IMPORT_H
 
 #include	"PrSDKStructs.h"
 #include	"PrSDKImport.h"
@@ -77,4 +68,4 @@ PREMPLUGENTRY DllExport xImportEntry (csSDK_int32	selector,
 
 }
 
-#endif //CHYRONFILEIMPORT_H
+#endif //WEBM_PREMIERE_IMPORT_H

@@ -1,15 +1,4 @@
 
-// Chyron_File_Import.cpp
-//
-// Premiere file importer for reading .chy files, which are really PNG or
-// QuickTime RLE (Animation codec) files.
-//
-// Also writes file's path to $(HOME)/ChyronAXISClip.txt when clip is double-clicked (SDKGetPrefs8)
-//
-// Written by Brendan Bolles <brendan@fnordware.com> for Bill Ferster <bferster@stagetools.com>
-// Part of the Chyron AXIS project
-//
-
 #include "WebM_Premiere_Import.h"
 
 
@@ -636,7 +625,7 @@ SDKGetIndPixelFormat(
 	{
 		// just support one pixel format, 8-bit BGRA
 		case 0:
-			SDKIndPixelFormatRec->outPixelFormat = PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+			SDKIndPixelFormatRec->outPixelFormat = PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
 			break;
 	
 		default:
@@ -782,7 +771,7 @@ SDKGetInfo8(
 				{
 					// Video information
 					SDKFileInfo8->hasVideo				= kPrTrue;
-					SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+					SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
 					SDKFileInfo8->vidInfo.imageWidth	= params.width;
 					SDKFileInfo8->vidInfo.imageHeight	= params.height;
 					SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
@@ -938,11 +927,6 @@ SDKGetSourceVideo(
 	}
 	else
 	{
-		// we store frame rate in private data so we don't have to go to the FFmpeg struct yet
-		// although really we could
-		//theFrame = ((csSDK_uint64)sourceVideoRec->inFrameTime * (csSDK_uint64)localRecP->frameRateNum) / ((csSDK_uint64)ticksPerSecond * (csSDK_uint64)localRecP->frameRateDen);
-		//theFrame = ((sourceVideoRec->inFrameTime / (PrTime)localRecP->frameRateDen) * (PrTime)localRecP->frameRateNum) / ticksPerSecond;
-
 		PrTime ticksPerFrame = (ticksPerSecond * (PrTime)localRecP->frameRateDen) / (PrTime)localRecP->frameRateNum;
 		theFrame = sourceVideoRec->inFrameTime / ticksPerFrame;
 	}
@@ -974,9 +958,6 @@ SDKGetSourceVideo(
 		
 		// Windows and MacOS have different definitions of Rects, so use the cross-platform prSetRect
 		prSetRect(&theRect, 0, 0, frameFormat->inFrameWidth, frameFormat->inFrameHeight);
-		//localRecP->PPixCreatorSuite->CreatePPix(sourceVideoRec->outFrame, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
-		//localRecP->PPixSuite->GetPixels(*sourceVideoRec->outFrame, PrPPixBufferAccess_ReadWrite, &frameBuffer);
-		//localRecP->PPixSuite->GetRowBytes(*sourceVideoRec->outFrame, &rowBytes);
 		
 
 		assert(localRecP->io.userdata == fileRef);
@@ -987,17 +968,17 @@ SDKGetSourceVideo(
 			uint64_t scale;
 			nestegg_tstamp_scale(localRecP->nestegg_ctx, &scale);
 			
-			uint64_t fps_num = localRecP->frameRateNum * localRecP->time_mult;
-			uint64_t fps_den = localRecP->frameRateDen * localRecP->time_mult;
+			const uint64_t fps_num = localRecP->frameRateNum * localRecP->time_mult;
+			const uint64_t fps_den = localRecP->frameRateDen * localRecP->time_mult;
 			
 			assert(scale == fps_den);
 			
 			uint64_t tstamp = ((uint64_t)theFrame * fps_den * 1000000000UL / fps_num);
-			uint64_t tstamp2 = (uint64_t)sourceVideoRec->inFrameTime * 1000UL / ((uint64_t)ticksPerSecond / 1000000UL);
+			uint64_t tstamp2 = (uint64_t)sourceVideoRec->inFrameTime * 1000UL / ((uint64_t)ticksPerSecond / 1000000UL); // alternate way of calculating it
 			
 			assert(tstamp == tstamp2);
 			
-			uint64_t half_frame_time = (1000000000UL * fps_den / fps_num) / 2; // half-a-frame
+			const uint64_t half_frame_time = (1000000000UL * fps_den / fps_num) / 2; // half-a-frame
 			
 			
 			int seek_err = nestegg_track_seek(localRecP->nestegg_ctx, localRecP->video_track, tstamp);
@@ -1013,20 +994,13 @@ SDKGetSourceVideo(
 				
 				vpx_codec_ctx_t decoder;
 				
-				vpx_codec_dec_cfg_t	cfg;
-				cfg.threads = 8;
-				cfg.w = frameFormat->inFrameWidth;
-				cfg.h = frameFormat->inFrameHeight;
-				
-				int dec_flags = VPX_CODEC_USE_FRAME_THREADING | VPX_CODEC_CAP_FRAME_THREADING;
-				
-				vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder, iface, &cfg, dec_flags);
+				vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder, iface, NULL, 0);
 				
 				if(codec_err == VPX_CODEC_OK)
 				{
 					nestegg_packet *pkt = NULL;
 					
-					uint64_t found_tstamp = 0;
+					uint64_t packet_tstamp = 0;
 					
 					int read_result = NESTEGG_SUCCESS;
 					int data_err = NESTEGG_ERR_NONE;
@@ -1048,7 +1022,7 @@ SDKGetSourceVideo(
 						
 						if(read_result == NESTEGG_SUCCESS)
 						{
-							nestegg_packet_tstamp(pkt, &found_tstamp);
+							nestegg_packet_tstamp(pkt, &packet_tstamp);
 							
 							unsigned int track;
 							nestegg_packet_track(pkt, &track);
@@ -1078,7 +1052,7 @@ SDKGetSourceVideo(
 											
 											if(decode_err == VPX_CODEC_OK)
 											{
-												csSDK_int32 decodedFrame = ((found_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+												csSDK_int32 decodedFrame = ((packet_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
 												
 												csSDK_int32 hopingforFrame = ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
 												assert(hopingforFrame == theFrame);
@@ -1093,6 +1067,8 @@ SDKGetSourceVideo(
 													
 													localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
 
+													assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709);
+													
 													char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 													csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
 													
@@ -1153,9 +1129,6 @@ SDKGetSourceVideo(
 					}while(!reached_iframe && read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK);
 					
 					
-					vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
-					assert(destroy_err == VPX_CODEC_OK);
-					
 					if(pkt)
 						nestegg_free_packet(pkt);
 					
@@ -1165,6 +1138,9 @@ SDKGetSourceVideo(
 				}
 				else
 					result = imBadCodec;
+					
+				vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
+				assert(destroy_err == VPX_CODEC_OK);
 			}
 			else
 				result = imFileReadFailed;
@@ -1193,9 +1169,6 @@ SDKImportAudio7(
 	stdParms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
-
-	PrTime ticksPerSecond = 0;
-	localRecP->TimeSuite->GetTicksPerSecond(&ticksPerSecond);
 
 	assert(localRecP->io.userdata == SDKfileRef);
 	assert(localRecP->nestegg_ctx != NULL);
@@ -1264,11 +1237,11 @@ SDKImportAudio7(
 					csSDK_uint32 samples_copied = 0;
 					csSDK_uint32 samples_left = audioRec7->size;
 					
-					uint64_t found_tstamp = 0;
+					uint64_t packet_tstamp = 0;
 					
 					int read_result = NESTEGG_SUCCESS;
 					int data_err = NESTEGG_ERR_NONE;
-
+					
 					do{
 						if(pkt)
 						{
@@ -1280,19 +1253,20 @@ SDKImportAudio7(
 						
 						if(read_result == NESTEGG_SUCCESS)
 						{
-							nestegg_packet_tstamp(pkt, &found_tstamp);
-							
-							PrAudioSample packet_start = localRecP->audioSampleRate * found_tstamp / 1000000000UL;
-							PrAudioSample packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
-							
-							if(packet_offset < 0)
-								packet_offset = 0;
+							nestegg_packet_tstamp(pkt, &packet_tstamp);
 							
 							unsigned int track;
 							nestegg_packet_track(pkt, &track);
 							
 							if(track == localRecP->audio_track)
 							{
+								PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+								
+								PrAudioSample packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+								
+								if(packet_offset < 0)
+									packet_offset = 0;
+							
 								unsigned int chunks;
 								nestegg_packet_count(pkt, &chunks);
 							
@@ -1340,7 +1314,7 @@ SDKImportAudio7(
 														samples_to_copy = (samples - packet_offset);
 													}
 												
-													// how nice, audio samples are float, which happens to be what Premiere wants
+													// how nice, audio samples are float, just like Premiere wants 'em
 													for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
 													{
 														memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
