@@ -215,11 +215,8 @@
 		2A550D6E1768193300BE5A72 /* vp9_alloccommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B001768193300BE5A72 /* vp9_alloccommon.c */; };
 		2A550D6F1768193300BE5A72 /* vp9_alloccommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B011768193300BE5A72 /* vp9_alloccommon.h */; };
 		2A550D701768193300BE5A72 /* vp9_asm_com_offsets.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B021768193300BE5A72 /* vp9_asm_com_offsets.c */; };
-		2A550D711768193300BE5A72 /* vp9_blockd.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B031768193300BE5A72 /* vp9_blockd.c */; };
 		2A550D721768193300BE5A72 /* vp9_blockd.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B041768193300BE5A72 /* vp9_blockd.h */; };
-		2A550D731768193300BE5A72 /* vp9_coefupdateprobs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B051768193300BE5A72 /* vp9_coefupdateprobs.h */; };
 		2A550D741768193300BE5A72 /* vp9_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B061768193300BE5A72 /* vp9_common.h */; };
-		2A550D751768193300BE5A72 /* vp9_context.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B071768193300BE5A72 /* vp9_context.c */; };
 		2A550D761768193300BE5A72 /* vp9_convolve.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B081768193300BE5A72 /* vp9_convolve.c */; };
 		2A550D771768193300BE5A72 /* vp9_convolve.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B091768193300BE5A72 /* vp9_convolve.h */; };
 		2A550D781768193300BE5A72 /* vp9_debugmodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B0A1768193300BE5A72 /* vp9_debugmodes.c */; };
@@ -236,7 +233,6 @@
 		2A550D831768193300BE5A72 /* vp9_filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B151768193300BE5A72 /* vp9_filter.h */; };
 		2A550D841768193300BE5A72 /* vp9_findnearmv.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B161768193300BE5A72 /* vp9_findnearmv.c */; };
 		2A550D851768193300BE5A72 /* vp9_findnearmv.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B171768193300BE5A72 /* vp9_findnearmv.h */; };
-		2A550D861768193300BE5A72 /* vp9_header.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B181768193300BE5A72 /* vp9_header.h */; };
 		2A550D871768193300BE5A72 /* vp9_idct.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B191768193300BE5A72 /* vp9_idct.c */; };
 		2A550D881768193300BE5A72 /* vp9_idct.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B1A1768193300BE5A72 /* vp9_idct.h */; };
 		2A550D891768193300BE5A72 /* vp9_implicit_segmentation.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B1B1768193300BE5A72 /* vp9_implicit_segmentation.c */; };
@@ -263,21 +259,15 @@
 		2A550D9E1768193300BE5A72 /* vp9_pred_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B301768193300BE5A72 /* vp9_pred_common.h */; };
 		2A550D9F1768193300BE5A72 /* vp9_quant_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B311768193300BE5A72 /* vp9_quant_common.c */; };
 		2A550DA01768193300BE5A72 /* vp9_quant_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B321768193300BE5A72 /* vp9_quant_common.h */; };
-		2A550DA11768193300BE5A72 /* vp9_recon.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B331768193300BE5A72 /* vp9_recon.c */; };
 		2A550DA21768193300BE5A72 /* vp9_reconinter.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B341768193300BE5A72 /* vp9_reconinter.c */; };
 		2A550DA31768193300BE5A72 /* vp9_reconinter.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B351768193300BE5A72 /* vp9_reconinter.h */; };
 		2A550DA41768193300BE5A72 /* vp9_reconintra.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B361768193300BE5A72 /* vp9_reconintra.c */; };
 		2A550DA51768193300BE5A72 /* vp9_reconintra.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B371768193300BE5A72 /* vp9_reconintra.h */; };
-		2A550DA61768193300BE5A72 /* vp9_reconintra4x4.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B381768193300BE5A72 /* vp9_reconintra4x4.c */; };
 		2A550DA71768193300BE5A72 /* vp9_rtcd.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B391768193300BE5A72 /* vp9_rtcd.c */; };
 		2A550DA81768193300BE5A72 /* vp9_sadmxn.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */; };
 		2A550DA91768193300BE5A72 /* vp9_seg_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B3B1768193300BE5A72 /* vp9_seg_common.c */; };
 		2A550DAA1768193300BE5A72 /* vp9_seg_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3C1768193300BE5A72 /* vp9_seg_common.h */; };
-		2A550DAB1768193300BE5A72 /* vp9_setupintrarecon.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B3D1768193300BE5A72 /* vp9_setupintrarecon.c */; };
-		2A550DAC1768193300BE5A72 /* vp9_setupintrarecon.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3E1768193300BE5A72 /* vp9_setupintrarecon.h */; };
 		2A550DAD1768193300BE5A72 /* vp9_subpelvar.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3F1768193300BE5A72 /* vp9_subpelvar.h */; };
-		2A550DAE1768193300BE5A72 /* vp9_swapyv12buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B401768193300BE5A72 /* vp9_swapyv12buffer.c */; };
-		2A550DAF1768193300BE5A72 /* vp9_swapyv12buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B411768193300BE5A72 /* vp9_swapyv12buffer.h */; };
 		2A550DB11768193300BE5A72 /* vp9_textblit.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B441768193300BE5A72 /* vp9_textblit.c */; };
 		2A550DB21768193300BE5A72 /* vp9_textblit.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B451768193300BE5A72 /* vp9_textblit.h */; };
 		2A550DB31768193300BE5A72 /* vp9_tile_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B461768193300BE5A72 /* vp9_tile_common.c */; };
@@ -286,10 +276,8 @@
 		2A550DB61768193300BE5A72 /* vp9_treecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B491768193300BE5A72 /* vp9_treecoder.h */; };
 		2A550DB71768193300BE5A72 /* vp9_asm_stubs.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4B1768193300BE5A72 /* vp9_asm_stubs.c */; };
 		2A550DB81768193300BE5A72 /* vp9_idct_intrin_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */; };
-		2A550DB91768193300BE5A72 /* vp9_idct_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4D1768193300BE5A72 /* vp9_idct_sse2.asm */; };
 		2A550DBA1768193300BE5A72 /* vp9_iwalsh_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4E1768193300BE5A72 /* vp9_iwalsh_mmx.asm */; };
 		2A550DBB1768193300BE5A72 /* vp9_iwalsh_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4F1768193300BE5A72 /* vp9_iwalsh_sse2.asm */; };
-		2A550DBC1768193300BE5A72 /* vp9_loopfilter_intrin_mmx.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B501768193300BE5A72 /* vp9_loopfilter_intrin_mmx.c */; };
 		2A550DBD1768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B511768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c */; };
 		2A550DBE1768193300BE5A72 /* vp9_loopfilter_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B521768193300BE5A72 /* vp9_loopfilter_mmx.asm */; };
 		2A550DBF1768193300BE5A72 /* vp9_loopfilter_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B531768193300BE5A72 /* vp9_loopfilter_sse2.asm */; };
@@ -311,8 +299,6 @@
 		2A550DD01768193300BE5A72 /* vp9_decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B651768193300BE5A72 /* vp9_decodemv.h */; };
 		2A550DD11768193300BE5A72 /* vp9_decodframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B661768193300BE5A72 /* vp9_decodframe.c */; };
 		2A550DD21768193300BE5A72 /* vp9_decodframe.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B671768193300BE5A72 /* vp9_decodframe.h */; };
-		2A550DD31768193300BE5A72 /* vp9_dequantize.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B681768193300BE5A72 /* vp9_dequantize.c */; };
-		2A550DD41768193300BE5A72 /* vp9_dequantize.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B691768193300BE5A72 /* vp9_dequantize.h */; };
 		2A550DD51768193300BE5A72 /* vp9_detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6A1768193300BE5A72 /* vp9_detokenize.c */; };
 		2A550DD61768193300BE5A72 /* vp9_detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6B1768193300BE5A72 /* vp9_detokenize.h */; };
 		2A550DD71768193300BE5A72 /* vp9_idct_blk.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6C1768193300BE5A72 /* vp9_idct_blk.c */; };
@@ -321,7 +307,6 @@
 		2A550DDA1768193300BE5A72 /* vp9_onyxd_int.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */; };
 		2A550DDB1768193300BE5A72 /* vp9_treereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B701768193300BE5A72 /* vp9_treereader.h */; };
 		2A550DDC1768193300BE5A72 /* vp9_dequantize_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B721768193300BE5A72 /* vp9_dequantize_sse2.c */; };
-		2A550DDD1768193300BE5A72 /* vp9_idct_blk_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B731768193300BE5A72 /* vp9_idct_blk_sse2.c */; };
 		2A550DE51768193300BE5A72 /* vp9_asm_enc_offsets.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B7D1768193300BE5A72 /* vp9_asm_enc_offsets.c */; };
 		2A550DE61768193300BE5A72 /* vp9_bitstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B7E1768193300BE5A72 /* vp9_bitstream.c */; };
 		2A550DE71768193300BE5A72 /* vp9_bitstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B7F1768193300BE5A72 /* vp9_bitstream.h */; };
@@ -377,7 +362,6 @@
 		2A550E191768193300BE5A72 /* vp9_encodeopt.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BB21768193300BE5A72 /* vp9_encodeopt.asm */; };
 		2A550E1A1768193300BE5A72 /* vp9_fwalsh_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BB31768193300BE5A72 /* vp9_fwalsh_sse2.asm */; };
 		2A550E1B1768193300BE5A72 /* vp9_mcomp_x86.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BB41768193300BE5A72 /* vp9_mcomp_x86.h */; };
-		2A550E1C1768193300BE5A72 /* vp9_quantize_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BB51768193300BE5A72 /* vp9_quantize_mmx.asm */; };
 		2A550E211768193300BE5A72 /* vp9_sad4d_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBA1768193300BE5A72 /* vp9_sad4d_sse2.asm */; };
 		2A550E221768193300BE5A72 /* vp9_sad_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBB1768193300BE5A72 /* vp9_sad_mmx.asm */; };
 		2A550E231768193300BE5A72 /* vp9_sad_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBC1768193300BE5A72 /* vp9_sad_sse2.asm */; };
@@ -794,23 +778,11 @@
 		2A550AF01768193200BE5A72 /* vp8_multi_resolution_encoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp8_multi_resolution_encoder.c; sourceTree = "<group>"; };
 		2A550AF11768193200BE5A72 /* vp8_scalable_patterns.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp8_scalable_patterns.c; sourceTree = "<group>"; };
 		2A550AF51768193200BE5A72 /* vp9_systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_systemdependent.c; sourceTree = "<group>"; };
-		2A550AF71768193200BE5A72 /* vp9_copy_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_copy_altivec.asm; sourceTree = "<group>"; };
-		2A550AF81768193300BE5A72 /* vp9_filter_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_filter_altivec.asm; sourceTree = "<group>"; };
-		2A550AF91768193300BE5A72 /* vp9_filter_bilinear_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_filter_bilinear_altivec.asm; sourceTree = "<group>"; };
-		2A550AFA1768193300BE5A72 /* vp9_idct_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_idct_altivec.asm; sourceTree = "<group>"; };
-		2A550AFB1768193300BE5A72 /* vp9_loopfilter_altivec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_loopfilter_altivec.c; sourceTree = "<group>"; };
-		2A550AFC1768193300BE5A72 /* vp9_loopfilter_filters_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_loopfilter_filters_altivec.asm; sourceTree = "<group>"; };
-		2A550AFD1768193300BE5A72 /* vp9_platform_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_platform_altivec.asm; sourceTree = "<group>"; };
-		2A550AFE1768193300BE5A72 /* vp9_recon_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_recon_altivec.asm; sourceTree = "<group>"; };
-		2A550AFF1768193300BE5A72 /* vp9_systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_systemdependent.c; sourceTree = "<group>"; };
 		2A550B001768193300BE5A72 /* vp9_alloccommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_alloccommon.c; sourceTree = "<group>"; };
 		2A550B011768193300BE5A72 /* vp9_alloccommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_alloccommon.h; sourceTree = "<group>"; };
 		2A550B021768193300BE5A72 /* vp9_asm_com_offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_asm_com_offsets.c; sourceTree = "<group>"; };
-		2A550B031768193300BE5A72 /* vp9_blockd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_blockd.c; sourceTree = "<group>"; };
 		2A550B041768193300BE5A72 /* vp9_blockd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_blockd.h; sourceTree = "<group>"; };
-		2A550B051768193300BE5A72 /* vp9_coefupdateprobs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_coefupdateprobs.h; sourceTree = "<group>"; };
 		2A550B061768193300BE5A72 /* vp9_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_common.h; sourceTree = "<group>"; };
-		2A550B071768193300BE5A72 /* vp9_context.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_context.c; sourceTree = "<group>"; };
 		2A550B081768193300BE5A72 /* vp9_convolve.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_convolve.c; sourceTree = "<group>"; };
 		2A550B091768193300BE5A72 /* vp9_convolve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_convolve.h; sourceTree = "<group>"; };
 		2A550B0A1768193300BE5A72 /* vp9_debugmodes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_debugmodes.c; sourceTree = "<group>"; };
@@ -827,7 +799,6 @@
 		2A550B151768193300BE5A72 /* vp9_filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_filter.h; sourceTree = "<group>"; };
 		2A550B161768193300BE5A72 /* vp9_findnearmv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_findnearmv.c; sourceTree = "<group>"; };
 		2A550B171768193300BE5A72 /* vp9_findnearmv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_findnearmv.h; sourceTree = "<group>"; };
-		2A550B181768193300BE5A72 /* vp9_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_header.h; sourceTree = "<group>"; };
 		2A550B191768193300BE5A72 /* vp9_idct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct.c; sourceTree = "<group>"; };
 		2A550B1A1768193300BE5A72 /* vp9_idct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_idct.h; sourceTree = "<group>"; };
 		2A550B1B1768193300BE5A72 /* vp9_implicit_segmentation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_implicit_segmentation.c; sourceTree = "<group>"; };
@@ -854,21 +825,15 @@
 		2A550B301768193300BE5A72 /* vp9_pred_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_pred_common.h; sourceTree = "<group>"; };
 		2A550B311768193300BE5A72 /* vp9_quant_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_quant_common.c; sourceTree = "<group>"; };
 		2A550B321768193300BE5A72 /* vp9_quant_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_quant_common.h; sourceTree = "<group>"; };
-		2A550B331768193300BE5A72 /* vp9_recon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_recon.c; sourceTree = "<group>"; };
 		2A550B341768193300BE5A72 /* vp9_reconinter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_reconinter.c; sourceTree = "<group>"; };
 		2A550B351768193300BE5A72 /* vp9_reconinter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_reconinter.h; sourceTree = "<group>"; };
 		2A550B361768193300BE5A72 /* vp9_reconintra.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_reconintra.c; sourceTree = "<group>"; };
 		2A550B371768193300BE5A72 /* vp9_reconintra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_reconintra.h; sourceTree = "<group>"; };
-		2A550B381768193300BE5A72 /* vp9_reconintra4x4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_reconintra4x4.c; sourceTree = "<group>"; };
 		2A550B391768193300BE5A72 /* vp9_rtcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_rtcd.c; sourceTree = "<group>"; };
 		2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_sadmxn.h; sourceTree = "<group>"; };
 		2A550B3B1768193300BE5A72 /* vp9_seg_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_seg_common.c; sourceTree = "<group>"; };
 		2A550B3C1768193300BE5A72 /* vp9_seg_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_seg_common.h; sourceTree = "<group>"; };
-		2A550B3D1768193300BE5A72 /* vp9_setupintrarecon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_setupintrarecon.c; sourceTree = "<group>"; };
-		2A550B3E1768193300BE5A72 /* vp9_setupintrarecon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_setupintrarecon.h; sourceTree = "<group>"; };
 		2A550B3F1768193300BE5A72 /* vp9_subpelvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_subpelvar.h; sourceTree = "<group>"; };
-		2A550B401768193300BE5A72 /* vp9_swapyv12buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_swapyv12buffer.c; sourceTree = "<group>"; };
-		2A550B411768193300BE5A72 /* vp9_swapyv12buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_swapyv12buffer.h; sourceTree = "<group>"; };
 		2A550B421768193300BE5A72 /* vp9_systemdependent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_systemdependent.h; sourceTree = "<group>"; };
 		2A550B431768193300BE5A72 /* vp9_tapify.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = vp9_tapify.py; sourceTree = "<group>"; };
 		2A550B441768193300BE5A72 /* vp9_textblit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_textblit.c; sourceTree = "<group>"; };
@@ -879,10 +844,8 @@
 		2A550B491768193300BE5A72 /* vp9_treecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_treecoder.h; sourceTree = "<group>"; };
 		2A550B4B1768193300BE5A72 /* vp9_asm_stubs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_asm_stubs.c; sourceTree = "<group>"; };
 		2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct_intrin_sse2.c; sourceTree = "<group>"; };
-		2A550B4D1768193300BE5A72 /* vp9_idct_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_idct_sse2.asm; sourceTree = "<group>"; };
 		2A550B4E1768193300BE5A72 /* vp9_iwalsh_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_iwalsh_mmx.asm; sourceTree = "<group>"; };
 		2A550B4F1768193300BE5A72 /* vp9_iwalsh_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_iwalsh_sse2.asm; sourceTree = "<group>"; };
-		2A550B501768193300BE5A72 /* vp9_loopfilter_intrin_mmx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_loopfilter_intrin_mmx.c; sourceTree = "<group>"; };
 		2A550B511768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_loopfilter_intrin_sse2.c; sourceTree = "<group>"; };
 		2A550B521768193300BE5A72 /* vp9_loopfilter_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_loopfilter_mmx.asm; sourceTree = "<group>"; };
 		2A550B531768193300BE5A72 /* vp9_loopfilter_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_loopfilter_sse2.asm; sourceTree = "<group>"; };
@@ -905,8 +868,6 @@
 		2A550B651768193300BE5A72 /* vp9_decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodemv.h; sourceTree = "<group>"; };
 		2A550B661768193300BE5A72 /* vp9_decodframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_decodframe.c; sourceTree = "<group>"; };
 		2A550B671768193300BE5A72 /* vp9_decodframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodframe.h; sourceTree = "<group>"; };
-		2A550B681768193300BE5A72 /* vp9_dequantize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dequantize.c; sourceTree = "<group>"; };
-		2A550B691768193300BE5A72 /* vp9_dequantize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_dequantize.h; sourceTree = "<group>"; };
 		2A550B6A1768193300BE5A72 /* vp9_detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_detokenize.c; sourceTree = "<group>"; };
 		2A550B6B1768193300BE5A72 /* vp9_detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_detokenize.h; sourceTree = "<group>"; };
 		2A550B6C1768193300BE5A72 /* vp9_idct_blk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct_blk.c; sourceTree = "<group>"; };
@@ -915,14 +876,6 @@
 		2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_onyxd_int.h; sourceTree = "<group>"; };
 		2A550B701768193300BE5A72 /* vp9_treereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_treereader.h; sourceTree = "<group>"; };
 		2A550B721768193300BE5A72 /* vp9_dequantize_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dequantize_sse2.c; sourceTree = "<group>"; };
-		2A550B731768193300BE5A72 /* vp9_idct_blk_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct_blk_sse2.c; sourceTree = "<group>"; };
-		2A550B761768193300BE5A72 /* vp9_csystemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_csystemdependent.c; sourceTree = "<group>"; };
-		2A550B771768193300BE5A72 /* vp9_encodemb_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_encodemb_altivec.asm; sourceTree = "<group>"; };
-		2A550B781768193300BE5A72 /* vp9_fdct_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_fdct_altivec.asm; sourceTree = "<group>"; };
-		2A550B791768193300BE5A72 /* vp9_rdopt_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_rdopt_altivec.asm; sourceTree = "<group>"; };
-		2A550B7A1768193300BE5A72 /* vp9_sad_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_altivec.asm; sourceTree = "<group>"; };
-		2A550B7B1768193300BE5A72 /* vp9_variance_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_variance_altivec.asm; sourceTree = "<group>"; };
-		2A550B7C1768193300BE5A72 /* vp9_variance_subpixel_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_variance_subpixel_altivec.asm; sourceTree = "<group>"; };
 		2A550B7D1768193300BE5A72 /* vp9_asm_enc_offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_asm_enc_offsets.c; sourceTree = "<group>"; };
 		2A550B7E1768193300BE5A72 /* vp9_bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_bitstream.c; sourceTree = "<group>"; };
 		2A550B7F1768193300BE5A72 /* vp9_bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_bitstream.h; sourceTree = "<group>"; };
@@ -978,11 +931,6 @@
 		2A550BB21768193300BE5A72 /* vp9_encodeopt.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_encodeopt.asm; sourceTree = "<group>"; };
 		2A550BB31768193300BE5A72 /* vp9_fwalsh_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_fwalsh_sse2.asm; sourceTree = "<group>"; };
 		2A550BB41768193300BE5A72 /* vp9_mcomp_x86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_mcomp_x86.h; sourceTree = "<group>"; };
-		2A550BB51768193300BE5A72 /* vp9_quantize_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_quantize_mmx.asm; sourceTree = "<group>"; };
-		2A550BB61768193300BE5A72 /* vp9_quantize_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_quantize_sse2.asm; sourceTree = "<group>"; };
-		2A550BB71768193300BE5A72 /* vp9_quantize_sse4.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_quantize_sse4.asm; sourceTree = "<group>"; };
-		2A550BB81768193300BE5A72 /* vp9_quantize_ssse3.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_quantize_ssse3.asm; sourceTree = "<group>"; };
-		2A550BB91768193300BE5A72 /* vp9_quantize_x86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_quantize_x86.h; sourceTree = "<group>"; };
 		2A550BBA1768193300BE5A72 /* vp9_sad4d_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad4d_sse2.asm; sourceTree = "<group>"; };
 		2A550BBB1768193300BE5A72 /* vp9_sad_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_mmx.asm; sourceTree = "<group>"; };
 		2A550BBC1768193300BE5A72 /* vp9_sad_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_sse2.asm; sourceTree = "<group>"; };
@@ -1744,15 +1692,11 @@
 			isa = PBXGroup;
 			children = (
 				2A550AF41768193200BE5A72 /* generic */,
-				2A550AF61768193200BE5A72 /* ppc */,
 				2A550B001768193300BE5A72 /* vp9_alloccommon.c */,
 				2A550B011768193300BE5A72 /* vp9_alloccommon.h */,
 				2A550B021768193300BE5A72 /* vp9_asm_com_offsets.c */,
-				2A550B031768193300BE5A72 /* vp9_blockd.c */,
 				2A550B041768193300BE5A72 /* vp9_blockd.h */,
-				2A550B051768193300BE5A72 /* vp9_coefupdateprobs.h */,
 				2A550B061768193300BE5A72 /* vp9_common.h */,
-				2A550B071768193300BE5A72 /* vp9_context.c */,
 				2A550B081768193300BE5A72 /* vp9_convolve.c */,
 				2A550B091768193300BE5A72 /* vp9_convolve.h */,
 				2A550B0A1768193300BE5A72 /* vp9_debugmodes.c */,
@@ -1769,7 +1713,6 @@
 				2A550B151768193300BE5A72 /* vp9_filter.h */,
 				2A550B161768193300BE5A72 /* vp9_findnearmv.c */,
 				2A550B171768193300BE5A72 /* vp9_findnearmv.h */,
-				2A550B181768193300BE5A72 /* vp9_header.h */,
 				2A550B191768193300BE5A72 /* vp9_idct.c */,
 				2A550B1A1768193300BE5A72 /* vp9_idct.h */,
 				2A550B1B1768193300BE5A72 /* vp9_implicit_segmentation.c */,
@@ -1796,21 +1739,15 @@
 				2A550B301768193300BE5A72 /* vp9_pred_common.h */,
 				2A550B311768193300BE5A72 /* vp9_quant_common.c */,
 				2A550B321768193300BE5A72 /* vp9_quant_common.h */,
-				2A550B331768193300BE5A72 /* vp9_recon.c */,
 				2A550B341768193300BE5A72 /* vp9_reconinter.c */,
 				2A550B351768193300BE5A72 /* vp9_reconinter.h */,
 				2A550B361768193300BE5A72 /* vp9_reconintra.c */,
 				2A550B371768193300BE5A72 /* vp9_reconintra.h */,
-				2A550B381768193300BE5A72 /* vp9_reconintra4x4.c */,
 				2A550B391768193300BE5A72 /* vp9_rtcd.c */,
 				2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */,
 				2A550B3B1768193300BE5A72 /* vp9_seg_common.c */,
 				2A550B3C1768193300BE5A72 /* vp9_seg_common.h */,
-				2A550B3D1768193300BE5A72 /* vp9_setupintrarecon.c */,
-				2A550B3E1768193300BE5A72 /* vp9_setupintrarecon.h */,
 				2A550B3F1768193300BE5A72 /* vp9_subpelvar.h */,
-				2A550B401768193300BE5A72 /* vp9_swapyv12buffer.c */,
-				2A550B411768193300BE5A72 /* vp9_swapyv12buffer.h */,
 				2A550B421768193300BE5A72 /* vp9_systemdependent.h */,
 				2A550B431768193300BE5A72 /* vp9_tapify.py */,
 				2A550B441768193300BE5A72 /* vp9_textblit.c */,
@@ -1832,31 +1769,13 @@
 			path = generic;
 			sourceTree = "<group>";
 		};
-		2A550AF61768193200BE5A72 /* ppc */ = {
-			isa = PBXGroup;
-			children = (
-				2A550AF71768193200BE5A72 /* vp9_copy_altivec.asm */,
-				2A550AF81768193300BE5A72 /* vp9_filter_altivec.asm */,
-				2A550AF91768193300BE5A72 /* vp9_filter_bilinear_altivec.asm */,
-				2A550AFA1768193300BE5A72 /* vp9_idct_altivec.asm */,
-				2A550AFB1768193300BE5A72 /* vp9_loopfilter_altivec.c */,
-				2A550AFC1768193300BE5A72 /* vp9_loopfilter_filters_altivec.asm */,
-				2A550AFD1768193300BE5A72 /* vp9_platform_altivec.asm */,
-				2A550AFE1768193300BE5A72 /* vp9_recon_altivec.asm */,
-				2A550AFF1768193300BE5A72 /* vp9_systemdependent.c */,
-			);
-			path = ppc;
-			sourceTree = "<group>";
-		};
 		2A550B4A1768193300BE5A72 /* x86 */ = {
 			isa = PBXGroup;
 			children = (
 				2A550B4B1768193300BE5A72 /* vp9_asm_stubs.c */,
 				2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */,
-				2A550B4D1768193300BE5A72 /* vp9_idct_sse2.asm */,
 				2A550B4E1768193300BE5A72 /* vp9_iwalsh_mmx.asm */,
 				2A550B4F1768193300BE5A72 /* vp9_iwalsh_sse2.asm */,
-				2A550B501768193300BE5A72 /* vp9_loopfilter_intrin_mmx.c */,
 				2A550B511768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c */,
 				2A550B521768193300BE5A72 /* vp9_loopfilter_mmx.asm */,
 				2A550B531768193300BE5A72 /* vp9_loopfilter_sse2.asm */,
@@ -1886,8 +1805,6 @@
 				2A550B651768193300BE5A72 /* vp9_decodemv.h */,
 				2A550B661768193300BE5A72 /* vp9_decodframe.c */,
 				2A550B671768193300BE5A72 /* vp9_decodframe.h */,
-				2A550B681768193300BE5A72 /* vp9_dequantize.c */,
-				2A550B691768193300BE5A72 /* vp9_dequantize.h */,
 				2A550B6A1768193300BE5A72 /* vp9_detokenize.c */,
 				2A550B6B1768193300BE5A72 /* vp9_detokenize.h */,
 				2A550B6C1768193300BE5A72 /* vp9_idct_blk.c */,
@@ -1904,7 +1821,6 @@
 			isa = PBXGroup;
 			children = (
 				2A550B721768193300BE5A72 /* vp9_dequantize_sse2.c */,
-				2A550B731768193300BE5A72 /* vp9_idct_blk_sse2.c */,
 			);
 			path = x86;
 			sourceTree = "<group>";
@@ -1912,7 +1828,6 @@
 		2A550B741768193300BE5A72 /* encoder */ = {
 			isa = PBXGroup;
 			children = (
-				2A550B751768193300BE5A72 /* ppc */,
 				2A550B7D1768193300BE5A72 /* vp9_asm_enc_offsets.c */,
 				2A550B7E1768193300BE5A72 /* vp9_bitstream.c */,
 				2A550B7F1768193300BE5A72 /* vp9_bitstream.h */,
@@ -1967,20 +1882,6 @@
 			path = encoder;
 			sourceTree = "<group>";
 		};
-		2A550B751768193300BE5A72 /* ppc */ = {
-			isa = PBXGroup;
-			children = (
-				2A550B761768193300BE5A72 /* vp9_csystemdependent.c */,
-				2A550B771768193300BE5A72 /* vp9_encodemb_altivec.asm */,
-				2A550B781768193300BE5A72 /* vp9_fdct_altivec.asm */,
-				2A550B791768193300BE5A72 /* vp9_rdopt_altivec.asm */,
-				2A550B7A1768193300BE5A72 /* vp9_sad_altivec.asm */,
-				2A550B7B1768193300BE5A72 /* vp9_variance_altivec.asm */,
-				2A550B7C1768193300BE5A72 /* vp9_variance_subpixel_altivec.asm */,
-			);
-			path = ppc;
-			sourceTree = "<group>";
-		};
 		2A550BAE1768193300BE5A72 /* x86 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1990,11 +1891,6 @@
 				2A550BB21768193300BE5A72 /* vp9_encodeopt.asm */,
 				2A550BB31768193300BE5A72 /* vp9_fwalsh_sse2.asm */,
 				2A550BB41768193300BE5A72 /* vp9_mcomp_x86.h */,
-				2A550BB51768193300BE5A72 /* vp9_quantize_mmx.asm */,
-				2A550BB61768193300BE5A72 /* vp9_quantize_sse2.asm */,
-				2A550BB71768193300BE5A72 /* vp9_quantize_sse4.asm */,
-				2A550BB81768193300BE5A72 /* vp9_quantize_ssse3.asm */,
-				2A550BB91768193300BE5A72 /* vp9_quantize_x86.h */,
 				2A550BBA1768193300BE5A72 /* vp9_sad4d_sse2.asm */,
 				2A550BBB1768193300BE5A72 /* vp9_sad_mmx.asm */,
 				2A550BBC1768193300BE5A72 /* vp9_sad_sse2.asm */,
@@ -2268,7 +2164,6 @@
 				2A550D4F1768193300BE5A72 /* treewriter.h in Headers */,
 				2A550D6F1768193300BE5A72 /* vp9_alloccommon.h in Headers */,
 				2A550D721768193300BE5A72 /* vp9_blockd.h in Headers */,
-				2A550D731768193300BE5A72 /* vp9_coefupdateprobs.h in Headers */,
 				2A550D741768193300BE5A72 /* vp9_common.h in Headers */,
 				2A550D771768193300BE5A72 /* vp9_convolve.h in Headers */,
 				2A550D791768193300BE5A72 /* vp9_default_coef_probs.h in Headers */,
@@ -2278,7 +2173,6 @@
 				2A550D811768193300BE5A72 /* vp9_extend.h in Headers */,
 				2A550D831768193300BE5A72 /* vp9_filter.h in Headers */,
 				2A550D851768193300BE5A72 /* vp9_findnearmv.h in Headers */,
-				2A550D861768193300BE5A72 /* vp9_header.h in Headers */,
 				2A550D881768193300BE5A72 /* vp9_idct.h in Headers */,
 				2A550D8B1768193300BE5A72 /* vp9_invtrans.h in Headers */,
 				2A550D8D1768193300BE5A72 /* vp9_loopfilter.h in Headers */,
@@ -2296,9 +2190,7 @@
 				2A550DA51768193300BE5A72 /* vp9_reconintra.h in Headers */,
 				2A550DA81768193300BE5A72 /* vp9_sadmxn.h in Headers */,
 				2A550DAA1768193300BE5A72 /* vp9_seg_common.h in Headers */,
-				2A550DAC1768193300BE5A72 /* vp9_setupintrarecon.h in Headers */,
 				2A550DAD1768193300BE5A72 /* vp9_subpelvar.h in Headers */,
-				2A550DAF1768193300BE5A72 /* vp9_swapyv12buffer.h in Headers */,
 				2A550DB21768193300BE5A72 /* vp9_textblit.h in Headers */,
 				2A550DB41768193300BE5A72 /* vp9_tile_common.h in Headers */,
 				2A550DB61768193300BE5A72 /* vp9_treecoder.h in Headers */,
@@ -2307,7 +2199,6 @@
 				2A550DCE1768193300BE5A72 /* vp9_dboolhuff.h in Headers */,
 				2A550DD01768193300BE5A72 /* vp9_decodemv.h in Headers */,
 				2A550DD21768193300BE5A72 /* vp9_decodframe.h in Headers */,
-				2A550DD41768193300BE5A72 /* vp9_dequantize.h in Headers */,
 				2A550DD61768193300BE5A72 /* vp9_detokenize.h in Headers */,
 				2A550DD81768193300BE5A72 /* vp9_onyxd.h in Headers */,
 				2A550DDA1768193300BE5A72 /* vp9_onyxd_int.h in Headers */,
@@ -2555,8 +2446,6 @@
 				2A550D611768193300BE5A72 /* vp8_dx_iface.c in Sources */,
 				2A550D6E1768193300BE5A72 /* vp9_alloccommon.c in Sources */,
 				2A550D701768193300BE5A72 /* vp9_asm_com_offsets.c in Sources */,
-				2A550D711768193300BE5A72 /* vp9_blockd.c in Sources */,
-				2A550D751768193300BE5A72 /* vp9_context.c in Sources */,
 				2A550D761768193300BE5A72 /* vp9_convolve.c in Sources */,
 				2A550D781768193300BE5A72 /* vp9_debugmodes.c in Sources */,
 				2A550D7A1768193300BE5A72 /* vp9_entropy.c in Sources */,
@@ -2578,23 +2467,17 @@
 				2A550D991768193300BE5A72 /* vp9_postproc.c in Sources */,
 				2A550D9D1768193300BE5A72 /* vp9_pred_common.c in Sources */,
 				2A550D9F1768193300BE5A72 /* vp9_quant_common.c in Sources */,
-				2A550DA11768193300BE5A72 /* vp9_recon.c in Sources */,
 				2A550DA21768193300BE5A72 /* vp9_reconinter.c in Sources */,
 				2A550DA41768193300BE5A72 /* vp9_reconintra.c in Sources */,
-				2A550DA61768193300BE5A72 /* vp9_reconintra4x4.c in Sources */,
 				2A550DA71768193300BE5A72 /* vp9_rtcd.c in Sources */,
 				2A550DA91768193300BE5A72 /* vp9_seg_common.c in Sources */,
-				2A550DAB1768193300BE5A72 /* vp9_setupintrarecon.c in Sources */,
-				2A550DAE1768193300BE5A72 /* vp9_swapyv12buffer.c in Sources */,
 				2A550DB11768193300BE5A72 /* vp9_textblit.c in Sources */,
 				2A550DB31768193300BE5A72 /* vp9_tile_common.c in Sources */,
 				2A550DB51768193300BE5A72 /* vp9_treecoder.c in Sources */,
 				2A550DB71768193300BE5A72 /* vp9_asm_stubs.c in Sources */,
 				2A550DB81768193300BE5A72 /* vp9_idct_intrin_sse2.c in Sources */,
-				2A550DB91768193300BE5A72 /* vp9_idct_sse2.asm in Sources */,
 				2A550DBA1768193300BE5A72 /* vp9_iwalsh_mmx.asm in Sources */,
 				2A550DBB1768193300BE5A72 /* vp9_iwalsh_sse2.asm in Sources */,
-				2A550DBC1768193300BE5A72 /* vp9_loopfilter_intrin_mmx.c in Sources */,
 				2A550DBD1768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c in Sources */,
 				2A550DBE1768193300BE5A72 /* vp9_loopfilter_mmx.asm in Sources */,
 				2A550DBF1768193300BE5A72 /* vp9_loopfilter_sse2.asm in Sources */,
@@ -2611,12 +2494,10 @@
 				2A550DCD1768193300BE5A72 /* vp9_dboolhuff.c in Sources */,
 				2A550DCF1768193300BE5A72 /* vp9_decodemv.c in Sources */,
 				2A550DD11768193300BE5A72 /* vp9_decodframe.c in Sources */,
-				2A550DD31768193300BE5A72 /* vp9_dequantize.c in Sources */,
 				2A550DD51768193300BE5A72 /* vp9_detokenize.c in Sources */,
 				2A550DD71768193300BE5A72 /* vp9_idct_blk.c in Sources */,
 				2A550DD91768193300BE5A72 /* vp9_onyxd_if.c in Sources */,
 				2A550DDC1768193300BE5A72 /* vp9_dequantize_sse2.c in Sources */,
-				2A550DDD1768193300BE5A72 /* vp9_idct_blk_sse2.c in Sources */,
 				2A550DE51768193300BE5A72 /* vp9_asm_enc_offsets.c in Sources */,
 				2A550DE61768193300BE5A72 /* vp9_bitstream.c in Sources */,
 				2A550DE91768193300BE5A72 /* vp9_boolhuff.c in Sources */,
@@ -2647,7 +2528,6 @@
 				2A550E181768193300BE5A72 /* vp9_dct_sse2.c in Sources */,
 				2A550E191768193300BE5A72 /* vp9_encodeopt.asm in Sources */,
 				2A550E1A1768193300BE5A72 /* vp9_fwalsh_sse2.asm in Sources */,
-				2A550E1C1768193300BE5A72 /* vp9_quantize_mmx.asm in Sources */,
 				2A550E211768193300BE5A72 /* vp9_sad4d_sse2.asm in Sources */,
 				2A550E221768193300BE5A72 /* vp9_sad_mmx.asm in Sources */,
 				2A550E231768193300BE5A72 /* vp9_sad_sse2.asm in Sources */,
@@ -2703,7 +2583,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2728,6 +2607,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -2746,6 +2626,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
