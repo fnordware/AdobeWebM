@@ -9,11 +9,6 @@ You will need to manually add the following to this directory because the owners
 * [libogg](http://www.xiph.org/downloads/)
 * [libvorbis](http://www.xiph.org/downloads/)
  
-You will need to patch the libvpx library using the included .patch file like so:
-
-`cd ext/libvpx`
-`patch -p1 < ../libvpx.patch`
-
 If the submodule contents are missing, you should be able to get them by typing:
 
 `git submodule init`
