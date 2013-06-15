@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		11C3E5200A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r in Rez */ = {isa = PBXBuildFile; fileRef = 11C3E51F0A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r */; };
-		2A5503D117680D1300BE5A72 /* WebM_Premiere_Import.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A52845815584ABC0084670E /* WebM_Premiere_Import.cpp */; };
 		2A55332F176ADB4D00BE5A72 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A553326176ADB3E00BE5A72 /* libogg.a */; };
 		2A553330176ADB4E00BE5A72 /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A55332E176ADB4800BE5A72 /* libvorbis.a */; };
 		2A553331176ADB4E00BE5A72 /* libvpx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A55331E176ADB3300BE5A72 /* libvpx.a */; };
-		2A553BD9176B9AB500BE5A72 /* WebM_Premiere_Export.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A553BD7176B9AB500BE5A72 /* WebM_Premiere_Export.cpp */; };
 		2A553DD3176BB1D800BE5A72 /* EbmlWriter.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A553DCC176BB1D800BE5A72 /* EbmlWriter.c */; };
+		2A58AED9176CF23F00669435 /* WebM_Premiere_Export.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A58AED4176CF23F00669435 /* WebM_Premiere_Export.cpp */; };
+		2A58AEDA176CF23F00669435 /* WebM_Premiere_Import.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A58AED6176CF23F00669435 /* WebM_Premiere_Import.cpp */; };
 		8D01CCCA0486CAD60068D4B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D01CCCE0486CAD60068D4B7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08EA7FFBFE8413EDC02AAC07 /* Carbon.framework */; };
 /* End PBXBuildFile section */
@@ -84,15 +84,11 @@
 		112C3FC60A88292D001FFCCB /* PrSDKPPixCreatorSuite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKPPixCreatorSuite.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKPPixCreatorSuite.h"; sourceTree = SOURCE_ROOT; };
 		112C3FCA0A882955001FFCCB /* PrSDKPPixCacheSuite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKPPixCacheSuite.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKPPixCacheSuite.h"; sourceTree = SOURCE_ROOT; };
 		1157612B0AD5C4A200B6DA40 /* WebM Premiere.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WebM Premiere.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
-		11C3E51F0A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = WebM_Premiere_Import_PiPL.r; path = ../../src/WebM_Premiere_Import_PiPL.r; sourceTree = SOURCE_ROOT; };
+		11C3E51F0A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = WebM_Premiere_Import_PiPL.r; path = ../../src/premiere/WebM_Premiere_Import_PiPL.r; sourceTree = SOURCE_ROOT; };
 		11D512BB0B1E7F490085D80B /* PrSDKTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKTypes.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKTypes.h"; sourceTree = SOURCE_ROOT; };
-		11E323940A50CCAC00879EF9 /* WebM_Premiere_Import.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebM_Premiere_Import.h; path = ../../src/WebM_Premiere_Import.h; sourceTree = SOURCE_ROOT; };
-		2A52845815584ABC0084670E /* WebM_Premiere_Import.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WebM_Premiere_Import.cpp; path = ../../src/WebM_Premiere_Import.cpp; sourceTree = SOURCE_ROOT; };
 		2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libvpx.xcodeproj; path = ext/libvpx.xcodeproj; sourceTree = "<group>"; };
 		2A55321D176AA87700BE5A72 /* libogg.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libogg.xcodeproj; path = ext/libogg.xcodeproj; sourceTree = "<group>"; };
 		2A553220176AA87700BE5A72 /* libvorbis.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libvorbis.xcodeproj; path = ext/libvorbis.xcodeproj; sourceTree = "<group>"; };
-		2A553BD7176B9AB500BE5A72 /* WebM_Premiere_Export.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebM_Premiere_Export.cpp; sourceTree = "<group>"; };
-		2A553BD8176B9AB500BE5A72 /* WebM_Premiere_Export.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebM_Premiere_Export.h; sourceTree = "<group>"; };
 		2A553DC9176BB1D800BE5A72 /* EbmlBufferWriter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EbmlBufferWriter.c; sourceTree = "<group>"; };
 		2A553DCA176BB1D800BE5A72 /* EbmlBufferWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EbmlBufferWriter.h; sourceTree = "<group>"; };
 		2A553DCB176BB1D800BE5A72 /* EbmlIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EbmlIDs.h; sourceTree = "<group>"; };
@@ -101,6 +97,10 @@
 		2A553DCF176BB1D800BE5A72 /* testlibmkv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testlibmkv.c; sourceTree = "<group>"; };
 		2A553DD0176BB1D800BE5A72 /* WebMElement.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WebMElement.c; sourceTree = "<group>"; };
 		2A553DD1176BB1D800BE5A72 /* WebMElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebMElement.h; sourceTree = "<group>"; };
+		2A58AED4176CF23F00669435 /* WebM_Premiere_Export.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebM_Premiere_Export.cpp; sourceTree = "<group>"; };
+		2A58AED5176CF23F00669435 /* WebM_Premiere_Export.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebM_Premiere_Export.h; sourceTree = "<group>"; };
+		2A58AED6176CF23F00669435 /* WebM_Premiere_Import.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebM_Premiere_Import.cpp; sourceTree = "<group>"; };
+		2A58AED7176CF23F00669435 /* WebM_Premiere_Import.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebM_Premiere_Import.h; sourceTree = "<group>"; };
 		8D01CCD10486CAD60068D4B7 /* WebM_Premiere_Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = WebM_Premiere_Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -122,7 +122,7 @@
 		089C166AFE841209C02AAC07 /* SDK_File_Import */ = {
 			isa = PBXGroup;
 			children = (
-				08FB77ADFE841716C02AAC07 /* src */,
+				2A58AED3176CF23F00669435 /* premiere */,
 				2A553DC8176BB1D800BE5A72 /* libmkv */,
 				089C167CFE841241C02AAC07 /* Resources */,
 				2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */,
@@ -156,18 +156,6 @@
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
 			name = Resources;
-			sourceTree = "<group>";
-		};
-		08FB77ADFE841716C02AAC07 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				11E323940A50CCAC00879EF9 /* WebM_Premiere_Import.h */,
-				2A52845815584ABC0084670E /* WebM_Premiere_Import.cpp */,
-				2A553BD8176B9AB500BE5A72 /* WebM_Premiere_Export.h */,
-				2A553BD7176B9AB500BE5A72 /* WebM_Premiere_Export.cpp */,
-			);
-			name = src;
-			path = ../../src;
 			sourceTree = "<group>";
 		};
 		19C28FB4FE9D528D11CA2CBB /* Products */ = {
@@ -216,6 +204,18 @@
 			);
 			name = libmkv;
 			path = ../../ext/libvpx/libmkv;
+			sourceTree = SOURCE_ROOT;
+		};
+		2A58AED3176CF23F00669435 /* premiere */ = {
+			isa = PBXGroup;
+			children = (
+				2A58AED4176CF23F00669435 /* WebM_Premiere_Export.cpp */,
+				2A58AED5176CF23F00669435 /* WebM_Premiere_Export.h */,
+				2A58AED6176CF23F00669435 /* WebM_Premiere_Import.cpp */,
+				2A58AED7176CF23F00669435 /* WebM_Premiere_Import.h */,
+			);
+			name = premiere;
+			path = ../../src/premiere;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
@@ -333,9 +333,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A5503D117680D1300BE5A72 /* WebM_Premiere_Import.cpp in Sources */,
-				2A553BD9176B9AB500BE5A72 /* WebM_Premiere_Export.cpp in Sources */,
 				2A553DD3176BB1D800BE5A72 /* EbmlWriter.c in Sources */,
+				2A58AED9176CF23F00669435 /* WebM_Premiere_Export.cpp in Sources */,
+				2A58AEDA176CF23F00669435 /* WebM_Premiere_Import.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
