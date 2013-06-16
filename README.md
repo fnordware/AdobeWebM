@@ -1,7 +1,7 @@
 WebM plug-in for Premiere
 =========================
 
-This plug-in is a work in progress. It currently builds on Mac and imports WebM files pretty well. Exporting is broken.
+These plug-ins are a work in progress. Some things are broken at the moment.
 
 License
 -------
