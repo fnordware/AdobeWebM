@@ -786,7 +786,7 @@ static void DoWriteStart(GPtr globals)
 			VRect wroteRect;
 			VRect writeRect = { 0, 0, height, width };
 			PSScaling scaling; scaling.sourceRect = scaling.destinationRect = writeRect;
-			PixelMemoryDesc memDesc = { (char *)gStuff->data, gStuff->rowBytes * 8, gStuff->colBytes * 8, 0, gStuff->depth };					
+			PixelMemoryDesc memDesc = { (char *)gStuff->data, gStuff->rowBytes * 8, gStuff->colBytes * 8, 3 * 8, gStuff->depth };					
 		
 			gResult = ReadProc(alpha_channel->port, &scaling, &writeRect, &memDesc, &wroteRect);
 		}
