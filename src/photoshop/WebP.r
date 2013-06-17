@@ -111,7 +111,7 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 			noDuotone, noLABColor
 		},
 			
-		EnableInfo { "in (PSHOP_ImageMode, BitmapMode, GrayScaleMode, IndexedMode, RGBMode, Gray16Mode, RGB48Mode)" },
+		EnableInfo { "in (PSHOP_ImageMode, RGBMode)" },
 	
 		FmtFileType { 'WebP', '8BIM' },
 		ReadTypes { { 'WebP', '    ' } },
@@ -126,8 +126,8 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 					  fmtCannotCreateThumbnail },
 		PlugInMaxSize { 16384, 16384 },
 		FormatMaxSize { { 16384, 16384 } },
-		FormatMaxChannels { {   1, 2, 1, 4, 0, 0, 
-							   0, 0, 0, 0, 2, 4 } },
+		FormatMaxChannels { {   0, 0, 0, 5, 0, 0, 
+							   0, 0, 0, 0, 0, 0 } },
 		FormatICCFlags { 	iccCanEmbedGray,
 							iccCanEmbedIndexed,
 							iccCanEmbedRGB,
@@ -158,9 +158,9 @@ resource 'PiMI' (ResourceID, plugInName " PiMI", purgeable)
 		canWrite,
 		canWriteIfRead,
 		savesResources,
-		{  0, 2, 0, 4,		/* Maximum # of channels for each plug-in mode */
+		{  0, 0, 0, 5,		/* Maximum # of channels for each plug-in mode */
 		  0, 0, 0, 0,
-		  0, 0,  2,  4,
+		  0, 0,  0,  0,
 		   0,  0,  0,  0 },
 		32767,				/* Maximum rows allowed in document */
 		32767,				/* Maximum columns allowed in document */
@@ -200,7 +200,18 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				"parent class format",						/* optional description */
 				flagsSingleProperty,						/* if properties, list below */
 							
-
+				"Lossless",
+				keyWebPlossless,
+				typeBoolean,
+				"WebP lossless compression used",
+				flagsSingleProperty,
+				
+				"Quality",
+				keyWebPquality,
+				typeInteger,
+				"WebP compression quality",
+				flagsSingleProperty,
+				
 				"Alpha Channel",
 				keyWebPalpha,
 				typeEnumerated,

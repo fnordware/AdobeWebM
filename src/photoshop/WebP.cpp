@@ -1,6 +1,7 @@
 
 #include "WebP.h"
 
+#include "WebP_version.h"
 #include "WebP_UI.h"
 
 
@@ -29,7 +30,17 @@ static void DoAbout(AboutRecordPtr aboutP)
 	HWND hwnd = (HWND)((PlatformData *)aboutP->platformData)->hwnd;
 #endif
 
-	WebP_About(plugHndl, hwnd);
+	const int version = WebPGetEncoderVersion();
+	
+	char version_string[32];
+	
+	sprintf(version_string, "WebP version %d.%d.%d", 
+				(version >> 16) & 0xff,
+				(version >> 8) & 0xff,
+				(version >> 0) & 0xff);
+				
+
+	WebP_About(WebP_Build_Complete_Manual, version_string, plugHndl, hwnd);
 }
 
 #pragma mark-
@@ -40,19 +51,13 @@ static void InitGlobals(Ptr globalPtr)
 	// macros work:
 	GPtr globals = (GPtr)globalPtr;
 		
-	gPixelData = NULL;
-	gRowBytes = 0;
-	
 	globals->fileH				= NULL;
 	
 	gInOptions.alpha			= WEBP_ALPHA_TRANSPARENCY;
 	gInOptions.mult				= FALSE;
 	
 	gOptions.quality			= 50;
-	gOptions.strength 			= 50;
-	gOptions.sharpness			= 50;
 	gOptions.lossless			= TRUE;
-	gOptions.profile			= WEBP_PROFILE_STRONG;
 	gOptions.alpha				= WEBP_ALPHA_TRANSPARENCY;
 }
 
@@ -375,33 +380,6 @@ static void DoReadStart(GPtr globals)
 {
 	bool reverting = ReadParams(globals, &gInOptions);
 	
-	if(!reverting)
-	{
-		WebP_InUI_Data params;
-		
-	#ifdef __PIMac__
-		const char * const plugHndl = "com.fnordware.Photoshop.WebP";
-		const void *hwnd = globals;	
-	#else
-		const char *const plugHndl = NULL;
-		HWND hwnd = (HWND)((PlatformData *)gStuff->platformData)->hwnd;
-	#endif
-
-		// WebP_InUI is responsible for not popping a dialog if the user
-		// didn't request it.  It still has to set the read settings from preferences though.
-		bool result = WebP_InUI(&params, plugHndl, hwnd);
-		
-		if(result)
-		{
-			gInOptions.alpha = params.alpha;
-			gInOptions.mult = params.mult;
-			
-			WriteParams(globals, &gInOptions);
-		}
-		else
-			gResult = userCanceledErr;
-	}
-	
 	if(gResult == noErr)
 	{
 		assert(globals->fileH == NULL);
@@ -424,22 +402,52 @@ static void DoReadStart(GPtr globals)
 				
 				if(status == VP8_STATUS_OK)
 				{
-					gStuff->imageMode = plugInModeRGBColor;
-					gStuff->depth = 8;
-
-					gStuff->imageSize.h = gStuff->imageSize32.h = features.width;
-					gStuff->imageSize.v = gStuff->imageSize32.v = features.height;
-					
-					gStuff->planes = (features.has_alpha ? 4 : 3);
-					
-					if(gInOptions.alpha == WEBP_ALPHA_TRANSPARENCY && gStuff->planes == 4)
+					if(!reverting)
 					{
-						gStuff->transparencyPlane = gStuff->planes - 1;
-						gStuff->transparencyMatting = 0;
+						WebP_InUI_Data params;
+						
+					#ifdef __PIMac__
+						const char * const plugHndl = "com.fnordware.Photoshop.WebP";
+						const void *hwnd = globals;	
+					#else
+						const char *const plugHndl = NULL;
+						HWND hwnd = (HWND)((PlatformData *)gStuff->platformData)->hwnd;
+					#endif
+
+						// WebP_InUI is responsible for not popping a dialog if the user
+						// didn't request it.  It still has to set the read settings from preferences though.
+						bool result = WebP_InUI(&params, features.has_alpha, plugHndl, hwnd);
+						
+						if(result)
+						{
+							gInOptions.alpha = params.alpha;
+							gInOptions.mult = params.mult;
+							
+							WriteParams(globals, &gInOptions);
+						}
+						else
+							gResult = userCanceledErr;
 					}
-					
-					if(features.has_animation)
-						gResult = formatCannotRead; // not supported as of yet
+	
+					if(gResult == noErr)
+					{
+						gStuff->imageMode = plugInModeRGBColor;
+						gStuff->depth = 8;
+
+						gStuff->imageSize.h = gStuff->imageSize32.h = features.width;
+						gStuff->imageSize.v = gStuff->imageSize32.v = features.height;
+						
+						gStuff->planes = (features.has_alpha ? 4 : 3);
+						
+						if(gInOptions.alpha == WEBP_ALPHA_TRANSPARENCY && gStuff->planes == 4)
+						{
+							gStuff->transparencyPlane = gStuff->planes - 1;
+							gStuff->transparencyMatting = 0;
+						}
+						
+						if(features.has_animation)
+							gResult = formatCannotRead; // not supported as of yet
+					}
 				}
 				else
 					gResult = badFileFormat;
@@ -451,6 +459,14 @@ static void DoReadStart(GPtr globals)
 		}
 		else
 			gResult = memFullErr;
+	}
+	
+	
+	if(gResult != noErr && globals->fileH != NULL)
+	{
+		myDisposeHandle(globals, globals->fileH);
+		
+		globals->fileH = NULL;
 	}
 }
 
@@ -512,7 +528,7 @@ static void DoReadContinue(GPtr globals)
 		
 		if(gResult == noErr)
 		{
-			gStuff->data = gPixelData = myLockBuffer(globals, bufferID, TRUE);
+			gStuff->data = myLockBuffer(globals, bufferID, TRUE);
 			
 			WebPRGBABuffer *buf_info = &output_buffer->u.RGBA;
 			
@@ -532,7 +548,7 @@ static void DoReadContinue(GPtr globals)
 			
 				gStuff->planeBytes = 1;
 				gStuff->colBytes = gStuff->planeBytes * gStuff->planes;
-				gStuff->rowBytes = gRowBytes = rowbytes;
+				gStuff->rowBytes = rowbytes;
 				
 				gStuff->loPlane = 0;
 				gStuff->hiPlane = gStuff->planes - 1;
@@ -730,7 +746,7 @@ static void DoWriteStart(GPtr globals)
 	gStuff->loPlane = 0;
 	gStuff->hiPlane = (use_transparency ? 3 : 2);
 	gStuff->colBytes = sizeof(unsigned char) * (use_alpha ? 4 : 3);
-	gStuff->rowBytes = gRowBytes = gStuff->colBytes * width;
+	gStuff->rowBytes = gStuff->colBytes * width;
 	gStuff->planeBytes = sizeof(unsigned char);
 	
 	gStuff->theRect.left = gStuff->theRect32.left = 0;
@@ -760,7 +776,7 @@ static void DoWriteStart(GPtr globals)
 	
 	if(gResult == noErr)
 	{
-		gStuff->data = gPixelData = myLockBuffer(globals, bufferID, TRUE);
+		gStuff->data = myLockBuffer(globals, bufferID, TRUE);
 		
 		gResult = AdvanceState();
 		
@@ -770,7 +786,7 @@ static void DoWriteStart(GPtr globals)
 			VRect wroteRect;
 			VRect writeRect = { 0, 0, height, width };
 			PSScaling scaling; scaling.sourceRect = scaling.destinationRect = writeRect;
-			PixelMemoryDesc memDesc = { (char *)gPixelData, gRowBytes * 8, gStuff->colBytes * 8, 0, gStuff->depth };					
+			PixelMemoryDesc memDesc = { (char *)gStuff->data, gStuff->rowBytes * 8, gStuff->colBytes * 8, 0, gStuff->depth };					
 		
 			gResult = ReadProc(alpha_channel->port, &scaling, &writeRect, &memDesc, &wroteRect);
 		}
@@ -784,8 +800,8 @@ static void DoWriteStart(GPtr globals)
 			picture.height = height;
 			picture.use_argb = TRUE;
 			
-			int ok = use_alpha ? WebPPictureImportRGBA(&picture, (const uint8_t *)gPixelData, gStuff->rowBytes) :
-									WebPPictureImportRGB(&picture, (const uint8_t *)gPixelData, gStuff->rowBytes);
+			int ok = use_alpha ? WebPPictureImportRGBA(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes) :
+									WebPPictureImportRGB(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes);
 			
 			if(ok)
 			{

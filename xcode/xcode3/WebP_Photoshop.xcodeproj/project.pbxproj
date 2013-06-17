@@ -10,12 +10,17 @@
 		2A0E4254176D0ED100420489 /* WebP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E424D176D0ED100420489 /* WebP.cpp */; };
 		2A0E4255176D0ED100420489 /* WebP.r in Rez */ = {isa = PBXBuildFile; fileRef = 2A0E424F176D0ED100420489 /* WebP.r */; };
 		2A0E4256176D0ED100420489 /* WebP_Scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E4250176D0ED100420489 /* WebP_Scripting.cpp */; };
-		2A0E42B3176D29BD00420489 /* WebP_UI_Carbon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E42B1176D29BD00420489 /* WebP_UI_Carbon.cpp */; };
 		2A0E42B4176D29BD00420489 /* WebP_UI_Cocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E42B2176D29BD00420489 /* WebP_UI_Cocoa.mm */; };
 		2A0E42D2176D2ED400420489 /* libwebp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A0E42D1176D2EC500420489 /* libwebp.a */; };
 		2A0E45CC176D9D5500420489 /* WebM_banner.png in Resources */ = {isa = PBXBuildFile; fileRef = 2A0E45CB176D9D5500420489 /* WebM_banner.png */; };
 		2A0E45CE176D9D7900420489 /* WebP_Out_Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2A0E45CD176D9D7900420489 /* WebP_Out_Dialog.xib */; };
 		2A0E45D6176DA11100420489 /* WebP_Out_Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E45D5176DA11100420489 /* WebP_Out_Controller.m */; };
+		2AFE660C176EE72E0086E20A /* WebP_In_Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2AFE660B176EE72E0086E20A /* WebP_In_Dialog.xib */; };
+		2AFE6611176EE93E0086E20A /* WebP_In_Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFE6610176EE93E0086E20A /* WebP_In_Controller.m */; };
+		2AFE6683176EF99E0086E20A /* WebP_About_Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2AFE6682176EF99E0086E20A /* WebP_About_Dialog.xib */; };
+		2AFE6687176EFBB70086E20A /* WebP_About_Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFE6686176EFBB70086E20A /* WebP_About_Controller.m */; };
+		2AFE6952176F0D970086E20A /* WebP_UI_Carbon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E42B1176D29BD00420489 /* WebP_UI_Carbon.cpp */; };
+		2AFE69B6176F17910086E20A /* WebP_UI_Carbon.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2AFE69B5176F17910086E20A /* WebP_UI_Carbon.nib */; };
 		64126C2B09F979EA006DF4E6 /* PIUSuites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 64126C2A09F979EA006DF4E6 /* PIUSuites.cpp */; };
 		64126C3509F97A19006DF4E6 /* PIUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 64126C3409F97A19006DF4E6 /* PIUtilities.cpp */; };
 		646B5CAA10D31664001A7C6E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646B5CA910D31664001A7C6E /* Cocoa.framework */; };
@@ -31,14 +36,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A0E42CC176D2EC500420489 /* libwebp.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* libwebp.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = libwebp;
 		};
 		2A0E42D3176D2EDC00420489 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A0E42CC176D2EC500420489 /* libwebp.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* libwebp */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = libwebp;
 		};
 /* End PBXContainerItemProxy section */
@@ -60,6 +65,13 @@
 		2A0E45CD176D9D7900420489 /* WebP_Out_Dialog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebP_Out_Dialog.xib; sourceTree = "<group>"; };
 		2A0E45D4176DA11100420489 /* WebP_Out_Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebP_Out_Controller.h; sourceTree = "<group>"; };
 		2A0E45D5176DA11100420489 /* WebP_Out_Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebP_Out_Controller.m; sourceTree = "<group>"; };
+		2AFE660B176EE72E0086E20A /* WebP_In_Dialog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebP_In_Dialog.xib; sourceTree = "<group>"; };
+		2AFE660F176EE93E0086E20A /* WebP_In_Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebP_In_Controller.h; sourceTree = "<group>"; };
+		2AFE6610176EE93E0086E20A /* WebP_In_Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebP_In_Controller.m; sourceTree = "<group>"; };
+		2AFE6682176EF99E0086E20A /* WebP_About_Dialog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebP_About_Dialog.xib; sourceTree = "<group>"; };
+		2AFE6685176EFBB70086E20A /* WebP_About_Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebP_About_Controller.h; sourceTree = "<group>"; };
+		2AFE6686176EFBB70086E20A /* WebP_About_Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebP_About_Controller.m; sourceTree = "<group>"; };
+		2AFE69B5176F17910086E20A /* WebP_UI_Carbon.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = WebP_UI_Carbon.nib; sourceTree = "<group>"; };
 		6412691809F974D9006DF4E6 /* ADSP.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ADSP.h; path = /Developer/Headers/FlatCarbon/ADSP.h; sourceTree = "<absolute>"; };
 		6412691909F974D9006DF4E6 /* AEDataModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AEDataModel.h; path = /Developer/Headers/FlatCarbon/AEDataModel.h; sourceTree = "<absolute>"; };
 		6412691A09F974D9006DF4E6 /* AEDataModel.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = AEDataModel.r; path = /Developer/Headers/FlatCarbon/AEDataModel.r; sourceTree = "<absolute>"; };
@@ -653,10 +665,17 @@
 			children = (
 				2A0E45CB176D9D5500420489 /* WebM_banner.png */,
 				2A0E42B1176D29BD00420489 /* WebP_UI_Carbon.cpp */,
+				2AFE69B5176F17910086E20A /* WebP_UI_Carbon.nib */,
 				2A0E42B2176D29BD00420489 /* WebP_UI_Cocoa.mm */,
+				2AFE660B176EE72E0086E20A /* WebP_In_Dialog.xib */,
+				2AFE660F176EE93E0086E20A /* WebP_In_Controller.h */,
+				2AFE6610176EE93E0086E20A /* WebP_In_Controller.m */,
 				2A0E45CD176D9D7900420489 /* WebP_Out_Dialog.xib */,
 				2A0E45D4176DA11100420489 /* WebP_Out_Controller.h */,
 				2A0E45D5176DA11100420489 /* WebP_Out_Controller.m */,
+				2AFE6682176EF99E0086E20A /* WebP_About_Dialog.xib */,
+				2AFE6685176EFBB70086E20A /* WebP_About_Controller.h */,
+				2AFE6686176EFBB70086E20A /* WebP_About_Controller.m */,
 			);
 			path = mac;
 			sourceTree = "<group>";
@@ -1332,6 +1351,9 @@
 			files = (
 				2A0E45CC176D9D5500420489 /* WebM_banner.png in Resources */,
 				2A0E45CE176D9D7900420489 /* WebP_Out_Dialog.xib in Resources */,
+				2AFE660C176EE72E0086E20A /* WebP_In_Dialog.xib in Resources */,
+				2AFE6683176EF99E0086E20A /* WebP_About_Dialog.xib in Resources */,
+				2AFE69B6176F17910086E20A /* WebP_UI_Carbon.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1360,9 +1382,11 @@
 				647B65A2111396450067F135 /* FileUtilities.cpp in Sources */,
 				2A0E4254176D0ED100420489 /* WebP.cpp in Sources */,
 				2A0E4256176D0ED100420489 /* WebP_Scripting.cpp in Sources */,
-				2A0E42B3176D29BD00420489 /* WebP_UI_Carbon.cpp in Sources */,
 				2A0E42B4176D29BD00420489 /* WebP_UI_Cocoa.mm in Sources */,
 				2A0E45D6176DA11100420489 /* WebP_Out_Controller.m in Sources */,
+				2AFE6611176EE93E0086E20A /* WebP_In_Controller.m in Sources */,
+				2AFE6687176EFBB70086E20A /* WebP_About_Controller.m in Sources */,
+				2AFE6952176F0D970086E20A /* WebP_UI_Carbon.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

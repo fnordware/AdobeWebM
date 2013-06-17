@@ -28,23 +28,11 @@ typedef struct {
 	
 } WebP_inData;
 
-
-enum {
-	WEBP_PROFILE_NONE = 0,
-	WEBP_PROFILE_SIMPLE,
-	WEBP_PROFILE_STRONG
-};
-typedef uint8 WebP_Profile;
-
 typedef struct {
-	uint8			quality;
-	uint8			strength;
-	uint8			sharpness;
-	uint8			r1;
 	bool			lossless;
-	WebP_Profile	profile;
+	uint8			quality;
 	WebP_Alpha		alpha;
-	bool			r2;
+	uint8			reserved[253];
 	
 } WebP_outData;
 
@@ -56,8 +44,6 @@ typedef struct Globals
 	FormatRecord		*formatParamBlock;	// Must always be second in Globals.
 
 	Handle				fileH;				// stores the entire binary file
-	Ptr					pixelData;
-	int32				rowBytes;
 	
 	WebP_inData			in_options;
 	WebP_outData		options;
@@ -77,10 +63,6 @@ typedef void (* FProc)(GPtr globals);
 
 #define gResult				(*(globals->result))
 #define gStuff				(globals->formatParamBlock)
-
-#define gPixelBuffer		(globals->pixelBuffer)
-#define gPixelData			(globals->pixelData)
-#define gRowBytes			(globals->rowBytes)
 
 #define gInOptions			(globals->in_options)
 #define gOptions			(globals->options)

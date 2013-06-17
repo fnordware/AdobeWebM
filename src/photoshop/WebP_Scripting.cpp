@@ -41,31 +41,16 @@ Boolean ReadScriptParamsOnWrite(GPtr globals)
 			{
 				switch (key)
 				{
-/*					case keyPNGcompression:
-							PIGetInt(token, &storeValue);
-							gOptions.compression = storeValue;
+					case keyWebPlossless:
+							PIGetBool(token, &boolStoreValue);
+							gOptions.lossless = boolStoreValue;
 							break;
 					
-					case keyPNGfilter:
+					case keyWebPquality:
 							PIGetInt(token, &storeValue);
-							gOptions.filter = storeValue;
+							gOptions.quality = storeValue;
 							break;
 
-					case keyPNGstrategy:
-							PIGetInt(token, &storeValue);
-							gOptions.strategy = storeValue;
-							break;
-
-					case keyPNGinterlace:
-							PIGetBool(token, &boolStoreValue);
-							gOptions.interlace = boolStoreValue;
-							break;
-					
-					case keyPNGmeta:
-							PIGetBool(token, &boolStoreValue);
-							gOptions.metadata = boolStoreValue;
-							break;
-*/					
 					case keyWebPalpha:
 							PIGetEnum(token, &ostypeStoreValue);
 							gOptions.alpha = KeyToAlpha(ostypeStoreValue);
@@ -114,12 +99,15 @@ OSErr WriteScriptParamsOnWrite(GPtr globals)
 		if (token)
 		{
 			// write keys here
-/*			PIPutInt(token, keyPNGcompression, gOptions.compression);
-			PIPutInt(token, keyPNGfilter, gOptions.filter);
-			PIPutInt(token, keyPNGstrategy, gOptions.strategy);
-			PIPutBool(token, keyPNGinterlace, gOptions.interlace);
-			PIPutBool(token, keyPNGmeta, gOptions.metadata);
-*/			PIPutEnum(token, keyWebPalpha, typeAlphaChannel, AlphaToKey(gOptions.alpha));
+			PIPutBool(token, keyWebPlossless, gOptions.lossless);
+			
+			if(!gOptions.lossless)
+			{
+				PIPutInt(token, keyWebPquality, gOptions.quality);
+			}
+				
+			PIPutEnum(token, keyWebPalpha, typeAlphaChannel, AlphaToKey(gOptions.alpha));
+			
 			gotErr = CloseWriter(&token); /* closes and sets dialog optional */
 			/* done.  Now pass handle on to Photoshop */
 		}

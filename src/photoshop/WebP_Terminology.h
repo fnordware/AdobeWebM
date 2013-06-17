@@ -16,7 +16,9 @@
 //	Definitions -- Scripting keys
 //-------------------------------------------------------------------------------
 
-#define keyWebPalpha			'WebP'
+#define keyWebPlossless			'WebL'
+#define keyWebPquality			'WebQ'
+#define keyWebPalpha			'WebA'
 
 #define typeAlphaChannel		'alfT'
 
