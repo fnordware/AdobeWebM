@@ -62,7 +62,7 @@ WebP_About(
 #define WEBP_PREFIX		 "Software\\fnord\\WebP"
 #define WEBP_ALPHA_KEY	"Alpha"
 #define WEBP_MULT_KEY	"Mult"
-#define WEBP_AUTO_KEY	"Augo"
+#define WEBP_AUTO_KEY	"Auto"
 
 
 #endif // WEBP_UI_H

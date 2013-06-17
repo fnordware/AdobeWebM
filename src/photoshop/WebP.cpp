@@ -5,10 +5,10 @@
 #include "WebP_UI.h"
 
 
-#include "webp/format_constants.h"
 #include "webp/encode.h"
 #include "webp/decode.h"
 
+#include <stdio.h>
 #include <assert.h>
 
 // globals needed by a bunch of Photoshop SDK routines
@@ -197,9 +197,9 @@ static int my_fseek(GPtr globals, long offset, int whence)
 
 	lpos.QuadPart = offset;
 
-	DWORD method = ( origin == SEEK_SET ? FILE_BEGIN :
-						origin == SEEK_CUR ? FILE_CURRENT :
-						origin == SEEK_END ? FILE_END :
+	DWORD method = ( whence == SEEK_SET ? FILE_BEGIN :
+						whence == SEEK_CUR ? FILE_CURRENT :
+						whence == SEEK_END ? FILE_END :
 						FILE_CURRENT );
 
 #if _MSC_VER < 1300
@@ -223,16 +223,13 @@ static long my_ftell(GPtr globals)
 	
 	return lpos;
 #else
-	Int64 pos;
 	LARGE_INTEGER lpos, zero;
 
 	zero.QuadPart = 0;
 
 	BOOL result = SetFilePointerEx((HANDLE)gStuff->dataFork, zero, &lpos, FILE_CURRENT);
 
-	pos = lpos.QuadPart;
-	
-	return pos;
+	return lpos.QuadPart;
 #endif
 }
 
@@ -275,6 +272,8 @@ static int myWebPWriterFunction(const uint8_t* data, size_t data_size, const Web
 static void DoFilterFile(GPtr globals)
 {
 	// copied from ParseRiff()
+#define RIFF_HEADER_SIZE 12
+#define TAG_SIZE 4
 
 	uint8_t buf[RIFF_HEADER_SIZE];
 
@@ -450,7 +449,7 @@ static void DoReadStart(GPtr globals)
 					}
 				}
 				else
-					gResult = badFileFormat;
+					gResult = formatCannotRead;
 			}
 			else
 				gResult = readErr;
@@ -562,7 +561,7 @@ static void DoReadContinue(GPtr globals)
 				gResult = AdvanceState();
 			}
 			else
-				gResult = badFileFormat;
+				gResult = formatCannotRead;
 			
 			
 			myFreeBuffer(globals, bufferID);
