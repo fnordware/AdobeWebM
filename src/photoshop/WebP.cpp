@@ -42,6 +42,7 @@
 #include "WebP_UI.h"
 
 
+#include "webp/demux.h"
 #include "webp/encode.h"
 #include "webp/decode.h"
 
@@ -432,12 +433,16 @@ static void DoReadStart(GPtr globals)
 			
 			if(file_size == my_fread(globals, buf, file_size))
 			{
-				WebPBitstreamFeatures features;
-				
-				VP8StatusCode status = WebPGetFeatures((const uint8_t *)buf, file_size, &features);
-				
-				if(status == VP8_STATUS_OK)
+				WebPData webp_data = { (const uint8_t *)buf, file_size };
+
+				WebPDemuxer *demux = WebPDemux(&webp_data);
+
+				if(demux)
 				{
+					uint32_t width = WebPDemuxGetI(demux, WEBP_FF_CANVAS_WIDTH);
+					uint32_t height = WebPDemuxGetI(demux, WEBP_FF_CANVAS_HEIGHT);
+					uint32_t flags = WebPDemuxGetI(demux, WEBP_FF_FORMAT_FLAGS);
+					
 					if(!reverting)
 					{
 						WebP_InUI_Data params;
@@ -452,7 +457,7 @@ static void DoReadStart(GPtr globals)
 
 						// WebP_InUI is responsible for not popping a dialog if the user
 						// didn't request it.  It still has to set the read settings from preferences though.
-						bool result = WebP_InUI(&params, features.has_alpha, plugHndl, hwnd);
+						bool result = WebP_InUI(&params, (flags & ALPHA_FLAG), plugHndl, hwnd);
 						
 						if(result)
 						{
@@ -464,16 +469,17 @@ static void DoReadStart(GPtr globals)
 						else
 							gResult = userCanceledErr;
 					}
-	
+					
+					
 					if(gResult == noErr)
 					{
 						gStuff->imageMode = plugInModeRGBColor;
 						gStuff->depth = 8;
 
-						gStuff->imageSize.h = gStuff->imageSize32.h = features.width;
-						gStuff->imageSize.v = gStuff->imageSize32.v = features.height;
+						gStuff->imageSize.h = gStuff->imageSize32.h = width;
+						gStuff->imageSize.v = gStuff->imageSize32.v = height;
 						
-						gStuff->planes = (features.has_alpha ? 4 : 3);
+						gStuff->planes = ((flags & ALPHA_FLAG) ? 4 : 3);
 						
 						if(gInOptions.alpha == WEBP_ALPHA_TRANSPARENCY && gStuff->planes == 4)
 						{
@@ -481,9 +487,64 @@ static void DoReadStart(GPtr globals)
 							gStuff->transparencyMatting = 0;
 						}
 						
-						if(features.has_animation)
-							gResult = formatCannotRead; // not supported as of yet
+						
+						WebPChunkIterator chunk_iter;
+						
+						if(gStuff->canUseICCProfiles && (flags & ICCP_FLAG) && WebPDemuxGetChunk(demux, "ICCP", 1, &chunk_iter) )
+						{
+							gStuff->iCCprofileSize = chunk_iter.chunk.size;
+							gStuff->iCCprofileData = myNewHandle(globals, gStuff->iCCprofileSize);
+							
+							if(gStuff->iCCprofileData)
+							{
+								Ptr iccP = myLockHandle(globals, gStuff->iCCprofileData);
+								
+								memcpy(iccP, chunk_iter.chunk.bytes, gStuff->iCCprofileSize);
+								
+								myUnlockHandle(globals, gStuff->iCCprofileData);
+							}
+							
+							WebPDemuxReleaseChunkIterator(&chunk_iter);
+						}
+						
+						if(PISetProp && (flags & EXIF_FLAG) && WebPDemuxGetChunk(demux, "EXIF", 1, &chunk_iter) )
+						{
+							Handle exif_handle = myNewHandle(globals, chunk_iter.chunk.size);
+							
+							if(exif_handle)
+							{
+								Ptr exifP = myLockHandle(globals, exif_handle);
+								
+								memcpy(exifP, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+								
+								myUnlockHandle(globals, exif_handle);
+								
+								PISetProp(kPhotoshopSignature, propEXIFData, 0, NULL, exif_handle);
+							}
+							
+							WebPDemuxReleaseChunkIterator(&chunk_iter);
+						}
+
+						if(PISetProp && (flags & XMP_FLAG) && WebPDemuxGetChunk(demux, "XMP ", 1, &chunk_iter) )
+						{
+							Handle xmp_handle = myNewHandle(globals, chunk_iter.chunk.size);
+							
+							if(xmp_handle)
+							{
+								Ptr xmpP = myLockHandle(globals, xmp_handle);
+								
+								memcpy(xmpP, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+								
+								myUnlockHandle(globals, xmp_handle);
+								
+								PISetProp(kPhotoshopSignature, propXMP, 0, NULL, xmp_handle);
+							}
+							
+							WebPDemuxReleaseChunkIterator(&chunk_iter);
+						}
 					}
+					
+					WebPDemuxDelete(demux);
 				}
 				else
 					gResult = formatCannotRead;
@@ -539,70 +600,90 @@ static void DoReadContinue(GPtr globals)
 		
 		Ptr data = myLockHandle(globals, globals->fileH);
 		
-		
-		WebPDecoderConfig config;
-		WebPInitDecoderConfig(&config);
-		
-		config.options.use_threads = 1;
-		
-		WebPGetFeatures((const uint8_t *)data, data_size, &config.input);
-		
-		
-		WebPDecBuffer* const output_buffer = &config.output;
-		
-		output_buffer->colorspace = (gStuff->planes == 4 ? MODE_RGBA : MODE_RGB);
-		output_buffer->width = gStuff->imageSize.h;
-		output_buffer->height = gStuff->imageSize.v;
-		output_buffer->is_external_memory = TRUE;
-		
-		int32 rowbytes = sizeof(unsigned char) * gStuff->planes * gStuff->imageSize.h;
-		int32 buffer_size = rowbytes * gStuff->imageSize.v;
-		
-		BufferID bufferID = 0;
-		
-		gResult = myAllocateBuffer(globals, buffer_size, &bufferID);
-		
-		if(gResult == noErr)
+
+		WebPData webp_data = { (const uint8_t *)data, data_size };
+
+		WebPDemuxer *demux = WebPDemux(&webp_data);
+
+		if(demux)
 		{
-			gStuff->data = myLockBuffer(globals, bufferID, TRUE);
+			WebPIterator iter;
 			
-			WebPRGBABuffer *buf_info = &output_buffer->u.RGBA;
-			
-			buf_info->rgba = (uint8_t *)gStuff->data;
-			buf_info->stride = rowbytes;
-			buf_info->size = buffer_size;
-			
-			
-			VP8StatusCode status = WebPDecode((const uint8_t *)data, data_size, &config);
-			
-			if(status == VP8_STATUS_OK)
+			if( WebPDemuxGetFrame(demux, 1, &iter) )
 			{
-				if(gStuff->planes == 4 && gInOptions.alpha == WEBP_ALPHA_CHANNEL && gInOptions.mult == TRUE)
+				WebPDecoderConfig config;
+				WebPInitDecoderConfig(&config);
+				
+				config.options.use_threads = TRUE;
+				
+				VP8StatusCode status = WebPGetFeatures(iter.fragment.bytes, iter.fragment.size, &config.input);
+				
+				if(status == VP8_STATUS_OK)
 				{
-					Premultiply((RGBApixel8 *)gStuff->data, gStuff->imageSize.h * gStuff->imageSize.v);
-				}
-			
-				gStuff->planeBytes = 1;
-				gStuff->colBytes = gStuff->planeBytes * gStuff->planes;
-				gStuff->rowBytes = rowbytes;
-				
-				gStuff->loPlane = 0;
-				gStuff->hiPlane = gStuff->planes - 1;
+					WebPDecBuffer* const output_buffer = &config.output;
+					
+					output_buffer->colorspace = (gStuff->planes == 4 ? MODE_RGBA : MODE_RGB);
+					output_buffer->width = gStuff->imageSize.h;
+					output_buffer->height = gStuff->imageSize.v;
+					output_buffer->is_external_memory = TRUE;
+					
+					int32 rowbytes = sizeof(unsigned char) * gStuff->planes * gStuff->imageSize.h;
+					int32 buffer_size = rowbytes * gStuff->imageSize.v;
+					
+					BufferID bufferID = 0;
+					
+					gResult = myAllocateBuffer(globals, buffer_size, &bufferID);
+					
+					if(gResult == noErr)
+					{
+						gStuff->data = myLockBuffer(globals, bufferID, TRUE);
 						
-				gStuff->theRect.left = gStuff->theRect32.left = 0;
-				gStuff->theRect.right = gStuff->theRect32.right = gStuff->imageSize.h;
+						WebPRGBABuffer *buf_info = &output_buffer->u.RGBA;
+						
+						buf_info->rgba = (uint8_t *)gStuff->data;
+						buf_info->stride = rowbytes;
+						buf_info->size = buffer_size;
+						
+						
+						status = WebPDecode((const uint8_t *)data, data_size, &config);
+						
+						if(status == VP8_STATUS_OK)
+						{
+							if(gStuff->planes == 4 && gInOptions.alpha == WEBP_ALPHA_CHANNEL && gInOptions.mult == TRUE)
+							{
+								Premultiply((RGBApixel8 *)gStuff->data, gStuff->imageSize.h * gStuff->imageSize.v);
+							}
+						
+							gStuff->planeBytes = 1;
+							gStuff->colBytes = gStuff->planeBytes * gStuff->planes;
+							gStuff->rowBytes = rowbytes;
+							
+							gStuff->loPlane = 0;
+							gStuff->hiPlane = gStuff->planes - 1;
+									
+							gStuff->theRect.left = gStuff->theRect32.left = 0;
+							gStuff->theRect.right = gStuff->theRect32.right = gStuff->imageSize.h;
+							
+							gStuff->theRect.top = gStuff->theRect32.top = 0;
+							gStuff->theRect.bottom = gStuff->theRect32.bottom = gStuff->imageSize.v;
+							
+							gResult = AdvanceState();
+						}
+						else
+							gResult = formatCannotRead;
+						
+						
+						myFreeBuffer(globals, bufferID);
+					}
+				}
 				
-				gStuff->theRect.top = gStuff->theRect32.top = 0;
-				gStuff->theRect.bottom = gStuff->theRect32.bottom = gStuff->imageSize.v;
-				
-				gResult = AdvanceState();
+				WebPDemuxReleaseIterator(&iter);
 			}
 			else
 				gResult = formatCannotRead;
-			
-			
-			myFreeBuffer(globals, bufferID);
 		}
+		else
+			gResult = formatCannotRead;
 		
 		
 		myUnlockHandle(globals, globals->fileH);

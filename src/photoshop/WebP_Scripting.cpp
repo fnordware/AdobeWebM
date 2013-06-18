@@ -39,7 +39,8 @@
 #include "PIDefines.h"
 #include "WebP.h"
 
-		
+#include "WebP_Terminology.h"
+
 
 static WebP_Alpha KeyToAlpha(OSType key)
 {

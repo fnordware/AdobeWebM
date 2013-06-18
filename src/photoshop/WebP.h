@@ -43,8 +43,7 @@
 #include "PIDefines.h"
 #include "PIFormat.h"
 #include "PIUtilities.h"
-
-#include "WebP_Terminology.h"
+#include "PIProperties.h"
 
 
 enum {
