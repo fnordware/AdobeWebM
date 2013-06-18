@@ -193,7 +193,7 @@ WebP_InUI(
 				if(window)
 				{
 					// put image in HIImageView
-					CFURLRef png_url = CFBundleCopyResourceURL(bundle_ref, CFSTR("WebM_banner.png"), NULL, NULL);
+					CFURLRef png_url = CFBundleCopyResourceURL(bundle_ref, CFSTR("WebP_banner.png"), NULL, NULL);
 					
 					HIViewRef banner_view = NULL;
 					HIViewID  hiViewID = {'Banr', 0};
@@ -386,7 +386,7 @@ WebP_OutUI(
 			if(window)
 			{
 				// put image in HIImageView
-				CFURLRef png_url = CFBundleCopyResourceURL(bundle_ref, CFSTR("WebM_banner.png"), NULL, NULL);
+				CFURLRef png_url = CFBundleCopyResourceURL(bundle_ref, CFSTR("WebP_banner.png"), NULL, NULL);
 				
 				HIViewRef banner_view = NULL;
 				HIViewID  hiViewID = {'Banr', 0};
@@ -531,7 +531,7 @@ WebP_About(
 			if(window)
 			{
 				// put image in HIImageView
-				CFURLRef png_url = CFBundleCopyResourceURL(bundle_ref, CFSTR("WebM_banner.png"), NULL, NULL);
+				CFURLRef png_url = CFBundleCopyResourceURL(bundle_ref, CFSTR("WebP_banner.png"), NULL, NULL);
 				
 				HIViewRef banner_view = NULL;
 				HIViewID  hiViewID = {'Banr', 0};

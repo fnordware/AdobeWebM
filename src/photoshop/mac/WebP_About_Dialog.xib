@@ -75,7 +75,7 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">WebM_banner</string>
+									<string key="NSResourceName">WebP_banner</string>
 								</object>
 								<int key="NSAlign">0</int>
 								<int key="NSScale">0</int>
@@ -795,7 +795,7 @@
 		<string key="IBDocument.LastKnownRelativeProjectPath">../../../xcode/xcode3/WebP_Photoshop.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">WebM_banner</string>
+			<string key="NS.key.0">WebP_banner</string>
 			<string key="NS.object.0">{325, 40}</string>
 		</object>
 	</data>
