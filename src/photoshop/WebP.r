@@ -104,8 +104,8 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 		
 		SupportedModes
 		{
-			doesSupportBitmap, doesSupportGrayScale,
-			doesSupportIndexedColor, doesSupportRGBColor,
+			noBitmap, noGrayScale,
+			noIndexedColor, doesSupportRGBColor,
 			noCMYKColor, noHSLColor,
 			noHSBColor, noMultichannel,
 			noDuotone, noLABColor
