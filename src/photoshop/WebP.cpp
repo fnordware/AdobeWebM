@@ -231,7 +231,7 @@ static bool my_fwrite(GPtr globals, const void * buf, size_t len)
 #else
 	DWORD count = len, out = 0;
 	
-	BOOL result = WriteFile(picture->custom_ptr, (LPVOID)buf, count, &out, NULL);
+	BOOL result = WriteFile((HANDLE)gStuff->dataFork, (LPVOID)buf, count, &out, NULL);
 	
 	return (result && out == count);
 #endif
