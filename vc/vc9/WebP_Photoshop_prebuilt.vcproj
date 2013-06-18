@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="WebP"
-	ProjectGUID="{73C59F9A-C645-4EE5-8F00-AB4332011062}"
+	Name="WebP_prebuilt"
+	ProjectGUID="{0AB9DA8B-FC0C-4CCF-90CC-0704D962DD9B}"
 	RootNamespace="WebP"
 	TargetFrameworkVersion="131072"
 	>
@@ -51,7 +51,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src\photoshop;..\..\ext\libwebp\src;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
+				AdditionalIncludeDirectories="..\..\src\photoshop;&quot;libwebp-0.3.0-windows-x86\include&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
@@ -76,11 +76,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib"
-				OutputFile="$(OutDir)\$(ProjectName).8bi"
+				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib libwebp.lib"
+				OutputFile="$(OutDir)\WebP.8bi"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
+				AdditionalLibraryDirectories="&quot;libwebp-0.3.0-windows-x86\lib&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)$(TargetName).pdb"
 				SubSystem="2"
@@ -144,7 +144,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src\photoshop;..\..\ext\libwebp\src;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
+				AdditionalIncludeDirectories="..\..\src\photoshop;&quot;libwebp-0.3.0-windows-x64\include&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
@@ -169,11 +169,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib"
-				OutputFile="$(OutDir)\$(ProjectName).8bi"
+				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib libwebp.lib"
+				OutputFile="$(OutDir)\WebP.8bi"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
+				AdditionalLibraryDirectories="&quot;libwebp-0.3.0-windows-x64\lib&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)$(TargetName).pdb"
 				SubSystem="2"
@@ -237,7 +237,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..\src\photoshop;..\..\ext\libwebp\src;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
+				AdditionalIncludeDirectories="..\..\src\photoshop;&quot;libwebp-0.3.0-windows-x86\include&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;$(NOINHERIT)"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -263,11 +263,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/VERBOSE:LIB"
-				AdditionalDependencies="version.lib"
-				OutputFile="$(OutDir)\$(ProjectName).8bi"
+				AdditionalDependencies="version.lib libwebp.lib"
+				OutputFile="$(OutDir)\WebP.8bi"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
+				AdditionalLibraryDirectories="&quot;libwebp-0.3.0-windows-x86\lib&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
 				IgnoreDefaultLibraryNames="libcpmtd.lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
@@ -331,7 +331,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..\src\photoshop;..\..\ext\libwebp\src;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
+				AdditionalIncludeDirectories="..\..\src\photoshop;&quot;libwebp-0.3.0-windows-x64\include&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;$(NOINHERIT)"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -357,11 +357,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/VERBOSE:LIB"
-				AdditionalDependencies="version.lib"
-				OutputFile="$(OutDir)\$(ProjectName).8bi"
+				AdditionalDependencies="version.lib libwebp.lib"
+				OutputFile="$(OutDir)\WebP.8bi"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
+				AdditionalLibraryDirectories="&quot;libwebp-0.3.0-windows-x64\lib&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\ADM;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\AS;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PICA;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\Photoshop\PS-Suites&quot;;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Headers\SDK;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\Photoshop&quot;;&quot;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Rez-files\SDK&quot;"
 				IgnoreDefaultLibraryNames="libcpmtd.lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"

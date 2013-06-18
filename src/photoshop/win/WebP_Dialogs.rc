@@ -92,8 +92,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,95,100,50,14
     CONTROL         "WEBP_BANNER",IDC_STATIC,"Static",SS_BITMAP,13,7,15,13
     CTEXT           "WebP Photoshop Plug-In",IDC_STATIC,74,40,98,8
-    CTEXT           "plug-in version",4,92,60,58,8
-    CTEXT           "WebP version",5,82,70,77,8
+    CTEXT           "plug-in version",4,61,60,118,8
+    CTEXT           "WebP version",5,55,70,129,8
 END
 
 
@@ -110,8 +110,8 @@ WEBP_BANNER             BITMAP                  "WebP_banner.bmp"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,0
- PRODUCTVERSION 2,0,0,0
+ FILEVERSION 0,5,0,0
+ PRODUCTVERSION 0,5,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -126,12 +126,12 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "SuperPNG"
-            VALUE "FileVersion", "2.0"
-            VALUE "InternalName", "SuperPNG"
-            VALUE "LegalCopyright", "Copyright (C) 2002-2011"
-            VALUE "OriginalFilename", "SuperPNG.dll"
-            VALUE "ProductName", "SuperPNG Photoshop Plug-in"
+            VALUE "FileDescription", "WebP"
+            VALUE "FileVersion", "0.5"
+            VALUE "InternalName", "WebP"
+            VALUE "LegalCopyright", "Copyright (C) 2013"
+            VALUE "OriginalFilename", "WebP.dll"
+            VALUE "ProductName", "WebP Photoshop Plug-in"
             VALUE "ProductVersion", "2.0"
         END
     END
