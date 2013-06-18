@@ -345,7 +345,7 @@ SDKOpenFile8(
 
 	if(result == malNoError && localRecP->nestegg_ctx == NULL)
 	{
-		assert(localRecP->io.tell(localRecP->io.userdata) == 0);
+		localRecP->io.seek(0, SEEK_SET, localRecP->io.userdata);
 		
 		int init_err = nestegg_init(&localRecP->nestegg_ctx, localRecP->io, NULL);
 	
@@ -381,11 +381,11 @@ SDKOpenFile8(
 			
 			if(localRecP->video_track == -1 && localRecP->audio_track == -1)
 			{
-				result = imFileOpenFailed;
+				result = imFileHasNoImportableStreams;
 			}
 		}
 		else
-			result = imFileOpenFailed;
+			result = imBadHeader;
 	}
 
 	// close file and delete private data if we got a bad file

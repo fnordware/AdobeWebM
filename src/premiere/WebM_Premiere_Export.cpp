@@ -971,13 +971,13 @@ exSDKExport(
 	
 	result = mySettings->exportFileSuite->Open(exportInfoP->fileObject);
 	
+	EbmlGlobal ebml;
+	memset(&ebml, 0, sizeof(ebml));
+	
 	try{
 	
 	if(result == malNoError)
 	{
-		EbmlGlobal ebml;
-		memset(&ebml, 0, sizeof(ebml));
-		
 		ebml.fileSuite = mySettings->exportFileSuite;
 		ebml.fileObject = exportInfoP->fileObject;
 		ebml.debug = false;
@@ -993,18 +993,19 @@ exSDKExport(
 		config.g_h = renderParms.inHeight;
 		
 		config.g_pass = VPX_RC_ONE_PASS;
+		config.g_threads = 8;
 		
 		exRatioValue fps;
 		get_framerate(ticksPerSecond, frameRateP.value.timeValue, &fps);
 		
-		config.g_timebase.num = fps.denominator * 1000;
-		config.g_timebase.den = fps.numerator * 1000;
-		
 		stereo_format_t stereo_fmt = STEREO_FORMAT_MONO;
 		
 		vpx_rational vpx_fps;
-		vpx_fps.num = config.g_timebase.den;
-		vpx_fps.den = config.g_timebase.num;
+		vpx_fps.num = fps.numerator * 1000;
+		vpx_fps.den = fps.denominator * 1000;
+		
+		config.g_timebase.num = 1;
+		config.g_timebase.den = vpx_fps.den;
 		
 		
 		write_webm_file_header(&ebml, &config, &vpx_fps, stereo_fmt, VP8_FOURCC);
@@ -1031,7 +1032,7 @@ exSDKExport(
 														kRenderCacheType_None,
 														&renderResult);
 				
-				if(result != suiteError_CompilerCompileAbort)
+				if(result == suiteError_NoError)
 				{
 					PrPixelFormat pixFormat;
 					prRect bounds;
@@ -1124,8 +1125,9 @@ exSDKExport(
 					}
 					
 					vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
+					vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
 					
-					vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, config.g_timebase.num, 0, 0);
+					vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, nextTimeStamp - timeStamp, 0, 0);
 					
 					if(encode_err == VPX_CODEC_OK)
 					{
@@ -1148,16 +1150,16 @@ exSDKExport(
 					vpx_img_free(img);
 					
 					pixSuite->Dispose(renderResult.outFrame);
-				}
-				
-				
-				float progress = (double)(videoTime - exportInfoP->startTime) / (double)(exportInfoP->endTime - exportInfoP->startTime);
-				
-				result = mySettings->exportProgressSuite->UpdateProgressPercent(exID, progress);
-				
-				if(result == suiteError_ExporterSuspended)
-				{
-					result = mySettings->exportProgressSuite->WaitForResume(exID);
+					
+					
+					float progress = (double)(videoTime - exportInfoP->startTime) / (double)(exportInfoP->endTime - exportInfoP->startTime);
+					
+					result = mySettings->exportProgressSuite->UpdateProgressPercent(exID, progress);
+					
+					if(result == suiteError_ExporterSuspended)
+					{
+						result = mySettings->exportProgressSuite->WaitForResume(exID);
+					}
 				}
 				
 				
@@ -1171,11 +1173,15 @@ exSDKExport(
 		}
 		else
 			result = exportReturn_InternalError;
+			
 	}
 	
 	}catch(...) { result = exportReturn_InternalError; }
 	
 	mySettings->exportFileSuite->Close(exportInfoP->fileObject);
+	
+	if(ebml.cue_list)
+		free(ebml.cue_list);
 	
 	renderSuite->ReleaseVideoRenderer(exID, videoRenderID);
 
@@ -1322,7 +1328,7 @@ exSDKGenerateDefaultParams(
 	fpsValues.rangeMin.timeValue = 1;
 	timeSuite->GetTicksPerSecond(&fpsValues.rangeMax.timeValue);
 	fpsValues.value.timeValue = frameRateP.mInt64;
-	fpsValues.disabled = kPrTrue;
+	fpsValues.disabled = kPrFalse;
 	fpsValues.hidden = kPrFalse;
 	
 	exNewParamInfo fpsParam;
