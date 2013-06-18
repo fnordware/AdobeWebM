@@ -43,8 +43,9 @@
 
 
 #include "webp/demux.h"
-#include "webp/encode.h"
+#include "webp/mux.h"
 #include "webp/decode.h"
+#include "webp/encode.h"
 
 #include <stdio.h>
 #include <assert.h>
@@ -219,6 +220,23 @@ static size_t my_fread(GPtr globals, void * buf, size_t len)
 #endif
 }
 
+static bool my_fwrite(GPtr globals, const void * buf, size_t len)
+{
+#ifdef __PIMac__
+	ByteCount count = len;
+
+	OSErr result = FSWriteFork(gStuff->dataFork, fsAtMark, 0, count, (const void *)buf, &count);
+	
+	return (result == noErr && count == len);
+#else
+	DWORD count = len, out = 0;
+	
+	BOOL result = WriteFile(picture->custom_ptr, (LPVOID)buf, count, &out, NULL);
+	
+	return (result && out == count);
+#endif
+}
+
 static int my_fseek(GPtr globals, long offset, int whence)
 {
 #ifdef __PIMac__
@@ -281,25 +299,6 @@ static long my_GetFileSize(GPtr globals)
 	return fork_size;
 #else
 	return GetFileSize((HANDLE)gStuff->dataFork, NULL);
-#endif
-}
-
-static int myWebPWriterFunction(const uint8_t* data, size_t data_size, const WebPPicture* picture)
-{
-#ifdef __PIMac__
-	ByteCount count = data_size;
-
-	GPtr globals = (GPtr)picture->custom_ptr;
-
-	OSErr result = FSWriteFork(gStuff->dataFork, fsAtMark, 0, count, (const void *)data, &count);
-	
-	return (result == noErr && count == data_size);
-#else
-	DWORD count = data_size, out = 0;
-	
-	BOOL result = WriteFile(picture->custom_ptr, (LPVOID)data, count, &out, NULL);
-	
-	return (result && out == count);
 #endif
 }
 
@@ -507,40 +506,43 @@ static void DoReadStart(GPtr globals)
 							WebPDemuxReleaseChunkIterator(&chunk_iter);
 						}
 						
-						if(PISetProp && (flags & EXIF_FLAG) && WebPDemuxGetChunk(demux, "EXIF", 1, &chunk_iter) )
+						if(gStuff->propertyProcs && PISetProp)
 						{
-							Handle exif_handle = myNewHandle(globals, chunk_iter.chunk.size);
-							
-							if(exif_handle)
+							if( (flags & EXIF_FLAG) && WebPDemuxGetChunk(demux, "EXIF", 1, &chunk_iter) )
 							{
-								Ptr exifP = myLockHandle(globals, exif_handle);
+								Handle exif_handle = myNewHandle(globals, chunk_iter.chunk.size);
 								
-								memcpy(exifP, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+								if(exif_handle)
+								{
+									Ptr exifP = myLockHandle(globals, exif_handle);
+									
+									memcpy(exifP, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+									
+									myUnlockHandle(globals, exif_handle);
+									
+									PISetProp(kPhotoshopSignature, propEXIFData, 0, NULL, exif_handle);
+								}
 								
-								myUnlockHandle(globals, exif_handle);
-								
-								PISetProp(kPhotoshopSignature, propEXIFData, 0, NULL, exif_handle);
+								WebPDemuxReleaseChunkIterator(&chunk_iter);
 							}
-							
-							WebPDemuxReleaseChunkIterator(&chunk_iter);
-						}
 
-						if(PISetProp && (flags & XMP_FLAG) && WebPDemuxGetChunk(demux, "XMP ", 1, &chunk_iter) )
-						{
-							Handle xmp_handle = myNewHandle(globals, chunk_iter.chunk.size);
-							
-							if(xmp_handle)
+							if( (flags & XMP_FLAG) && WebPDemuxGetChunk(demux, "XMP ", 1, &chunk_iter) )
 							{
-								Ptr xmpP = myLockHandle(globals, xmp_handle);
+								Handle xmp_handle = myNewHandle(globals, chunk_iter.chunk.size);
 								
-								memcpy(xmpP, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+								if(xmp_handle)
+								{
+									Ptr xmpP = myLockHandle(globals, xmp_handle);
+									
+									memcpy(xmpP, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+									
+									myUnlockHandle(globals, xmp_handle);
+									
+									PISetProp(kPhotoshopSignature, propXMP, 0, NULL, xmp_handle);
+								}
 								
-								myUnlockHandle(globals, xmp_handle);
-								
-								PISetProp(kPhotoshopSignature, propXMP, 0, NULL, xmp_handle);
+								WebPDemuxReleaseChunkIterator(&chunk_iter);
 							}
-							
-							WebPDemuxReleaseChunkIterator(&chunk_iter);
 						}
 					}
 					
@@ -681,6 +683,9 @@ static void DoReadContinue(GPtr globals)
 			}
 			else
 				gResult = formatCannotRead;
+			
+			
+			WebPDemuxDelete(demux);
 		}
 		else
 			gResult = formatCannotRead;
@@ -910,34 +915,129 @@ static void DoWriteStart(GPtr globals)
 		
 		if(gResult == noErr)
 		{
-			WebPPicture picture;
-			WebPPictureInit(&picture);
+			WebPMux *mux = WebPMuxNew();
 			
-			picture.width = width;
-			picture.height = height;
-			picture.use_argb = TRUE;
-			
-			int ok = use_alpha ? WebPPictureImportRGBA(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes) :
-									WebPPictureImportRGB(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes);
-			
-			if(ok)
+			if(mux)
 			{
-				WebPConfig config;
-				WebPConfigInit(&config);
+				WebPPicture picture;
+				WebPPictureInit(&picture);
 				
-				config.thread_level++;
-				config.lossless = gOptions.lossless;
-				config.quality = gOptions.quality;
+				picture.width = width;
+				picture.height = height;
+				picture.use_argb = TRUE;
 				
-				picture.progress_hook = ProgressReport;
-				picture.user_data = globals;
-				picture.writer = myWebPWriterFunction;
-				picture.custom_ptr = globals;
+				int ok = use_alpha ? WebPPictureImportRGBA(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes) :
+										WebPPictureImportRGB(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes);
 				
-				int success = WebPEncode(&config, &picture);
+				if(ok)
+				{
+					WebPMemoryWriter memory_writer;
+					WebPMemoryWriterInit(&memory_writer);
 				
-				if(!success && gResult == noErr)
-					gResult = formatBadParameters;
+					WebPConfig config;
+					WebPConfigInit(&config);
+					
+					config.thread_level = TRUE;
+					config.lossless = gOptions.lossless;
+					config.quality = gOptions.quality;
+					
+					picture.progress_hook = ProgressReport;
+					picture.user_data = globals;
+					picture.writer = WebPMemoryWrite;
+					picture.custom_ptr = &memory_writer;
+					
+					int success = WebPEncode(&config, &picture);
+					
+					if(success && gResult == noErr)
+					{
+						WebPData image_data = { memory_writer.mem, memory_writer.size };
+					
+						WebPMuxError img_err = WebPMuxSetImage(mux, &image_data, FALSE);
+						
+						if(img_err == WEBP_MUX_OK)
+						{
+							// add metadata
+							if(gStuff->canUseICCProfiles && (gStuff->iCCprofileSize > 0) && (gStuff->iCCprofileData != NULL))
+							{
+								WebPData chunk_data;
+								
+								chunk_data.bytes = (const uint8_t *)myLockHandle(globals, gStuff->iCCprofileData);
+								chunk_data.size = myGetHandleSize(globals, gStuff->iCCprofileData);
+											
+								WebPMuxError chunk_err = WebPMuxSetChunk(mux, "ICCP", &chunk_data, TRUE);
+								
+								myUnlockHandle(globals, gStuff->iCCprofileData);
+							}
+						
+							if(gStuff->propertyProcs && PIGetProp)
+							{
+								intptr_t simp;
+								
+								
+								Handle exif_handle = NULL;
+								
+								PIGetProp(kPhotoshopSignature, propEXIFData, 0, &simp, &exif_handle);
+								
+								if(exif_handle)
+								{
+									WebPData chunk_data;
+									
+									chunk_data.bytes = (const uint8_t *)myLockHandle(globals, exif_handle);
+									chunk_data.size = myGetHandleSize(globals, exif_handle);
+									
+									WebPMuxError chunk_err = WebPMuxSetChunk(mux, "EXIF", &chunk_data, TRUE);
+									
+									myDisposeHandle(globals, exif_handle);
+								}
+
+
+								Handle xmp_handle = NULL;
+								
+								PIGetProp(kPhotoshopSignature, propXMP, 0, &simp, &exif_handle);
+								
+								if(xmp_handle)
+								{
+									WebPData chunk_data;
+									
+									chunk_data.bytes = (const uint8_t *)myLockHandle(globals, xmp_handle);
+									chunk_data.size = myGetHandleSize(globals, xmp_handle);
+									
+									WebPMuxError chunk_err = WebPMuxSetChunk(mux, "XMP ", &chunk_data, TRUE);
+									
+									myDisposeHandle(globals, xmp_handle);
+								}
+							}
+							
+							// assemble and write the file
+							WebPData output_data;
+							
+							WebPMuxError err = WebPMuxAssemble(mux, &output_data);
+							
+							if(err == WEBP_MUX_OK)
+							{
+								bool ok = my_fwrite(globals, output_data.bytes, output_data.size);
+								
+								WebPDataClear(&output_data);
+								
+								if(!ok)
+									gResult = writErr; // or maybe dskFulErr
+							}
+							else
+								gResult = formatBadParameters;
+						}
+						else
+							gResult = formatBadParameters;
+					}
+					else if(gResult == noErr)
+					{
+						gResult = formatBadParameters;
+					}
+					
+					if(memory_writer.mem)
+						free(memory_writer.mem);
+				}
+			
+				WebPMuxDelete(mux);
 			}
 			else
 				gResult = formatBadParameters;
