@@ -146,6 +146,21 @@ SDKInit(
 	imStdParms		*stdParms, 
 	imImportInfoRec	*importInfo)
 {
+	PrSDKAppInfoSuite *appInfoSuite = NULL;
+	stdParms->piSuites->utilFuncs->getSPBasicSuite()->AcquireSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion, (const void**)&appInfoSuite);
+	
+	if(appInfoSuite)
+	{
+		int fourCC = 0;
+	
+		appInfoSuite->GetAppInfo(PrSDKAppInfoSuite::kAppInfo_AppFourCC, (void *)&fourCC);
+	
+		stdParms->piSuites->utilFuncs->getSPBasicSuite()->ReleaseSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion);
+		
+		if(fourCC == kAppAfterEffects)
+			return imOtherErr;
+	}
+	
 	importInfo->setupOnDblClk		= kPrFalse;		// If user dbl-clicks file you imported, pop your setup dialog
 	importInfo->canSave				= kPrFalse;		// Can 'save as' files to disk, real file only
 	
@@ -156,7 +171,7 @@ SDKInit(
 	importInfo->priority			= 0;
 	importInfo->canTrim				= kPrFalse;
 	importInfo->canCalcSizes		= kPrFalse;
-	if (stdParms->imInterfaceVer >= IMPORTMOD_VERSION_6)
+	if(stdParms->imInterfaceVer >= IMPORTMOD_VERSION_6)
 	{
 		importInfo->avoidAudioConform = kPrTrue;
 	}							

@@ -24,6 +24,7 @@
 #include	"PrSDKImporterFileManagerSuite.h"
 #include	"PrSDKMemoryManagerSuite.h"
 #include	"PrSDKWindowSuite.h"
+#include	"PrSDKAppInfoSuite.h"
 #include	"SDK_Segment_Utils.h"
 #ifdef		PRMAC_ENV
 #include	<wchar.h>
