@@ -442,6 +442,26 @@ static void DoReadStart(GPtr globals)
 					uint32_t height = WebPDemuxGetI(demux, WEBP_FF_CANVAS_HEIGHT);
 					uint32_t flags = WebPDemuxGetI(demux, WEBP_FF_FORMAT_FLAGS);
 					
+					bool has_alpha = (flags & ALPHA_FLAG);
+					
+					// check the bitstream to see if we REALLY have an alpha
+					// (lossless images are always compressed with an alpha)
+					WebPIterator iter;
+					
+					if(has_alpha && WebPDemuxGetFrame(demux, 0, &iter) )
+					{
+						WebPBitstreamFeatures features;
+					
+						VP8StatusCode status = WebPGetFeatures(iter.fragment.bytes, iter.fragment.size, &features);
+						
+						has_alpha = features.has_alpha;
+						
+						WebPDemuxReleaseIterator(&iter);
+					}
+
+					assert(WebPDemuxGetI(demux, WEBP_FF_FRAME_COUNT) >= 1);
+					
+
 					if(!reverting)
 					{
 						WebP_InUI_Data params;
@@ -456,7 +476,7 @@ static void DoReadStart(GPtr globals)
 
 						// WebP_InUI is responsible for not popping a dialog if the user
 						// didn't request it.  It still has to set the read settings from preferences though.
-						bool result = WebP_InUI(&params, (flags & ALPHA_FLAG), plugHndl, hwnd);
+						bool result = WebP_InUI(&params, has_alpha, plugHndl, hwnd);
 						
 						if(result)
 						{
@@ -478,7 +498,7 @@ static void DoReadStart(GPtr globals)
 						gStuff->imageSize.h = gStuff->imageSize32.h = width;
 						gStuff->imageSize.v = gStuff->imageSize32.v = height;
 						
-						gStuff->planes = ((flags & ALPHA_FLAG) ? 4 : 3);
+						gStuff->planes = (has_alpha ? 4 : 3);
 						
 						if(gInOptions.alpha == WEBP_ALPHA_TRANSPARENCY && gStuff->planes == 4)
 						{
@@ -611,7 +631,7 @@ static void DoReadContinue(GPtr globals)
 		{
 			WebPIterator iter;
 			
-			if( WebPDemuxGetFrame(demux, 1, &iter) )
+			if( WebPDemuxGetFrame(demux, 0, &iter) )
 			{
 				WebPDecoderConfig config;
 				WebPInitDecoderConfig(&config);
@@ -647,7 +667,7 @@ static void DoReadContinue(GPtr globals)
 						buf_info->size = buffer_size;
 						
 						
-						status = WebPDecode((const uint8_t *)data, data_size, &config);
+						status = WebPDecode((const uint8_t *)iter.fragment.bytes, iter.fragment.size, &config);
 						
 						if(status == VP8_STATUS_OK)
 						{
