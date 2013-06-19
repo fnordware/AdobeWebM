@@ -1013,7 +1013,7 @@ static void DoWriteStart(GPtr globals)
 
 								Handle xmp_handle = NULL;
 								
-								PIGetProp(kPhotoshopSignature, propXMP, 0, &simp, &exif_handle);
+								PIGetProp(kPhotoshopSignature, propXMP, 0, &simp, &xmp_handle);
 								
 								if(xmp_handle)
 								{
