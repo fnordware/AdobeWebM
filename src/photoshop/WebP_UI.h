@@ -55,6 +55,9 @@ typedef struct {
 	bool				lossless;
 	int					quality;
 	DialogAlpha			alpha;
+	bool				lossy_alpha;
+	bool				alpha_cleanup;
+	bool				save_metadata;
 } WebP_OutUI_Data;
 
 // WebP UI

@@ -55,15 +55,18 @@ typedef uint8 WebP_Alpha;
 
 typedef struct {
 	WebP_Alpha	alpha;
-	bool		mult;
+	Boolean		mult;
 	
 } WebP_inData;
 
 typedef struct {
-	bool			lossless;
+	Boolean			lossless;
 	uint8			quality;
 	WebP_Alpha		alpha;
-	uint8			reserved[253];
+	Boolean			lossy_alpha;
+	Boolean			alpha_cleanup;
+	Boolean			save_metadata;
+	uint8			reserved[250];
 	
 } WebP_outData;
 
@@ -108,27 +111,6 @@ DLLExport MACPASCAL void PluginMain (const short selector,
 					  	             FormatRecord *formatParamBlock,
 						             intptr_t *data,
 						             short *result);
-
-// funcs living in other files
-void SuperPNG_VerifyFile(GPtr globals);
-void SuperPNG_FileInfo(GPtr globals);
-void SuperPNG_ReadFile(GPtr globals);
-
-void SuperPNG_WriteFile(GPtr globals);
-
-// my backward compatible buffer and handle routines
-/*
-Handle myNewHandle(GPtr globals, const int32 inSize);
-Ptr myLockHandle(GPtr globals, Handle h);
-void myUnlockHandle(GPtr globals, Handle h);
-int32 myGetHandleSize(GPtr globals, Handle h);
-void mySetHandleSize(GPtr globals, Handle h, const int32 inSize);
-void myDisposeHandle(GPtr globals, Handle h);
-
-OSErr myAllocateBuffer(GPtr globals, const int32 inSize, BufferID *outBufferID);
-Ptr myLockBuffer(GPtr globals, const BufferID inBufferID, Boolean inMoveHigh);
-void myFreeBuffer(GPtr globals, const BufferID inBufferID);
-*/
 
 // Scripting functions
 Boolean ReadScriptParamsOnWrite (GPtr globals);	// Read any scripting params.

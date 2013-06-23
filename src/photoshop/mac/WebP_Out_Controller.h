@@ -40,16 +40,33 @@
 
 #include "WebP_UI.h"
 
+typedef enum {
+	DIALOG_RESULT_CONTINUE = 0,
+	DIALOG_RESULT_OK,
+	DIALOG_RESULT_CANCEL
+} DialogResult;
 
 @interface WebP_Out_Controller : NSObject {
-	IBOutlet NSButton *losslessCheck;
+	IBOutlet NSButton *losslessRadio;
+	IBOutlet NSButton *qualityRadio;
+	IBOutlet NSTextField *qualityField;
 	IBOutlet NSSlider *qualitySlider;
-	IBOutlet NSMatrix *alphaMatrix;
+	IBOutlet NSButton *alphaNoneRadio;
+	IBOutlet NSButton *alphaTransparencyRadio;
+	IBOutlet NSButton *alphaChannelRadio;
+	IBOutlet NSButton *lossyAlphaCheck;
+	IBOutlet NSButton *alphaCleanupCheck;
+	IBOutlet NSButton *saveMetadataCheck;
 	IBOutlet NSWindow *theWindow;
+	
+	DialogResult result;
 }
 - (id)init:(BOOL)lossless
 	quality:(int)quality
 	alpha:(DialogAlpha)alpha
+	lossyAlpha:(BOOL)lossyAlpha
+	alphaCleanup:(BOOL)alphaCleanup
+	saveMetadata:(BOOL)saveMetadata
 	have_transparency:(BOOL)has_transparency
 	alpha_name:(const char *)alphaName;
 
@@ -57,11 +74,16 @@
 - (IBAction)clickedCancel:(id)sender;
 
 - (IBAction)trackLossless:(id)sender;
+- (IBAction)trackAlpha:(id)sender;
 
 - (NSWindow *)getWindow;
+- (DialogResult)getResult;
 
 - (BOOL)getLossless;
 - (int)getQuality;
 - (DialogAlpha)getAlpha;
+- (BOOL)getLossyAlpha;
+- (BOOL)getAlphaCleanup;
+- (BOOL)getSaveMetadata;
 
 @end

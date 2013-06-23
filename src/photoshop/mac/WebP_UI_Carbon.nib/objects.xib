@@ -2,76 +2,66 @@
 <object class="NSIBObjectData">
   <object name="rootObject" class="NSCustomObject" id="1">
   </object>
-  <array count="26" name="allObjects">
-    <object class="IBCarbonImageView" id="180">
-      <ostype name="controlSignature">Banr</ostype>
-      <string name="viewFrame">20 8 325 40 </string>
-      <string name="bounds">8 20 48 345 </string>
+  <array count="30" name="allObjects">
+    <object class="IBCarbonButton" id="232">
+      <ostype name="command">ok  </ostype>
+      <int name="buttonType">1</int>
+      <string name="title">OK</string>
+      <string name="viewFrame">134 156 96 20 </string>
+      <string name="bounds">156 134 176 230 </string>
     </object>
-    <object class="IBCarbonRadioGroup" id="205">
-      <ostype name="controlSignature">Alph</ostype>
+    <object class="IBCarbonRootControl" id="167">
       <int name="controlSize">1</int>
-      <int name="numRows">3</int>
-      <int name="selectedRow">2</int>
-      <int name="intercellHeight">11</int>
-      <array count="3" name="radioTitles">
-        <array count="1">
-          <string>None</string>
-        </array>
-        <array count="1">
-          <string>Transparency</string>
-        </array>
-        <array count="1">
-          <string>Channels Palette</string>
-        </array>
-      </array>
-      <string name="viewFrame">16 30 157 67 </string>
-      <string name="bounds">168 110 235 267 </string>
-    </object>
-    <object class="IBCarbonStaticText" id="238">
-      <string name="title">WebP Photoshop Plug-In</string>
-      <int name="justification">1</int>
-      <string name="viewFrame">99 63 167 16 </string>
-      <string name="bounds">63 99 79 266 </string>
-    </object>
-    <object class="IBCarbonRootControl" id="217">
-      <ostype name="controlSignature">Auto</ostype>
-      <int name="controlSize">1</int>
-      <string name="viewFrame">0 0 365 274 </string>
-      <array count="6" name="subviews">
-        <object class="IBCarbonImageView" id="223">
+      <string name="viewFrame">0 0 365 342 </string>
+      <array count="8" name="subviews">
+        <object class="IBCarbonImageView" id="180">
           <ostype name="controlSignature">Banr</ostype>
           <string name="viewFrame">20 8 325 40 </string>
           <string name="bounds">8 20 48 345 </string>
         </object>
-        <object class="IBCarbonButton" id="219">
+        <object class="IBCarbonButton" id="199">
           <ostype name="command">ok  </ostype>
           <int name="buttonType">1</int>
           <string name="title">OK</string>
-          <string name="viewFrame">265 234 80 20 </string>
-          <string name="bounds">234 265 254 345 </string>
+          <string name="viewFrame">249 302 96 20 </string>
+          <string name="bounds">302 249 322 345 </string>
         </object>
-        <object class="IBCarbonButton" id="218">
+        <object class="IBCarbonButton" id="200">
           <ostype name="command">not!</ostype>
           <int name="buttonType">2</int>
           <string name="title">Cancel</string>
-          <string name="viewFrame">161 234 80 20 </string>
-          <string name="bounds">234 161 254 241 </string>
+          <string name="viewFrame">141 302 96 20 </string>
+          <string name="bounds">302 141 322 237 </string>
         </object>
-        <object class="IBCarbonGroupBox" id="221">
+        <object class="IBCarbonSlider" id="203">
+          <ostype name="controlSignature">Qual</ostype>
+          <int name="controlSize">1</int>
+          <ostype name="command">Slid</ostype>
+          <int name="numTickMarks">11</int>
+          <int name="orientation">1</int>
+          <int name="initialValue">50</int>
+          <string name="viewFrame">224 96 120 15 </string>
+          <string name="bounds">96 224 111 344 </string>
+        </object>
+        <object class="IBCarbonGroupBox" id="204">
           <int name="fontStyle">0</int>
-          <string name="title">Alpha Channel Handling</string>
+          <string name="title">Alpha Channel</string>
           <boolean name="autoToggle">FALSE</boolean>
           <boolean name="primary">FALSE</boolean>
           <int name="selectedItem">0</int>
-          <string name="viewFrame">94 59 177 116 </string>
-          <array count="2" name="subviews">
-            <object class="IBCarbonRadioGroup" id="224">
+          <string name="viewFrame">47 130 270 103 </string>
+          <array count="3" name="subviews">
+            <object class="IBCarbonRadioGroup" id="205">
               <ostype name="controlSignature">Alph</ostype>
+              <int name="controlSize">1</int>
               <ostype name="command">Alph</ostype>
+              <int name="numRows">3</int>
               <int name="selectedRow">2</int>
-              <int name="intercellHeight">11</int>
-              <array count="2" name="radioTitles">
+              <int name="intercellHeight">8</int>
+              <array count="3" name="radioTitles">
+                <array count="1">
+                  <string>None</string>
+                </array>
                 <array count="1">
                   <string>Transparency</string>
                 </array>
@@ -79,137 +69,64 @@
                   <string>Channels Palette</string>
                 </array>
               </array>
-              <string name="viewFrame">16 30 157 47 </string>
-              <string name="bounds">89 110 136 267 </string>
+              <string name="viewFrame">16 26 157 61 </string>
+              <string name="bounds">156 63 217 220 </string>
             </object>
-            <object class="IBCarbonCheckBox" id="227">
-              <ostype name="controlSignature">Prem</ostype>
-              <string name="title">Premultiply RGB</string>
-              <string name="viewFrame">38 85 123 18 </string>
-              <string name="bounds">144 132 162 255 </string>
+            <object class="IBCarbonCheckBox" id="244">
+              <ostype name="controlSignature">ACln</ostype>
+              <int name="controlSize">1</int>
+              <int name="initialState">1</int>
+              <string name="title">Alpha Cleanup</string>
+              <string name="viewFrame">157 48 103 18 </string>
+              <string name="bounds">178 204 196 307 </string>
+            </object>
+            <object class="IBCarbonCheckBox" id="245">
+              <ostype name="controlSignature">ALos</ostype>
+              <int name="controlSize">1</int>
+              <string name="title">Lossy Alpha</string>
+              <string name="viewFrame">157 72 103 18 </string>
+              <string name="bounds">202 204 220 307 </string>
             </object>
           </array>
-          <string name="bounds">59 94 175 271 </string>
+          <string name="bounds">130 47 233 317 </string>
         </object>
-        <object class="IBCarbonButton" id="226">
-          <ostype name="controlSignature">Dflt</ostype>
-          <ostype name="command">Dflt</ostype>
-          <int name="buttonType">2</int>
-          <string name="title">Set Default</string>
-          <string name="viewFrame">20 234 100 20 </string>
-          <string name="bounds">234 20 254 120 </string>
+        <object class="IBCarbonRadioGroup" id="242">
+          <ostype name="controlSignature">Loss</ostype>
+          <ostype name="command">Loss</ostype>
+          <int name="selectedRow">2</int>
+          <int name="intercellHeight">12</int>
+          <array count="2" name="radioTitles">
+            <array count="1">
+              <string>Lossless</string>
+            </array>
+            <array count="1">
+              <string>Lossy Quality:</string>
+            </array>
+          </array>
+          <string name="viewFrame">47 63 153 48 </string>
+          <string name="bounds">63 47 111 200 </string>
         </object>
-        <object class="IBCarbonCheckBox" id="228">
-          <ostype name="controlSignature">Auto</ostype>
-          <int name="controlSize">1</int>
-          <string name="title">Automatically show this dialog</string>
-          <string name="viewFrame">89 196 185 18 </string>
-          <string name="bounds">196 89 214 274 </string>
+        <object class="IBCarbonEditText" id="243">
+          <ostype name="controlSignature">Qual</ostype>
+          <int name="controlID">1</int>
+          <ostype name="command">Text</ostype>
+          <boolean name="useInlineInput">TRUE</boolean>
+          <boolean name="isUnicode">TRUE</boolean>
+          <boolean name="isSingleLine">TRUE</boolean>
+          <string name="title">50</string>
+          <string name="foreColor">0 0 0 </string>
+          <string name="viewFrame">166 94 46 16 </string>
+          <string name="bounds">94 166 110 212 </string>
+        </object>
+        <object class="IBCarbonCheckBox" id="246">
+          <ostype name="controlSignature">Meta</ostype>
+          <int name="initialState">1</int>
+          <string name="title">Save Metadata</string>
+          <string name="viewFrame">45 249 122 18 </string>
+          <string name="bounds">249 45 267 167 </string>
         </object>
       </array>
-      <string name="bounds">0 0 274 365 </string>
-    </object>
-    <reference idRef="227"/>
-    <object class="IBCarbonWindow" id="216">
-      <boolean name="receiveUpdates">FALSE</boolean>
-      <boolean name="hasCloseBox">FALSE</boolean>
-      <boolean name="hasCollapseBox">FALSE</boolean>
-      <boolean name="hasHorizontalZoom">FALSE</boolean>
-      <boolean name="isResizable">FALSE</boolean>
-      <boolean name="hasVerticalZoom">FALSE</boolean>
-      <boolean name="compositing">TRUE</boolean>
-      <boolean name="inWindowMenu">FALSE</boolean>
-      <int name="carbonWindowClass">4</int>
-      <string name="title">WebP Options</string>
-      <reference name="rootControl" idRef="217"/>
-      <string name="windowRect">346 475 620 840 </string>
-      <string name="ScreenRectAtEncodeTime">0 0 768 1024 </string>
-    </object>
-    <reference idRef="218"/>
-    <object class="IBCarbonGroupBox" id="204">
-      <int name="fontStyle">0</int>
-      <string name="title">Alpha Channel</string>
-      <boolean name="autoToggle">FALSE</boolean>
-      <boolean name="primary">FALSE</boolean>
-      <int name="selectedItem">0</int>
-      <string name="viewFrame">94 138 177 116 </string>
-      <array count="1" name="subviews">
-        <reference idRef="205"/>
-      </array>
-      <string name="bounds">138 94 254 271 </string>
-    </object>
-    <object class="IBCarbonStaticText" id="240">
-      <ostype name="controlSignature">WebP</ostype>
-      <int name="controlSize">1</int>
-      <string name="title">WebP version</string>
-      <int name="justification">1</int>
-      <string name="viewFrame">102 108 161 16 </string>
-      <string name="bounds">108 102 124 263 </string>
-    </object>
-    <object class="IBCarbonCheckBox" id="202">
-      <ostype name="controlSignature">Loss</ostype>
-      <ostype name="command">Loss</ostype>
-      <string name="title">Lossless</string>
-      <string name="viewFrame">57 63 86 18 </string>
-      <string name="bounds">63 57 81 143 </string>
-    </object>
-    <reference idRef="221"/>
-    <object class="IBCarbonButton" id="199">
-      <ostype name="command">ok  </ostype>
-      <int name="buttonType">1</int>
-      <string name="title">OK</string>
-      <string name="viewFrame">249 280 96 20 </string>
-      <string name="bounds">280 249 300 345 </string>
-    </object>
-    <object class="IBCarbonWindow" id="166">
-      <boolean name="receiveUpdates">FALSE</boolean>
-      <boolean name="hasCloseBox">FALSE</boolean>
-      <boolean name="hasCollapseBox">FALSE</boolean>
-      <boolean name="hasHorizontalZoom">FALSE</boolean>
-      <boolean name="isResizable">FALSE</boolean>
-      <boolean name="hasVerticalZoom">FALSE</boolean>
-      <boolean name="compositing">TRUE</boolean>
-      <boolean name="inWindowMenu">FALSE</boolean>
-      <int name="carbonWindowClass">4</int>
-      <string name="title">WebP Options</string>
-      <object name="rootControl" class="IBCarbonRootControl" id="167">
-        <int name="controlSize">1</int>
-        <string name="viewFrame">0 0 365 320 </string>
-        <array count="6" name="subviews">
-          <reference idRef="180"/>
-          <reference idRef="199"/>
-          <object class="IBCarbonButton" id="200">
-            <ostype name="command">not!</ostype>
-            <int name="buttonType">2</int>
-            <string name="title">Cancel</string>
-            <string name="viewFrame">141 280 96 20 </string>
-            <string name="bounds">280 141 300 237 </string>
-          </object>
-          <reference idRef="202"/>
-          <object class="IBCarbonSlider" id="203">
-            <ostype name="controlSignature">Qual</ostype>
-            <int name="numTickMarks">11</int>
-            <int name="orientation">1</int>
-            <int name="initialValue">50</int>
-            <string name="viewFrame">57 101 251 20 </string>
-            <string name="bounds">101 57 121 308 </string>
-          </object>
-          <reference idRef="204"/>
-        </array>
-        <string name="bounds">0 0 320 365 </string>
-      </object>
-      <string name="windowRect">346 475 666 840 </string>
-      <string name="ScreenRectAtEncodeTime">0 0 768 1024 </string>
-    </object>
-    <reference idRef="228"/>
-    <reference idRef="223"/>
-    <object class="IBCarbonStaticText" id="239">
-      <ostype name="controlSignature">Plug</ostype>
-      <int name="controlSize">1</int>
-      <string name="title">plug-in version</string>
-      <int name="justification">1</int>
-      <string name="viewFrame">102 92 161 16 </string>
-      <string name="bounds">92 102 108 263 </string>
+      <string name="bounds">0 0 342 365 </string>
     </object>
     <object class="IBCarbonWindow" id="229">
       <boolean name="receiveUpdates">FALSE</boolean>
@@ -231,59 +148,197 @@
             <string name="viewFrame">20 8 325 40 </string>
             <string name="bounds">8 20 48 345 </string>
           </object>
-          <object class="IBCarbonButton" id="232">
-            <ostype name="command">ok  </ostype>
-            <int name="buttonType">1</int>
-            <string name="title">OK</string>
-            <string name="viewFrame">134 156 96 20 </string>
-            <string name="bounds">156 134 176 230 </string>
+          <reference idRef="232"/>
+          <object class="IBCarbonStaticText" id="238">
+            <string name="title">WebP Photoshop Plug-In</string>
+            <int name="justification">1</int>
+            <string name="viewFrame">99 63 167 16 </string>
+            <string name="bounds">63 99 79 266 </string>
           </object>
-          <reference idRef="238"/>
-          <reference idRef="239"/>
-          <reference idRef="240"/>
+          <object class="IBCarbonStaticText" id="239">
+            <ostype name="controlSignature">Plug</ostype>
+            <int name="controlSize">1</int>
+            <string name="title">plug-in version</string>
+            <int name="justification">1</int>
+            <string name="viewFrame">102 92 161 16 </string>
+            <string name="bounds">92 102 108 263 </string>
+          </object>
+          <object class="IBCarbonStaticText" id="240">
+            <ostype name="controlSignature">WebP</ostype>
+            <int name="controlSize">1</int>
+            <string name="title">WebP version</string>
+            <int name="justification">1</int>
+            <string name="viewFrame">102 108 161 16 </string>
+            <string name="bounds">108 102 124 263 </string>
+          </object>
         </array>
         <string name="bounds">0 0 196 365 </string>
       </object>
       <string name="windowRect">346 475 542 840 </string>
       <string name="ScreenRectAtEncodeTime">0 0 768 1024 </string>
     </object>
+    <reference idRef="238"/>
+    <object class="IBCarbonCheckBox" id="227">
+      <ostype name="controlSignature">Prem</ostype>
+      <string name="title">Premultiply RGB</string>
+      <string name="viewFrame">38 85 123 18 </string>
+      <string name="bounds">144 132 162 255 </string>
+    </object>
+    <reference idRef="205"/>
+    <object class="IBCarbonRadioGroup" id="224">
+      <ostype name="controlSignature">Alph</ostype>
+      <ostype name="command">Alph</ostype>
+      <int name="selectedRow">2</int>
+      <int name="intercellHeight">11</int>
+      <array count="2" name="radioTitles">
+        <array count="1">
+          <string>Transparency</string>
+        </array>
+        <array count="1">
+          <string>Channels Palette</string>
+        </array>
+      </array>
+      <string name="viewFrame">16 30 157 47 </string>
+      <string name="bounds">89 110 136 267 </string>
+    </object>
+    <reference idRef="199"/>
+    <reference idRef="243"/>
+    <reference idRef="244"/>
     <reference idRef="200"/>
+    <reference idRef="246"/>
     <reference idRef="203"/>
-    <reference idRef="167"/>
-    <reference idRef="236"/>
-    <reference idRef="230"/>
+    <reference idRef="180"/>
+    <reference idRef="245"/>
+    <object class="IBCarbonWindow" id="216">
+      <boolean name="receiveUpdates">FALSE</boolean>
+      <boolean name="hasCloseBox">FALSE</boolean>
+      <boolean name="hasCollapseBox">FALSE</boolean>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <boolean name="compositing">TRUE</boolean>
+      <boolean name="inWindowMenu">FALSE</boolean>
+      <int name="carbonWindowClass">4</int>
+      <string name="title">WebP Options</string>
+      <object name="rootControl" class="IBCarbonRootControl" id="217">
+        <ostype name="controlSignature">Auto</ostype>
+        <int name="controlSize">1</int>
+        <string name="viewFrame">0 0 365 274 </string>
+        <array count="6" name="subviews">
+          <object class="IBCarbonImageView" id="223">
+            <ostype name="controlSignature">Banr</ostype>
+            <string name="viewFrame">20 8 325 40 </string>
+            <string name="bounds">8 20 48 345 </string>
+          </object>
+          <object class="IBCarbonButton" id="219">
+            <ostype name="command">ok  </ostype>
+            <int name="buttonType">1</int>
+            <string name="title">OK</string>
+            <string name="viewFrame">265 234 80 20 </string>
+            <string name="bounds">234 265 254 345 </string>
+          </object>
+          <object class="IBCarbonButton" id="218">
+            <ostype name="command">not!</ostype>
+            <int name="buttonType">2</int>
+            <string name="title">Cancel</string>
+            <string name="viewFrame">161 234 80 20 </string>
+            <string name="bounds">234 161 254 241 </string>
+          </object>
+          <object class="IBCarbonGroupBox" id="221">
+            <int name="fontStyle">0</int>
+            <string name="title">Alpha Channel Handling</string>
+            <boolean name="autoToggle">FALSE</boolean>
+            <boolean name="primary">FALSE</boolean>
+            <int name="selectedItem">0</int>
+            <string name="viewFrame">94 59 177 116 </string>
+            <array count="2" name="subviews">
+              <reference idRef="224"/>
+              <reference idRef="227"/>
+            </array>
+            <string name="bounds">59 94 175 271 </string>
+          </object>
+          <object class="IBCarbonButton" id="226">
+            <ostype name="controlSignature">Dflt</ostype>
+            <ostype name="command">Dflt</ostype>
+            <int name="buttonType">2</int>
+            <string name="title">Set Default</string>
+            <string name="viewFrame">20 234 100 20 </string>
+            <string name="bounds">234 20 254 120 </string>
+          </object>
+          <object class="IBCarbonCheckBox" id="228">
+            <ostype name="controlSignature">Auto</ostype>
+            <int name="controlSize">1</int>
+            <string name="title">Automatically show this dialog</string>
+            <string name="viewFrame">89 196 185 18 </string>
+            <string name="bounds">196 89 214 274 </string>
+          </object>
+        </array>
+        <string name="bounds">0 0 274 365 </string>
+      </object>
+      <string name="windowRect">346 475 620 840 </string>
+      <string name="ScreenRectAtEncodeTime">0 0 768 1024 </string>
+    </object>
     <reference idRef="226"/>
-    <reference idRef="232"/>
+    <reference idRef="228"/>
+    <reference idRef="242"/>
+    <reference idRef="204"/>
+    <reference idRef="223"/>
+    <reference idRef="230"/>
+    <reference idRef="221"/>
+    <reference idRef="239"/>
+    <reference idRef="240"/>
+    <object class="IBCarbonWindow" id="166">
+      <boolean name="receiveUpdates">FALSE</boolean>
+      <boolean name="hasCloseBox">FALSE</boolean>
+      <boolean name="hasCollapseBox">FALSE</boolean>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <boolean name="compositing">TRUE</boolean>
+      <boolean name="inWindowMenu">FALSE</boolean>
+      <int name="carbonWindowClass">4</int>
+      <int name="windowPosition">1</int>
+      <string name="title">WebP Options</string>
+      <reference name="rootControl" idRef="167"/>
+      <string name="windowRect">346 475 688 840 </string>
+      <string name="ScreenRectAtEncodeTime">0 0 768 1024 </string>
+    </object>
+    <reference idRef="218"/>
     <reference idRef="219"/>
-    <reference idRef="224"/>
+    <reference idRef="217"/>
+    <reference idRef="236"/>
   </array>
-  <array count="26" name="allParents">
+  <array count="30" name="allParents">
+    <reference idRef="230"/>
+    <reference idRef="166"/>
+    <reference idRef="1"/>
+    <reference idRef="230"/>
+    <reference idRef="221"/>
+    <reference idRef="204"/>
+    <reference idRef="221"/>
+    <reference idRef="167"/>
     <reference idRef="167"/>
     <reference idRef="204"/>
-    <reference idRef="230"/>
-    <reference idRef="216"/>
-    <reference idRef="221"/>
-    <reference idRef="1"/>
-    <reference idRef="217"/>
     <reference idRef="167"/>
-    <reference idRef="230"/>
     <reference idRef="167"/>
-    <reference idRef="217"/>
     <reference idRef="167"/>
+    <reference idRef="167"/>
+    <reference idRef="204"/>
     <reference idRef="1"/>
     <reference idRef="217"/>
     <reference idRef="217"/>
-    <reference idRef="230"/>
-    <reference idRef="1"/>
     <reference idRef="167"/>
     <reference idRef="167"/>
-    <reference idRef="166"/>
-    <reference idRef="230"/>
+    <reference idRef="217"/>
     <reference idRef="229"/>
     <reference idRef="217"/>
     <reference idRef="230"/>
+    <reference idRef="230"/>
+    <reference idRef="1"/>
     <reference idRef="217"/>
-    <reference idRef="221"/>
+    <reference idRef="217"/>
+    <reference idRef="216"/>
+    <reference idRef="230"/>
   </array>
   <dictionary count="4" name="nameTable">
     <string>About Dialog</string>
@@ -296,5 +351,5 @@
     <reference idRef="166"/>
   </dictionary>
   <string name="targetFramework">IBCarbonFramework</string>
-  <unsigned_int name="nextObjectID">241</unsigned_int>
+  <unsigned_int name="nextObjectID">247</unsigned_int>
 </object>

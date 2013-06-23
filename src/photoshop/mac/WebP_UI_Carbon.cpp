@@ -327,16 +327,124 @@ WebP_InUI(
 
 static void TrackLossless(WindowRef window)
 {
-	ControlID cid = {'Qual', 0};
-	ControlRef cref;
+	ControlID slider_id = {'Qual', 0};
+	ControlID field_id = {'Qual', 1};
+	ControlID lossyA_id = {'ALos', 0};
 	
-	GetControlByID(window, &cid, &cref);
+	ControlRef slider_ref, field_ref, lossyA_ref;
 	
-	if( GetControlVal(window, 'Loss', 0) )
-		DisableControl(cref);
+	GetControlByID(window, &slider_id, &slider_ref);
+	GetControlByID(window, &field_id, &field_ref);
+	GetControlByID(window, &lossyA_id, &lossyA_ref);
+	
+	if( GetControlVal(window, 'Loss', 0) == 1 )
+	{
+		// Lossless
+		DisableControl(slider_ref);
+		DisableControl(field_ref);
+		DisableControl(lossyA_ref);
+	}
 	else
-		EnableControl(cref);
+	{
+		EnableControl(slider_ref);
+		DisableControl(field_ref); // can't figure out how to track typing, so I'll keep it disabled
+		
+		if( GetControlVal(window, 'Alph', 0) != 1 )
+		{
+			EnableControl(lossyA_ref);
+		}
+	}
 }
+
+
+static void TrackAlphaOut(WindowRef window)
+{
+	ControlID cleanup_id = {'ACln', 0};
+	ControlID lossyA_id = {'ALos', 0};
+	
+	ControlRef cleanup_ref, lossyA_ref;
+	
+	GetControlByID(window, &cleanup_id, &cleanup_ref);
+	GetControlByID(window, &lossyA_id, &lossyA_ref);
+	
+	DialogAlpha alpha = (DialogAlpha)(GetControlVal(window, 'Alph', 0) - 1);
+	
+	if(alpha == DIALOG_ALPHA_NONE)
+	{
+		DisableControl(cleanup_ref);
+		DisableControl(lossyA_ref);
+	}
+	else
+	{
+		if(GetControlVal(window, 'Loss', 0) == 1)
+		{
+			// lossless
+			DisableControl(lossyA_ref);
+		}
+		else
+		{
+			EnableControl(lossyA_ref);
+		}
+		
+		if(alpha == DIALOG_ALPHA_TRANSPARENCY)
+		{
+			EnableControl(cleanup_ref);
+		}
+		else
+		{
+			DisableControl(cleanup_ref);
+		}
+	}
+}
+
+
+static void TrackSlider(WindowRef window)
+{
+	ControlID text_id = {'Qual', 1};
+	
+	ControlRef text_ref;
+	
+	GetControlByID(window, &text_id, &text_ref);
+
+
+	int val = GetControlVal(window, 'Qual', 0);
+	
+	CFStringRef text_str = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, CFSTR("%d"), val);
+	
+	if(text_str)
+	{
+		SetControlData(text_ref, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &text_str);
+		
+		CFRelease(text_str);
+	}
+}
+
+
+static void TrackText(WindowRef window)
+{
+	ControlID slider_id = {'Qual', 0};
+	ControlID text_id = {'Qual', 1};
+	
+	ControlRef slider_ref, text_ref;
+	
+	GetControlByID(window, &slider_id, &slider_ref);
+	GetControlByID(window, &text_id, &text_ref);
+	
+	CFStringRef text_str = NULL;
+	
+	GetControlData(text_ref, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &text_str, NULL);
+	
+	if(text_str)
+	{
+		int val = CFStringGetIntValue(text_str);
+		
+		if(val >= 0 && val <= 100)	
+			SetControlVal(window, 'Qual', 0, val);
+		
+		CFRelease(text_str);
+	}
+}
+
 
 static pascal OSStatus
 Out_WindowEventHandler( EventHandlerCallRef inCaller, EventRef inEvent, void* inRefcon )
@@ -369,17 +477,29 @@ Out_WindowEventHandler( EventHandlerCallRef inCaller, EventRef inEvent, void* in
 							TrackLossless((WindowRef)inRefcon);
 						break;
 						
+						case 'Alph':
+							TrackAlphaOut((WindowRef)inRefcon);
+						break;
+						
+						case 'Slid':
+							TrackSlider((WindowRef)inRefcon);
+						break;
+						
+						case 'Text':
+							TrackText((WindowRef)inRefcon);
+						break;
+						
 						default:
 						break;
 					}
 				break;
-
+				
 				default:
 				break;
 			}
 			break;
 		}
-
+		
 		default:
 		break;
 	}
@@ -447,11 +567,12 @@ WebP_OutUI(
 				SetControlVal(window, 'Loss', 0, params->lossless);
 				SetControlVal(window, 'Qual', 0, params->quality);
 				SetControlVal(window, 'Alph', 0, params->alpha + 1);
+				SetControlVal(window, 'ACln', 0, params->alpha_cleanup);
+				SetControlVal(window, 'ALos', 0, params->lossy_alpha);
+				SetControlVal(window, 'Meta', 0, params->save_metadata);
 				
-				TrackLossless(window);
 				
-				
-				// manipulate radio buttons
+				// manipulate alpha radio buttons
 				ControlID alpha_id = {'Alph', 0};
 				ControlRef alpha_control;
 				GetControlByID(window, &alpha_id, &alpha_control);
@@ -492,7 +613,11 @@ WebP_OutUI(
 					DisableControl(channel_radio);
 				}
 
-				
+
+				TrackLossless(window);
+				TrackSlider(window);
+				TrackAlphaOut(window);
+
 				
 
 				// event handler
@@ -507,14 +632,19 @@ WebP_OutUI(
 				ShowWindow(window);
 				
 				
+				SetThemeCursor(kThemeArrowCursor); // Photoshop will have set the cursor to the watch
+
 				// event loop
 				RunAppModalLoopForWindow(window);
 				
 				if(g_item_clicked == kHICommandOK)
 				{
-					params->lossless = GetControlVal(window, 'Loss', 0);
+					params->lossless = (GetControlVal(window, 'Loss', 0) == 1);
 					params->quality = GetControlVal(window, 'Qual', 0);
 					params->alpha = (DialogAlpha)(GetControlVal(window, 'Alph', 0) - 1);
+					params->alpha_cleanup = GetControlVal(window, 'ACln', 0);
+					params->lossy_alpha = GetControlVal(window, 'ALos', 0);
+					params->save_metadata = GetControlVal(window, 'Meta', 0);
 				
 					result = true;
 				}

@@ -248,9 +248,25 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				keyWebPalpha,
 				typeEnumerated,
 				"Source of the alpha channel",
-				flagsSingleProperty
+				flagsSingleProperty,
 
-				/* no properties */
+				"Lossy Alpha",
+				keyWebPlossyAlpha,
+				typeBoolean,
+				"Compress with lossy alpha channel",
+				flagsSingleProperty,
+
+				"Alpha Cleanup",
+				keyWebPalphaCleanup,
+				typeBoolean,
+				"Clean transparent areas of alpha channel",
+				flagsSingleProperty,
+
+				"Save Metadata",
+				keyWebPsaveMetadata,
+				typeBoolean,
+				"Save ICC profile, EXIF, and XMP",
+				flagsSingleProperty
 			},
 			{}, /* elements (not supported) */
 			/* class descriptions */

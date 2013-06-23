@@ -87,6 +87,21 @@ Boolean ReadScriptParamsOnWrite(GPtr globals)
 							PIGetEnum(token, &ostypeStoreValue);
 							gOptions.alpha = KeyToAlpha(ostypeStoreValue);
 							break;
+					
+					case keyWebPlossyAlpha:
+							PIGetBool(token, &boolStoreValue);
+							gOptions.lossy_alpha = boolStoreValue;
+							break;
+
+					case keyWebPalphaCleanup:
+							PIGetBool(token, &boolStoreValue);
+							gOptions.alpha_cleanup = boolStoreValue;
+							break;
+
+					case keyWebPsaveMetadata:
+							PIGetBool(token, &boolStoreValue);
+							gOptions.save_metadata = boolStoreValue;
+							break;
 				}
 			}
 
@@ -139,6 +154,18 @@ OSErr WriteScriptParamsOnWrite(GPtr globals)
 			}
 				
 			PIPutEnum(token, keyWebPalpha, typeAlphaChannel, AlphaToKey(gOptions.alpha));
+			
+			if(gOptions.alpha != WEBP_ALPHA_NONE)
+			{
+				PIPutBool(token, keyWebPlossyAlpha, gOptions.lossy_alpha);
+				
+				if(gOptions.alpha == WEBP_ALPHA_TRANSPARENCY)
+				{
+					PIPutBool(token, keyWebPalphaCleanup, gOptions.alpha_cleanup);
+				}
+			}
+			
+			PIPutBool(token, keyWebPsaveMetadata, gOptions.save_metadata);
 			
 			gotErr = CloseWriter(&token); /* closes and sets dialog optional */
 			/* done.  Now pass handle on to Photoshop */

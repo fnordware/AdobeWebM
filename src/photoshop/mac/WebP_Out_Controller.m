@@ -43,6 +43,9 @@
 - (id)init:(BOOL)lossless
 	quality:(int)quality
 	alpha:(DialogAlpha)alpha
+	lossyAlpha:(BOOL)lossyAlpha
+	alphaCleanup:(BOOL)alphaCleanup
+	saveMetadata:(BOOL)saveMetadata
 	have_transparency:(BOOL)has_transparency
 	alpha_name:(const char *)alphaName
 {
@@ -50,16 +53,15 @@
 	
 	if(!([NSBundle loadNibNamed:@"WebP_Out_Dialog" owner:self]))
 		return nil;
-		
-	[losslessCheck setState:(lossless ? NSOnState : NSOffState)];
-	[qualitySlider setIntValue:quality];
 	
-	[self trackLossless:self];
+	
+	[qualityField setIntValue:quality];
+	[qualitySlider setIntValue:quality];
 	
 	
 	if(!has_transparency)
 	{
-		[[alphaMatrix cellAtRow:1 column:0] setEnabled:FALSE];
+		[alphaTransparencyRadio setEnabled:FALSE];
 		
 		if(alpha == DIALOG_ALPHA_TRANSPARENCY)
 		{
@@ -69,11 +71,11 @@
 	
 	if(alphaName)
 	{
-		[[alphaMatrix cellAtRow:2 column:0] setTitle:[NSString stringWithUTF8String:alphaName]];
+		[alphaChannelRadio setTitle:[NSString stringWithUTF8String:alphaName]];
 	}
 	else
 	{
-		[[alphaMatrix cellAtRow:2 column:0] setEnabled:FALSE];
+		[alphaChannelRadio setEnabled:FALSE];
 		
 		if(alpha == DIALOG_ALPHA_CHANNEL)
 		{
@@ -81,33 +83,90 @@
 		}
 	}
 
-	[alphaMatrix selectCellAtRow:(NSInteger)alpha column:0];
 
+	[lossyAlphaCheck setState:(lossyAlpha ? NSOnState : NSOffState)];
+	[alphaCleanupCheck setState:(alphaCleanup ? NSOnState : NSOffState)];
+
+	id selectedAlpha = (alpha == DIALOG_ALPHA_NONE ? alphaNoneRadio :
+						alpha == DIALOG_ALPHA_TRANSPARENCY ? alphaTransparencyRadio :
+						alphaChannelRadio);
+						
+	[selectedAlpha setState:NSOnState];
+	[self trackAlpha:selectedAlpha];
+	
+	
+	id selectedLossless = (lossless ? losslessRadio : qualityRadio);
+	
+	[selectedLossless setState:NSOnState];
+	[self trackLossless:(lossless ? losslessRadio : qualityRadio)];
+	
+
+	[saveMetadataCheck setState:(saveMetadata ? NSOnState : NSOffState)];
+	
 
 	[theWindow center];
+	
+	result = DIALOG_RESULT_CONTINUE;
 	
 	return self;
 }
 
-
 - (IBAction)clickedOK:(id)sender {
-	[NSApp stopModal];
+	result = DIALOG_RESULT_OK;
 }
 
 - (IBAction)clickedCancel:(id)sender {
-    [NSApp abortModal];
+    result = DIALOG_RESULT_CANCEL;
 }
 
 - (IBAction)trackLossless:(id)sender {
-	[qualitySlider setEnabled:([losslessCheck state] == NSOffState)];
+	BOOL isLossless = (sender == losslessRadio);
+	
+	[qualityField setEnabled:!isLossless];
+	[qualitySlider setEnabled:!isLossless];
+	
+	BOOL using_alpha = ([self getAlpha] != DIALOG_ALPHA_NONE);
+	
+	[lossyAlphaCheck setEnabled:(!isLossless && using_alpha)];
+	
+
+	id otherButton = (sender == losslessRadio ? qualityRadio : losslessRadio);
+
+	[otherButton setState:NSOffState];
+}
+
+- (IBAction)trackAlpha:(id)sender {
+	if(sender == alphaNoneRadio)
+	{
+		[alphaTransparencyRadio setState:NSOffState];
+		[alphaChannelRadio setState:NSOffState];
+	}
+	else if(sender == alphaTransparencyRadio)
+	{
+		[alphaNoneRadio setState:NSOffState];
+		[alphaChannelRadio setState:NSOffState];
+	}
+	else // alphaChannelRadio
+	{
+		[alphaNoneRadio setState:NSOffState];
+		[alphaTransparencyRadio setState:NSOffState];
+	}
+	
+	[lossyAlphaCheck setEnabled:(![self getLossless] && (sender != alphaNoneRadio))];
+	
+	[alphaCleanupCheck setEnabled:(sender == alphaTransparencyRadio)];
 }
 
 - (NSWindow *)getWindow {
 	return theWindow;
 }
 
+- (DialogResult)getResult {
+	return result;
+}
+
 - (BOOL)getLossless {
-	return ([losslessCheck state] == NSOnState);
+	return ([losslessRadio state] == NSOnState);
 }
 
 - (int)getQuality {
@@ -115,15 +174,26 @@
 }
 
 - (DialogAlpha)getAlpha {
-	// got to be a better way to do this, right?
-	if([[alphaMatrix cellAtRow:0 column:0] state] == NSOnState)
+	if([alphaNoneRadio state] == NSOnState)
 		return DIALOG_ALPHA_NONE;
-	else if([[alphaMatrix cellAtRow:1 column:0] state] == NSOnState)
+	else if([alphaTransparencyRadio state] == NSOnState)
 		return DIALOG_ALPHA_TRANSPARENCY;
-	else if([[alphaMatrix cellAtRow:2 column:0] state] == NSOnState)
+	else if([alphaChannelRadio state] == NSOnState)
 		return DIALOG_ALPHA_CHANNEL;
 	else
 		return DIALOG_ALPHA_NONE;
+}
+
+- (BOOL)getLossyAlpha {
+	return ([lossyAlphaCheck state] == NSOnState);
+}
+
+- (BOOL)getAlphaCleanup {
+	return ([alphaCleanupCheck state] == NSOnState);
+}
+
+- (BOOL)getSaveMetadata {
+	return ([saveMetadataCheck state] == NSOnState);
 }
 
 @end

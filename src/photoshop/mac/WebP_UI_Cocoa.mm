@@ -185,6 +185,9 @@ WebP_OutUI(
 		WebP_Out_Controller *ui_controller = [[ui_controller_class alloc] init:params->lossless
 														quality:params->quality
 														alpha:params->alpha
+														lossyAlpha:params->lossy_alpha
+														alphaCleanup:params->alpha_cleanup
+														saveMetadata:params->save_metadata
 														have_transparency:have_transparency
 														alpha_name:alpha_name];
 		if(ui_controller)
@@ -193,13 +196,29 @@ WebP_OutUI(
 			
 			if(my_window)
 			{
-				NSInteger modal_result = [NSApp runModalForWindow:my_window];
+				NSInteger modal_result;
+				DialogResult dialog_result;
 				
-				if(modal_result == NSRunStoppedResponse)
+				NSModalSession modal_session = [NSApp beginModalSessionForWindow:my_window];
+				
+				do{
+					modal_result = [NSApp runModalSession:modal_session];
+
+					dialog_result = [ui_controller getResult];
+				}
+				while(dialog_result == DIALOG_RESULT_CONTINUE && modal_result == NSRunContinuesResponse);
+				
+				[NSApp endModalSession:modal_session];
+				
+				
+				if(dialog_result == DIALOG_RESULT_OK || modal_result == NSRunStoppedResponse)
 				{
-					params->lossless	= [ui_controller getLossless];
-					params->quality		= [ui_controller getQuality];
-					params->alpha		= [ui_controller getAlpha];
+					params->lossless		= [ui_controller getLossless];
+					params->quality			= [ui_controller getQuality];
+					params->alpha			= [ui_controller getAlpha];
+					params->lossy_alpha		= [ui_controller getLossyAlpha];
+					params->alpha_cleanup	= [ui_controller getAlphaCleanup];
+					params->save_metadata	= [ui_controller getSaveMetadata];
 					
 					result = true;
 				}

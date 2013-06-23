@@ -73,7 +73,7 @@ static void DoAbout(AboutRecordPtr aboutP)
 	
 	char version_string[32];
 	
-	sprintf(version_string, "WebP version %d.%d.%d", 
+	sprintf(version_string, "libwebp version %d.%d.%d", 
 				(version >> 16) & 0xff,
 				(version >> 8) & 0xff,
 				(version >> 0) & 0xff);
@@ -92,12 +92,18 @@ static void InitGlobals(Ptr globalPtr)
 		
 	globals->fileH				= NULL;
 	
+	memset(&gInOptions, 0, sizeof(gInOptions));
+	memset(&gOptions, 0, sizeof(gOptions));
+	
 	gInOptions.alpha			= WEBP_ALPHA_TRANSPARENCY;
 	gInOptions.mult				= FALSE;
 	
 	gOptions.quality			= 50;
 	gOptions.lossless			= TRUE;
 	gOptions.alpha				= WEBP_ALPHA_TRANSPARENCY;
+	gOptions.lossy_alpha		= FALSE;
+	gOptions.alpha_cleanup		= TRUE;
+	gOptions.save_metadata		= TRUE;
 }
 
 
@@ -761,9 +767,12 @@ static void DoOptionsStart(GPtr globals)
 	
 		WebP_OutUI_Data params;
 		
-		params.lossless		= gOptions.lossless;
-		params.quality		= gOptions.quality;
-		params.alpha		= (DialogAlpha)gOptions.alpha;
+		params.lossless			= gOptions.lossless;
+		params.quality			= gOptions.quality;
+		params.alpha			= (DialogAlpha)gOptions.alpha;
+		params.lossy_alpha		= gOptions.lossy_alpha;
+		params.alpha_cleanup	= gOptions.alpha_cleanup;
+		params.save_metadata	= gOptions.save_metadata;
 	
 	
 	#ifdef __PIMac__
@@ -779,9 +788,12 @@ static void DoOptionsStart(GPtr globals)
 		
 		if(result)
 		{
-			gOptions.lossless	= params.lossless;
-			gOptions.quality	= params.quality;
-			gOptions.alpha		= params.alpha;
+			gOptions.lossless		= params.lossless;
+			gOptions.quality		= params.quality;
+			gOptions.alpha			= params.alpha;
+			gOptions.lossy_alpha	= params.lossy_alpha;
+			gOptions.alpha_cleanup	= params.alpha_cleanup;
+			gOptions.save_metadata	= params.save_metadata;
 			
 			WriteParams(globals, &gOptions);
 			WriteScriptParamsOnWrite(globals);
@@ -862,6 +874,20 @@ static int ProgressReport(int percent, const WebPPicture* const picture)
 	return (noErr == (gResult = TestAbort()));
 }
 
+
+static void AlphaCleanup(RGBApixel8 *buf, int64 len)
+{
+	while(len--)
+	{
+		if(buf->a == 0)
+		{	
+			buf->r = buf->g = buf->b = 0;
+		}
+		
+		buf++;
+	}
+}
+
 static void DoWriteStart(GPtr globals)
 {
 	ReadParams(globals, &gOptions);
@@ -869,7 +895,7 @@ static void DoWriteStart(GPtr globals)
 
 	assert(gStuff->imageMode == plugInModeRGBColor);
 	assert(gStuff->depth == 8);
-	assert(gStuff->planes == 3 || gStuff->planes == 4);
+	assert(gStuff->planes >= 3);
 	
 	
 	bool have_transparency = (gStuff->planes >= 4);
@@ -933,6 +959,13 @@ static void DoWriteStart(GPtr globals)
 			gResult = ReadProc(alpha_channel->port, &scaling, &writeRect, &memDesc, &wroteRect);
 		}
 		
+		if(gResult == noErr && use_transparency && gOptions.alpha_cleanup)
+		{
+			// could use WebPCleanupTransparentArea(), but will just do this myself
+			AlphaCleanup((RGBApixel8 *)gStuff->data, width * height);
+		}
+		
+		
 		if(gResult == noErr)
 		{
 			WebPMux *mux = WebPMuxNew();
@@ -961,6 +994,9 @@ static void DoWriteStart(GPtr globals)
 					config.lossless = gOptions.lossless;
 					config.quality = gOptions.quality;
 					
+					if(use_alpha && !gOptions.lossless && gOptions.lossy_alpha)
+						config.alpha_quality = gOptions.quality;
+					
 					picture.progress_hook = ProgressReport;
 					picture.user_data = globals;
 					picture.writer = WebPMemoryWrite;
@@ -976,55 +1012,57 @@ static void DoWriteStart(GPtr globals)
 						
 						if(img_err == WEBP_MUX_OK)
 						{
-							// add metadata
-							if(gStuff->canUseICCProfiles && (gStuff->iCCprofileSize > 0) && (gStuff->iCCprofileData != NULL))
+							if(gOptions.save_metadata)
 							{
-								WebPData chunk_data;
-								
-								chunk_data.bytes = (const uint8_t *)myLockHandle(globals, gStuff->iCCprofileData);
-								chunk_data.size = myGetHandleSize(globals, gStuff->iCCprofileData);
-											
-								WebPMuxError chunk_err = WebPMuxSetChunk(mux, "ICCP", &chunk_data, TRUE);
-								
-								myUnlockHandle(globals, gStuff->iCCprofileData);
-							}
-						
-							if(gStuff->propertyProcs && PIGetProp)
-							{
-								intptr_t simp;
-								
-								
-								Handle exif_handle = NULL;
-								
-								PIGetProp(kPhotoshopSignature, propEXIFData, 0, &simp, &exif_handle);
-								
-								if(exif_handle)
+								if(gStuff->canUseICCProfiles && (gStuff->iCCprofileSize > 0) && (gStuff->iCCprofileData != NULL))
 								{
 									WebPData chunk_data;
 									
-									chunk_data.bytes = (const uint8_t *)myLockHandle(globals, exif_handle);
-									chunk_data.size = myGetHandleSize(globals, exif_handle);
+									chunk_data.bytes = (const uint8_t *)myLockHandle(globals, gStuff->iCCprofileData);
+									chunk_data.size = myGetHandleSize(globals, gStuff->iCCprofileData);
+												
+									WebPMuxError chunk_err = WebPMuxSetChunk(mux, "ICCP", &chunk_data, TRUE);
 									
-									WebPMuxError chunk_err = WebPMuxSetChunk(mux, "EXIF", &chunk_data, TRUE);
-									
-									myDisposeHandle(globals, exif_handle);
+									myUnlockHandle(globals, gStuff->iCCprofileData);
 								}
-
-
-								Handle xmp_handle = NULL;
-								
-								PIGetProp(kPhotoshopSignature, propXMP, 0, &simp, &xmp_handle);
-								
-								if(xmp_handle)
+							
+								if(gStuff->propertyProcs && PIGetProp)
 								{
-									WebPData chunk_data;
+									intptr_t simp;
 									
-									chunk_data.bytes = (const uint8_t *)myLockHandle(globals, xmp_handle);
-									chunk_data.size = myGetHandleSize(globals, xmp_handle);
 									
-									WebPMuxError chunk_err = WebPMuxSetChunk(mux, "XMP ", &chunk_data, TRUE);
+									Handle exif_handle = NULL;
 									
-									myDisposeHandle(globals, xmp_handle);
+									PIGetProp(kPhotoshopSignature, propEXIFData, 0, &simp, &exif_handle);
+									
+									if(exif_handle)
+									{
+										WebPData chunk_data;
+										
+										chunk_data.bytes = (const uint8_t *)myLockHandle(globals, exif_handle);
+										chunk_data.size = myGetHandleSize(globals, exif_handle);
+										
+										WebPMuxError chunk_err = WebPMuxSetChunk(mux, "EXIF", &chunk_data, TRUE);
+										
+										myDisposeHandle(globals, exif_handle);
+									}
+
+
+									Handle xmp_handle = NULL;
+									
+									PIGetProp(kPhotoshopSignature, propXMP, 0, &simp, &xmp_handle);
+									
+									if(xmp_handle)
+									{
+										WebPData chunk_data;
+										
+										chunk_data.bytes = (const uint8_t *)myLockHandle(globals, xmp_handle);
+										chunk_data.size = myGetHandleSize(globals, xmp_handle);
+										
+										WebPMuxError chunk_err = WebPMuxSetChunk(mux, "XMP ", &chunk_data, TRUE);
+										
+										myDisposeHandle(globals, xmp_handle);
+									}
 								}
 							}
 							

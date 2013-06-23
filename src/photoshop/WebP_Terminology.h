@@ -50,6 +50,9 @@
 #define keyWebPlossless			'WebL'
 #define keyWebPquality			'WebQ'
 #define keyWebPalpha			'WebA'
+#define keyWebPlossyAlpha		'WelA'
+#define keyWebPalphaCleanup		'WebC'
+#define keyWebPsaveMetadata		'WebM'
 
 #define typeAlphaChannel		'alfT'
 
