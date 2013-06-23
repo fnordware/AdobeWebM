@@ -44,6 +44,8 @@
 #include <Windows.h>
 #include <commctrl.h>
 
+#include <stdio.h>
+
 extern HINSTANCE hDllInstance;
 
 enum {
@@ -51,11 +53,16 @@ enum {
 	OUT_OK = IDOK,
 	OUT_Cancel = IDCANCEL,
 	OUT_Picture,
-	OUT_Lossless_Check,
+	OUT_Lossless_Radio,
+	OUT_Lossy_Radio,
+	OUT_Quality_Field,
 	OUT_Quality_Slider,
 	OUT_Alpha_Radio_None,
 	OUT_Alpha_Radio_Transparency,
-	OUT_Alpha_Radio_Channel
+	OUT_Alpha_Radio_Channel,
+	OUT_Alpha_Cleanup_Check,
+	OUT_Lossy_Alpha_Check,
+	OUT_Save_Metadata_Check
 };
 
 // sensible Win macros
@@ -71,12 +78,71 @@ enum {
 static bool					g_lossless = TRUE;
 static int					g_quality = 50;
 static DialogAlpha			g_alpha = DIALOG_ALPHA_NONE;
+static bool					g_alpha_cleanup = TRUE;
+static bool					g_lossy_alpha = FALSE;
+static bool					g_save_metadata = TRUE;
 
 static bool					g_have_transparency = false;
 static const char			*g_alpha_name = NULL;
 
 static WORD	g_item_clicked = 0;
 
+
+static void TrackLossless(HWND hwndDlg)
+{
+	bool lossy = GET_CHECK(OUT_Lossy_Radio);
+
+	ENABLE_ITEM(OUT_Quality_Field, lossy);
+	ENABLE_ITEM(OUT_Quality_Slider, lossy);
+
+	bool alpha = !GET_CHECK(OUT_Alpha_Radio_None);
+
+	ENABLE_ITEM(OUT_Lossy_Alpha_Check, (lossy && alpha));
+}
+
+
+static void TrackSlider(HWND hwndDlg)
+{
+	int val = SendMessage(GET_ITEM(OUT_Quality_Slider), TBM_GETPOS, (WPARAM)0, (LPARAM)0 );
+
+	char txt[5];
+	sprintf_s(txt, 4, "%d", val);
+
+	SetDlgItemText(hwndDlg, OUT_Quality_Field, txt);
+}
+
+
+static void TrackField(HWND hwndDlg)
+{
+	char txt[5];
+
+	UINT chars = GetDlgItemText(hwndDlg, OUT_Quality_Field, txt, 4);
+
+	if(chars)
+	{
+		int val = atoi(txt);
+
+		if(val >= 0 && val <= 100)
+		{
+			SendMessage(GET_ITEM(OUT_Quality_Slider),(UINT)TBM_SETPOS, (WPARAM)(BOOL)TRUE, (LPARAM)val);
+		}
+	}
+}
+
+
+static void TrackAlpha(HWND hwndDlg)
+{
+	if( GET_CHECK(OUT_Alpha_Radio_None) )
+	{
+		ENABLE_ITEM(OUT_Alpha_Cleanup_Check, FALSE);
+		ENABLE_ITEM(OUT_Lossy_Alpha_Check, FALSE);
+	}
+	else
+	{
+		ENABLE_ITEM(OUT_Alpha_Cleanup_Check, GET_CHECK(OUT_Alpha_Radio_Transparency));
+		ENABLE_ITEM(OUT_Lossy_Alpha_Check, GET_CHECK(OUT_Lossy_Radio));
+	}
+}
 
 
 static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
@@ -86,13 +152,12 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
     switch(message) 
     { 
 		case WM_INITDIALOG:
-			SET_CHECK(OUT_Lossless_Check, g_lossless);
+			SET_CHECK(OUT_Lossless_Radio, g_lossless);
+			SET_CHECK(OUT_Lossy_Radio, !g_lossless);
 
-			SendMessage(GET_ITEM(OUT_Quality_Slider),(UINT)TBM_SETRANGEMIN, (WPARAM)(BOOL)FALSE, (LPARAM)1);
+			SendMessage(GET_ITEM(OUT_Quality_Slider),(UINT)TBM_SETRANGEMIN, (WPARAM)(BOOL)FALSE, (LPARAM)0);
 			SendMessage(GET_ITEM(OUT_Quality_Slider),(UINT)TBM_SETRANGEMAX, (WPARAM)(BOOL)FALSE, (LPARAM)100);
 			SendMessage(GET_ITEM(OUT_Quality_Slider),(UINT)TBM_SETPOS, (WPARAM)(BOOL)TRUE, (LPARAM)g_quality);
-
-			ENABLE_ITEM(OUT_Quality_Slider, !g_lossless);
 
 			if(!g_have_transparency)
 			{
@@ -123,10 +188,24 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 						g_alpha == DIALOG_ALPHA_CHANNEL ? OUT_Alpha_Radio_Channel :
 						OUT_Alpha_Radio_None), TRUE);
 
+			SET_CHECK(OUT_Alpha_Cleanup_Check, g_alpha_cleanup);
+			SET_CHECK(OUT_Lossy_Alpha_Check, g_lossy_alpha);
+			SET_CHECK(OUT_Save_Metadata_Check, g_save_metadata);
+
+			TrackLossless(hwndDlg);
+			TrackSlider(hwndDlg);
+			TrackAlpha(hwndDlg);
+
 			return TRUE;
  
 		case WM_NOTIFY:
-			return FALSE;
+			switch(LOWORD(wParam))
+			{
+				case OUT_Quality_Slider:
+					TrackSlider(hwndDlg);
+				return TRUE;
+			}
+		return FALSE;
 
         case WM_COMMAND: 
 			g_item_clicked = LOWORD(wParam);
@@ -135,7 +214,7 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
             { 
                 case OUT_OK: 
 				case OUT_Cancel:  // do the same thing, but g_item_clicked will be different
-					g_lossless = GET_CHECK(OUT_Lossless_Check);
+					g_lossless = GET_CHECK(OUT_Lossless_Radio);
 					g_quality = SendMessage(GET_ITEM(OUT_Quality_Slider), TBM_GETPOS, (WPARAM)0, (LPARAM)0 );
 
 					g_alpha =	GET_CHECK(OUT_Alpha_Radio_None) ? DIALOG_ALPHA_NONE :
@@ -143,13 +222,26 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 								GET_CHECK(OUT_Alpha_Radio_Channel) ? DIALOG_ALPHA_CHANNEL :
 								DIALOG_ALPHA_TRANSPARENCY;
 
+					g_alpha_cleanup = GET_CHECK(OUT_Alpha_Cleanup_Check);
+					g_lossy_alpha = GET_CHECK(OUT_Lossy_Alpha_Check);
+					g_save_metadata = GET_CHECK(OUT_Save_Metadata_Check);
 
 					EndDialog(hwndDlg, 0);
 					return TRUE;
 
 
-				case OUT_Lossless_Check:
-					ENABLE_ITEM(OUT_Quality_Slider, !GET_CHECK(OUT_Lossless_Check));
+				case OUT_Lossless_Radio:
+				case OUT_Lossy_Radio:
+					TrackLossless(hwndDlg);
+					return TRUE;
+
+				case OUT_Alpha_Radio_None:
+				case OUT_Alpha_Radio_Transparency:
+				case OUT_Alpha_Radio_Channel:
+					TrackAlpha(hwndDlg);
+
+				case OUT_Quality_Field:
+					TrackField(hwndDlg);
 					return TRUE;
             } 
     } 
@@ -164,9 +256,12 @@ WebP_OutUI(
 	const void			*plugHndl,
 	const void			*mwnd)
 {
-	g_lossless	= params->lossless;
-	g_quality	= params->quality;
-	g_alpha		= params->alpha;
+	g_lossless		= params->lossless;
+	g_quality		= params->quality;
+	g_alpha			= params->alpha;
+	g_alpha_cleanup	= params->alpha_cleanup;
+	g_lossy_alpha	= params->lossy_alpha;
+	g_save_metadata	= params->save_metadata;
 	
 	g_have_transparency = have_transparency;
 	g_alpha_name = alpha_name;
@@ -177,9 +272,12 @@ WebP_OutUI(
 
 	if(g_item_clicked == OUT_OK)
 	{
-		params->lossless	= g_lossless;
-		params->quality		= g_quality;
-		params->alpha		= g_alpha;
+		params->lossless		= g_lossless;
+		params->quality			= g_quality;
+		params->alpha			= g_alpha;
+		params->alpha_cleanup	= g_alpha_cleanup;
+		params->lossy_alpha		= g_lossy_alpha;
+		params->save_metadata	= g_save_metadata;
 
 		return true;
 	}

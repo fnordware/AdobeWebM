@@ -68,20 +68,25 @@ BEGIN
     GROUPBOX        "Alpha Channel Handling",IDC_STATIC,68,35,107,61
 END
 
-OUT_DIALOG DIALOGEX 0, 0, 242, 183
+OUT_DIALOG DIALOGEX 0, 0, 242, 214
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "WebP Options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,131,163,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,185,163,50,14
+    DEFPUSHBUTTON   "OK",IDOK,131,193,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,185,193,50,14
     CONTROL         "WEBP_BANNER",IDC_STATIC,"Static",SS_BITMAP,13,7,15,13
-    GROUPBOX        "Alpha Channel",IDC_STATIC,57,79,127,74
-    CONTROL         "None",6,"Button",BS_AUTORADIOBUTTON | WS_GROUP,69,92,33,10
-    CONTROL         "Transparency",7,"Button",BS_AUTORADIOBUTTON,69,113,60,10
-    CONTROL         "Channels Palette",8,"Button",BS_AUTORADIOBUTTON,69,132,113,10
-    CONTROL         "",5,"msctls_trackbar32",TBS_TOP | TBS_NOTICKS | WS_TABSTOP,40,54,159,15
-    CONTROL         "Lossless",4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,53,35,76,10
+    GROUPBOX        "Alpha Channel",IDC_STATIC,32,85,179,74
+    CONTROL         "None",8,"Button",BS_AUTORADIOBUTTON | WS_GROUP,44,99,33,10
+    CONTROL         "Transparency",9,"Button",BS_AUTORADIOBUTTON,44,119,60,10
+    CONTROL         "Channels Palette",10,"Button",BS_AUTORADIOBUTTON,44,139,97,10
+    CONTROL         "",7,"msctls_trackbar32",TBS_TOP | TBS_NOTICKS | WS_TABSTOP,124,61,105,14
+    CONTROL         "Lossless",4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,30,44,42,10
+    CONTROL         "Lossy Quality:",5,"Button",BS_AUTORADIOBUTTON,30,62,58,10
+    EDITTEXT        6,90,60,31,14,ES_AUTOHSCROLL
+    CONTROL         "Alpha Cleanup",11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,144,119,62,10
+    CONTROL         "Lossy Alpha",12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,144,139,54,10
+    CONTROL         "Save Metadata",13,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,167,65,10
 END
 
 ABOUT_DIALOG DIALOGEX 0, 0, 242, 125
@@ -140,6 +145,22 @@ BEGIN
         VALUE "Translation", 0x409, 1200
     END
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    "OUT_DIALOG", DIALOG
+    BEGIN
+        BOTTOMMARGIN, 199
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
