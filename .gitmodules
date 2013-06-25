@@ -4,3 +4,6 @@
 [submodule "ext/libwebp"]
 	path = ext/libwebp
 	url = http://git.chromium.org/webm/libwebp.git
+[submodule "ext/libwebm"]
+	path = ext/libwebm
+	url = http://git.chromium.org/webm/libwebm.git
