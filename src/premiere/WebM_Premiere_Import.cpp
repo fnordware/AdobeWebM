@@ -42,25 +42,14 @@
 
 extern "C" {
 
-//#define VPX_DONT_DEFINE_STDINT_TYPES
-//#define VPX_CODEC_DISABLE_COMPAT 1
-//#include "vpx_config.h"
 #include "vpx/vpx_decoder.h"
-//#include "vpx_ports/vpx_timer.h"
-//#if CONFIG_VP8_DECODER || CONFIG_VP9_DECODER
 #include "vpx/vp8dx.h"
-//#endif
-//#if CONFIG_MD5
-//#include "md5_utils.h"
-//#endif
-//#include "tools_common.h"
-#include "nestegg/include/nestegg/nestegg.h"
-//#define INT_TYPES_DEFINED
-//#include "third_party/libyuv/include/libyuv/scale.h"
 
 #include <vorbis/codec.h>
 
 }
+
+#include "mkvparser.hpp"
 
 #include <assert.h>
 
@@ -74,77 +63,82 @@ typedef PrSDKPPixCacheSuite PrCacheSuite;
 #endif
 
 
-
-#define NESTEGG_ERR_NONE 0
-#define NESTEGG_SUCCESS  1
-#define NESTEGG_ERR      (-1)
-
-static int
-nestegg_read(void *buffer, size_t length, void *refcon)
+class PrMkvReader : public mkvparser::IMkvReader
 {
-	imFileRef fileRef = reinterpret_cast<imFileRef>( refcon );
+  public:
+	PrMkvReader(imFileRef fileRef) : _fileRef(fileRef) {}
+	virtual ~PrMkvReader() {}
 	
-#ifdef PRWIN_ENV
-	DWORD count = length, out = 0;
+	virtual int Read(long long pos, long len, unsigned char* buf);
+	virtual int Length(long long* total, long long* available);
 	
-	BOOL result = ReadFile(fileRef, (LPVOID)buffer, count, &out, NULL);
-
-	return (result && length == out) ? NESTEGG_SUCCESS : NESTEGG_ERR;
-#else
-	ByteCount count = length, out = 0;
+	const imFileRef FileRef() const { return _fileRef; }
 	
-	OSErr result = FSReadFork(CAST_REFNUM(fileRef), fsAtMark, 0, count, buffer, &out);
+	enum {
+		PrMkvError = -1,
+		PrMkvSuccess = 0
+	};
+	
+  private:
+	const imFileRef _fileRef;
+};
 
-	return (result == noErr && length == out) ? NESTEGG_SUCCESS : (result == eofErr ? 0 : NESTEGG_ERR);
-#endif
-}
 
-
-static int
-nestegg_seek(int64_t offset, int whence, void *refcon)
+int PrMkvReader::Read(long long pos, long len, unsigned char* buf)
 {
-	imFileRef fileRef = reinterpret_cast<imFileRef>( refcon );
-	
 #ifdef PRWIN_ENV
+#error "Some work to do here"
 	LARGE_INTEGER lpos, out;
 
 	lpos.QuadPart = offset;
 
 	BOOL result = SetFilePointerEx(fileRef, lpos, &out, whence);
+	
+	DWORD count = length, out = 0;
+	
+	BOOL result = ReadFile(_fileRef, (LPVOID)buffer, count, &out, NULL);
 
-	return (result ? NESTEGG_ERR_NONE : NESTEGG_ERR);
+	return (result && length == out) ? PrMkvSuccess : PrMkvError;
 #else
-	UInt16 positionMode =	whence == NESTEGG_SEEK_SET ? fsFromStart :
-							whence == NESTEGG_SEEK_CUR ? (offset == 0 ? fsAtMark : fsFromMark) :
-							whence == NESTEGG_SEEK_END ? fsFromLEOF :
-							fsFromStart;
+	ByteCount count = len, out = 0;
 	
-	OSErr result = FSSetForkPosition(CAST_REFNUM(fileRef), positionMode, offset);
-	
-	return (result == noErr ? NESTEGG_ERR_NONE : NESTEGG_ERR);
+	OSErr result = FSReadFork(CAST_REFNUM(_fileRef), fsFromStart, pos, count, buf, &out);
+
+	return (result == noErr && len == out) ? PrMkvSuccess : PrMkvError;
 #endif
 }
 
 
-static int64_t
-nestegg_tell(void *refcon)
+int PrMkvReader::Length(long long* total, long long* available)
 {
-	imFileRef fileRef = reinterpret_cast<imFileRef>( refcon );
-	
 #ifdef PRWIN_ENV
-	LARGE_INTEGER lpos, out;
-
-	lpos.QuadPart = 0;
-
-	BOOL result = SetFilePointerEx(fileRef, lpos, &out, FILE_CURRENT);
-
-	return out.QuadPart;
+#error "Use the 64-bit version of this func and the other"
+	DWORD size = GetFileSize(_fileRef, NULL);
+	
+	if(total)
+		*total = size;
+		
+	if(available)
+		*available = size;
+		
+	return PrMkvSuccess;
 #else
-	SInt64 lpos;
+	SInt64 fork_size = 0;
 	
-	OSErr result = FSGetForkPosition(CAST_REFNUM(fileRef), &lpos);
-	
-	return lpos;
+	OSErr result = FSGetForkSize(CAST_REFNUM(_fileRef), &fork_size);
+		
+	if(result == noErr)
+	{
+		if(total)
+			*total = fork_size;
+		
+		if(available)
+			*available = fork_size;
+		
+		return PrMkvSuccess;
+	}
+	else
+		return PrMkvError;
 #endif
 }
 
@@ -160,12 +154,10 @@ typedef struct
 	float					audioSampleRate;
 	int						numChannels;
 	
-	nestegg_io				io;
-	nestegg					*nestegg_ctx;
+	PrMkvReader				*reader;
+	mkvparser::Segment		*segment;
 	int						video_track;
 	int						audio_track;
-	int						video_codec_id;
-	int						audio_codec_id;
 	unsigned int			time_mult;
 	
 	PlugMemoryFuncsPtr		memFuncs;
@@ -293,13 +285,11 @@ SDKOpenFile8(
 
 		localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *localRecH );
 		
-		localRecP->io.read = nestegg_read;
-		localRecP->io.seek = nestegg_seek;
-		localRecP->io.tell = nestegg_tell;
+		localRecP->reader = NULL;
+		localRecP->segment = NULL;
 		localRecP->video_track = -1;
 		localRecP->audio_track = -1;
 		localRecP->time_mult = 1;
-		localRecP->nestegg_ctx = NULL;
 		
 		// Acquire needed suites
 		localRecP->memFuncs = stdParms->piSuites->memFuncs;
@@ -319,7 +309,7 @@ SDKOpenFile8(
 	}
 
 
-	localRecP->io.userdata = SDKfileOpenRec8->fileinfo.fileref = *SDKfileRef = reinterpret_cast<imFileRef>(imInvalidHandleValue);
+	SDKfileOpenRec8->fileinfo.fileref = *SDKfileRef = reinterpret_cast<imFileRef>(imInvalidHandleValue);
 
 
 	if(localRecP)
@@ -372,7 +362,7 @@ SDKOpenFile8(
 
 		if(CAST_FILEREF(refNum) != imInvalidHandleValue)
 		{
-			localRecP->io.userdata = SDKfileOpenRec8->fileinfo.fileref = *SDKfileRef = CAST_FILEREF(refNum);
+			SDKfileOpenRec8->fileinfo.fileref = *SDKfileRef = CAST_FILEREF(refNum);
 		}
 		else
 			result = imFileOpenFailed;
@@ -380,52 +370,68 @@ SDKOpenFile8(
 
 	}
 
-
-	if(result == malNoError && localRecP->nestegg_ctx == NULL)
+	if(result == malNoError && localRecP->reader == NULL)
 	{
-		localRecP->io.seek(0, SEEK_SET, localRecP->io.userdata);
-		
-		int init_err = nestegg_init(&localRecP->nestegg_ctx, localRecP->io, NULL);
+		assert(localRecP->segment == NULL);
 	
-		if(init_err == NESTEGG_ERR_NONE)
-		{
-			nestegg *ctx = localRecP->nestegg_ctx;
+		localRecP->reader = new PrMkvReader(*SDKfileRef);
 		
-			unsigned int tracks;
-			nestegg_track_count(ctx, &tracks);
+		long long pos = 0;
+
+		mkvparser::EBMLHeader ebmlHeader;
+
+		ebmlHeader.Parse(localRecP->reader, pos);
+		
+		long long ret = mkvparser::Segment::CreateInstance(localRecP->reader, pos, localRecP->segment);
+		
+		if(ret >= 0 && localRecP->segment != NULL)
+		{
+			ret = localRecP->segment->Load();
 			
-			for(int track=0; track < tracks; track++)
+			if(ret >= 0)
 			{
-				int track_type = nestegg_track_type(ctx, track);
+				const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 				
-				int codec_id = nestegg_track_codec_id(ctx, track);
+				for(int t=0; t < pTracks->GetTracksCount(); t++)
+				{
+					const mkvparser::Track* const pTrack = pTracks->GetTrackByIndex(t);
 					
-				if(track_type == NESTEGG_TRACK_VIDEO)
-				{
-					if(codec_id == NESTEGG_CODEC_VP8 || codec_id == NESTEGG_CODEC_VP9)
+					if(pTrack != NULL)
 					{
-						localRecP->video_track = track;
-						localRecP->video_codec_id = codec_id;
-					}
+						const long trackType = pTrack->GetType();
+						const long trackNumber = pTrack->GetNumber();
+						
+						if(trackType == mkvparser::Track::kVideo)
+						{
+							const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+							
+							if(pVideoTrack)
+							{
+								localRecP->video_track = trackNumber;
+							}
+						}
+						else if(trackType == mkvparser::Track::kAudio)
+						{
+							const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
+							
+							if(pAudioTrack)
+							{
+								localRecP->audio_track = trackNumber;
+							}
+						}
+ 					}
 				}
-				else if(track_type == NESTEGG_TRACK_AUDIO)
-				{
-					assert(codec_id == NESTEGG_CODEC_VORBIS);
 				
-					localRecP->audio_track = track;
-					localRecP->audio_codec_id = codec_id;
+				if(localRecP->video_track == -1 && localRecP->audio_track == -1)
+				{
+					result = imFileHasNoImportableStreams;
 				}
-			}
-			
-			if(localRecP->video_track == -1 && localRecP->audio_track == -1)
-			{
-				result = imFileHasNoImportableStreams;
 			}
 		}
 		else
 			result = imBadHeader;
 	}
-
+	
 	// close file and delete private data if we got a bad file
 	if(result != malNoError)
 	{
@@ -467,11 +473,18 @@ SDKQuietFile(
 
 		ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
-		if(localRecP->nestegg_ctx)
+		if(localRecP->segment)
 		{
-			nestegg_destroy(localRecP->nestegg_ctx);
+			delete localRecP->segment;
 			
-			localRecP->nestegg_ctx = NULL;
+			localRecP->segment = NULL;
+		}
+		
+		if(localRecP->reader)
+		{
+			delete localRecP->reader;
+			
+			localRecP->reader = NULL;
 		}
 
 		stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
@@ -710,46 +723,61 @@ SDKAnalysis(
 }
 
 
-
 static int
-webm_guess_framerate(nestegg		*ctx,
-					int				video_track,
-                     unsigned int	*fps_den,
-                     unsigned int	*fps_num)
+webm_guess_framerate(mkvparser::Segment *segment,
+						int				video_track,
+						unsigned int	*fps_den,
+						unsigned int	*fps_num)
 {
-  unsigned int i;
-  uint64_t     tstamp = 0;
+	unsigned int i = 0;
+	uint64_t     tstamp = 0;
 
-  // Guess the framerate. Read up to 1 second, or 50 video packets,
-	//whichever comes first.
-  for (i = 0; tstamp < 1000000000 && i < 50;) {
-    nestegg_packet *pkt;
-    unsigned int track;
+	const mkvparser::Cluster* pCluster = segment->GetFirst();
+	const mkvparser::Tracks* pTracks = segment->GetTracks();
 
-    if (nestegg_read_packet(ctx, &pkt) <= 0)
-      break;
+	while( (pCluster != NULL) && !pCluster->EOS() && tstamp < 1000000000 && i < 50)
+	{
+		const mkvparser::BlockEntry* pBlockEntry = NULL;
+		
+		long status = pCluster->GetFirst(pBlockEntry);
+		
+		if(status >= 0)
+		{
+			while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0)
+			{
+				const mkvparser::Block* const pBlock  = pBlockEntry->GetBlock();
+				const long long trackNum = pBlock->GetTrackNumber();
+				
+				if(trackNum == video_track)
+				{
+					const unsigned long tn = static_cast<unsigned long>(trackNum);
+					const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(tn);
+					
+					if(pTrack)
+					{
+						assert(pTrack->GetType() == mkvparser::Track::kVideo);
+						assert(pBlock->GetFrameCount() == 1);
+						
+						tstamp = pBlock->GetTime(pCluster);
+						
+						i++;
+					}
+				}
+				
+				status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+			}
+		}
+		
+		pCluster = segment->GetNext(pCluster);
+	}
 
-    nestegg_packet_track(pkt, &track);
-    if (track == video_track) {
-      nestegg_packet_tstamp(pkt, &tstamp);
-      i++;
-    }
 
-    nestegg_free_packet(pkt);
-  }
+	*fps_num = (i - 1) * 1000000;
+	*fps_den = (unsigned int)(tstamp / 1000);
 
-  //if (nestegg_track_seek(ctx, video_track, 0))
-  //  goto fail;
-
-  *fps_num = (i - 1) * 1000000;
-  *fps_den = (unsigned int)(tstamp / 1000);
-  return 0;
-fail:
-  //nestegg_destroy(input->nestegg_ctx);
-  //input->nestegg_ctx = NULL;
-  //rewind(input->infile);
-  return 1;
+	return 0;
 }
+
 
 
 //-------------------------------------------------------------------
@@ -783,109 +811,127 @@ SDKGetInfo8(
 	stdParms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
+
+	SDKFileInfo8->hasVideo = kPrFalse;
+	SDKFileInfo8->hasAudio = kPrFalse;
+	
+	
 	if(localRecP)
 	{
-		assert(localRecP->io.userdata == fileAccessInfo8->fileref);
-		assert(localRecP->nestegg_ctx != NULL);
-	
-		if(localRecP->nestegg_ctx != NULL)
-		{
-			nestegg *ctx = localRecP->nestegg_ctx;
+		assert(localRecP->segment != NULL);
 		
-			uint64_t scale;
-			nestegg_tstamp_scale(localRecP->nestegg_ctx, &scale);
+		if(localRecP->segment != NULL)
+		{
+			const mkvparser::SegmentInfo* const pSegmentInfo = localRecP->segment->GetInfo();
 			
-			uint64_t duration;
-			int dur_err = nestegg_duration(localRecP->nestegg_ctx, &duration);
+			const long long duration = pSegmentInfo->GetDuration();
 			
-			unsigned int fps_num = 0;
-			unsigned int fps_den = 0;
-			webm_guess_framerate(localRecP->nestegg_ctx, localRecP->video_track, &fps_den, &fps_num);
-			
-			int frames = (duration * fps_num / fps_den) / 1000000000UL;
-			
-			assert(scale == fps_den);
-			
-			// getting some very large fps numbers, maybe we can lower them
-			if(fps_num % 1000 == 0 && fps_den % 1000 == 0)
-			{
-				localRecP->time_mult = 1000;
-			}
-			else
-				localRecP->time_mult = 1;
-			
+			const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 			
 			if(localRecP->video_track >= 0)
 			{
-				nestegg_video_params params;
-				int params_err = nestegg_track_video_params(ctx, localRecP->video_track, &params);
+				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
 				
-				if(params_err == NESTEGG_ERR_NONE && dur_err == NESTEGG_ERR_NONE)
+				if(pTrack != NULL)
 				{
-					// Video information
-					SDKFileInfo8->hasVideo				= kPrTrue;
-					SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
-					SDKFileInfo8->vidInfo.imageWidth	= params.width;
-					SDKFileInfo8->vidInfo.imageHeight	= params.height;
-					SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
-					SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
-					SDKFileInfo8->vidInfo.isStill		= kPrFalse;
-					SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-					SDKFileInfo8->vidDuration			= frames * (fps_den / localRecP->time_mult);
-					SDKFileInfo8->vidScale				= fps_num / localRecP->time_mult;
-					SDKFileInfo8->vidSampleSize			= fps_den / localRecP->time_mult;
+					const long trackType = pTrack->GetType();
+				
+					if(trackType == mkvparser::Track::kVideo)
+					{
+						const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+						
+						if(pVideoTrack)
+						{
+							const double rate = pVideoTrack->GetFrameRate();
+							
+							unsigned int fps_num = 0;
+							unsigned int fps_den = 0;
+							
+							if(rate != 0)
+							{
+								fps_den = 1000;
+								fps_num = rate * fps_den;
+							}
+							
+							webm_guess_framerate(localRecP->segment, localRecP->video_track, &fps_den, &fps_num);
+							
+							// getting some very large fps numbers, need to lower them
+							if(fps_num % 1000 == 0 && fps_den % 1000 == 0)
+							{
+								localRecP->time_mult = 1000;
+							}
+							else
+								localRecP->time_mult = 1;
+							
+							int frames = (duration * fps_num / fps_den) / 1000000000UL;
+														
+							// Video information
+							SDKFileInfo8->hasVideo				= kPrTrue;
+							SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
+							SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
+							SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
+							SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
+							SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
+							SDKFileInfo8->vidInfo.isStill		= kPrFalse;
+							SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
+							SDKFileInfo8->vidDuration			= frames * (fps_den / localRecP->time_mult);
+							SDKFileInfo8->vidScale				= fps_num / localRecP->time_mult;
+							SDKFileInfo8->vidSampleSize			= fps_den / localRecP->time_mult;
 
-					SDKFileInfo8->vidInfo.alphaType	= alphaNone;
+							SDKFileInfo8->vidInfo.alphaType	= alphaNone;
 
-					SDKFileInfo8->vidInfo.pixelAspectNum = 1;
-					SDKFileInfo8->vidInfo.pixelAspectDen = 1;
+							SDKFileInfo8->vidInfo.pixelAspectNum = 1;
+							SDKFileInfo8->vidInfo.pixelAspectDen = 1;
 
-					// store some values we want to get without going to the file
-					localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
-					localRecP->height = SDKFileInfo8->vidInfo.imageHeight;
+							// store some values we want to get without going to the file
+							localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
+							localRecP->height = SDKFileInfo8->vidInfo.imageHeight;
 
-					localRecP->frameRateNum = SDKFileInfo8->vidScale;
-					localRecP->frameRateDen = SDKFileInfo8->vidSampleSize;
+							localRecP->frameRateNum = SDKFileInfo8->vidScale;
+							localRecP->frameRateDen = SDKFileInfo8->vidSampleSize;
+						}
+					}
 				}
-				else
-					result = imBadFile;
 			}
-			else
-				SDKFileInfo8->hasVideo = kPrFalse;
-			
 			
 			if(localRecP->audio_track >= 0)
 			{
-				nestegg_audio_params params;
-				int params_err = nestegg_track_audio_params(ctx, localRecP->audio_track, &params);
+				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
 				
-				if(params_err == NESTEGG_ERR_NONE && dur_err == NESTEGG_ERR_NONE)
+				if(pTrack != NULL)
 				{
-					// Audio information
-					SDKFileInfo8->hasAudio				= kPrTrue;
-					SDKFileInfo8->audInfo.numChannels	= params.channels;
-					SDKFileInfo8->audInfo.sampleRate	= params.rate;
-					SDKFileInfo8->audInfo.sampleType	= params.depth == 8 ? kPrAudioSampleType_8BitInt :
-															params.depth == 16 ? kPrAudioSampleType_16BitInt :
-															params.depth == 24 ? kPrAudioSampleType_24BitInt :
-															params.depth == 32 ? kPrAudioSampleType_32BitFloat :
-															params.depth == 64 ? kPrAudioSampleType_64BitFloat :
-															kPrAudioSampleType_8BitTwosInt;
-															
-					SDKFileInfo8->audDuration			= (uint64_t)params.rate * duration / 1000000000UL;
+					const long trackType = pTrack->GetType();
 					
-					
-					localRecP->audioSampleRate			= SDKFileInfo8->audInfo.sampleRate;
-					localRecP->numChannels				= SDKFileInfo8->audInfo.numChannels;
+					if(trackType == mkvparser::Track::kAudio)
+					{
+						const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
+						
+						if(pAudioTrack)
+						{
+							const long long bitDepth = pAudioTrack->GetBitDepth();
+							
+							
+							// Audio information
+							SDKFileInfo8->hasAudio				= kPrTrue;
+							SDKFileInfo8->audInfo.numChannels	= pAudioTrack->GetChannels();
+							SDKFileInfo8->audInfo.sampleRate	= pAudioTrack->GetSamplingRate();
+							SDKFileInfo8->audInfo.sampleType	= bitDepth == 8 ? kPrAudioSampleType_8BitInt :
+																	bitDepth == 16 ? kPrAudioSampleType_16BitInt :
+																	bitDepth == 24 ? kPrAudioSampleType_24BitInt :
+																	bitDepth == 32 ? kPrAudioSampleType_32BitFloat :
+																	bitDepth == 64 ? kPrAudioSampleType_64BitFloat :
+																	kPrAudioSampleType_Compressed;
+																	
+							SDKFileInfo8->audDuration			= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
+							
+							
+							localRecP->audioSampleRate			= SDKFileInfo8->audInfo.sampleRate;
+							localRecP->numChannels				= SDKFileInfo8->audInfo.numChannels;
+						}
+					}
 				}
-				else
-					result = imBadFile;
 			}
-			else
-				SDKFileInfo8->hasAudio = kPrFalse;
 		}
-		else
-			result = imBadFile;
 	}
 		
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
@@ -943,7 +989,6 @@ SDKPreferredFrameSize(
 			result = malNoError;
 	}
 
-	
 
 	stdparms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
 
@@ -951,7 +996,6 @@ SDKPreferredFrameSize(
 }
 
 
-// Here we go - copy a frame to Premiere
 static prMALError 
 SDKGetSourceVideo(
 	imStdParms			*stdParms, 
@@ -960,9 +1004,7 @@ SDKGetSourceVideo(
 {
 	prMALError		result		= malNoError;
 	csSDK_int32		theFrame	= 0;
-	//RowbyteType		rowBytes	= 0;
 	imFrameFormat	*frameFormat;
-	//char			*frameBuffer;
 
 	// privateData
 	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(sourceVideoRec->inPrivateData);
@@ -1013,18 +1055,13 @@ SDKGetSourceVideo(
 		prSetRect(&theRect, 0, 0, frameFormat->inFrameWidth, frameFormat->inFrameHeight);
 		
 
-		assert(localRecP->io.userdata == fileRef);
-		assert(localRecP->nestegg_ctx != NULL);
-
-		if(localRecP->nestegg_ctx != NULL)
+		assert(localRecP->reader != NULL && localRecP->reader->FileRef() == fileRef);
+		assert(localRecP->segment != NULL);
+		
+		if(localRecP->segment)
 		{
-			uint64_t scale;
-			nestegg_tstamp_scale(localRecP->nestegg_ctx, &scale);
-			
 			const uint64_t fps_num = localRecP->frameRateNum * localRecP->time_mult;
 			const uint64_t fps_den = localRecP->frameRateDen * localRecP->time_mult;
-			
-			assert(scale == fps_den);
 			
 			uint64_t tstamp = ((uint64_t)theFrame * fps_den * 1000000000UL / fps_num);
 			uint64_t tstamp2 = (uint64_t)sourceVideoRec->inFrameTime * 1000UL / ((uint64_t)ticksPerSecond / 1000000UL); // alternate way of calculating it
@@ -1033,173 +1070,194 @@ SDKGetSourceVideo(
 			
 			const uint64_t half_frame_time = (1000000000UL * fps_den / fps_num) / 2; // half-a-frame
 			
-			
-			int seek_err = nestegg_track_seek(localRecP->nestegg_ctx, localRecP->video_track, tstamp);
-			
-			if(seek_err == NESTEGG_ERR_NONE)
+			if(localRecP->video_track >= 0)
 			{
-				bool first_frame = true;
+				const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 			
-				int codec_id = nestegg_track_codec_id(localRecP->nestegg_ctx, localRecP->video_track);
-				assert(localRecP->video_codec_id == codec_id);
-			
-				const vpx_codec_iface_t *iface = (codec_id == NESTEGG_CODEC_VP8 ? vpx_codec_vp8_dx() : vpx_codec_vp9_dx());
+				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
 				
-				vpx_codec_ctx_t decoder;
-				
-				vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder, iface, NULL, 0);
-				
-				if(codec_err == VPX_CODEC_OK)
+				if(pTrack != NULL)
 				{
-					nestegg_packet *pkt = NULL;
-					
-					uint64_t packet_tstamp = 0;
-					
-					int read_result = NESTEGG_SUCCESS;
-					int data_err = NESTEGG_ERR_NONE;
-					vpx_codec_err_t decode_err = VPX_CODEC_OK;
-					
-					unsigned char *data = NULL;
-					size_t length;
-					
-					bool reached_iframe = false;
-					
-					do{
-						if(pkt)
-						{
-							nestegg_free_packet(pkt);
-							pkt = NULL;
-						}
-
-						read_result = nestegg_read_packet(localRecP->nestegg_ctx, &pkt);
+					const long trackType = pTrack->GetType();
+				
+					if(trackType == mkvparser::Track::kVideo)
+					{
+						const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
 						
-						if(read_result == NESTEGG_SUCCESS)
+						if(pVideoTrack)
 						{
-							nestegg_packet_tstamp(pkt, &packet_tstamp);
+							const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 							
-							unsigned int track;
-							nestegg_packet_track(pkt, &track);
+							pVideoTrack->Seek(tstamp, pSeekBlockEntry);
 							
-							if(track == localRecP->video_track)
+							if(pSeekBlockEntry != NULL)
 							{
-								unsigned int chunks;
-								nestegg_packet_count(pkt, &chunks);
+								const char* codec_id = pTrack->GetCodecId();
 							
-								for(int i=0; i < chunks && !reached_iframe && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK; i++)
+								const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() : vpx_codec_vp9_dx());
+								
+								vpx_codec_ctx_t decoder;
+								
+								vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder, iface, NULL, 0);
+								
+								if(codec_err == VPX_CODEC_OK)
 								{
-									data_err = nestegg_packet_data(pkt, i, &data, &length);
+									const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
 									
-									if(data_err == NESTEGG_ERR_NONE)
+									bool first_frame = true;
+									bool got_frame = false;
+									bool reached_next_iframe = false;
+									
+									while((pCluster != NULL) && !pCluster->EOS() && !reached_next_iframe && result == malNoError)
 									{
-										vpx_codec_stream_info_t stream_info;
-										stream_info.sz = sizeof(stream_info);
-									
-										vpx_codec_err_t peek_err = vpx_codec_peek_stream_info(iface, data, length, &stream_info);
+										const mkvparser::BlockEntry* pBlockEntry = NULL;
 										
-										if(!first_frame && stream_info.is_kf)
-											reached_iframe = true;
+										pCluster->GetFirst(pBlockEntry);
 										
-										if(!reached_iframe)
+										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && !reached_next_iframe && result == malNoError)
 										{
-											decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
-											
-											if(decode_err == VPX_CODEC_OK)
+											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+										
+											if(pBlock->GetTrackNumber() == localRecP->video_track)
 											{
-												csSDK_int32 decodedFrame = ((packet_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+												assert(pBlock->GetFrameCount() == 1);
 												
-												csSDK_int32 hopingforFrame = ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
-												assert(hopingforFrame == theFrame);
+												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
-												vpx_codec_iter_t iter = NULL;
+												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 												
-												vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
+												unsigned int length = blockFrame.len;
+												uint8_t *data = (uint8_t *)malloc(length);
 												
-												if(img)
+												if(data != NULL)
 												{
-													PPixHand ppix;
+													int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
 													
-													localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
+													if(read_err == PrMkvReader::PrMkvSuccess)
+													{
+														vpx_codec_stream_info_t stream_info;
+														stream_info.sz = sizeof(stream_info);
+													
+														vpx_codec_err_t peek_err = vpx_codec_peek_stream_info(iface, data, length, &stream_info);
+														
+														if(peek_err == VPX_CODEC_OK)
+														{
+															if(!first_frame && stream_info.is_kf && got_frame)
+															{
+																reached_next_iframe = true;
+																
+																assert(got_frame); // now this is always true, of course, but we thought seek would take us to the iframe before the frame we wanted
+															}
+														}
+														
+														if(!reached_next_iframe)
+														{
+															vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
+															
+															if(decode_err == VPX_CODEC_OK)
+															{
+																csSDK_int32 decodedFrame = ((packet_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+																
+																csSDK_int32 hopingforFrame = ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+																assert(hopingforFrame == theFrame);
+																
+																vpx_codec_iter_t iter = NULL;
+																
+																vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
+																
+																if(img)
+																{
+																	PPixHand ppix;
+																	
+																	localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
 
-													assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709);
-													
-													char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-													csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-													
-													localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
-																									&Y_PixelAddress, &Y_RowBytes,
-																									&U_PixelAddress, &U_RowBytes,
-																									&V_PixelAddress, &V_RowBytes);
-																								
-													assert(frameFormat->inFrameHeight == img->d_h);
-													assert(frameFormat->inFrameWidth == img->d_w);
+																	assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709);
+																	
+																	char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+																	csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+																	
+																	localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
+																													&Y_PixelAddress, &Y_RowBytes,
+																													&U_PixelAddress, &U_RowBytes,
+																													&V_PixelAddress, &V_RowBytes);
+																												
+																	assert(frameFormat->inFrameHeight == img->d_h);
+																	assert(frameFormat->inFrameWidth == img->d_w);
 
-													for(int y = 0; y < img->d_h; y++)
-													{
-														unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-														
-														unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-														
-														memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
-													}
-													
-													for(int y = 0; y < img->d_h / 2; y++)
-													{
-														unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-														unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-														
-														unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-														unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-														
-														memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
-														memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
-													}
-													
-													localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
-																								0,
-																								ppix,
-																								decodedFrame,
-																								NULL,
-																								NULL);
-													
-													if(decodedFrame == theFrame)
-													{
-														*sourceVideoRec->outFrame = ppix;
+																	for(int y = 0; y < img->d_h; y++)
+																	{
+																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+																		
+																		unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+																		
+																		memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+																	}
+																	
+																	for(int y = 0; y < img->d_h / 2; y++)
+																	{
+																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+																		
+																		unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+																		unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+																		
+																		memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
+																		memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
+																	}
+																	
+																	localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
+																												0,
+																												ppix,
+																												decodedFrame,
+																												NULL,
+																												NULL);
+																	
+																	if(decodedFrame == theFrame)
+																	{
+																		*sourceVideoRec->outFrame = ppix;
+																		
+																		got_frame = true;
+																	}
+																	else
+																	{
+																		localRecP->PPixSuite->Dispose(ppix);
+																	}
+																	
+																	vpx_img_free(img);
+																}
+															}
+															else
+																result = imFileReadFailed;
+														}
 													}
 													else
-													{
-														localRecP->PPixSuite->Dispose(ppix);
-													}
+														result = imFileReadFailed;
+													
+													free(data);
 												}
+												else
+													result = imMemErr;
 											}
+											
+											first_frame = false;
+																			
+											long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+											
+											assert(status == 0);
 										}
+										
+										pCluster = localRecP->segment->GetNext(pCluster);
 									}
+									
+									vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
+									assert(destroy_err == VPX_CODEC_OK);
 								}
 							}
 						}
-						
-						first_frame = false;
-						
-					}while(!reached_iframe && read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK);
-					
-					
-					if(pkt)
-						nestegg_free_packet(pkt);
-					
-					
-					if( !(read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE && decode_err == VPX_CODEC_OK) )
-						result = imFileReadFailed;
+					}
 				}
-				else
-					result = imBadCodec;
-					
-				vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
-				assert(destroy_err == VPX_CODEC_OK);
 			}
-			else
-				result = imFileReadFailed;
 		}
-		else
-			result = imOtherErr;
 	}
 
 
@@ -1208,6 +1266,73 @@ SDKGetSourceVideo(
 	return result;
 }
 
+
+static int PrivateDataCount(const unsigned char *private_data, size_t private_size)
+{
+	// the first byte
+	unsigned char *p = (unsigned char *)private_data;
+	
+	return *p + 1;
+}
+
+static uint64_t
+xiph_lace_value(const unsigned char ** np)
+{
+	uint64_t lace;
+	uint64_t value;
+	const unsigned char *p = *np;
+
+	lace = *p++;
+	value = lace;
+	while (lace == 255) {
+		lace = *p++;
+		value += lace;
+	}
+
+	*np = p;
+
+	return value;
+}
+
+static const unsigned char *GetPrivateDataPart(const unsigned char *private_data,
+												size_t private_size, int part,
+												size_t *part_size)
+{
+	const unsigned char *result = NULL;
+	size_t result_size = 0;
+	
+	const unsigned char *p = private_data;
+	
+	int count = *p++ + 1;
+	assert(count == 3);
+	
+	
+	if(*p >= part)
+	{
+		uint64_t sizes[3];
+		uint64_t total = 0;
+		int i = 0;
+		
+		while(--count)
+		{
+			sizes[i] = xiph_lace_value(&p);
+			total += sizes[i];
+			i++;
+		}
+		sizes[i] = private_size - total - (p - private_data);
+		
+		for(i=0; i < part; ++i)
+			p += sizes[i];
+		
+		result = p;
+		result_size = sizes[part];
+	}
+	
+	*part_size = result_size;
+	
+	return result;
+}
+												
 
 static prMALError 
 SDKImportAudio7(
@@ -1223,207 +1348,230 @@ SDKImportAudio7(
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
 
-	assert(localRecP->io.userdata == SDKfileRef);
-	assert(localRecP->nestegg_ctx != NULL);
-
-	if(localRecP->nestegg_ctx != NULL)
+	assert(localRecP->reader != NULL && localRecP->reader->FileRef() == SDKfileRef);
+	assert(localRecP->segment != NULL);
+	
+	if(localRecP->segment)
 	{
 		uint64_t tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
 		
-		int ogg_packet_num = 0;
-		
-		unsigned int headers = 0;
-		
-		int count_err = nestegg_track_codec_data_count(localRecP->nestegg_ctx, localRecP->audio_track, &headers);
-		
-		if(count_err == NESTEGG_ERR_NONE && headers == 3)
+		if(localRecP->audio_track >= 0)
 		{
-			vorbis_info vi;
-			vorbis_comment vc;
-			vorbis_dsp_state vd;
-			vorbis_block vb;
+			const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
+		
+			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
 			
-			vorbis_info_init(&vi);
-			vorbis_comment_init(&vc);
-			
-			
-			int v_err = NESTEGG_ERR_NONE;
-			
-			for(int h=0; h < headers && v_err == NESTEGG_ERR_NONE; h++)
+			if(pTrack != NULL)
 			{
-				unsigned char *data = NULL;
-				size_t length = 0;
-				
-				v_err = nestegg_track_codec_data(localRecP->nestegg_ctx, localRecP->audio_track,
-														h, &data, &length);
-														
-				if(v_err == NESTEGG_ERR_NONE)
+				const long trackType = pTrack->GetType();
+			
+				if(trackType == mkvparser::Track::kAudio)
 				{
-					ogg_packet packet;
-					
-					packet.packet = data;
-					packet.bytes = length;
-					packet.b_o_s = (h == 0);
-					packet.e_o_s = false;
-					packet.granulepos = 0;
-					packet.packetno = ogg_packet_num++;
-					
-					v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
-				}
-			}
-					
-			if(v_err == NESTEGG_ERR_NONE)
-			{
-				v_err = vorbis_synthesis_init(&vd, &vi);
+					assert(pTrack->GetCodecId() == std::string("A_VORBIS"));
 				
-				if(v_err == NESTEGG_ERR_NONE)
-					v_err = vorbis_block_init(&vd, &vb);
-				
-				v_err = nestegg_track_seek(localRecP->nestegg_ctx,
-											localRecP->video_track >= 0 ? localRecP->video_track : localRecP->audio_track,
-											tstamp);
-											
-				if(v_err == NESTEGG_ERR_NONE)
-				{
-					nestegg_packet *pkt = NULL;
+					const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
 					
-					csSDK_uint32 samples_copied = 0;
-					csSDK_uint32 samples_left = audioRec7->size;
-					
-					uint64_t packet_tstamp = 0;
-					
-					int read_result = NESTEGG_SUCCESS;
-					int data_err = NESTEGG_ERR_NONE;
-					
-					do{
-						if(pkt)
-						{
-							nestegg_free_packet(pkt);
-							pkt = NULL;
-						}
-
-						read_result = nestegg_read_packet(localRecP->nestegg_ctx, &pkt);
+					if(pAudioTrack)
+					{
+						size_t private_size = 0;
+						const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
 						
-						if(read_result == NESTEGG_SUCCESS)
+						if(private_data && private_size && PrivateDataCount(private_data, private_size) == 3)
 						{
-							nestegg_packet_tstamp(pkt, &packet_tstamp);
+							vorbis_info vi;
+							vorbis_comment vc;
+							vorbis_dsp_state vd;
+							vorbis_block vb;
 							
-							unsigned int track;
-							nestegg_packet_track(pkt, &track);
+							vorbis_info_init(&vi);
+							vorbis_comment_init(&vc);
 							
-							if(track == localRecP->audio_track)
+							int ogg_packet_num = 0;
+							
+						#define OV_OK 0
+						
+							int v_err = OV_OK;
+							
+							for(int h=0; h < 3 && v_err == OV_OK; h++)
 							{
-								PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+								size_t length = 0;
+								const unsigned char *data = GetPrivateDataPart(private_data, private_size,
+																				h, &length);
 								
-								PrAudioSample packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
-								
-								if(packet_offset < 0)
-									packet_offset = 0;
-							
-								unsigned int chunks;
-								nestegg_packet_count(pkt, &chunks);
-							
-								for(int i=0; i < chunks && data_err == NESTEGG_ERR_NONE; i++)
+								if(data != NULL)
 								{
-									unsigned char *data = NULL;
-									size_t length;
+									ogg_packet packet;
 									
-									data_err = nestegg_packet_data(pkt, i, &data, &length);
+									packet.packet = (unsigned char *)data;
+									packet.bytes = length;
+									packet.b_o_s = (h == 0);
+									packet.e_o_s = false;
+									packet.granulepos = 0;
+									packet.packetno = ogg_packet_num++;
 									
-									if(data_err == NESTEGG_ERR_NONE)
-									{
-										ogg_packet packet;
-					
-										packet.packet = data;
-										packet.bytes = length;
-										packet.b_o_s = false;
-										packet.e_o_s = false;
-										packet.granulepos = -1;
-										packet.packetno = ogg_packet_num++;
-
-										int synth_err = vorbis_synthesis(&vb, &packet);
-										
-										if(synth_err == NESTEGG_ERR_NONE)
-										{
-											int block_err = vorbis_synthesis_blockin(&vd, &vb);
-											
-											if(block_err == NESTEGG_ERR_NONE)
-											{
-												float **pcm = NULL;
-												int samples;
-												
-												int synth_result = 1;
-												
-												while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
-												{
-													int samples_to_copy = samples_left;
-													
-													if(packet_offset >= samples)
-													{
-														samples_to_copy = 0;
-													}
-													else if(samples_to_copy > (samples - packet_offset))
-													{
-														samples_to_copy = (samples - packet_offset);
-													}
-												
-													// how nice, audio samples are float, just like Premiere wants 'em
-													for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
-													{
-														memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
-													}
-													
-													samples_copied += samples_to_copy;
-													samples_left -= samples_to_copy;
-													
-													if(samples_to_copy > 0)
-														packet_offset = 0;
-													else
-														packet_offset -= samples;
-													
-													
-													synth_result = vorbis_synthesis_read(&vd, samples);
-												}
-											}
-										}
-										else
-											read_result = 0;
-									}
+									v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
 								}
 							}
+									
+							if(v_err == OV_OK)
+							{
+								v_err = vorbis_synthesis_init(&vd, &vi);
+								
+								if(v_err == OV_OK)
+									v_err = vorbis_block_init(&vd, &vb);
+								
+								
+								const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+								
+								pAudioTrack->Seek(tstamp, pSeekBlockEntry);
+								
+								if(pSeekBlockEntry != NULL)
+								{
+									csSDK_uint32 samples_copied = 0;
+									csSDK_uint32 samples_left = audioRec7->size;
+									
+									const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
+									
+									while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
+									{
+										const mkvparser::BlockEntry* pBlockEntry = NULL;
+										
+										pCluster->GetFirst(pBlockEntry);
+										
+										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && samples_left > 0 && result == malNoError)
+										{
+											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+											
+											if(pBlock->GetTrackNumber() == localRecP->audio_track)
+											{
+												long long packet_tstamp = pBlock->GetTime(pCluster);
+												
+												PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+												
+												PrAudioSample packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+												
+												if(packet_offset < 0)
+													packet_offset = 0;
+													
+												for(int f=0; f < pBlock->GetFrameCount(); f++)
+												{
+													const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+													
+													unsigned int length = blockFrame.len;
+													uint8_t *data = (uint8_t *)malloc(length);
+													
+													if(data != NULL)
+													{
+														int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+														
+														if(read_err == PrMkvReader::PrMkvSuccess)
+														{
+															ogg_packet packet;
+										
+															packet.packet = data;
+															packet.bytes = length;
+															packet.b_o_s = false;
+															packet.e_o_s = false;
+															packet.granulepos = -1;
+															packet.packetno = ogg_packet_num++;
+
+															int synth_err = vorbis_synthesis(&vb, &packet);
+															
+															if(synth_err == OV_OK)
+															{
+																int block_err = vorbis_synthesis_blockin(&vd, &vb);
+																
+																if(block_err == OV_OK)
+																{
+																	float **pcm = NULL;
+																	int samples;
+																	
+																	int synth_result = 1;
+																	
+																	while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+																	{
+																		int samples_to_copy = samples_left;
+																		
+																		if(packet_offset >= samples)
+																		{
+																			samples_to_copy = 0;
+																		}
+																		else if(samples_to_copy > (samples - packet_offset))
+																		{
+																			samples_to_copy = (samples - packet_offset);
+																		}
+																	
+																		// how nice, audio samples are float, just like Premiere wants 'em
+																		for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
+																		{
+																			memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+																		}
+																		
+																		samples_copied += samples_to_copy;
+																		samples_left -= samples_to_copy;
+																		
+																		if(samples_to_copy > 0)
+																			packet_offset = 0;
+																		else
+																			packet_offset -= samples;
+																		
+																		
+																		synth_result = vorbis_synthesis_read(&vd, samples);
+																	}
+																}
+																else
+																	result = imFileReadFailed;
+															}
+															else
+																result = imFileReadFailed;
+														}
+														else
+															result = imFileReadFailed;
+														
+														free(data);
+													}
+													else
+														result = imMemErr;
+												}
+											}
+											
+											long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+											
+											assert(status == 0);
+										}
+										
+										pCluster = localRecP->segment->GetNext(pCluster);
+									}
+
+									assert(samples_left == 0 && samples_copied == audioRec7->size);
+								}
+								else
+									result = imFileReadFailed;
+							}
+							else
+								result = imFileReadFailed;
+							
+							
+							vorbis_block_clear(&vb);
+							vorbis_dsp_clear(&vd);
+							vorbis_info_clear(&vi);
+							vorbis_comment_clear(&vc);
 						}
-						
-					}while(samples_left > 0 && read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE);
-
-					assert(samples_left == 0 && samples_copied == audioRec7->size);
-
-					if(pkt)
-						nestegg_free_packet(pkt);
-					
-					
-					if( !(read_result == NESTEGG_SUCCESS && data_err == NESTEGG_ERR_NONE) )
+						else
+							result = imFileReadFailed;
+					}
+					else
 						result = imFileReadFailed;
-						
-					assert(result == malNoError);
 				}
 				else
 					result = imFileReadFailed;
 			}
 			else
 				result = imFileReadFailed;
-			
-			
-			vorbis_block_clear(&vb);
-			vorbis_dsp_clear(&vd);
-			vorbis_info_clear(&vi);
-			vorbis_comment_clear(&vc);
 		}
-		else
-			result = imFileReadFailed;
 	}
-	else
-		result = imOtherErr;
-		
+	
+					
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
 	
 	assert(result == malNoError);
@@ -1439,6 +1587,8 @@ PREMPLUGENTRY DllExport xImportEntry (
 	void			*param2)
 {
 	prMALError	result				= imUnsupported;
+
+	try{
 
 	switch (selector)
 	{
@@ -1531,6 +1681,8 @@ PREMPLUGENTRY DllExport xImportEntry (
 			result =	imUnsupported;
 			break;
 	}
+	
+	}catch(...) { result = imOtherErr; }
 
 	return result;
 }

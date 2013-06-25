@@ -55,479 +55,99 @@
 
 extern "C" {
 
-#include "vpx_config.h"
 #include "vpx/vpx_encoder.h"
 #include "vpx/vp8cx.h"
-#include "libmkv/EbmlWriter.h"
-#include "libmkv/EbmlIDs.h"
+
+#include <vorbis/codec.h>
+#include <vorbis/vorbisenc.h>
 
 }
 
+#include "mkvmuxer.hpp"
 
-// this stuff basically just copied from vpxenc.c
-typedef off_t EbmlLoc;
-
-struct cue_entry {
-  unsigned int time;
-  uint64_t     loc;
-};
-
-struct EbmlGlobal {
-
-	PrSDKExportFileSuite *fileSuite;
-	csSDK_uint32 fileObject;
-	
-	int debug;
-
-	//FILE    *stream;
-	int64_t last_pts_ms;
-	vpx_rational_t  framerate;
-
-	/* These pointers are to the start of an element */
-	off_t    position_reference;
-	off_t    seek_info_pos;
-	off_t    segment_info_pos;
-	off_t    track_pos;
-	off_t    cue_pos;
-	off_t    cluster_pos;
-
-	/* This pointer is to a specific element to be serialized */
-	off_t    track_id_pos;
-
-	/* These pointers are to the size field of the element */
-	EbmlLoc  startSegment;
-	EbmlLoc  startCluster;
-
-	uint32_t cluster_timecode;
-	int      cluster_open;
-
-	struct cue_entry *cue_list;
-	unsigned int      cues;
-
-};
+#include <assert.h>
 
 
-void Ebml_Write(EbmlGlobal *glob, const void *buffer_in, unsigned long len)
+typedef mkvmuxer::int32 int32;
+typedef mkvmuxer::int64 int64;
+
+class PrMkvWriter : public mkvmuxer::IMkvWriter
 {
-	glob->fileSuite->Write(glob->fileObject, (void *)buffer_in, len);
+  public:
+	PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObject);
+	virtual ~PrMkvWriter();
+	
+	virtual int32 Write(const void* buf, uint32 len);
+	virtual int64 Position() const;
+	virtual int32 Position(int64 position); // seek
+	virtual bool Seekable() const { return true; }
+	virtual void ElementStartNotify(uint64 element_id, int64 position);
+	
+  private:
+	//PrMkvWriter() : _fileSuite(NULL), _fileObject(NULL) { throw -1; }
+	const PrSDKExportFileSuite *_fileSuite;
+	const csSDK_uint32 _fileObject;
+	
+	//LIBWEBM_DISALLOW_COPY_AND_ASSIGN(PrMkvWriter);
+};
+
+PrMkvWriter::PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObject) :
+	_fileSuite(fileSuite),
+	_fileObject(fileObject)
+{
+	prSuiteError err = _fileSuite->Open(_fileObject);
+	
+	if(err != malNoError)
+		throw err;
+}
+
+PrMkvWriter::~PrMkvWriter()
+{
+	prSuiteError err = _fileSuite->Close(_fileObject);
+}
+
+int32
+PrMkvWriter::Write(const void* buf, uint32 len)
+{
+	prSuiteError err = _fileSuite->Write(_fileObject, (void *)buf, len);
+	
+	return err;
 }
 
 
-static EbmlLoc Ebml_Tell(EbmlGlobal *glob)
+int64
+PrMkvWriter::Position() const
 {
 	prInt64 pos = 0;
-	
-	prSuiteError err = glob->fileSuite->Seek(glob->fileObject, 0, pos, fileSeekMode_Current);
+
+// son of a gun, fileSeekMode_End and fileSeekMode_Current are flipped inside Premiere!
+#define PR_SEEK_CURRENT fileSeekMode_End
+
+	prSuiteError err = _fileSuite->Seek(_fileObject, 0, pos, PR_SEEK_CURRENT);
 	
 	return pos;
 }
 
-
-static int Ebml_Seek(EbmlGlobal *glob, EbmlLoc offset, int whence)
+int32
+PrMkvWriter::Position(int64 position)
 {
-	ExFileSuite_SeekMode mode = whence == SEEK_SET ? fileSeekMode_Begin :
-								whence == SEEK_CUR ? fileSeekMode_Current :
-								whence == SEEK_END ? fileSeekMode_End :
-								fileSeekMode_Begin;
+	prInt64 pos = 0;
+
+	prSuiteError err = _fileSuite->Seek(_fileObject, position, pos, fileSeekMode_Begin);
 	
-	prInt64 new_pos = 0;
-	
-	prSuiteError err = glob->fileSuite->Seek(glob->fileObject, offset, new_pos, mode);
+	return err;
+}
 
-	return (err == suiteError_NoError) ? 0 : -1;
+void
+PrMkvWriter::ElementStartNotify(uint64 element_id, int64 position)
+{
+	//Position(position);
 }
 
 
 
-#define WRITE_BUFFER(s) \
-  for(i = len-1; i>=0; i--)\
-  { \
-    x = (char)(*(const s *)buffer_in >> (i * CHAR_BIT)); \
-    Ebml_Write(glob, &x, 1); \
-  }
-void Ebml_Serialize(EbmlGlobal *glob, const void *buffer_in, int buffer_size, unsigned long len) {
-  char x;
-  int i;
 
-  /* buffer_size:
-   * 1 - int8_t;
-   * 2 - int16_t;
-   * 3 - int32_t;
-   * 4 - int64_t;
-   */
-  switch (buffer_size) {
-    case 1:
-      WRITE_BUFFER(int8_t)
-      break;
-    case 2:
-      WRITE_BUFFER(int16_t)
-      break;
-    case 4:
-      WRITE_BUFFER(int32_t)
-      break;
-    case 8:
-      WRITE_BUFFER(int64_t)
-      break;
-    default:
-      break;
-  }
-}
-#undef WRITE_BUFFER
-
-
-/* Need a fixed size serializer for the track ID. libmkv provides a 64 bit
- * one, but not a 32 bit one.
- */
-static void Ebml_SerializeUnsigned32(EbmlGlobal *glob, unsigned long class_id, uint64_t ui) {
-  unsigned char sizeSerialized = 4 | 0x80;
-  Ebml_WriteID(glob, class_id);
-  Ebml_Serialize(glob, &sizeSerialized, sizeof(sizeSerialized), 1);
-  Ebml_Serialize(glob, &ui, sizeof(ui), 4);
-}
-
-#define LITERALU64(hi,lo) ((((uint64_t)hi)<<32)|lo)
-
-static void
-Ebml_StartSubElement(EbmlGlobal *glob, EbmlLoc *ebmlLoc,
-                     unsigned long class_id) {
-  /* todo this is always taking 8 bytes, this may need later optimization */
-  /* this is a key that says length unknown */
-  uint64_t unknownLen = LITERALU64(0x01FFFFFF, 0xFFFFFFFF);
-
-  Ebml_WriteID(glob, class_id);
-  *ebmlLoc = Ebml_Tell(glob);
-  Ebml_Serialize(glob, &unknownLen, sizeof(unknownLen), 8);
-}
-
-static void
-Ebml_EndSubElement(EbmlGlobal *glob, EbmlLoc *ebmlLoc) {
-  off_t pos;
-  uint64_t size;
-
-  /* Save the current stream pointer */
-  pos = Ebml_Tell(glob);
-
-  /* Calculate the size of this element */
-  size = pos - *ebmlLoc - 8;
-  size |= LITERALU64(0x01000000, 0x00000000);
-
-  /* Seek back to the beginning of the element and write the new size */
-  Ebml_Seek(glob, *ebmlLoc, SEEK_SET);
-  Ebml_Serialize(glob, &size, sizeof(size), 8);
-
-  /* Reset the stream pointer */
-  Ebml_Seek(glob, pos, SEEK_SET);
-}
-
-
-static void
-write_webm_seek_element(EbmlGlobal *ebml, unsigned long id, off_t pos) {
-  uint64_t offset = pos - ebml->position_reference;
-  EbmlLoc start;
-  Ebml_StartSubElement(ebml, &start, Seek);
-  Ebml_SerializeBinary(ebml, SeekID, id);
-  Ebml_SerializeUnsigned64(ebml, SeekPosition, offset);
-  Ebml_EndSubElement(ebml, &start);
-}
-
-
-static void
-write_webm_seek_info(EbmlGlobal *ebml) {
-
-  off_t pos;
-
-  /* Save the current stream pointer */
-  pos = Ebml_Tell(ebml);
-
-  if (ebml->seek_info_pos)
-    Ebml_Seek(ebml, ebml->seek_info_pos, SEEK_SET);
-  else
-    ebml->seek_info_pos = pos;
-
-  {
-    EbmlLoc start;
-
-    Ebml_StartSubElement(ebml, &start, SeekHead);
-    write_webm_seek_element(ebml, Tracks, ebml->track_pos);
-    write_webm_seek_element(ebml, Cues,   ebml->cue_pos);
-    write_webm_seek_element(ebml, Info,   ebml->segment_info_pos);
-    Ebml_EndSubElement(ebml, &start);
-  }
-  {
-    /* segment info */
-    EbmlLoc startInfo;
-    uint64_t frame_time;
-    char version_string[64];
-
-    /* Assemble version string */
-    if (ebml->debug)
-      strcpy(version_string, "vpxenc");
-    else {
-      strcpy(version_string, "vpxenc ");
-      strncat(version_string,
-              vpx_codec_version_str(),
-              sizeof(version_string) - 1 - strlen(version_string));
-    }
-
-    frame_time = (uint64_t)1000 * ebml->framerate.den
-                 / ebml->framerate.num;
-    ebml->segment_info_pos = Ebml_Tell(ebml);
-    Ebml_StartSubElement(ebml, &startInfo, Info);
-    Ebml_SerializeUnsigned(ebml, TimecodeScale, 1000000);
-    Ebml_SerializeFloat(ebml, Segment_Duration,
-                        (double)(ebml->last_pts_ms + frame_time));
-    Ebml_SerializeString(ebml, 0x4D80, version_string);
-    Ebml_SerializeString(ebml, 0x5741, version_string);
-    Ebml_EndSubElement(ebml, &startInfo);
-  }
-}
-
-
-typedef enum stereo_format {
-  STEREO_FORMAT_MONO       = 0,
-  STEREO_FORMAT_LEFT_RIGHT = 1,
-  STEREO_FORMAT_BOTTOM_TOP = 2,
-  STEREO_FORMAT_TOP_BOTTOM = 3,
-  STEREO_FORMAT_RIGHT_LEFT = 11
-} stereo_format_t;
-
-#define VP8_FOURCC (0x30385056)
-#define VP9_FOURCC (0x30395056)
-
-static void
-write_webm_file_header(EbmlGlobal                *glob,
-                       const vpx_codec_enc_cfg_t *cfg,
-                       const struct vpx_rational *fps,
-                       stereo_format_t            stereo_fmt,
-                       unsigned int               fourcc) {
-  {
-    EbmlLoc start;
-    Ebml_StartSubElement(glob, &start, EBML);
-    Ebml_SerializeUnsigned(glob, EBMLVersion, 1);
-    Ebml_SerializeUnsigned(glob, EBMLReadVersion, 1);
-    Ebml_SerializeUnsigned(glob, EBMLMaxIDLength, 4);
-    Ebml_SerializeUnsigned(glob, EBMLMaxSizeLength, 8);
-    Ebml_SerializeString(glob, DocType, "webm");
-    Ebml_SerializeUnsigned(glob, DocTypeVersion, 2);
-    Ebml_SerializeUnsigned(glob, DocTypeReadVersion, 2);
-    Ebml_EndSubElement(glob, &start);
-  }
-  {
-    Ebml_StartSubElement(glob, &glob->startSegment, Segment);
-    glob->position_reference = Ebml_Tell(glob);
-    glob->framerate = *fps;
-    write_webm_seek_info(glob);
-
-    {
-      EbmlLoc trackStart;
-      glob->track_pos = Ebml_Tell(glob);
-      Ebml_StartSubElement(glob, &trackStart, Tracks);
-      {
-        unsigned int trackNumber = 1;
-        uint64_t     trackID = 0;
-
-        EbmlLoc start;
-        Ebml_StartSubElement(glob, &start, TrackEntry);
-        Ebml_SerializeUnsigned(glob, TrackNumber, trackNumber);
-        glob->track_id_pos = Ebml_Tell(glob);
-        Ebml_SerializeUnsigned32(glob, TrackUID, trackID);
-        Ebml_SerializeUnsigned(glob, TrackType, 1);
-        Ebml_SerializeString(glob, CodecID,
-                             fourcc == VP8_FOURCC ? "V_VP8" : "V_VP9");
-        {
-          unsigned int pixelWidth = cfg->g_w;
-          unsigned int pixelHeight = cfg->g_h;
-          float        frameRate   = (float)fps->num / (float)fps->den;
-
-          EbmlLoc videoStart;
-          Ebml_StartSubElement(glob, &videoStart, Video);
-          Ebml_SerializeUnsigned(glob, PixelWidth, pixelWidth);
-          Ebml_SerializeUnsigned(glob, PixelHeight, pixelHeight);
-          Ebml_SerializeUnsigned(glob, StereoMode, stereo_fmt);
-          Ebml_SerializeFloat(glob, FrameRate, frameRate);
-          Ebml_EndSubElement(glob, &videoStart);
-        }
-        Ebml_EndSubElement(glob, &start); /* Track Entry */
-      }
-      Ebml_EndSubElement(glob, &trackStart);
-    }
-    /* segment element is open */
-  }
-}
-
-
-static void
-write_webm_block(EbmlGlobal                *glob,
-                 const vpx_codec_enc_cfg_t *cfg,
-                 const vpx_codec_cx_pkt_t  *pkt) {
-  unsigned long  block_length;
-  unsigned char  track_number;
-  unsigned short block_timecode = 0;
-  unsigned char  flags;
-  int64_t        pts_ms;
-  int            start_cluster = 0, is_keyframe;
-
-  /* Calculate the PTS of this frame in milliseconds */
-  pts_ms = pkt->data.frame.pts * 1000
-           * (uint64_t)cfg->g_timebase.num / (uint64_t)cfg->g_timebase.den;
-  if (pts_ms <= glob->last_pts_ms)
-    pts_ms = glob->last_pts_ms + 1;
-  glob->last_pts_ms = pts_ms;
-
-  /* Calculate the relative time of this block */
-  if (pts_ms - glob->cluster_timecode > SHRT_MAX)
-    start_cluster = 1;
-  else
-    block_timecode = (unsigned short)pts_ms - glob->cluster_timecode;
-
-  is_keyframe = (pkt->data.frame.flags & VPX_FRAME_IS_KEY);
-  if (start_cluster || is_keyframe) {
-    if (glob->cluster_open)
-      Ebml_EndSubElement(glob, &glob->startCluster);
-
-    /* Open the new cluster */
-    block_timecode = 0;
-    glob->cluster_open = 1;
-    glob->cluster_timecode = (uint32_t)pts_ms;
-    glob->cluster_pos = Ebml_Tell(glob);
-    Ebml_StartSubElement(glob, &glob->startCluster, Cluster); /* cluster */
-    Ebml_SerializeUnsigned(glob, Timecode, glob->cluster_timecode);
-
-    /* Save a cue point if this is a keyframe. */
-    if (is_keyframe) {
-       struct cue_entry *cue, *new_cue_list;
-
-      new_cue_list = (struct cue_entry *)realloc((void *)glob->cue_list,
-                             (glob->cues + 1) * sizeof(struct cue_entry));
-      if (new_cue_list)
-        glob->cue_list = new_cue_list;
-      else
-        throw -1; // because we can't call exit()
-
-      cue = &glob->cue_list[glob->cues];
-      cue->time = glob->cluster_timecode;
-      cue->loc = glob->cluster_pos;
-      glob->cues++;
-    }
-  }
-
-  /* Write the Simple Block */
-  Ebml_WriteID(glob, SimpleBlock);
-
-  block_length = (unsigned long)pkt->data.frame.sz + 4;
-  block_length |= 0x10000000;
-  Ebml_Serialize(glob, &block_length, sizeof(block_length), 4);
-
-  track_number = 1;
-  track_number |= 0x80;
-  Ebml_Write(glob, &track_number, 1);
-
-  Ebml_Serialize(glob, &block_timecode, sizeof(block_timecode), 2);
-
-  flags = 0;
-  if (is_keyframe)
-    flags |= 0x80;
-  if (pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE)
-    flags |= 0x08;
-  Ebml_Write(glob, &flags, 1);
-
-  Ebml_Write(glob, pkt->data.frame.buf, (unsigned long)pkt->data.frame.sz);
-}
-
-
-static void
-write_webm_file_footer(EbmlGlobal *glob, long hash) {
-
-  if (glob->cluster_open)
-    Ebml_EndSubElement(glob, &glob->startCluster);
-
-  {
-    EbmlLoc start;
-    unsigned int i;
-
-    glob->cue_pos = Ebml_Tell(glob);
-    Ebml_StartSubElement(glob, &start, Cues);
-    for (i = 0; i < glob->cues; i++) {
-      struct cue_entry *cue = &glob->cue_list[i];
-      EbmlLoc start;
-
-      Ebml_StartSubElement(glob, &start, CuePoint);
-      {
-        EbmlLoc start;
-
-        Ebml_SerializeUnsigned(glob, CueTime, cue->time);
-
-        Ebml_StartSubElement(glob, &start, CueTrackPositions);
-        Ebml_SerializeUnsigned(glob, CueTrack, 1);
-        Ebml_SerializeUnsigned64(glob, CueClusterPosition,
-                                 cue->loc - glob->position_reference);
-        Ebml_EndSubElement(glob, &start);
-      }
-      Ebml_EndSubElement(glob, &start);
-    }
-    Ebml_EndSubElement(glob, &start);
-  }
-
-  Ebml_EndSubElement(glob, &glob->startSegment);
-
-  /* Patch up the seek info block */
-  write_webm_seek_info(glob);
-
-  /* Patch up the track id */
-  Ebml_Seek(glob, glob->track_id_pos, SEEK_SET);
-  Ebml_SerializeUnsigned32(glob, TrackUID, glob->debug ? 0xDEADBEEF : hash);
-
-  Ebml_Seek(glob, 0, SEEK_END);
-}
-
-
-/* Murmur hash derived from public domain reference implementation at
- *   http:// sites.google.com/site/murmurhash/
- */
-static unsigned int murmur(const void *key, int len, unsigned int seed) {
-  const unsigned int m = 0x5bd1e995;
-  const int r = 24;
-
-  unsigned int h = seed ^ len;
-
-  const unsigned char *data = (const unsigned char *)key;
-
-  while (len >= 4) {
-    unsigned int k;
-
-    k  = data[0];
-    k |= data[1] << 8;
-    k |= data[2] << 16;
-    k |= data[3] << 24;
-
-    k *= m;
-    k ^= k >> r;
-    k *= m;
-
-    h *= m;
-    h ^= k;
-
-    data += 4;
-    len -= 4;
-  }
-
-  switch (len) {
-    case 3:
-      h ^= data[2] << 16;
-    case 2:
-      h ^= data[1] << 8;
-    case 1:
-      h ^= data[0];
-      h *= m;
-  };
-
-  h ^= h >> 13;
-  h *= m;
-  h ^= h >> 15;
-
-  return h;
-}
-
+/*
 #include "math.h"
 #define MAX_PSNR 100
 static double vp8_mse2psnr(double Samples, double Peak, double Mse) {
@@ -536,13 +156,14 @@ static double vp8_mse2psnr(double Samples, double Peak, double Mse) {
   if ((double)Mse > 0.0)
     psnr = 10.0 * log10(Peak * Peak * Samples / Mse);
   else
-    psnr = MAX_PSNR;      /* Limit to prevent / 0 */
+    psnr = MAX_PSNR;      // Limit to prevent / 0
 
   if (psnr > MAX_PSNR)
     psnr = MAX_PSNR;
 
   return psnr;
 }
+*/
 
 #pragma mark-
 
@@ -565,6 +186,7 @@ typedef struct ExportSettings
 	PrSDKTimeSuite				*timeSuite;
 	PrSDKMemoryManagerSuite		*memorySuite;
 	PrSDKSequenceRenderSuite	*sequenceRenderSuite;
+	PrSDKSequenceAudioSuite		*sequenceAudioSuite;
 	PrSDKWindowSuite			*windowSuite;
 } ExportSettings;
 
@@ -614,7 +236,7 @@ exSDKStartup(
 	infoRecP->hideInUI			= kPrFalse;
 	infoRecP->doesNotSupportAudioOnly = kPrFalse;
 	infoRecP->canExportVideo	= kPrTrue;
-	infoRecP->canExportAudio	= kPrFalse;
+	infoRecP->canExportAudio	= kPrTrue;
 	infoRecP->singleFrameOnly	= kPrFalse;
 	
 	infoRecP->interfaceVersion	= EXPORTMOD_VERSION;
@@ -685,6 +307,10 @@ exSDKBeginInstance(
 				kPrSDKSequenceRenderSuiteVersion,
 				const_cast<const void**>(reinterpret_cast<void**>(&(mySettings->sequenceRenderSuite))));
 			spError = spBasic->AcquireSuite(
+				kPrSDKSequenceAudioSuite,
+				kPrSDKSequenceAudioSuiteVersion,
+				const_cast<const void**>(reinterpret_cast<void**>(&(mySettings->sequenceAudioSuite))));
+			spError = spBasic->AcquireSuite(
 				kPrSDKTimeSuite,
 				kPrSDKTimeSuiteVersion,
 				const_cast<const void**>(reinterpret_cast<void**>(&(mySettings->timeSuite))));
@@ -748,6 +374,10 @@ exSDKEndInstance(
 		if (lRec->sequenceRenderSuite)
 		{
 			result = spBasic->ReleaseSuite(kPrSDKSequenceRenderSuite, kPrSDKSequenceRenderSuiteVersion);
+		}
+		if (lRec->sequenceAudioSuite)
+		{
+			result = spBasic->ReleaseSuite(kPrSDKSequenceAudioSuite, kPrSDKSequenceAudioSuiteVersion);
 		}
 		if (lRec->timeSuite)
 		{
@@ -951,6 +581,55 @@ static void get_framerate(PrTime ticksPerSecond, PrTime ticks_per_frame, exRatio
 }
 
 
+static int
+xiph_len(int l)
+{
+    return 1 + l / 255 + l;
+}
+
+static void
+xiph_lace(unsigned char **np, uint64_t val)
+{
+	unsigned char *p = *np;
+
+	while(val >= 255)
+	{
+		*p++ = 255;
+		val -= 255;
+	}
+	
+	*p++ = val;
+	
+	*np = p;
+}
+
+static void *
+MakePrivateData(ogg_packet &header, ogg_packet &header_comm, ogg_packet &header_code, size_t &size)
+{
+	size = 1 + xiph_len(header.bytes) + xiph_len(header_comm.bytes) + header_code.bytes;
+	
+	void *buf = malloc(size);
+	
+	if(buf)
+	{
+		unsigned char *p = (unsigned char *)buf;
+		
+		*p++ = 2;
+		
+		xiph_lace(&p, header.bytes);
+		xiph_lace(&p, header_comm.bytes);
+		
+		memcpy(p, header.packet, header.bytes);
+		p += header.bytes;
+		memcpy(p, header_comm.packet, header_comm.bytes);
+		p += header_comm.bytes;
+		memcpy(p, header_code.packet, header_code.bytes);
+	}
+	
+	return buf;
+}
+
+
 static prMALError
 exSDKExport(
 	exportStdParms	*stdParmsP,
@@ -961,6 +640,7 @@ exSDKExport(
 	PrSDKExportParamSuite		*paramSuite				= mySettings->exportParamSuite;
 	PrSDKExportInfoSuite		*exportInfoSuite		= mySettings->exportInfoSuite;
 	PrSDKSequenceRenderSuite	*renderSuite			= mySettings->sequenceRenderSuite;
+	PrSDKSequenceAudioSuite		*audioSuite				= mySettings->sequenceAudioSuite;
 	PrSDKMemoryManagerSuite		*memorySuite			= mySettings->memorySuite;
 	PrSDKPPixCreatorSuite		*pixCreatorSuite		= mySettings->ppixCreatorSuite;
 	PrSDKPPixSuite				*pixSuite				= mySettings->ppixSuite;
@@ -977,7 +657,7 @@ exSDKExport(
 	csSDK_uint32 exID = exportInfoP->exporterPluginID;
 	csSDK_int32 gIdx = 0;
 	
-	exParamValues widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP, alphaP;
+	exParamValues widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP, alphaP, sampleRateP, channelTypeP;
 	
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
@@ -985,6 +665,8 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoAlpha, &alphaP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 	
 	
 	SequenceRender_ParamsRec renderParms;
@@ -1006,22 +688,14 @@ exSDKExport(
 	csSDK_uint32 videoRenderID;
 	renderSuite->MakeVideoRenderer(exID, &videoRenderID, frameRateP.value.timeValue);
 	
-	
-	result = mySettings->exportFileSuite->Open(exportInfoP->fileObject);
-	
-	EbmlGlobal ebml;
-	memset(&ebml, 0, sizeof(ebml));
+	//csSDK_uint32 audioRenderID;
+	//audioSuite->MakeAudioRenderer(exID, exportInfoP->startTime, (PrAudioChannelType)channelTypeP.value.intValue,
+	//								kPrAudioSampleType_32BitFloat, sampleRateP.value.floatValue, &audioRenderID);
 	
 	try{
 	
 	if(result == malNoError)
 	{
-		ebml.fileSuite = mySettings->exportFileSuite;
-		ebml.fileObject = exportInfoP->fileObject;
-		ebml.debug = false;
-		ebml.last_pts_ms = -1;
-		
-	
 		vpx_codec_iface_t *iface = vpx_codec_vp8_cx();
 		
 		vpx_codec_enc_cfg_t config;
@@ -1036,31 +710,93 @@ exSDKExport(
 		exRatioValue fps;
 		get_framerate(ticksPerSecond, frameRateP.value.timeValue, &fps);
 		
-		stereo_format_t stereo_fmt = STEREO_FORMAT_MONO;
-		
-		vpx_rational vpx_fps;
-		vpx_fps.num = fps.numerator * 1000;
-		vpx_fps.den = fps.denominator * 1000;
-		
 		config.g_timebase.num = 1;
-		config.g_timebase.den = vpx_fps.den;
-		
-		
-		write_webm_file_header(&ebml, &config, &vpx_fps, stereo_fmt, VP8_FOURCC);
-		
-		
-		long hash = 0;
+		config.g_timebase.den = 1000000; // for some reason I get errors if I set this to anything else; must investigate
 		
 		
 		vpx_codec_ctx_t encoder;
 		
 		vpx_codec_err_t codec_err = vpx_codec_enc_init(&encoder, iface, &config, 0);
 		
+/*	
+	#define OV_OK 0
+	
+		vorbis_info vi;
+		vorbis_comment vc;
+		vorbis_dsp_state vd;
+		vorbis_block vb;
+		
+		vorbis_info_init(&vi);
+		
+		int v_err = vorbis_encode_setup_managed(&vi,
+												channelTypeP.value.intValue,
+												sampleRateP.value.floatValue,
+												123, 456, 789);
+		assert(v_err == OV_OK);
+		
+		vorbis_comment_init(&vc);
+		vorbis_analysis_init(&vd, &vi);
+		vorbis_block_init(&vd, &vb);
+		
+		
+		ogg_packet header;
+		ogg_packet header_comm;
+		ogg_packet header_code;
+		
+		vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
+		
+		size_t private_size = 0;
+		void *private_data = MakePrivateData(header, header_comm, header_code, private_size);
+*/		
+		
 		if(codec_err == VPX_CODEC_OK)
 		{
+			PrMkvWriter writer(mySettings->exportFileSuite, exportInfoP->fileObject);
+
+			mkvmuxer::Segment muxer_segment;
+			
+			muxer_segment.Init(&writer);
+			muxer_segment.set_mode(mkvmuxer::Segment::kFile);
+			
+			
+			mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
+			
+			info->set_timecode_scale(config.g_timebase.den);
+			info->set_writing_app("fnord WebM");
+			
+			
+			
+			uint64 vid_track = muxer_segment.AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
+			
+			mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment.GetTrackByNumber(vid_track));
+			
+			video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
+			video->set_codec_id(mkvmuxer::Tracks::kVp8CodecId);
+			
+			muxer_segment.CuesTrack(vid_track);
+			
+			
+/*			
+			uint64 audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, channelTypeP.value.intValue, 2);
+			
+			mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
+			
+			if(private_data)
+			{
+				bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
+				
+				assert(copied);
+				
+				free(private_data);
+			}
+*/			
+		
 			SequenceRender_GetFrameReturnRec renderResult;
 			
 			PrTime videoTime = exportInfoP->startTime;
+			
+			PrTime audioBegin = exportInfoP->startTime;
+			int frames_without_audio = 0;
 			
 			while(videoTime < exportInfoP->endTime && result == suiteError_NoError)
 			{
@@ -1086,110 +822,194 @@ exSDKExport(
 					vpx_image_t img_data;
 					vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);;
 					
-					if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
+					if(img)
 					{
-						char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-						csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-						
-						pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
-															&Y_PixelAddress, &Y_RowBytes,
-															&U_PixelAddress, &U_RowBytes,
-															&V_PixelAddress, &V_RowBytes);
-						
-						for(int y = 0; y < img->d_h; y++)
+						if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
 						{
-							unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+							char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+							csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
 							
-							unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+							pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
+																&Y_PixelAddress, &Y_RowBytes,
+																&U_PixelAddress, &U_RowBytes,
+																&V_PixelAddress, &V_RowBytes);
 							
-							memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
-						}
-						
-						for(int y = 0; y < img->d_h / 2; y++)
-						{
-							unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-							unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-							
-							unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-							unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-							
-							memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
-							memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
-						}
-					}
-					else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
-					{
-						// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
-						// see validate_img() in vp8_cx_iface.c
-						
-						// so here's our dumb RGB to YUV conversion
-					
-						char *frameBufferP = NULL;
-						csSDK_int32 rowbytes = 0;
-						
-						pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-						pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-						
-						
-						for(int y = 0; y < img->d_h; y++)
-						{
-							unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-							unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
-							unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
-							
-							unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * y);
-							
-							unsigned char *prB = prBGRA + 0;
-							unsigned char *prG = prBGRA + 1;
-							unsigned char *prR = prBGRA + 2;
-							unsigned char *prA = prBGRA + 3;
-							
-							for(int x=0; x < img->d_w; x++)
+							for(int y = 0; y < img->d_h; y++)
 							{
-								*imgY++ = (((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB)) / 1000) + 16;
+								unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
 								
-								if( (y % 2 == 0) && (x % 2 == 0) )
+								unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+								
+								memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
+							}
+							
+							for(int y = 0; y < img->d_h / 2; y++)
+							{
+								unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+								unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+								
+								unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+								unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+								
+								memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
+								memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
+							}
+						}
+						else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
+						{
+							// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
+							// see validate_img() in vp8_cx_iface.c
+							
+							// so here's our dumb RGB to YUV conversion
+						
+							char *frameBufferP = NULL;
+							csSDK_int32 rowbytes = 0;
+							
+							pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+							pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+							
+							
+							for(int y = 0; y < img->d_h; y++)
+							{
+								unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+								unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
+								unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+								
+								unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * y);
+								
+								unsigned char *prB = prBGRA + 0;
+								unsigned char *prG = prBGRA + 1;
+								unsigned char *prR = prBGRA + 2;
+								unsigned char *prA = prBGRA + 3;
+								
+								for(int x=0; x < img->d_w; x++)
 								{
-									*imgV++ = (((439 * (int)*prR) + (368 * (int)*prG) - ( 71 * (int)*prB)) / 1000) + 128;
-									*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB)) / 1000) + 128;
+									*imgY++ = (((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB)) / 1000) + 16;
+									
+									if( (y % 2 == 0) && (x % 2 == 0) )
+									{
+										*imgV++ = (((439 * (int)*prR) + (368 * (int)*prG) - ( 71 * (int)*prB)) / 1000) + 128;
+										*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB)) / 1000) + 128;
+									}
+									
+									prR += 4;
+									prG += 4;
+									prB += 4;
+									prA += 4;
 								}
-								
-								prR += 4;
-								prG += 4;
-								prB += 4;
-								prA += 4;
 							}
 						}
-					}
-					
-					vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
-					vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
-					
-					vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, nextTimeStamp - timeStamp, 0, 0);
-					
-					if(encode_err == VPX_CODEC_OK)
-					{
-						const vpx_codec_cx_pkt_t *pkt = NULL;
-						vpx_codec_iter_t iter = NULL;
-						 
-						while( (pkt = vpx_codec_get_cx_data(&encoder, &iter)) )
+						
+						vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
+						vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
+						
+						vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, nextTimeStamp - timeStamp, 0, 0);
+						
+						if(encode_err == VPX_CODEC_OK)
 						{
-							if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
+							const vpx_codec_cx_pkt_t *pkt = NULL;
+							vpx_codec_iter_t iter = NULL;
+							 
+							while( (pkt = vpx_codec_get_cx_data(&encoder, &iter)) )
 							{
-								hash = murmur(pkt->data.frame.buf, pkt->data.frame.sz, hash);
-							
-								write_webm_block(&ebml, &config, pkt);
+								if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
+								{
+									uint64 timestamp_ns = timeStamp * 1000000000UL / config.g_timebase.den;
+									
+									bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+																		vid_track, timestamp_ns,
+																		(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
+																		
+									if(!added)
+										result = exportReturn_InternalError;
+								}
 							}
 						}
+						else
+							result = exportReturn_InternalError;
+						
+						vpx_img_free(img);
 					}
 					else
-						result = exportReturn_InternalError;
-					
-					vpx_img_free(img);
+						result = exportReturn_ErrMemory;
 					
 					pixSuite->Dispose(renderResult.outFrame);
+				}
+				
+				/*
+				if(result == malNoError && (frames_without_audio >= 10 || ((videoTime + frameRateP.value.timeValue) >= exportInfoP->endTime)))
+				{
+					int samples = sampleRateP.value.floatValue * fps.denominator / fps.numerator;
 					
-					
+					while(frames_without_audio-- && result == malNoError)
+					{
+						vpx_codec_pts_t timeStamp = (audioBegin - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
+						uint64 timestamp_ns = timeStamp * 1000000000UL / config.g_timebase.den;
+						
+						float *audioBuffer[6];
+						
+						for(int c=0; c < channelTypeP.value.intValue; c++)
+						{
+							audioBuffer[c] = (float *)malloc(samples * sizeof(float));
+						}
+						
+						result = audioSuite->GetAudio(audioRenderID, 1, audioBuffer, false);
+						
+						if(result == malNoError)
+						{
+							float **buffer = vorbis_analysis_buffer(&vd, samples);
+							
+							for(int c=0; c < channelTypeP.value.intValue; c++)
+							{
+								memcpy(buffer[c], audioBuffer[c], samples * sizeof(float));
+							}
+							
+							size_t compressed_buf_size = 0;
+							unsigned char *compressed_buf = (unsigned char *)malloc(1);
+							size_t compressed_pos = 0;
+							
+							vorbis_analysis_wrote(&vd, samples);
+							
+							while(vorbis_analysis_blockout(&vd, &vb) == 1)
+							{
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+
+								ogg_packet op;
+								
+								while(vorbis_bitrate_flushpacket(&vd, &op) )
+								{
+									compressed_buf_size += op.bytes;
+									compressed_buf = (unsigned char *)realloc(compressed_buf, compressed_buf_size);
+									
+									memcpy(&compressed_buf[compressed_pos], op.packet, op.bytes);
+									compressed_pos += op.bytes;
+								}
+							}
+							
+							bool added = muxer_segment.AddFrame(compressed_buf, compressed_buf_size,
+																audio_track, timestamp_ns, 0);
+																
+							if(!added)
+								result = exportReturn_InternalError;
+								
+							free(compressed_buf);
+						}
+						
+						for(int c=0; c < channelTypeP.value.intValue; c++)
+						{
+							free(audioBuffer[c]);
+						}
+						
+						audioBegin += frameRateP.value.timeValue;
+					}
+				}
+				else
+					frames_without_audio++;
+				*/
+				
+				if(result == malNoError)
+				{
 					float progress = (double)(videoTime - exportInfoP->startTime) / (double)(exportInfoP->endTime - exportInfoP->startTime);
 					
 					result = mySettings->exportProgressSuite->UpdateProgressPercent(exID, progress);
@@ -1207,22 +1027,27 @@ exSDKExport(
 			vpx_codec_err_t destroy_err = vpx_codec_destroy(&encoder);
 			assert(destroy_err == VPX_CODEC_OK);
 			
-			write_webm_file_footer(&ebml, hash);
+			bool final = muxer_segment.Finalize();
+			
+			if(!final)
+				result = exportReturn_InternalError;
 		}
 		else
 			result = exportReturn_InternalError;
-			
+		
+/*
+		vorbis_block_clear(&vb);
+		vorbis_dsp_clear(&vd);
+		vorbis_comment_clear(&vc);
+		vorbis_info_clear(&vi);*/
 	}
 	
 	}catch(...) { result = exportReturn_InternalError; }
 	
-	mySettings->exportFileSuite->Close(exportInfoP->fileObject);
-	
-	if(ebml.cue_list)
-		free(ebml.cue_list);
 	
 	renderSuite->ReleaseVideoRenderer(exID, videoRenderID);
 
+	//audioSuite->ReleaseAudioRenderer(exID, audioRenderID);
 
 	return result;
 }
@@ -1245,7 +1070,7 @@ exSDKGenerateDefaultParams(
 	
 	
 	// get current settings
-	PrParam widthP, heightP, parN, parD, fieldTypeP, frameRateP;
+	PrParam widthP, heightP, parN, parD, fieldTypeP, frameRateP, channelsTypeP, sampleRateP;
 	
 	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoWidth, &widthP);
 	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoHeight, &heightP);
@@ -1253,6 +1078,8 @@ exSDKGenerateDefaultParams(
 	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectDenominator, &parD);
 	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFieldType, &fieldTypeP);
 	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFrameRate, &frameRateP);
+	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_AudioChannelsType, &channelsTypeP);
+	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_AudioSampleRate, &sampleRateP);
 	
 	if(widthP.mInt32 == 0)
 	{
@@ -1396,6 +1223,50 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &alphaParam);
 
 
+	// Audio Tab
+	utf16ncpy(groupString, "Audio Tab", 255);
+	exportParamSuite->AddParamGroup(exID, gIdx,
+									ADBETopParamGroup, ADBEAudioTabGroup, groupString,
+									kPrFalse, kPrFalse, kPrFalse);
+
+
+	// Audio Settings group
+	utf16ncpy(groupString, "Audio Settings", 255);
+	exportParamSuite->AddParamGroup(exID, gIdx,
+									ADBEAudioTabGroup, ADBEBasicAudioGroup, groupString,
+									kPrFalse, kPrFalse, kPrFalse);
+	
+	// Sample rate
+	exParamValues sampleRateValues;
+	sampleRateValues.value.floatValue = sampleRateP.mFloat64;
+	sampleRateValues.disabled = kPrFalse;
+	sampleRateValues.hidden = kPrFalse;
+	
+	exNewParamInfo sampleRateParam;
+	sampleRateParam.structVersion = 1;
+	strncpy(sampleRateParam.identifier, ADBEAudioRatePerSecond, 255);
+	sampleRateParam.paramType = exParamType_float;
+	sampleRateParam.flags = exParamFlag_none;
+	sampleRateParam.paramValues = sampleRateValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEBasicAudioGroup, &sampleRateParam);
+	
+	
+	// Channel type
+	exParamValues channelTypeValues;
+	channelTypeValues.value.intValue = channelsTypeP.mInt32;
+	channelTypeValues.disabled = kPrFalse;
+	channelTypeValues.hidden = kPrFalse;
+	
+	exNewParamInfo channelTypeParam;
+	channelTypeParam.structVersion = 1;
+	strncpy(channelTypeParam.identifier, ADBEAudioNumChannels, 255);
+	channelTypeParam.paramType = exParamType_int;
+	channelTypeParam.flags = exParamFlag_none;
+	channelTypeParam.paramValues = channelTypeValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEBasicAudioGroup, &channelTypeParam);
+	
 
 	exportParamSuite->SetParamsVersion(exID, 1);
 	
@@ -1555,6 +1426,55 @@ exSDKPostProcessParams(
 	// Alpha channel
 	utf16ncpy(paramString, "Include Alpha Channel", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoAlpha, paramString);
+	
+	
+	
+	// Audio Settings group
+	utf16ncpy(paramString, "Audio Settings", 255);
+	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicAudioGroup, paramString);
+	
+	
+	// Sample rate
+	utf16ncpy(paramString, "Sample Rate", 255);
+	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioRatePerSecond, paramString);
+	
+	float sampleRates[] = { 8000.0f, 16000.0f, 32000.0f, 44100.0f, 48000.0f, 96000.0f };
+	
+	const char *sampleRateStrings[] = { "8000 Hz", "16000 Hz", "32000 Hz", "44100 Hz", "48000 Hz", "96000 Hz" };
+	
+	
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEAudioRatePerSecond);
+	
+	exOneParamValueRec tempSampleRate;
+	
+	for(csSDK_int32 i=0; i < sizeof(sampleRates) / sizeof(float); i++)
+	{
+		tempSampleRate.floatValue = sampleRates[i];
+		utf16ncpy(paramString, sampleRateStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEAudioRatePerSecond, &tempSampleRate, paramString);
+	}
+
+	
+	// Channels
+	utf16ncpy(paramString, "Channels", 255);
+	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioNumChannels, paramString);
+	
+	csSDK_int32 channelTypes[] = { kPrAudioChannelType_Mono, kPrAudioChannelType_Stereo };
+	
+	const char *channelTypeStrings[] = { "Mono", "Stereo" };
+	
+	
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEAudioNumChannels);
+	
+	exOneParamValueRec tempChannelType;
+	
+	for(csSDK_int32 i=0; i < sizeof(channelTypes) / sizeof(csSDK_int32); i++)
+	{
+		tempChannelType.intValue = channelTypes[i];
+		utf16ncpy(paramString, channelTypeStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEAudioNumChannels, &tempChannelType, paramString);
+	}
+	
 	
 	
 	return result;

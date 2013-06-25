@@ -47,6 +47,7 @@
 #include	"PrSDKExportInfoSuite.h"
 #include	"PrSDKExportParamSuite.h"
 #include	"PrSDKSequenceRenderSuite.h"
+#include	"PrSDKSequenceAudioSuite.h"
 #include	"PrSDKExportProgressSuite.h"
 #include	"PrSDKPPix2Suite.h"
 #include	"PrSDKPPixCreatorSuite.h"
