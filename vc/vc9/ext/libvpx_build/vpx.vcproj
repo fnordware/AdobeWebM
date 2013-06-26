@@ -1156,6 +1156,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_sse2.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_debugmodes.c"
 				>
 			</File>

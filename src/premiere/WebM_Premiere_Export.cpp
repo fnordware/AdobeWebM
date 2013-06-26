@@ -1711,7 +1711,7 @@ exSDKGetParamSummary(
 	stream1 << width.value.intValue << "x" << height.value.intValue;
 	
 	if(frame_rate_index >= 0 && frame_rate_index < 10) 
-		stream1 << frameRateStrings[frame_rate_index] << " fps";
+		stream1 << ", " << frameRateStrings[frame_rate_index] << " fps";
 	
 	//stream1 << ", " << (alpha.value.intValue ? "Alpha" : "No Alpha");
 	
