@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="WebM"
+	ProjectGUID="{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}"
+	RootNamespace="WebM"
+	TargetFrameworkVersion="131072"
+	>
+	<Platforms>
+		<Platform
+			Name="x64"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Debug/WebM.tlb"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
+				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC"
+				RuntimeLibrary="3"
+				StructMemberAlignment="0"
+				RuntimeTypeInfo="true"
+				PrecompiledHeaderFile=".\Debug/WebM.pch"
+				AssemblerListingLocation=".\Debug/"
+				ObjectFile=".\Debug/"
+				ProgramDataBaseFileName=".\Debug/"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,MSWindows,PRWIN_ENV"
+				Culture="1033"
+				AdditionalIncludeDirectories=""
+				ResourceOutputFileName="$(IntDir)/$(InputName).res"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="true"
+				AdditionalDependencies="vfw32.lib msacm32.lib winmm.lib comctl32.lib"
+				OutputFile="$(OutDir)\WebM.prm"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\Debug/WebM.pdb"
+				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary=".\Debug/WebM.lib"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				UseFAT32Workaround="true"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
+				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC"
+				RuntimeLibrary="2"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\WebM.prm"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				UseFAT32Workaround="true"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Resource Files"
+			>
+			<File
+				RelativePath="..\..\src\premiere\win\WebM_Import.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter=".h"
+			>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAlphaTypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAsyncImporter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAudioSuite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKClassData.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKEntry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKImport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKImporterShared.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKMALErrors.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPixelFormat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugMemory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugPPix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugSuites.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugUtilities.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPPixCacheSuite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPPixCreatorSuite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKTimeSuite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKTypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPBasic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPConfig.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPErrorCodes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPTypes.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Source Files"
+			>
+		</Filter>
+		<File
+			RelativePath="..\..\src\premiere\WebM_Premiere_Export.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\premiere\WebM_Premiere_Export.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\premiere\WebM_Premiere_Import.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\premiere\WebM_Premiere_Import.h"
+			>
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

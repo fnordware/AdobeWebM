@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebM", "WebM_Premiere.vcproj", "{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {3A214E06-B95E-4D61-A291-1F8DF2EC10FD}
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74} = {DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}
+		{7B1F12CA-0724-430B-B61A-1D357C912CBA} = {7B1F12CA-0724-430B-B61A-1D357C912CBA}
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159} = {15CBFEFF-7965-41F5-B4E2-21E8795C9159}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vpx", "ext\libvpx_build\vpx.vcproj", "{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E1360C65-D375-4335-8057-7ED99CC3F9B2} = {E1360C65-D375-4335-8057-7ED99CC3F9B2}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "obj_int_extract", "ext\libvpx_build\obj_int_extract.vcproj", "{E1360C65-D375-4335-8057-7ED99CC3F9B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "..\..\ext\libogg\win32\VS2008\libogg_static.vcproj", "{15CBFEFF-7965-41F5-B4E2-21E8795C9159}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "..\..\ext\libvorbis\win32\VS2008\libvorbis\libvorbis_static.vcproj", "{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwebm", "..\..\ext\libwebm\libwebm_2008.vcproj", "{7B1F12CA-0724-430B-B61A-1D357C912CBA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Debug|x64.ActiveCfg = Debug|x64
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Debug|x64.Build.0 = Debug|x64
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Release|x64.ActiveCfg = Release|x64
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Release|x64.Build.0 = Release|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Debug|x64.ActiveCfg = Debug|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Debug|x64.Build.0 = Debug|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Release|x64.ActiveCfg = Release|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Release|x64.Build.0 = Release|x64
+		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Debug|x64.ActiveCfg = Debug|x64
+		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Debug|x64.Build.0 = Debug|x64
+		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Release|x64.ActiveCfg = Release|x64
+		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Release|x64.Build.0 = Release|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.ActiveCfg = Debug|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.Build.0 = Debug|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.ActiveCfg = Release|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.Build.0 = Release|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|x64.ActiveCfg = Debug|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|x64.Build.0 = Debug|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.ActiveCfg = Release|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.Build.0 = Release|x64
+		{7B1F12CA-0724-430B-B61A-1D357C912CBA}.Debug|x64.ActiveCfg = Debug|x64
+		{7B1F12CA-0724-430B-B61A-1D357C912CBA}.Debug|x64.Build.0 = Debug|x64
+		{7B1F12CA-0724-430B-B61A-1D357C912CBA}.Release|x64.ActiveCfg = Release|x64
+		{7B1F12CA-0724-430B-B61A-1D357C912CBA}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
