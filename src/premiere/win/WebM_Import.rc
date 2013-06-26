@@ -1,0 +1,11 @@
+// This is our FCC filetype
+#define pWbM 0x5765624DL		// Hex description 'WebM'
+
+// For compatibility with Premiere 6.x, we still define a real IMPT resource
+1000 IMPT DISCARDABLE
+BEGIN
+	0x0000
+	pWbM 
+END
+
+	
