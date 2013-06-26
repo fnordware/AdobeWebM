@@ -856,11 +856,14 @@ exSDKExport(
 								
 								for(int y = 0; y < img->d_h; y++)
 								{
+									// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
+									
 									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
 									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
 									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
 									
-									unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * y);
+									// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
+									unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
 									
 									unsigned char *prB = prBGRA + 0;
 									unsigned char *prG = prBGRA + 1;
@@ -869,12 +872,13 @@ exSDKExport(
 									
 									for(int x=0; x < img->d_w; x++)
 									{
-										*imgY++ = (((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB)) / 1000) + 16;
+										// like the clever integer (fixed point) math?
+										*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
 										
 										if( (y % 2 == 0) && (x % 2 == 0) )
 										{
-											*imgV++ = (((439 * (int)*prR) + (368 * (int)*prG) - ( 71 * (int)*prB)) / 1000) + 128;
-											*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB)) / 1000) + 128;
+											*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
+											*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;
 										}
 										
 										prR += 4;
