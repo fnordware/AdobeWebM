@@ -88,18 +88,17 @@ class PrMkvReader : public mkvparser::IMkvReader
 int PrMkvReader::Read(long long pos, long len, unsigned char* buf)
 {
 #ifdef PRWIN_ENV
-#error "Some work to do here"
 	LARGE_INTEGER lpos, out;
 
-	lpos.QuadPart = offset;
+	lpos.QuadPart = pos;
 
-	BOOL result = SetFilePointerEx(fileRef, lpos, &out, whence);
+	BOOL result = SetFilePointerEx(_fileRef, lpos, &out, FILE_BEGIN);
 	
-	DWORD count = length, out = 0;
+	DWORD count = len, out2;
 	
-	BOOL result = ReadFile(_fileRef, (LPVOID)buffer, count, &out, NULL);
+	result = ReadFile(_fileRef, (LPVOID)buf, count, &out2, NULL);
 
-	return (result && length == out) ? PrMkvSuccess : PrMkvError;
+	return (result && len == out2) ? PrMkvSuccess : PrMkvError;
 #else
 	ByteCount count = len, out = 0;
 	
@@ -113,16 +112,22 @@ int PrMkvReader::Read(long long pos, long len, unsigned char* buf)
 int PrMkvReader::Length(long long* total, long long* available)
 {
 #ifdef PRWIN_ENV
-#error "Use the 64-bit version of this func and the other"
-	DWORD size = GetFileSize(_fileRef, NULL);
+	LARGE_INTEGER len;
+
+	BOOL ok = GetFileSizeEx(_fileRef, &len);
 	
-	if(total)
-		*total = size;
-		
-	if(available)
-		*available = size;
-		
-	return PrMkvSuccess;
+	if(ok)
+	{
+		if(total)
+			*total = len.QuadPart;
+
+		if(available)
+			*available = len.QuadPart;
+
+		return PrMkvSuccess;
+	}
+	else
+		return PrMkvError;
 #else
 	SInt64 fork_size = 0;
 	
@@ -328,7 +333,7 @@ SDKOpenFile8(
 									
 		if(fileH != imInvalidHandleValue)
 		{
-			localRecP->io.userdata = localRecP->egg.fileRef = SDKfileOpenRec8->fileinfo.fileref = *SDKfileRef = fileH;
+			SDKfileOpenRec8->fileinfo.fileref = *SDKfileRef = fileH;
 		}
 		else
 			result = imFileOpenFailed;
@@ -975,7 +980,7 @@ SDKPreferredFrameSize(
 	else
 	{
 		// we store width and height in private data so we can produce it here
-		const int divisor = pow(2, preferredFrameSizeRec->inIndex);
+		const int divisor = 1; //pow(2, preferredFrameSizeRec->inIndex);
 		
 		if(can_shrink &&
 			preferredFrameSizeRec->inIndex < 4 &&

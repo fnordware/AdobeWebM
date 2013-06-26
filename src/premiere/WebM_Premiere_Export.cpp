@@ -65,9 +65,11 @@ extern "C" {
 
 #include "mkvmuxer.hpp"
 
-
+using mkvmuxer::uint8;
 using mkvmuxer::int32;
+using mkvmuxer::uint32;
 using mkvmuxer::int64;
+using mkvmuxer::uint64;
 
 class PrMkvWriter : public mkvmuxer::IMkvWriter
 {
