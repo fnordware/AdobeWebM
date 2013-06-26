@@ -59,6 +59,25 @@
 #include	<wchar.h>
 #endif
 
+
+typedef enum {
+	WEBM_CODEC_VP8 = 0,
+	WEBM_CODEC_VP9
+} WebM_Video_Codec;
+
+typedef enum {
+	WEBM_QUALITY_REALTIME = 0,
+	WEBM_QUALITY_GOOD,
+	WEBM_QUALITY_BEST
+} WebM_Video_Quality;
+
+#define WebMVideoCodec		"WebMVideoCodec"
+#define WebMVideoBitrate	"WebMVideoBitrate"
+#define WebMVideoQuality	"WebMVideoQuality"
+
+#define WebMAudioQuality	"WebMAudioQuality"
+
+
 extern "C" {
 DllExport PREMPLUGENTRY xSDKExport (
 	csSDK_int32		selector, 

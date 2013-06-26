@@ -54,6 +54,13 @@ extern "C" {
 #include <assert.h>
 
 
+#ifdef PRMAC_ENV
+	#include <mach/mach.h>
+#endif
+
+int g_num_cpus = 1;
+
+
 
 #if IMPORTMOD_VERSION <= IMPORTMOD_VERSION_9
 typedef PrSDKPPixCacheSuite2 PrCacheSuite;
@@ -211,6 +218,23 @@ SDKInit(
 	{
 		importInfo->avoidAudioConform = kPrTrue;
 	}							
+
+#ifdef PRMAC_ENV
+	// get number of CPUs using Mach calls
+	host_basic_info_data_t hostInfo;
+	mach_msg_type_number_t infoCount;
+	
+	infoCount = HOST_BASIC_INFO_COUNT;
+	host_info(mach_host_self(), HOST_BASIC_INFO, 
+			  (host_info_t)&hostInfo, &infoCount);
+	
+	g_num_cpus = hostInfo.avail_cpus;
+#else // WIN_ENV
+	SYSTEM_INFO systemInfo;
+	GetSystemInfo(&systemInfo);
+
+	g_num_cpus = systemInfo.dwNumberOfProcessors;
+#endif
 
 	return malNoError;
 }
@@ -1099,11 +1123,26 @@ SDKGetSourceVideo(
 							{
 								const char* codec_id = pTrack->GetCodecId();
 							
-								const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() : vpx_codec_vp9_dx());
+								const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() :
+																	codec_id == std::string("V_VP9") ? vpx_codec_vp9_dx() :
+																	NULL);
+								
+								vpx_codec_err_t codec_err = VPX_CODEC_OK;
 								
 								vpx_codec_ctx_t decoder;
 								
-								vpx_codec_err_t codec_err = vpx_codec_dec_init(&decoder, iface, NULL, 0);
+								if(iface != NULL)
+								{
+									vpx_codec_dec_cfg_t config;
+									config.threads = g_num_cpus;
+									config.w = frameFormat->inFrameWidth;
+									config.h = frameFormat->inFrameHeight;
+									
+									codec_err = vpx_codec_dec_init(&decoder, iface, &config, 0);
+								}
+								else
+									codec_err = VPX_CODEC_ERROR;
+								
 								
 								if(codec_err == VPX_CODEC_OK)
 								{
