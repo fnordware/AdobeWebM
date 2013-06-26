@@ -54,6 +54,7 @@ extern "C" {
 #include <assert.h>
 
 
+
 #if IMPORTMOD_VERSION <= IMPORTMOD_VERSION_9
 typedef PrSDKPPixCacheSuite2 PrCacheSuite;
 #define PrCacheVersion	kPrSDKPPixCacheSuiteVersion2
@@ -735,37 +736,36 @@ webm_guess_framerate(mkvparser::Segment *segment,
 	const mkvparser::Cluster* pCluster = segment->GetFirst();
 	const mkvparser::Tracks* pTracks = segment->GetTracks();
 
-	while( (pCluster != NULL) && !pCluster->EOS() && tstamp < 1000000000 && i < 50)
+	long status = 0;
+
+	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && i < 50)
 	{
 		const mkvparser::BlockEntry* pBlockEntry = NULL;
 		
-		long status = pCluster->GetFirst(pBlockEntry);
+		status = pCluster->GetFirst(pBlockEntry);
 		
-		if(status >= 0)
+		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < 1000000000 && i < 50)
 		{
-			while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0)
+			const mkvparser::Block* const pBlock  = pBlockEntry->GetBlock();
+			const long long trackNum = pBlock->GetTrackNumber();
+			
+			if(trackNum == video_track)
 			{
-				const mkvparser::Block* const pBlock  = pBlockEntry->GetBlock();
-				const long long trackNum = pBlock->GetTrackNumber();
+				const unsigned long tn = static_cast<unsigned long>(trackNum);
+				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(tn);
 				
-				if(trackNum == video_track)
+				if(pTrack)
 				{
-					const unsigned long tn = static_cast<unsigned long>(trackNum);
-					const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(tn);
+					assert(pTrack->GetType() == mkvparser::Track::kVideo);
+					assert(pBlock->GetFrameCount() == 1);
 					
-					if(pTrack)
-					{
-						assert(pTrack->GetType() == mkvparser::Track::kVideo);
-						assert(pBlock->GetFrameCount() == 1);
-						
-						tstamp = pBlock->GetTime(pCluster);
-						
-						i++;
-					}
+					tstamp = pBlock->GetTime(pCluster);
+					
+					i++;
 				}
-				
-				status = pCluster->GetNext(pBlockEntry, pBlockEntry);
 			}
+			
+			status = pCluster->GetNext(pBlockEntry, pBlockEntry);
 		}
 		
 		pCluster = segment->GetNext(pCluster);

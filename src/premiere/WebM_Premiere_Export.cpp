@@ -65,11 +65,9 @@ extern "C" {
 
 #include "mkvmuxer.hpp"
 
-#include <assert.h>
 
-
-typedef mkvmuxer::int32 int32;
-typedef mkvmuxer::int64 int64;
+using mkvmuxer::int32;
+using mkvmuxer::int64;
 
 class PrMkvWriter : public mkvmuxer::IMkvWriter
 {
@@ -84,11 +82,9 @@ class PrMkvWriter : public mkvmuxer::IMkvWriter
 	virtual void ElementStartNotify(uint64 element_id, int64 position);
 	
   private:
-	//PrMkvWriter() : _fileSuite(NULL), _fileObject(NULL) { throw -1; }
 	const PrSDKExportFileSuite *_fileSuite;
 	const csSDK_uint32 _fileObject;
 	
-	//LIBWEBM_DISALLOW_COPY_AND_ASSIGN(PrMkvWriter);
 };
 
 PrMkvWriter::PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObject) :
@@ -141,29 +137,8 @@ PrMkvWriter::Position(int64 position)
 void
 PrMkvWriter::ElementStartNotify(uint64 element_id, int64 position)
 {
-	//Position(position);
+	// ummm, should I do something?
 }
-
-
-
-
-/*
-#include "math.h"
-#define MAX_PSNR 100
-static double vp8_mse2psnr(double Samples, double Peak, double Mse) {
-  double psnr;
-
-  if ((double)Mse > 0.0)
-    psnr = 10.0 * log10(Peak * Peak * Samples / Mse);
-  else
-    psnr = MAX_PSNR;      // Limit to prevent / 0
-
-  if (psnr > MAX_PSNR)
-    psnr = MAX_PSNR;
-
-  return psnr;
-}
-*/
 
 #pragma mark-
 
@@ -418,7 +393,9 @@ exSDKQueryOutputSettings(
 								frameRate,
 								pixelAspectRatio,
 								fieldType,
-								alpha;
+								alpha,
+								sampleRate,
+								channelType;
 	PrSDKExportParamSuite		*paramSuite		= privateData->exportParamSuite;
 	csSDK_int32					mgroupIndex		= 0;
 	float						fps				= 0.0f;
@@ -443,6 +420,15 @@ exSDKQueryOutputSettings(
 		
 	}
 	
+	if(outputSettingsP->inExportAudio)
+	{
+		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioRatePerSecond, &sampleRate);
+		outputSettingsP->outAudioSampleRate = sampleRate.value.floatValue;
+		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioNumChannels, &channelType);
+		outputSettingsP->outAudioChannelType = (PrAudioChannelType)channelType.value.intValue;
+		outputSettingsP->outAudioSampleType = kPrAudioSampleType_Compressed;
+	}
+	
 	// return outBitratePerSecond in kbps
 	outputSettingsP->outBitratePerSecond = 1001;
 
@@ -459,91 +445,6 @@ exSDKFileExtension(
 		
 	return malNoError;
 }
-
-/*
-static TimeCode
-CalculateTimeCode(int frame_num, int frame_rate, bool drop_frame)
-{
-	// the easiest way to do this is just count!
-	int h = 0,
-		m = 0,
-		s = 0,
-		f = 0;
-	
-	// skip ahead quickly
-	int frames_per_ten_mins = (frame_rate * 60 * 10) - (drop_frame ? 9 * (frame_rate == 60 ? 4 : 2) : 0);
-	int frames_per_hour = 6 * frames_per_ten_mins;
-	
-	while(frame_num >= frames_per_hour)
-	{
-		h++;
-		
-		frame_num -= frames_per_hour;
-	}
-	
-	while(frame_num >= frames_per_ten_mins)
-	{
-		m += 10;
-		
-		frame_num -= frames_per_ten_mins;
-	}
-	
-	// now count out the rest
-	int frame = 0;
-	
-	while(frame++ < frame_num)
-	{
-		if(f < frame_rate - 1)
-		{
-			f++;
-		}
-		else
-		{
-			f = 0;
-			
-			if(s < 59)
-			{
-				s++;
-			}
-			else
-			{
-				s = 0;
-				
-				if(m < 59)
-				{
-					m++;
-					
-					if(drop_frame && (m % 10) != 0) // http://en.wikipedia.org/wiki/SMPTE_timecode
-					{
-						f += (frame_rate == 60 ? 4 : 2);
-					}
-				}
-				else
-				{
-					m = 0;
-					
-					h++;
-				}
-			}
-		}
-	}
-	
-	return TimeCode(h, m, s, f, drop_frame);
-}
-*/
-
-/*
-static void
-Premultiply(Rgba &in)
-{
-	if(in.a != 1.f)
-	{
-		in.r *= in.a;
-		in.g *= in.a;
-		in.b *= in.a;
-	}
-}
-*/
 
 
 static void get_framerate(PrTime ticksPerSecond, PrTime ticks_per_frame, exRatioValue *fps)
@@ -685,71 +586,107 @@ exSDKExport(
 	renderParms.inDeinterlaceQuality = kPrRenderQuality_High;
 	renderParms.inCompositeOnBlack = (alphaP.value.intValue ? kPrFalse: kPrTrue);
 	
-	csSDK_uint32 videoRenderID;
-	renderSuite->MakeVideoRenderer(exID, &videoRenderID, frameRateP.value.timeValue);
 	
-	//csSDK_uint32 audioRenderID;
-	//audioSuite->MakeAudioRenderer(exID, exportInfoP->startTime, (PrAudioChannelType)channelTypeP.value.intValue,
-	//								kPrAudioSampleType_32BitFloat, sampleRateP.value.floatValue, &audioRenderID);
+	csSDK_uint32 videoRenderID = 0;
+	
+	if(exportInfoP->exportVideo)
+	{
+		result = renderSuite->MakeVideoRenderer(exID, &videoRenderID, frameRateP.value.timeValue);
+	}
+	
+	csSDK_uint32 audioRenderID = 0;
+	
+	if(exportInfoP->exportAudio)
+	{
+		result = audioSuite->MakeAudioRenderer(exID,
+												exportInfoP->startTime,
+												(PrAudioChannelType)channelTypeP.value.intValue,
+												kPrAudioSampleType_32BitFloat,
+												sampleRateP.value.floatValue, 
+												&audioRenderID);
+	}
+
 	
 	try{
 	
 	if(result == malNoError)
 	{
-		vpx_codec_iface_t *iface = vpx_codec_vp8_cx();
-		
-		vpx_codec_enc_cfg_t config;
-		vpx_codec_enc_config_default(iface, &config, 0);
-		
-		config.g_w = renderParms.inWidth;
-		config.g_h = renderParms.inHeight;
-		
-		config.g_pass = VPX_RC_ONE_PASS;
-		config.g_threads = 8;
-		
 		exRatioValue fps;
 		get_framerate(ticksPerSecond, frameRateP.value.timeValue, &fps);
 		
-		config.g_timebase.num = 1;
-		config.g_timebase.den = 1000000; // for some reason I get errors if I set this to anything else; must investigate
+		const int mandatory_timebase_den = 1000000; // have to figure out what this means
 		
+		
+		vpx_codec_err_t codec_err = VPX_CODEC_OK;
 		
 		vpx_codec_ctx_t encoder;
 		
-		vpx_codec_err_t codec_err = vpx_codec_enc_init(&encoder, iface, &config, 0);
 		
-/*	
+		if(exportInfoP->exportVideo)
+		{
+			vpx_codec_iface_t *iface = vpx_codec_vp8_cx();
+			
+			vpx_codec_enc_cfg_t config;
+			vpx_codec_enc_config_default(iface, &config, 0);
+			
+			config.g_w = renderParms.inWidth;
+			config.g_h = renderParms.inHeight;
+			
+			config.g_pass = VPX_RC_ONE_PASS;
+			config.g_threads = 8;
+			
+			config.g_timebase.num = 1;
+			config.g_timebase.den = mandatory_timebase_den;
+		
+		
+			codec_err = vpx_codec_enc_init(&encoder, iface, &config, 0);
+		}
+		
+	
 	#define OV_OK 0
+	
+		int v_err = OV_OK;
 	
 		vorbis_info vi;
 		vorbis_comment vc;
 		vorbis_dsp_state vd;
 		vorbis_block vb;
 		
-		vorbis_info_init(&vi);
-		
-		int v_err = vorbis_encode_setup_managed(&vi,
-												channelTypeP.value.intValue,
-												sampleRateP.value.floatValue,
-												123, 456, 789);
-		assert(v_err == OV_OK);
-		
-		vorbis_comment_init(&vc);
-		vorbis_analysis_init(&vd, &vi);
-		vorbis_block_init(&vd, &vb);
-		
-		
-		ogg_packet header;
-		ogg_packet header_comm;
-		ogg_packet header_code;
-		
-		vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
-		
 		size_t private_size = 0;
-		void *private_data = MakePrivateData(header, header_comm, header_code, private_size);
-*/		
+		void *private_data = NULL;
 		
-		if(codec_err == VPX_CODEC_OK)
+		if(exportInfoP->exportAudio)
+		{
+			vorbis_info_init(&vi);
+			
+			v_err = vorbis_encode_init_vbr(&vi,
+											channelTypeP.value.intValue,
+											sampleRateP.value.floatValue,
+											0.8);
+			
+			if(v_err == OV_OK)
+			{
+				v_err = vorbis_encode_setup_init(&vi);
+				
+				assert(v_err == OV_OK);
+				
+				vorbis_comment_init(&vc);
+				vorbis_analysis_init(&vd, &vi);
+				vorbis_block_init(&vd, &vb);
+				
+				
+				ogg_packet header;
+				ogg_packet header_comm;
+				ogg_packet header_code;
+				
+				vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
+				
+				private_data = MakePrivateData(header, header_comm, header_code, private_size);
+			}
+		}
+		
+		
+		if(codec_err == VPX_CODEC_OK && v_err == OV_OK)
 		{
 			PrMkvWriter writer(mySettings->exportFileSuite, exportInfoP->fileObject);
 
@@ -761,252 +698,253 @@ exSDKExport(
 			
 			mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
 			
-			info->set_timecode_scale(config.g_timebase.den);
+			info->set_timecode_scale(mandatory_timebase_den);
 			info->set_writing_app("fnord WebM");
 			
 			
+			uint64 vid_track = 0;
 			
-			uint64 vid_track = muxer_segment.AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
-			
-			mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment.GetTrackByNumber(vid_track));
-			
-			video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
-			video->set_codec_id(mkvmuxer::Tracks::kVp8CodecId);
-			
-			muxer_segment.CuesTrack(vid_track);
-			
-			
-/*			
-			uint64 audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, channelTypeP.value.intValue, 2);
-			
-			mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
-			
-			if(private_data)
+			if(exportInfoP->exportVideo)
 			{
-				bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
+				vid_track = muxer_segment.AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
 				
-				assert(copied);
+				mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment.GetTrackByNumber(vid_track));
 				
-				free(private_data);
+				video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
+				video->set_codec_id(mkvmuxer::Tracks::kVp8CodecId);
+				
+				muxer_segment.CuesTrack(vid_track);
 			}
-*/			
+			
+			
+			uint64 audio_track = 0;
+			
+			if(exportInfoP->exportAudio)
+			{
+				audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, channelTypeP.value.intValue, 2);
+				
+				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
+				
+				if(private_data)
+				{
+					bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
+					
+					assert(copied);
+					
+					free(private_data);
+				}
+			}
+			
 		
-			SequenceRender_GetFrameReturnRec renderResult;
-			
 			PrTime videoTime = exportInfoP->startTime;
-			
-			PrTime audioBegin = exportInfoP->startTime;
-			int frames_without_audio = 0;
 			
 			while(videoTime < exportInfoP->endTime && result == suiteError_NoError)
 			{
-				result = renderSuite->RenderVideoFrame(videoRenderID,
-														videoTime,
-														&renderParms,
-														kRenderCacheType_None,
-														&renderResult);
+				vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * mandatory_timebase_den / ticksPerSecond;
+				vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * mandatory_timebase_den / ticksPerSecond;
+				unsigned long duration = nextTimeStamp - timeStamp;
 				
-				if(result == suiteError_NoError)
+				uint64 timestamp_ns = timeStamp * 1000000000UL / mandatory_timebase_den;
+				
+				
+				if(exportInfoP->exportVideo)
 				{
-					PrPixelFormat pixFormat;
-					prRect bounds;
-					csSDK_uint32 parN, parD;
+					SequenceRender_GetFrameReturnRec renderResult;
 					
-					pixSuite->GetPixelFormat(renderResult.outFrame, &pixFormat);
-					pixSuite->GetBounds(renderResult.outFrame, &bounds);
-					pixSuite->GetPixelAspectRatio(renderResult.outFrame, &parN, &parD);
-					
-					const int width = bounds.right - bounds.left;
-					const int height = bounds.bottom - bounds.top;
-					
-					vpx_image_t img_data;
-					vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);;
-					
-					if(img)
+					result = renderSuite->RenderVideoFrame(videoRenderID,
+															videoTime,
+															&renderParms,
+															kRenderCacheType_None,
+															&renderResult);
+					assert(result == suiteError_NoError);
+					if(result == suiteError_NoError)
 					{
-						if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
-						{
-							char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-							csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-							
-							pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
-																&Y_PixelAddress, &Y_RowBytes,
-																&U_PixelAddress, &U_RowBytes,
-																&V_PixelAddress, &V_RowBytes);
-							
-							for(int y = 0; y < img->d_h; y++)
-							{
-								unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-								
-								unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-								
-								memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
-							}
-							
-							for(int y = 0; y < img->d_h / 2; y++)
-							{
-								unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-								unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-								
-								unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-								unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-								
-								memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
-								memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
-							}
-						}
-						else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
-						{
-							// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
-							// see validate_img() in vp8_cx_iface.c
-							
-							// so here's our dumb RGB to YUV conversion
+						PrPixelFormat pixFormat;
+						prRect bounds;
+						csSDK_uint32 parN, parD;
 						
-							char *frameBufferP = NULL;
-							csSDK_int32 rowbytes = 0;
-							
-							pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-							pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-							
-							
-							for(int y = 0; y < img->d_h; y++)
+						pixSuite->GetPixelFormat(renderResult.outFrame, &pixFormat);
+						pixSuite->GetBounds(renderResult.outFrame, &bounds);
+						pixSuite->GetPixelAspectRatio(renderResult.outFrame, &parN, &parD);
+						
+						const int width = bounds.right - bounds.left;
+						const int height = bounds.bottom - bounds.top;
+						
+						vpx_image_t img_data;
+						vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);;
+						
+						if(img)
+						{
+							if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
 							{
-								unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-								unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
-								unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+								char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+								csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
 								
-								unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * y);
+								pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
+																	&Y_PixelAddress, &Y_RowBytes,
+																	&U_PixelAddress, &U_RowBytes,
+																	&V_PixelAddress, &V_RowBytes);
 								
-								unsigned char *prB = prBGRA + 0;
-								unsigned char *prG = prBGRA + 1;
-								unsigned char *prR = prBGRA + 2;
-								unsigned char *prA = prBGRA + 3;
-								
-								for(int x=0; x < img->d_w; x++)
+								for(int y = 0; y < img->d_h; y++)
 								{
-									*imgY++ = (((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB)) / 1000) + 16;
+									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
 									
-									if( (y % 2 == 0) && (x % 2 == 0) )
+									unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+									
+									memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
+								}
+								
+								for(int y = 0; y < img->d_h / 2; y++)
+								{
+									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+									
+									unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+									unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+									
+									memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
+									memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
+								}
+							}
+							else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
+							{
+								// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
+								// see validate_img() in vp8_cx_iface.c
+								
+								// so here's our dumb RGB to YUV conversion
+							
+								char *frameBufferP = NULL;
+								csSDK_int32 rowbytes = 0;
+								
+								pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+								pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+								
+								
+								for(int y = 0; y < img->d_h; y++)
+								{
+									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
+									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+									
+									unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * y);
+									
+									unsigned char *prB = prBGRA + 0;
+									unsigned char *prG = prBGRA + 1;
+									unsigned char *prR = prBGRA + 2;
+									unsigned char *prA = prBGRA + 3;
+									
+									for(int x=0; x < img->d_w; x++)
 									{
-										*imgV++ = (((439 * (int)*prR) + (368 * (int)*prG) - ( 71 * (int)*prB)) / 1000) + 128;
-										*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB)) / 1000) + 128;
+										*imgY++ = (((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB)) / 1000) + 16;
+										
+										if( (y % 2 == 0) && (x % 2 == 0) )
+										{
+											*imgV++ = (((439 * (int)*prR) + (368 * (int)*prG) - ( 71 * (int)*prB)) / 1000) + 128;
+											*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB)) / 1000) + 128;
+										}
+										
+										prR += 4;
+										prG += 4;
+										prB += 4;
+										prA += 4;
 									}
-									
-									prR += 4;
-									prG += 4;
-									prB += 4;
-									prA += 4;
 								}
 							}
-						}
-						
-						vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
-						vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
-						
-						vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, nextTimeStamp - timeStamp, 0, 0);
-						
-						if(encode_err == VPX_CODEC_OK)
-						{
-							const vpx_codec_cx_pkt_t *pkt = NULL;
-							vpx_codec_iter_t iter = NULL;
-							 
-							while( (pkt = vpx_codec_get_cx_data(&encoder, &iter)) )
+							
+							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, duration, 0, 0);
+							
+							if(encode_err == VPX_CODEC_OK)
 							{
-								if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
+								const vpx_codec_cx_pkt_t *pkt = NULL;
+								vpx_codec_iter_t iter = NULL;
+								 
+								while( (pkt = vpx_codec_get_cx_data(&encoder, &iter)) )
 								{
-									uint64 timestamp_ns = timeStamp * 1000000000UL / config.g_timebase.den;
-									
-									bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
-																		vid_track, timestamp_ns,
-																		(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
-																		
-									if(!added)
-										result = exportReturn_InternalError;
+									if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
+									{
+										bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+																			vid_track, timestamp_ns,
+																			(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
+																			
+										if(!added)
+											result = exportReturn_InternalError;
+									}
 								}
 							}
+							else
+								result = exportReturn_InternalError;
+							
+							vpx_img_free(img);
 						}
 						else
-							result = exportReturn_InternalError;
+							result = exportReturn_ErrMemory;
 						
-						vpx_img_free(img);
+						pixSuite->Dispose(renderResult.outFrame);
 					}
-					else
-						result = exportReturn_ErrMemory;
-					
-					pixSuite->Dispose(renderResult.outFrame);
 				}
 				
-				/*
-				if(result == malNoError && (frames_without_audio >= 10 || ((videoTime + frameRateP.value.timeValue) >= exportInfoP->endTime)))
+				
+				if(exportInfoP->exportAudio)
 				{
-					int samples = sampleRateP.value.floatValue * fps.denominator / fps.numerator;
+					const int samples = sampleRateP.value.floatValue * fps.denominator / fps.numerator;
 					
-					while(frames_without_audio-- && result == malNoError)
+					csSDK_int32 maxBlip = 0;
+					mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
+					
+					assert(maxBlip >= samples);
+					
+					
+					float **buffer = vorbis_analysis_buffer(&vd, samples);
+					
+					result = audioSuite->GetAudio(audioRenderID, samples, buffer, false);
+					
+					if(result == malNoError)
 					{
-						vpx_codec_pts_t timeStamp = (audioBegin - exportInfoP->startTime) * config.g_timebase.den / ticksPerSecond;
-						uint64 timestamp_ns = timeStamp * 1000000000UL / config.g_timebase.den;
-						
-						float *audioBuffer[6];
-						
-						for(int c=0; c < channelTypeP.value.intValue; c++)
+						vorbis_analysis_wrote(&vd, samples);
+				
+						while(vorbis_analysis_blockout(&vd, &vb) == 1)
 						{
-							audioBuffer[c] = (float *)malloc(samples * sizeof(float));
-						}
-						
-						result = audioSuite->GetAudio(audioRenderID, 1, audioBuffer, false);
-						
-						if(result == malNoError)
-						{
-							float **buffer = vorbis_analysis_buffer(&vd, samples);
-							
-							for(int c=0; c < channelTypeP.value.intValue; c++)
-							{
-								memcpy(buffer[c], audioBuffer[c], samples * sizeof(float));
-							}
-							
-							size_t compressed_buf_size = 0;
-							unsigned char *compressed_buf = (unsigned char *)malloc(1);
-							size_t compressed_pos = 0;
-							
-							vorbis_analysis_wrote(&vd, samples);
-							
-							while(vorbis_analysis_blockout(&vd, &vb) == 1)
-							{
-								vorbis_analysis(&vb, NULL);
-								vorbis_bitrate_addblock(&vb);
+							vorbis_analysis(&vb, NULL);
+							vorbis_bitrate_addblock(&vb);
 
-								ogg_packet op;
-								
-								while(vorbis_bitrate_flushpacket(&vd, &op) )
-								{
-									compressed_buf_size += op.bytes;
-									compressed_buf = (unsigned char *)realloc(compressed_buf, compressed_buf_size);
-									
-									memcpy(&compressed_buf[compressed_pos], op.packet, op.bytes);
-									compressed_pos += op.bytes;
-								}
-							}
+							ogg_packet op;
 							
-							bool added = muxer_segment.AddFrame(compressed_buf, compressed_buf_size,
-																audio_track, timestamp_ns, 0);
-																
-							if(!added)
-								result = exportReturn_InternalError;
-								
-							free(compressed_buf);
+							while( vorbis_bitrate_flushpacket(&vd, &op) )
+							{
+								bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																	audio_track, timestamp_ns, 0);
+																		
+								if(!added)
+									result = exportReturn_InternalError;
+							}
 						}
+					}
 						
-						for(int c=0; c < channelTypeP.value.intValue; c++)
+					// save the rest of the audio if this is the last frame
+					if(result == malNoError &&
+						(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
+					{
+						vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
+				
+						while(vorbis_analysis_blockout(&vd, &vb) == 1)
 						{
-							free(audioBuffer[c]);
+							vorbis_analysis(&vb, NULL);
+							vorbis_bitrate_addblock(&vb);
+
+							ogg_packet op;
+							
+							while( vorbis_bitrate_flushpacket(&vd, &op) )
+							{
+								bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																	audio_track, timestamp_ns, 0);
+																		
+								if(!added)
+									result = exportReturn_InternalError;
+							}
 						}
-						
-						audioBegin += frameRateP.value.timeValue;
 					}
 				}
-				else
-					frames_without_audio++;
-				*/
+				
 				
 				if(result == malNoError)
 				{
@@ -1024,8 +962,6 @@ exSDKExport(
 				videoTime += frameRateP.value.timeValue;
 			}
 			
-			vpx_codec_err_t destroy_err = vpx_codec_destroy(&encoder);
-			assert(destroy_err == VPX_CODEC_OK);
 			
 			bool final = muxer_segment.Finalize();
 			
@@ -1035,19 +971,31 @@ exSDKExport(
 		else
 			result = exportReturn_InternalError;
 		
-/*
-		vorbis_block_clear(&vb);
-		vorbis_dsp_clear(&vd);
-		vorbis_comment_clear(&vc);
-		vorbis_info_clear(&vi);*/
+
+
+		if(exportInfoP->exportVideo)
+		{
+			vpx_codec_err_t destroy_err = vpx_codec_destroy(&encoder);
+			assert(destroy_err == VPX_CODEC_OK);
+		}
+			
+		if(exportInfoP->exportAudio)
+		{
+			vorbis_block_clear(&vb);
+			vorbis_dsp_clear(&vd);
+			vorbis_comment_clear(&vc);
+			vorbis_info_clear(&vi);
+		}
 	}
 	
 	}catch(...) { result = exportReturn_InternalError; }
 	
 	
-	renderSuite->ReleaseVideoRenderer(exID, videoRenderID);
+	if(exportInfoP->exportVideo)
+		renderSuite->ReleaseVideoRenderer(exID, videoRenderID);
 
-	//audioSuite->ReleaseAudioRenderer(exID, audioRenderID);
+	if(exportInfoP->exportAudio)
+		audioSuite->ReleaseAudioRenderer(exID, audioRenderID);
 
 	return result;
 }
@@ -1558,7 +1506,8 @@ exSDKGetParamSummary(
 	summary1 = stream1.str();
 	
 	
-	
+	summary2 = "summary2";
+	summary3 = "summary3";
 
 	utf16ncpy(summaryRecP->Summary1, summary1.c_str(), 255);
 	utf16ncpy(summaryRecP->Summary2, summary2.c_str(), 255);
@@ -1580,6 +1529,8 @@ exSDKValidateParamChanged (
 	csSDK_int32 gIdx = validateParamChangedRecP->multiGroupIndex;
 	
 	std::string param = validateParamChangedRecP->changedParamIdentifier;
+	
+	// This is where you flip controls on/off, etc...
 	
 
 	return malNoError;
