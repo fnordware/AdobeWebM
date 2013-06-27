@@ -753,7 +753,7 @@ SDKAnalysis(
 }
 
 
-static int
+static void
 webm_guess_framerate(mkvparser::Segment *segment,
 						int				video_track,
 						unsigned int	*fps_den,
@@ -834,8 +834,6 @@ webm_guess_framerate(mkvparser::Segment *segment,
 		*fps_num = (fps * 1000.0) + 0.5;
 		*fps_den = 1000;
 	}
-
-	return 0;
 }
 
 
@@ -1277,39 +1275,42 @@ SDKGetSourceVideo(
 																	
 																	localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
 
-																	assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709);
-																	
-																	char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-																	csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-																	
-																	localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
-																													&Y_PixelAddress, &Y_RowBytes,
-																													&U_PixelAddress, &U_RowBytes,
-																													&V_PixelAddress, &V_RowBytes);
-																												
-																	assert(frameFormat->inFrameHeight == img->d_h);
-																	assert(frameFormat->inFrameWidth == img->d_w);
+																	if(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
+																	{
+																		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+																		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+																		
+																		localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
+																														&Y_PixelAddress, &Y_RowBytes,
+																														&U_PixelAddress, &U_RowBytes,
+																														&V_PixelAddress, &V_RowBytes);
+																													
+																		assert(frameFormat->inFrameHeight == img->d_h);
+																		assert(frameFormat->inFrameWidth == img->d_w);
 
-																	for(int y = 0; y < img->d_h; y++)
-																	{
-																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+																		for(int y = 0; y < img->d_h; y++)
+																		{
+																			unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+																			
+																			unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+																			
+																			memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+																		}
 																		
-																		unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-																		
-																		memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+																		for(int y = 0; y < img->d_h / 2; y++)
+																		{
+																			unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+																			unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+																			
+																			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+																			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+																			
+																			memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
+																			memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
+																		}
 																	}
-																	
-																	for(int y = 0; y < img->d_h / 2; y++)
-																	{
-																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-																		
-																		unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-																		unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-																		
-																		memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
-																		memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
-																	}
+																	else
+																		assert(false); // didn't get the pixel format I wanted
 																	
 																	localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
 																												0,
@@ -1653,8 +1654,8 @@ SDKImportAudio7(
 										pCluster = localRecP->segment->GetNext(pCluster);
 									}
 
-									// actually, there might be samples left at the end, not much we can do about that
-									//assert(samples_left == 0 && samples_copied == audioRec7->size);
+									// there might not be samples left at the end; not much we can do about that
+									assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
 								}
 								else
 									result = imFileReadFailed;
