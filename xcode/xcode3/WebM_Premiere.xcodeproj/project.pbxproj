@@ -65,14 +65,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A6E91E817796854003B0F87 /* libwebm.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* libwebm.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = libwebm;
 		};
 		2A6E91F817796863003B0F87 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A6E91E817796854003B0F87 /* libwebm.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* libwebm */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = libwebm;
 		};
 /* End PBXContainerItemProxy section */

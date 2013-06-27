@@ -889,6 +889,9 @@ SDKGetInfo8(
 							if(fps_num % 1000 == 0 && fps_den % 1000 == 0)
 							{
 								localRecP->time_mult = 1000;
+								
+								fps_num /= localRecP->time_mult;
+								fps_den /= localRecP->time_mult;
 							}
 							else
 								localRecP->time_mult = 1;
@@ -904,9 +907,9 @@ SDKGetInfo8(
 							SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
 							SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 							SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-							SDKFileInfo8->vidDuration			= frames * (fps_den / localRecP->time_mult);
-							SDKFileInfo8->vidScale				= fps_num / localRecP->time_mult;
-							SDKFileInfo8->vidSampleSize			= fps_den / localRecP->time_mult;
+							SDKFileInfo8->vidDuration			= frames * fps_den;
+							SDKFileInfo8->vidScale				= fps_num;
+							SDKFileInfo8->vidSampleSize			= fps_den;
 
 							SDKFileInfo8->vidInfo.alphaType	= alphaNone;
 
@@ -1588,7 +1591,8 @@ SDKImportAudio7(
 										pCluster = localRecP->segment->GetNext(pCluster);
 									}
 
-									assert(samples_left == 0 && samples_copied == audioRec7->size);
+									// actually, there might be samples left at the end, not much we can do about that
+									//assert(samples_left == 0 && samples_copied == audioRec7->size);
 								}
 								else
 									result = imFileReadFailed;
