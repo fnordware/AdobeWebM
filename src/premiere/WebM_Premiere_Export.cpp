@@ -197,6 +197,7 @@ exSDKStartup(
 	
 		stdParmsP->getSPBasicSuite()->ReleaseSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion);
 		
+		// not a good idea to try to run a MediaCore exporter in AE
 		if(fourCC == kAppAfterEffects)
 			return exportReturn_IterateExporterDone;
 	}

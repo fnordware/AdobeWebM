@@ -200,8 +200,9 @@ SDKInit(
 	
 		stdParms->piSuites->utilFuncs->getSPBasicSuite()->ReleaseSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion);
 		
-		if(fourCC == kAppAfterEffects)
-			return imOtherErr;
+		// return this error if you don't want to run in AE
+		//if(fourCC == kAppAfterEffects)
+		//	return imOtherErr;
 	}
 	
 	importInfo->setupOnDblClk		= kPrFalse;		// If user dbl-clicks file you imported, pop your setup dialog
