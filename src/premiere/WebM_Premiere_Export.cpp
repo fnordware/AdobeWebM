@@ -768,6 +768,9 @@ exSDKExport(
 					
 					free(private_data);
 				}
+
+				if(!exportInfoP->exportVideo)
+					muxer_segment.CuesTrack(audio_track);
 			}
 			
 		

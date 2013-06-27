@@ -52,6 +52,7 @@ extern "C" {
 #include "mkvparser.hpp"
 
 #include <assert.h>
+#include <math.h>
 
 
 #ifdef PRMAC_ENV
@@ -171,7 +172,6 @@ typedef struct
 	mkvparser::Segment		*segment;
 	int						video_track;
 	int						audio_track;
-	unsigned int			time_mult;
 	
 	PlugMemoryFuncsPtr		memFuncs;
 	SPBasicSuite			*BasicSuite;
@@ -320,7 +320,6 @@ SDKOpenFile8(
 		localRecP->segment = NULL;
 		localRecP->video_track = -1;
 		localRecP->audio_track = -1;
-		localRecP->time_mult = 1;
 		
 		// Acquire needed suites
 		localRecP->memFuncs = stdParms->piSuites->memFuncs;
@@ -760,7 +759,7 @@ webm_guess_framerate(mkvparser::Segment *segment,
 						unsigned int	*fps_den,
 						unsigned int	*fps_num)
 {
-	unsigned int i = 0;
+	unsigned int frame = 0;
 	uint64_t     tstamp = 0;
 
 	const mkvparser::Cluster* pCluster = segment->GetFirst();
@@ -768,13 +767,13 @@ webm_guess_framerate(mkvparser::Segment *segment,
 
 	long status = 0;
 
-	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && i < 50)
+	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && frame < 50)
 	{
 		const mkvparser::BlockEntry* pBlockEntry = NULL;
 		
 		status = pCluster->GetFirst(pBlockEntry);
 		
-		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < 1000000000 && i < 50)
+		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < 1000000000 && frame < 50)
 		{
 			const mkvparser::Block* const pBlock  = pBlockEntry->GetBlock();
 			const long long trackNum = pBlock->GetTrackNumber();
@@ -791,7 +790,7 @@ webm_guess_framerate(mkvparser::Segment *segment,
 					
 					tstamp = pBlock->GetTime(pCluster);
 					
-					i++;
+					frame++;
 				}
 			}
 			
@@ -802,8 +801,39 @@ webm_guess_framerate(mkvparser::Segment *segment,
 	}
 
 
-	*fps_num = (i - 1) * 1000000;
-	*fps_den = (unsigned int)(tstamp / 1000);
+	// known frame rates
+	static const int frameRateNumDens[10][2] = {{10, 1}, {15, 1}, {24000, 1001},
+												{24, 1}, {25, 1}, {30000, 1001},
+												{30, 1}, {50, 1}, {60000, 1001},
+												{60, 1}};
+
+	double fps = (double)(frame - 1) * 1000000000.0 / (double)tstamp;
+
+	int match_index = -1;
+	double match_episilon = 999;
+
+	for(int i=0; i < 10; i++)
+	{
+		double rate = (double)frameRateNumDens[i][0] / (double)frameRateNumDens[i][1];
+		double episilon = fabs(fps - rate);
+
+		if(episilon < match_episilon)
+		{
+			match_index = i;
+			match_episilon = episilon;
+		}
+	}
+
+	if(match_index >=0 && match_episilon < 0.01)
+	{
+		*fps_num = frameRateNumDens[match_index][0];
+		*fps_den = frameRateNumDens[match_index][1];
+	}
+	else
+	{
+		*fps_num = (fps * 1000.0) + 0.5;
+		*fps_den = 1000;
+	}
 
 	return 0;
 }
@@ -872,49 +902,35 @@ SDKGetInfo8(
 						
 						if(pVideoTrack)
 						{
-							const double rate = pVideoTrack->GetFrameRate();
+							const double embedded_rate = pVideoTrack->GetFrameRate(); // never seems to contain anything
 							
 							unsigned int fps_num = 0;
 							unsigned int fps_den = 0;
 							
-							if(rate != 0)
-							{
-								fps_den = 1000;
-								fps_num = rate * fps_den;
-							}
-							
 							webm_guess_framerate(localRecP->segment, localRecP->video_track, &fps_den, &fps_num);
+
+							if(embedded_rate > 0)
+								assert( fabs(embedded_rate - ((double)fps_num / (double)fps_den)) < 0.01 );
 							
-							// getting some very large fps numbers, need to lower them
-							if(fps_num % 1000 == 0 && fps_den % 1000 == 0)
-							{
-								localRecP->time_mult = 1000;
-								
-								fps_num /= localRecP->time_mult;
-								fps_den /= localRecP->time_mult;
-							}
-							else
-								localRecP->time_mult = 1;
 							
-							int frames = (duration * fps_num / fps_den) / 1000000000UL;
-														
 							// Video information
 							SDKFileInfo8->hasVideo				= kPrTrue;
 							SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
 							SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
 							SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
-							SDKFileInfo8->vidInfo.depth			= 24;	// The bit depth of the video
+							SDKFileInfo8->vidInfo.depth			= 24;	// for RGB, no A
 							SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
 							SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 							SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-							SDKFileInfo8->vidDuration			= frames * fps_den;
+							SDKFileInfo8->vidDuration			= duration * fps_num / 1000000000UL;
 							SDKFileInfo8->vidScale				= fps_num;
 							SDKFileInfo8->vidSampleSize			= fps_den;
 
 							SDKFileInfo8->vidInfo.alphaType	= alphaNone;
 
-							SDKFileInfo8->vidInfo.pixelAspectNum = 1;
-							SDKFileInfo8->vidInfo.pixelAspectDen = 1;
+							// I don't know how to get the pixel aspect ratio, will let Premiere guess
+							//SDKFileInfo8->vidInfo.pixelAspectNum = 1;
+							//SDKFileInfo8->vidInfo.pixelAspectDen = 1;
 
 							// store some values we want to get without going to the file
 							localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
@@ -1008,7 +1024,7 @@ SDKPreferredFrameSize(
 	else
 	{
 		// we store width and height in private data so we can produce it here
-		const int divisor = 1; //pow(2, preferredFrameSizeRec->inIndex);
+		const int divisor = pow(2.0, preferredFrameSizeRec->inIndex);
 		
 		if(can_shrink &&
 			preferredFrameSizeRec->inIndex < 4 &&
@@ -1027,6 +1043,24 @@ SDKPreferredFrameSize(
 
 	return result;
 }
+
+
+static inline int
+tstamp2frame(long long tstamp, int fps_num, int fps_den)
+{
+	const long long half_frame_time = (1000000000UL * fps_den / fps_num) / 2;
+
+	return ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+}
+
+static inline long long
+frame2tstamp(int frame, int fps_num, int fps_den)
+{
+	return ((long long)frame * fps_den * 1000000000UL / fps_num);
+}
+
+#define ts2fr(ts)	(tstamp2frame((ts), fps_num, fps_den))
+#define fr2ts(fr)	(frame2tstamp((fr), fps_num, fps_den))
 
 
 static prMALError 
@@ -1093,15 +1127,14 @@ SDKGetSourceVideo(
 		
 		if(localRecP->segment)
 		{
-			const uint64_t fps_num = localRecP->frameRateNum * localRecP->time_mult;
-			const uint64_t fps_den = localRecP->frameRateDen * localRecP->time_mult;
+			const uint64_t fps_num = localRecP->frameRateNum;
+			const uint64_t fps_den = localRecP->frameRateDen;
 			
-			uint64_t tstamp = ((uint64_t)theFrame * fps_den * 1000000000UL / fps_num);
+			uint64_t tstamp = fr2ts(theFrame);
 			uint64_t tstamp2 = (uint64_t)sourceVideoRec->inFrameTime * 1000UL / ((uint64_t)ticksPerSecond / 1000000UL); // alternate way of calculating it
 			
 			assert(tstamp == tstamp2);
-			
-			const uint64_t half_frame_time = (1000000000UL * fps_den / fps_num) / 2; // half-a-frame
+			assert(theFrame == ts2fr( fr2ts( theFrame ) ) );
 			
 			if(localRecP->video_track >= 0)
 			{
@@ -1151,17 +1184,29 @@ SDKGetSourceVideo(
 								if(codec_err == VPX_CODEC_OK)
 								{
 									const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
-									
+
+									// The seek took us to this Cluster for a reason.
+									// It stars with a keyframe, although not necessarily the last keyframe before
+									// the requested frame. I have to decode each frame starting with the keyframe,
+									// and then I continue afterwards until I get to the next keyframe.
+
+									assert(tstamp >= pSeekBlockEntry->GetBlock()->GetTime(pCluster));
+									assert(tstamp >= pCluster->GetTime());
+
 									bool first_frame = true;
 									bool got_frame = false;
 									bool reached_next_iframe = false;
 									
 									while((pCluster != NULL) && !pCluster->EOS() && !reached_next_iframe && result == malNoError)
 									{
+										assert(pCluster->GetTime() >= 0);
+										assert(pCluster->GetTime() == pCluster->GetFirstTime());
+										assert(got_frame || ts2fr(tstamp) >= ts2fr(pCluster->GetTime()));
+
 										const mkvparser::BlockEntry* pBlockEntry = NULL;
 										
 										pCluster->GetFirst(pBlockEntry);
-										
+
 										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && !reached_next_iframe && result == malNoError)
 										{
 											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
@@ -1172,6 +1217,8 @@ SDKGetSourceVideo(
 												
 												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
+												assert(got_frame || ts2fr(tstamp) >= ts2fr(packet_tstamp)); // we either have the frame and we're still working toward getting it
+
 												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 												
 												unsigned int length = blockFrame.len;
@@ -1190,24 +1237,35 @@ SDKGetSourceVideo(
 														
 														if(peek_err == VPX_CODEC_OK)
 														{
-															if(!first_frame && stream_info.is_kf && got_frame)
+															assert(stream_info.is_kf); // I guess we can only parse the stream if we're on a keyframe
+
+															if(!first_frame && stream_info.is_kf)
 															{
-																reached_next_iframe = true;
-																
-																assert(got_frame); // now this is always true, of course, but we thought seek would take us to the iframe before the frame we wanted
+																// we only reached the next keyframe (where we stop)
+																// if we already got the frame we wanted
+																if(got_frame)
+																	reached_next_iframe = true;
+
+																// otherwise it turns out I should have been skipped to here
+																// but I guess this keyframe wasn't the first frame in the cluster
+																// too bad the only way to find this (that I know) is by parsing the stream
 															}
 														}
+														else
+															assert(!first_frame); // this is how I know the first frame is always a keyframe
 														
 														if(!reached_next_iframe)
 														{
 															vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
 															
+															assert(decode_err == VPX_CODEC_OK);
+
 															if(decode_err == VPX_CODEC_OK)
 															{
-																csSDK_int32 decodedFrame = ((packet_tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+																csSDK_int32 decodedFrame = ts2fr(packet_tstamp);
 																
-																csSDK_int32 hopingforFrame = ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
-																assert(hopingforFrame == theFrame);
+																csSDK_int32 hopingforFrame = ts2fr(tstamp);
+																assert(hopingforFrame == theFrame); // just checking - we can delete these lines
 																
 																vpx_codec_iter_t iter = NULL;
 																
@@ -1296,6 +1354,8 @@ SDKGetSourceVideo(
 										
 										pCluster = localRecP->segment->GetNext(pCluster);
 									}
+
+									assert(got_frame);
 									
 									vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
 									assert(destroy_err == VPX_CODEC_OK);
@@ -1401,6 +1461,8 @@ SDKImportAudio7(
 	
 	if(localRecP->segment)
 	{
+		assert(audioRec7->position >= 0); // Do they really want contiguous samples?
+
 		uint64_t tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
 		
 		if(localRecP->audio_track >= 0)
