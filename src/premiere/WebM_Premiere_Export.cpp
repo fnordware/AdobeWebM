@@ -40,6 +40,7 @@
 
 #include "WebM_Premiere_Export.h"
 
+#include "WebM_Premiere_Export_Params.h"
 
 
 #ifdef PRMAC_ENV
@@ -49,8 +50,6 @@
 	#include <time.h>
 	#include <sys/timeb.h>
 #endif
-
-#include <sstream>
 
 
 extern "C" {
@@ -64,6 +63,8 @@ extern "C" {
 }
 
 #include "mkvmuxer.hpp"
+
+
 
 using mkvmuxer::uint8;
 using mkvmuxer::int32;
@@ -142,6 +143,7 @@ PrMkvWriter::ElementStartNotify(uint64 element_id, int64 position)
 	// ummm, should I do something?
 }
 
+
 #pragma mark-
 
 
@@ -150,23 +152,6 @@ static const csSDK_int32 WebM_Export_Class = 'WebM';
 
 extern int g_num_cpus;
 
-
-typedef struct ExportSettings
-{
-	SPBasicSuite				*spBasic;
-	PrSDKExportParamSuite		*exportParamSuite;
-	PrSDKExportInfoSuite		*exportInfoSuite;
-	PrSDKExportFileSuite		*exportFileSuite;
-	PrSDKExportProgressSuite	*exportProgressSuite;
-	PrSDKPPixCreatorSuite		*ppixCreatorSuite;
-	PrSDKPPixSuite				*ppixSuite;
-	PrSDKPPix2Suite				*ppix2Suite;
-	PrSDKTimeSuite				*timeSuite;
-	PrSDKMemoryManagerSuite		*memorySuite;
-	PrSDKSequenceRenderSuite	*sequenceRenderSuite;
-	PrSDKSequenceAudioSuite		*sequenceAudioSuite;
-	PrSDKWindowSuite			*windowSuite;
-} ExportSettings;
 
 
 static void
@@ -379,72 +364,6 @@ exSDKEndInstance(
 
 
 
-#define ADBEVideoAlpha		"ADBEVideoAlpha"
-
-
-static prMALError
-exSDKQueryOutputSettings(
-	exportStdParms				*stdParmsP,
-	exQueryOutputSettingsRec	*outputSettingsP)
-{
-	prMALError result = malNoError;
-	
-	ExportSettings *privateData	= reinterpret_cast<ExportSettings*>(outputSettingsP->privateData);
-	
-	csSDK_uint32				exID			= outputSettingsP->exporterPluginID;
-	exParamValues				width,
-								height,
-								frameRate,
-								pixelAspectRatio,
-								fieldType,
-								//alpha,
-								bitrate,
-								sampleRate,
-								channelType;
-	PrSDKExportParamSuite		*paramSuite		= privateData->exportParamSuite;
-	csSDK_int32					mgroupIndex		= 0;
-	float						fps				= 0.0f;
-	PrTime						ticksPerSecond	= 0;
-	csSDK_uint32				videoBitrate	= 0;
-	
-	if(outputSettingsP->inExportVideo)
-	{
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoWidth, &width);
-		outputSettingsP->outVideoWidth = width.value.intValue;
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoHeight, &height);
-		outputSettingsP->outVideoHeight = height.value.intValue;
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoFPS, &frameRate);
-		outputSettingsP->outVideoFrameRate = frameRate.value.timeValue;
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoAspect, &pixelAspectRatio);
-		outputSettingsP->outVideoAspectNum = pixelAspectRatio.value.ratioValue.numerator;
-		outputSettingsP->outVideoAspectDen = pixelAspectRatio.value.ratioValue.denominator;
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoFieldType, &fieldType);
-		outputSettingsP->outVideoFieldType = fieldType.value.intValue;
-		
-		paramSuite->GetParamValue(exID, mgroupIndex, WebMVideoBitrate, &bitrate);
-		videoBitrate += bitrate.value.intValue;
-		
-		//paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoAlpha, &alpha);
-	}
-	
-	if(outputSettingsP->inExportAudio)
-	{
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioRatePerSecond, &sampleRate);
-		outputSettingsP->outAudioSampleRate = sampleRate.value.floatValue;
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioNumChannels, &channelType);
-		outputSettingsP->outAudioChannelType = (PrAudioChannelType)channelType.value.intValue;
-		outputSettingsP->outAudioSampleType = kPrAudioSampleType_Compressed;
-		
-		videoBitrate += 33;
-	}
-	
-	// return outBitratePerSecond in kbps
-	outputSettingsP->outBitratePerSecond = videoBitrate;
-
-
-	return result;
-}
-
 static prMALError
 exSDKFileExtension(
 	exportStdParms					*stdParmsP, 
@@ -581,11 +500,18 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 	
-	exParamValues codecP, bitrateP, vidQualityP, qualityP;
+	const PrAudioChannelType audioFormat = (PrAudioChannelType)channelTypeP.value.intValue;
+	const int audioChannels = (audioFormat == kPrAudioChannelType_51 ? 6 :
+								audioFormat == kPrAudioChannelType_Mono ? 1 :
+								2);
+	
+	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, audioQualityP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
-	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &vidQualityP);
-	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &qualityP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	
 	
 	SequenceRender_ParamsRec renderParms;
@@ -618,7 +544,7 @@ exSDKExport(
 	{
 		result = audioSuite->MakeAudioRenderer(exID,
 												exportInfoP->startTime,
-												(PrAudioChannelType)channelTypeP.value.intValue,
+												audioFormat,
 												kPrAudioSampleType_32BitFloat,
 												sampleRateP.value.floatValue, 
 												&audioRenderID);
@@ -648,8 +574,21 @@ exSDKExport(
 			config.g_w = renderParms.inWidth;
 			config.g_h = renderParms.inHeight;
 			
-			config.g_pass = VPX_RC_ONE_PASS;
-			config.rc_target_bitrate = bitrateP.value.intValue;
+			WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
+			
+			if(method == WEBM_METHOD_QUALITY)
+			{
+				config.g_usage = config.rc_end_usage = VPX_CQ;
+				config.rc_target_bitrate = 1000000; // what they do in libvpxenc.c
+			}
+			else
+			{
+				config.g_usage = VPX_CBR;
+				config.g_pass = VPX_RC_ONE_PASS;
+				
+				config.rc_target_bitrate = bitrateP.value.intValue;
+			}
+			
 			
 			config.g_threads = g_num_cpus;
 			
@@ -658,6 +597,21 @@ exSDKExport(
 		
 		
 			codec_err = vpx_codec_enc_init(&encoder, iface, &config, 0);
+			
+			
+			if(codec_err == VPX_CODEC_OK)
+			{
+				if(method == WEBM_METHOD_QUALITY)
+				{
+					// our slider goes 0..100, quality goes 0..63, and it's reversed
+					int qual = ((float)videoQualityP.value.intValue * 63.f / 100.f) + 0.5f; // old formula for the header that says it's 0..63
+					int quan = (((float)(100 - videoQualityP.value.intValue) / 100.f) * (config.rc_max_quantizer - config.rc_min_quantizer)) + config.rc_min_quantizer + 0.5f;
+				
+					vpx_codec_err_t config_err = vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, quan);
+					
+					assert(config_err == VPX_CODEC_OK);
+				}
+			}
 		}
 		
 	
@@ -677,17 +631,14 @@ exSDKExport(
 		{
 			vorbis_info_init(&vi);
 			
+			// non-VBR vorbis_encode_init() is giving me crashes for some reason
 			v_err = vorbis_encode_init_vbr(&vi,
-											channelTypeP.value.intValue,
+											audioChannels,
 											sampleRateP.value.floatValue,
-											qualityP.value.floatValue);
+											audioQualityP.value.floatValue);
 			
 			if(v_err == OV_OK)
 			{
-				v_err = vorbis_encode_setup_init(&vi);
-				
-				assert(v_err == OV_OK);
-				
 				vorbis_comment_init(&vc);
 				vorbis_analysis_init(&vd, &vi);
 				vorbis_block_init(&vd, &vb);
@@ -741,7 +692,7 @@ exSDKExport(
 			
 			if(exportInfoP->exportAudio)
 			{
-				audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, channelTypeP.value.intValue, 2);
+				audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
 				
 				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
 				
@@ -775,12 +726,17 @@ exSDKExport(
 				unsigned long duration = nextTimeStamp - timeStamp;
 				
 				// this is for the muxer
-				//uint64 timestamp_ns = videoTime * 1000000000UL / ticksPerSecond; // afraid of overflow
+				//uint64 timestamp_ns = (videoTime - exportInfoP->startTime) * 1000000000UL / ticksPerSecond; // I'm afraid of overflow so...
 				uint64 timestamp_ns = (videoTime - exportInfoP->startTime) * 100000UL / (ticksPerSecond / 10000);
 				
 				
 				if(exportInfoP->exportVideo)
 				{
+					unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
+												vidEncodingP.value.intValue == WEBM_ENCODING_BEST ? VPX_DL_BEST_QUALITY :
+												VPX_DL_GOOD_QUALITY;
+												
+							
 					SequenceRender_GetFrameReturnRec renderResult;
 					
 					result = renderSuite->RenderVideoFrame(videoRenderID,
@@ -788,7 +744,7 @@ exSDKExport(
 															&renderParms,
 															kRenderCacheType_None,
 															&renderResult);
-					assert(result == suiteError_NoError);
+					
 					if(result == suiteError_NoError)
 					{
 						PrPixelFormat pixFormat;
@@ -887,10 +843,6 @@ exSDKExport(
 								}
 							}
 							
-							unsigned long deadline = vidQualityP.value.intValue == WEBM_QUALITY_REALTIME ? VPX_DL_REALTIME :
-														vidQualityP.value.intValue == WEBM_QUALITY_BEST ? VPX_DL_BEST_QUALITY :
-														VPX_DL_GOOD_QUALITY;
-							
 							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, duration, 0, deadline);
 							
 							if(encode_err == VPX_CODEC_OK)
@@ -920,6 +872,32 @@ exSDKExport(
 							result = exportReturn_ErrMemory;
 						
 						pixSuite->Dispose(renderResult.outFrame);
+					}
+					else
+						assert(false); // error retreiving frame?
+					
+					
+					// squeeze last bits from encoder
+					if(result == malNoError &&
+						(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
+					{
+						const vpx_codec_cx_pkt_t *pkt = NULL;
+						vpx_codec_iter_t iter = NULL;
+						
+						do{
+							vpx_codec_encode(&encoder, NULL, timeStamp, duration, 0, deadline);
+							
+							pkt = vpx_codec_get_cx_data(&encoder, &iter);
+							
+							if(pkt != NULL)
+							{
+								bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+																	vid_track, timestamp_ns,
+																	(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
+								assert(added);
+							}
+							
+						}while(pkt != NULL);
 					}
 				}
 				
@@ -1040,737 +1018,6 @@ exSDKExport(
 	return result;
 }
 
-
-static prMALError
-exSDKGenerateDefaultParams(
-	exportStdParms				*stdParms, 
-	exGenerateDefaultParamRec	*generateDefaultParamRec)
-{
-	prMALError				result				= malNoError;
-
-	ExportSettings			*lRec				= reinterpret_cast<ExportSettings *>(generateDefaultParamRec->privateData);
-	PrSDKExportParamSuite	*exportParamSuite	= lRec->exportParamSuite;
-	PrSDKExportInfoSuite	*exportInfoSuite	= lRec->exportInfoSuite;
-	PrSDKTimeSuite			*timeSuite			= lRec->timeSuite;
-
-	csSDK_int32 exID = generateDefaultParamRec->exporterPluginID;
-	csSDK_int32 gIdx = 0;
-	
-	
-	// get current settings
-	PrParam widthP, heightP, parN, parD, fieldTypeP, frameRateP, channelsTypeP, sampleRateP;
-	
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoWidth, &widthP);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoHeight, &heightP);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectNumerator, &parN);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectDenominator, &parD);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFieldType, &fieldTypeP);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFrameRate, &frameRateP);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_AudioChannelsType, &channelsTypeP);
-	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_AudioSampleRate, &sampleRateP);
-	
-	if(widthP.mInt32 == 0)
-	{
-		widthP.mInt32 = 1920;
-	}
-	
-	if(heightP.mInt32 == 0)
-	{
-		heightP.mInt32 = 1080;
-	}
-
-
-
-	prUTF16Char groupString[256];
-	
-	// Video Tab
-	exportParamSuite->AddMultiGroup(exID, &gIdx);
-	
-	utf16ncpy(groupString, "Video Tab", 255);
-	exportParamSuite->AddParamGroup(exID, gIdx,
-									ADBETopParamGroup, ADBEVideoTabGroup, groupString,
-									kPrFalse, kPrFalse, kPrFalse);
-	
-
-	// Image Settings group
-	utf16ncpy(groupString, "Image Settings", 255);
-	exportParamSuite->AddParamGroup(exID, gIdx,
-									ADBEVideoTabGroup, ADBEBasicVideoGroup, groupString,
-									kPrFalse, kPrFalse, kPrFalse);
-	
-	// width
-	exParamValues widthValues;
-	widthValues.structVersion = 1;
-	widthValues.rangeMin.intValue = 16;
-	widthValues.rangeMax.intValue = 8192;
-	widthValues.value.intValue = widthP.mInt32;
-	widthValues.disabled = kPrFalse;
-	widthValues.hidden = kPrFalse;
-	
-	exNewParamInfo widthParam;
-	widthParam.structVersion = 1;
-	strncpy(widthParam.identifier, ADBEVideoWidth, 255);
-	widthParam.paramType = exParamType_int;
-	widthParam.flags = exParamFlag_none;
-	widthParam.paramValues = widthValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &widthParam);
-
-
-	// height
-	exParamValues heightValues;
-	heightValues.structVersion = 1;
-	heightValues.rangeMin.intValue = 16;
-	heightValues.rangeMax.intValue = 8192;
-	heightValues.value.intValue = heightP.mInt32;
-	heightValues.disabled = kPrFalse;
-	heightValues.hidden = kPrFalse;
-	
-	exNewParamInfo heightParam;
-	heightParam.structVersion = 1;
-	strncpy(heightParam.identifier, ADBEVideoHeight, 255);
-	heightParam.paramType = exParamType_int;
-	heightParam.flags = exParamFlag_none;
-	heightParam.paramValues = heightValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &heightParam);
-
-
-	// pixel aspect ratio
-	exParamValues parValues;
-	parValues.structVersion = 1;
-	parValues.rangeMin.ratioValue.numerator = 10;
-	parValues.rangeMin.ratioValue.denominator = 11;
-	parValues.rangeMax.ratioValue.numerator = 2;
-	parValues.rangeMax.ratioValue.denominator = 1;
-	parValues.value.ratioValue.numerator = parN.mInt32;
-	parValues.value.ratioValue.denominator = parD.mInt32;
-	parValues.disabled = kPrFalse;
-	parValues.hidden = kPrFalse;
-	
-	exNewParamInfo parParam;
-	parParam.structVersion = 1;
-	strncpy(parParam.identifier, ADBEVideoAspect, 255);
-	parParam.paramType = exParamType_ratio;
-	parParam.flags = exParamFlag_none;
-	parParam.paramValues = parValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &parParam);
-	
-	
-	// field order
-	exParamValues fieldOrderValues;
-	fieldOrderValues.structVersion = 1;
-	fieldOrderValues.value.intValue = fieldTypeP.mInt32;
-	fieldOrderValues.disabled = kPrFalse;
-	fieldOrderValues.hidden = kPrFalse;
-	
-	exNewParamInfo fieldOrderParam;
-	fieldOrderParam.structVersion = 1;
-	strncpy(fieldOrderParam.identifier, ADBEVideoFieldType, 255);
-	fieldOrderParam.paramType = exParamType_int;
-	fieldOrderParam.flags = exParamFlag_none;
-	fieldOrderParam.paramValues = fieldOrderValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &fieldOrderParam);
-
-
-	// frame rate
-	exParamValues fpsValues;
-	fpsValues.structVersion = 1;
-	fpsValues.rangeMin.timeValue = 1;
-	timeSuite->GetTicksPerSecond(&fpsValues.rangeMax.timeValue);
-	fpsValues.value.timeValue = frameRateP.mInt64;
-	fpsValues.disabled = kPrFalse;
-	fpsValues.hidden = kPrFalse;
-	
-	exNewParamInfo fpsParam;
-	fpsParam.structVersion = 1;
-	strncpy(fpsParam.identifier, ADBEVideoFPS, 255);
-	fpsParam.paramType = exParamType_ticksFrameRate;
-	fpsParam.flags = exParamFlag_none;
-	fpsParam.paramValues = fpsValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &fpsParam);
-
-
-	// Alpha channel
-	exParamValues alphaValues;
-	alphaValues.structVersion = 1;
-	alphaValues.value.intValue = kPrFalse;
-	alphaValues.disabled = kPrFalse;
-	alphaValues.hidden = kPrFalse;
-	
-	exNewParamInfo alphaParam;
-	alphaParam.structVersion = 1;
-	strncpy(alphaParam.identifier, ADBEVideoAlpha, 255);
-	alphaParam.paramType = exParamType_bool;
-	alphaParam.flags = exParamFlag_none;
-	alphaParam.paramValues = alphaValues;
-	
-	//exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &alphaParam);
-
-	
-	// Video Codec Settings Group
-	utf16ncpy(groupString, "Codec settings", 255);
-	exportParamSuite->AddParamGroup(exID, gIdx,
-									ADBEVideoTabGroup, ADBEVideoCodecGroup, groupString,
-									kPrFalse, kPrFalse, kPrFalse);
-									
-	// Codec
-	exParamValues codecValues;
-	codecValues.structVersion = 1;
-	codecValues.rangeMin.intValue = WEBM_CODEC_VP8;
-	codecValues.rangeMax.intValue = WEBM_CODEC_VP9;
-	codecValues.value.intValue = WEBM_CODEC_VP8;
-	codecValues.disabled = kPrFalse;
-	codecValues.hidden = kPrFalse;
-	
-	exNewParamInfo codecParam;
-	codecParam.structVersion = 1;
-	strncpy(codecParam.identifier, WebMVideoCodec, 255);
-	codecParam.paramType = exParamType_int;
-	codecParam.flags = exParamFlag_none;
-	codecParam.paramValues = codecValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &codecParam);
-	
-	
-	// Bitrate
-	exParamValues bitrateValues;
-	bitrateValues.structVersion = 1;
-	bitrateValues.rangeMin.intValue = 1;
-	bitrateValues.rangeMax.intValue = 9999;
-	bitrateValues.value.intValue = 500;
-	bitrateValues.disabled = kPrFalse;
-	bitrateValues.hidden = kPrFalse;
-	
-	exNewParamInfo bitrateParam;
-	bitrateParam.structVersion = 1;
-	strncpy(bitrateParam.identifier, WebMVideoBitrate, 255);
-	bitrateParam.paramType = exParamType_int;
-	bitrateParam.flags = exParamFlag_slider;
-	bitrateParam.paramValues = bitrateValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &bitrateParam);
-	
-	
-	// Quality
-	exParamValues vidQualityValues;
-	vidQualityValues.structVersion = 1;
-	vidQualityValues.rangeMin.intValue = WEBM_QUALITY_REALTIME;
-	vidQualityValues.rangeMax.intValue = WEBM_QUALITY_BEST;
-	vidQualityValues.value.intValue = WEBM_QUALITY_GOOD;
-	vidQualityValues.disabled = kPrFalse;
-	vidQualityValues.hidden = kPrFalse;
-	
-	exNewParamInfo vidQualityParam;
-	vidQualityParam.structVersion = 1;
-	strncpy(vidQualityParam.identifier, WebMVideoQuality, 255);
-	vidQualityParam.paramType = exParamType_int;
-	vidQualityParam.flags = exParamFlag_none;
-	vidQualityParam.paramValues = vidQualityValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &vidQualityParam);
-	
-	
-	
-	// Audio Tab
-	utf16ncpy(groupString, "Audio Tab", 255);
-	exportParamSuite->AddParamGroup(exID, gIdx,
-									ADBETopParamGroup, ADBEAudioTabGroup, groupString,
-									kPrFalse, kPrFalse, kPrFalse);
-
-
-	// Audio Settings group
-	utf16ncpy(groupString, "Audio Settings", 255);
-	exportParamSuite->AddParamGroup(exID, gIdx,
-									ADBEAudioTabGroup, ADBEBasicAudioGroup, groupString,
-									kPrFalse, kPrFalse, kPrFalse);
-	
-	// Sample rate
-	exParamValues sampleRateValues;
-	sampleRateValues.value.floatValue = sampleRateP.mFloat64;
-	sampleRateValues.disabled = kPrFalse;
-	sampleRateValues.hidden = kPrFalse;
-	
-	exNewParamInfo sampleRateParam;
-	sampleRateParam.structVersion = 1;
-	strncpy(sampleRateParam.identifier, ADBEAudioRatePerSecond, 255);
-	sampleRateParam.paramType = exParamType_float;
-	sampleRateParam.flags = exParamFlag_none;
-	sampleRateParam.paramValues = sampleRateValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicAudioGroup, &sampleRateParam);
-	
-	
-	// Channel type
-	exParamValues channelTypeValues;
-	channelTypeValues.value.intValue = channelsTypeP.mInt32;
-	channelTypeValues.disabled = kPrFalse;
-	channelTypeValues.hidden = kPrFalse;
-	
-	exNewParamInfo channelTypeParam;
-	channelTypeParam.structVersion = 1;
-	strncpy(channelTypeParam.identifier, ADBEAudioNumChannels, 255);
-	channelTypeParam.paramType = exParamType_int;
-	channelTypeParam.flags = exParamFlag_none;
-	channelTypeParam.paramValues = channelTypeValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicAudioGroup, &channelTypeParam);
-	
-	
-	
-	// Audio Codec Settings Group
-	utf16ncpy(groupString, "Codec settings", 255);
-	exportParamSuite->AddParamGroup(exID, gIdx,
-									ADBEAudioTabGroup, ADBEAudioCodecGroup, groupString,
-									kPrFalse, kPrFalse, kPrFalse);
-									
-	// Quality
-	exParamValues qualityValues;
-	qualityValues.structVersion = 1;
-	qualityValues.rangeMin.floatValue = -0.1f;
-	qualityValues.rangeMax.floatValue = 1.f;
-	qualityValues.value.floatValue = 0.5f;
-	qualityValues.disabled = kPrFalse;
-	qualityValues.hidden = kPrFalse;
-	
-	exNewParamInfo qualityParam;
-	qualityParam.structVersion = 1;
-	strncpy(qualityParam.identifier, WebMAudioQuality, 255);
-	qualityParam.paramType = exParamType_float;
-	qualityParam.flags = exParamFlag_slider;
-	qualityParam.paramValues = qualityValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &qualityParam);
-	
-	
-
-	exportParamSuite->SetParamsVersion(exID, 1);
-	
-	
-	return result;
-}
-
-
-static prMALError
-exSDKPostProcessParams(
-	exportStdParms			*stdParmsP, 
-	exPostProcessParamsRec	*postProcessParamsRecP)
-{
-	prMALError		result	= malNoError;
-
-	ExportSettings			*lRec				= reinterpret_cast<ExportSettings *>(postProcessParamsRecP->privateData);
-	PrSDKExportParamSuite	*exportParamSuite	= lRec->exportParamSuite;
-	//PrSDKExportInfoSuite	*exportInfoSuite	= lRec->exportInfoSuite;
-	PrSDKTimeSuite			*timeSuite			= lRec->timeSuite;
-
-	csSDK_int32 exID = postProcessParamsRecP->exporterPluginID;
-	csSDK_int32 gIdx = 0;
-	
-	prUTF16Char paramString[256];
-	
-	
-	// Image Settings group
-	utf16ncpy(paramString, "Image Settings", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicVideoGroup, paramString);
-	
-									
-	// width
-	utf16ncpy(paramString, "Width", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoWidth, paramString);
-	
-	exParamValues widthValues;
-	exportParamSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthValues);
-
-	widthValues.rangeMin.intValue = 16;
-	widthValues.rangeMax.intValue = 8192;
-
-	exportParamSuite->ChangeParam(exID, gIdx, ADBEVideoWidth, &widthValues);
-	
-	
-	// height
-	utf16ncpy(paramString, "Height", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoHeight, paramString);
-	
-	exParamValues heightValues;
-	exportParamSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightValues);
-
-	heightValues.rangeMin.intValue = 16;
-	heightValues.rangeMax.intValue = 8192;
-	
-	exportParamSuite->ChangeParam(exID, gIdx, ADBEVideoHeight, &heightValues);
-	
-	
-	// pixel aspect ratio
-	utf16ncpy(paramString, "Pixel Aspect Ratio", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoAspect, paramString);
-	
-	csSDK_int32	PARs[][2] = {{1, 1}, {10, 11}, {40, 33}, {768, 702}, 
-							{1024, 702}, {2, 1}, {4, 3}, {3, 2}};
-							
-	const char *PARStrings[] = {"Square pixels (1.0)",
-								"D1/DV NTSC (0.9091)",
-								"D1/DV NTSC Widescreen 16:9 (1.2121)",
-								"D1/DV PAL (1.0940)", 
-								"D1/DV PAL Widescreen 16:9 (1.4587)",
-								"Anamorphic 2:1 (2.0)",
-								"HD Anamorphic 1080 (1.3333)",
-								"DVCPRO HD (1.5)"};
-
-
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEVideoAspect);
-	
-	exOneParamValueRec tempPAR;
-	
-	for(csSDK_int32 i=0; i < sizeof (PARs) / sizeof(PARs[0]); i++)
-	{
-		tempPAR.ratioValue.numerator = PARs[i][0];
-		tempPAR.ratioValue.denominator = PARs[i][1];
-		utf16ncpy(paramString, PARStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEVideoAspect, &tempPAR, paramString);
-	}
-	
-	
-	// field type
-	utf16ncpy(paramString, "Field Type", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoFieldType, paramString);
-	
-	csSDK_int32	fieldOrders[] = {	prFieldsUpperFirst,
-									prFieldsLowerFirst,
-									prFieldsNone};
-	
-	const char *fieldOrderStrings[]	= {	"Upper First",
-										"Lower First",
-										"None"};
-
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEVideoFieldType);
-	
-	exOneParamValueRec tempFieldOrder;
-	for(int i=0; i < 3; i++)
-	{
-		tempFieldOrder.intValue = fieldOrders[i];
-		utf16ncpy(paramString, fieldOrderStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEVideoFieldType, &tempFieldOrder, paramString);
-	}
-	
-	
-	// frame rate
-	utf16ncpy(paramString, "Frame Rate", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoFPS, paramString);
-	
-	PrTime frameRates[] = {	10, 15, 23,
-							24, 25, 29,
-							30, 50, 59,
-							60};
-													
-	PrTime frameRateNumDens[][2] = {{10, 1}, {15, 1}, {24000, 1001},
-									{24, 1}, {25, 1}, {30000, 1001},
-									{30, 1}, {50, 1}, {60000, 1001},
-									{60, 1}};
-	
-	const char *frameRateStrings[] = {	"10",
-										"15",
-										"23.976",
-										"24",
-										"25 (PAL)",
-										"29.97 (NTSC)",
-										"30",
-										"50",
-										"59.94",
-										"60"};
-	
-	PrTime ticksPerSecond = 0;
-	timeSuite->GetTicksPerSecond (&ticksPerSecond);
-	
-	for(csSDK_int32 i=0; i < sizeof(frameRates) / sizeof (PrTime); i++)
-	{
-		frameRates[i] = ticksPerSecond / frameRateNumDens[i][0] * frameRateNumDens[i][1];
-	}
-	
-	
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEVideoFPS);
-	
-	exOneParamValueRec tempFrameRate;
-	
-	for(csSDK_int32 i=0; i < sizeof(frameRates) / sizeof (PrTime); i++)
-	{
-		tempFrameRate.timeValue = frameRates[i];
-		utf16ncpy(paramString, frameRateStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEVideoFPS, &tempFrameRate, paramString);
-	}
-	
-	
-	// Alpha channel
-	utf16ncpy(paramString, "Include Alpha Channel", 255);
-	//exportParamSuite->SetParamName(exID, gIdx, ADBEVideoAlpha, paramString);
-	
-	
-	// Video codec settings
-	utf16ncpy(paramString, "Codec settings", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoCodecGroup, paramString);
-	
-	
-	// Codec
-	utf16ncpy(paramString, "Codec", 255);
-	exportParamSuite->SetParamName(exID, gIdx, WebMVideoCodec, paramString);
-	
-	
-	WebM_Video_Codec codecs[] = {	WEBM_CODEC_VP8,
-									WEBM_CODEC_VP9 };
-	
-	const char *codecStrings[]	= {	"VP8",
-									"VP9" };
-
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoCodec);
-	
-	exOneParamValueRec tempCodec;
-	for(int i=0; i < 2; i++)
-	{
-		tempCodec.intValue = codecs[i];
-		utf16ncpy(paramString, codecStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoCodec, &tempCodec, paramString);
-	}
-	
-	
-	// Bitrate
-	utf16ncpy(paramString, "Bitrate (kb/s)", 255);
-	exportParamSuite->SetParamName(exID, gIdx, WebMVideoBitrate, paramString);
-	
-	exParamValues bitrateValues;
-	exportParamSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateValues);
-
-	bitrateValues.rangeMin.intValue = 1;
-	bitrateValues.rangeMax.intValue = 9999;
-	
-	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &bitrateValues);
-	
-	
-	// Quality
-	utf16ncpy(paramString, "Quality", 255);
-	exportParamSuite->SetParamName(exID, gIdx, WebMVideoQuality, paramString);
-	
-	
-	int vidQualities[] = {	WEBM_QUALITY_REALTIME,
-							WEBM_QUALITY_GOOD,
-							WEBM_QUALITY_BEST };
-	
-	const char *vidQualityStrings[]	= {	"Realtime",
-										"Normal",
-										"Best" };
-
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoQuality);
-	
-	exOneParamValueRec tempVidQuality;
-	for(int i=0; i < 3; i++)
-	{
-		tempVidQuality.intValue = vidQualities[i];
-		utf16ncpy(paramString, vidQualityStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoQuality, &tempVidQuality, paramString);
-	}
-
-	
-	// Audio Settings group
-	utf16ncpy(paramString, "Audio Settings", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicAudioGroup, paramString);
-	
-	
-	// Sample rate
-	utf16ncpy(paramString, "Sample Rate", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioRatePerSecond, paramString);
-	
-	float sampleRates[] = { 8000.0f, 16000.0f, 32000.0f, 44100.0f, 48000.0f, 96000.0f };
-	
-	const char *sampleRateStrings[] = { "8000 Hz", "16000 Hz", "32000 Hz", "44100 Hz", "48000 Hz", "96000 Hz" };
-	
-	
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEAudioRatePerSecond);
-	
-	exOneParamValueRec tempSampleRate;
-	
-	for(csSDK_int32 i=0; i < sizeof(sampleRates) / sizeof(float); i++)
-	{
-		tempSampleRate.floatValue = sampleRates[i];
-		utf16ncpy(paramString, sampleRateStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEAudioRatePerSecond, &tempSampleRate, paramString);
-	}
-
-	
-	// Channels
-	utf16ncpy(paramString, "Channels", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioNumChannels, paramString);
-	
-	csSDK_int32 channelTypes[] = { kPrAudioChannelType_Mono, kPrAudioChannelType_Stereo };
-	
-	const char *channelTypeStrings[] = { "Mono", "Stereo" };
-	
-	
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, ADBEAudioNumChannels);
-	
-	exOneParamValueRec tempChannelType;
-	
-	for(csSDK_int32 i=0; i < sizeof(channelTypes) / sizeof(csSDK_int32); i++)
-	{
-		tempChannelType.intValue = channelTypes[i];
-		utf16ncpy(paramString, channelTypeStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEAudioNumChannels, &tempChannelType, paramString);
-	}
-	
-	
-	// Audio codec settings
-	utf16ncpy(paramString, "Vorbis settings", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioCodecGroup, paramString);
-
-
-	// Quality
-	utf16ncpy(paramString, "Quality", 255);
-	exportParamSuite->SetParamName(exID, gIdx, WebMAudioQuality, paramString);
-	
-	exParamValues qualityValues;
-	exportParamSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &qualityValues);
-
-	qualityValues.rangeMin.floatValue = -0.1f;
-	qualityValues.rangeMax.floatValue = 1.f;
-	
-	exportParamSuite->ChangeParam(exID, gIdx, WebMAudioQuality, &qualityValues);
-	
-	
-	return result;
-}
-
-
-static prMALError
-exSDKGetParamSummary(
-	exportStdParms			*stdParmsP, 
-	exParamSummaryRec		*summaryRecP)
-{
-	ExportSettings			*privateData	= reinterpret_cast<ExportSettings*>(summaryRecP->privateData);
-	PrSDKExportParamSuite	*paramSuite		= privateData->exportParamSuite;
-	
-	std::string summary1, summary2, summary3;
-
-	csSDK_uint32	exID	= summaryRecP->exporterPluginID;
-	csSDK_int32		gIdx	= 0;
-	
-	// Standard settings
-	exParamValues width, height, frameRate, alpha;
-	
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &width);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &height);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRate);
-	//paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoAlpha, &alpha);
-	
-	exParamValues sampleRateP, channelTypeP;
-	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
-
-	exParamValues codecP, bitrateP, vidQualityP, qualityP;
-	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
-	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
-	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &vidQualityP);
-	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &qualityP);
-	
-
-	// oh boy, figure out frame rate
-	PrTime frameRates[] = {	10, 15, 23,
-							24, 25, 29,
-							30, 50, 59,
-							60};
-													
-	PrTime frameRateNumDens[][2] = {{10, 1}, {15, 1}, {24000, 1001},
-									{24, 1}, {25, 1}, {30000, 1001},
-									{30, 1}, {50, 1}, {60000, 1001},
-									{60, 1}};
-	
-	const char *frameRateStrings[] = {	"10",
-										"15",
-										"23.976",
-										"24",
-										"25",
-										"29.97",
-										"30",
-										"50",
-										"59.94",
-										"60"};
-	
-	PrTime ticksPerSecond = 0;
-	privateData->timeSuite->GetTicksPerSecond(&ticksPerSecond);
-	
-	csSDK_int32 frame_rate_index = -1;
-	
-	for(csSDK_int32 i=0; i < sizeof(frameRates) / sizeof (PrTime); i++)
-	{
-		frameRates[i] = ticksPerSecond / frameRateNumDens[i][0] * frameRateNumDens[i][1];
-		
-		if(frameRates[i] == frameRate.value.timeValue)
-			frame_rate_index = i;
-	}
-
-
-	std::stringstream stream1;
-	
-	stream1 << width.value.intValue << "x" << height.value.intValue;
-	
-	if(frame_rate_index >= 0 && frame_rate_index < 10) 
-		stream1 << ", " << frameRateStrings[frame_rate_index] << " fps";
-	
-	//stream1 << ", " << (alpha.value.intValue ? "Alpha" : "No Alpha");
-	
-	summary1 = stream1.str();
-	
-	
-	std::stringstream stream2;
-	
-	stream2 << (int)sampleRateP.value.floatValue << " Hz";
-	stream2 << ", " << (channelTypeP.value.intValue == 2 ? "Stereo" : "Mono");
-	
-	summary2 = stream2.str();
-	
-	
-	std::stringstream stream3;
-	
-	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? "VP9" : "VP8");
-	stream3 << ", " << bitrateP.value.intValue << " kb/s";
-	stream3 << ", ";
-	
-	if(vidQualityP.value.intValue == WEBM_QUALITY_REALTIME)
-		stream3 << "Realtime";
-	else if(vidQualityP.value.intValue == WEBM_QUALITY_BEST)
-		stream3 << "Best Quality";
-	else
-		stream3 << "Normal Quality";
-	
-	summary3 = stream3.str();
-	
-	
-
-	utf16ncpy(summaryRecP->Summary1, summary1.c_str(), 255);
-	utf16ncpy(summaryRecP->Summary2, summary2.c_str(), 255);
-	utf16ncpy(summaryRecP->Summary3, summary3.c_str(), 255);
-	
-	return malNoError;
-}
-
-
-static prMALError
-exSDKValidateParamChanged (
-	exportStdParms		*stdParmsP, 
-	exParamChangedRec	*validateParamChangedRecP)
-{
-	ExportSettings			*privateData	= reinterpret_cast<ExportSettings*>(validateParamChangedRecP->privateData);
-	PrSDKExportParamSuite	*paramSuite		= privateData->exportParamSuite;
-	
-	csSDK_int32 exID = validateParamChangedRecP->exporterPluginID;
-	csSDK_int32 gIdx = validateParamChangedRecP->multiGroupIndex;
-	
-	std::string param = validateParamChangedRecP->changedParamIdentifier;
-	
-	// This is where you flip controls on/off, etc...
-	
-
-	return malNoError;
-}
 
 
 
