@@ -39,8 +39,18 @@
 
 #include "WebM_Premiere_Export_Params.h"
 
-#include <sstream>
+extern "C" {
 
+#include "vpx/vpx_encoder.h"
+#include "vpx/vp8cx.h"
+
+}
+
+
+#include <sstream>
+#include <vector>
+
+using std::string;
 
 static void
 utf16ncpy(prUTF16Char *dest, const char *src, int max_len)
@@ -201,7 +211,7 @@ exSDKGenerateDefaultParams(
 	
 
 	// Image Settings group
-	utf16ncpy(groupString, "Image Settings", 255);
+	utf16ncpy(groupString, "Video Settings", 255);
 	exportParamSuite->AddParamGroup(exID, gIdx,
 									ADBEVideoTabGroup, ADBEBasicVideoGroup, groupString,
 									kPrFalse, kPrFalse, kPrFalse);
@@ -441,6 +451,29 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, WebMPluginVersion, &versionParam);
 	
 		
+	// Custom Settings Group
+	utf16ncpy(groupString, "Custom settings", 255);
+	exportParamSuite->AddParamGroup(exID, gIdx,
+									ADBEVideoTabGroup, WebMCustomGroup, groupString,
+									kPrFalse, kPrFalse, kPrFalse);
+									
+	// Custom field
+	exParamValues customArgValues;
+	memset(customArgValues.paramString, 0, sizeof(customArgValues.paramString));
+	customArgValues.disabled = kPrFalse;
+	customArgValues.hidden = kPrFalse;
+	
+	exNewParamInfo customArgParam;
+	customArgParam.structVersion = 1;
+	strncpy(customArgParam.identifier, WebMCustomArgs, 255);
+	customArgParam.paramType = exParamType_string;
+	customArgParam.flags = exParamFlag_multiLine;
+	customArgParam.paramValues = customArgValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, WebMCustomGroup, &customArgParam);
+
+
+
 	// Audio Tab
 	utf16ncpy(groupString, "Audio Tab", 255);
 	exportParamSuite->AddParamGroup(exID, gIdx,
@@ -774,6 +807,16 @@ exSDKPostProcessParams(
 	}
 	
 	
+	// Custom settings
+	utf16ncpy(paramString, "Custom settings", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMCustomGroup, paramString);
+	
+	utf16ncpy(paramString, "Custom args", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMCustomArgs, paramString);
+	
+	
+	
+	
 	// Audio Settings group
 	utf16ncpy(paramString, "Audio Settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicAudioGroup, paramString);
@@ -1002,5 +1045,240 @@ exSDKValidateParamChanged (
 	
 
 	return malNoError;
+}
+
+
+static bool
+quotedTokenize(const string& str,
+				  std::vector<string>& tokens,
+				  const string& delimiters = " ")
+{
+	// this function will respect quoted strings when tokenizing
+	// the quotes will be included in the returned strings
+	
+	int i = 0;
+	bool in_quotes = false;
+	
+	// if there are un-quoted delimiters in the beginning, skip them
+	while(i < str.size() && str[i] != '\"' && string::npos != delimiters.find(str[i]) )
+		i++;
+	
+	string::size_type lastPos = i;
+	
+	while(i < str.size())
+	{
+		if(str[i] == '\"' && (i == 0 || str[i-1] != '\\'))
+			in_quotes = !in_quotes;
+		else if(!in_quotes)
+		{
+			if( string::npos != delimiters.find(str[i]) )
+			{
+				tokens.push_back(str.substr(lastPos, i - lastPos));
+				
+				lastPos = i + 1;
+				
+				// if there are more delimiters ahead, push forward
+				while(lastPos < str.size() && (str[lastPos] != '\"' || str[lastPos-1] != '\\') && string::npos != delimiters.find(str[lastPos]) )
+					lastPos++;
+					
+				i = lastPos;
+				continue;
+			}
+		}
+		
+		i++;
+	}
+	
+	if(in_quotes)
+		return false;
+	
+	// we're at the end, was there anything left?
+	if(str.size() - lastPos > 0)
+		tokens.push_back( str.substr(lastPos) );
+	
+	return true;
+}
+
+
+template <typename T>
+static void SetValue(T &v, string s)
+{
+	std::stringstream ss;
+	
+	ss << s;
+	
+	ss >> v;
+}
+
+
+bool
+ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
+{
+	std::vector<string> args;
+	
+	if( quotedTokenize(txt, args, " =\t\r\n") )
+	{
+		args.push_back(""); // so there's always an i+1
+		
+		int i = 0;
+		
+		while(i < args.size())
+		{
+			const string &arg = args[i];
+			
+			if(arg == "-t" || arg == "--threads")
+			{	SetValue(config.g_threads, args[i + 1]); i++;	}
+			
+			else if(arg == "--lag-in-frames")
+			{	SetValue(config.g_lag_in_frames, args[i + 1]); i++;	}
+			
+			else if(arg == "--drop-frame")
+			{	SetValue(config.rc_dropframe_thresh, args[i + 1]); i++;	}
+			
+			else if(arg == "--resize-allowed")
+			{	SetValue(config.rc_resize_allowed, args[i + 1]); i++;	}
+			
+			else if(arg == "--resize-up")
+			{	SetValue(config.rc_resize_up_thresh, args[i + 1]); i++;	}
+			
+			else if(arg == "--resize-down")
+			{	SetValue(config.rc_resize_down_thresh, args[i + 1]); i++;	}
+			
+			else if(arg == "--target-bitrate")
+			{	SetValue(config.rc_target_bitrate, args[i + 1]); i++;	}
+			
+			else if(arg == "--min-q")
+			{	SetValue(config.rc_min_quantizer, args[i + 1]); i++;	}
+			
+			else if(arg == "--max-q")
+			{	SetValue(config.rc_max_quantizer, args[i + 1]); i++;	}
+			
+			else if(arg == "--undershoot-pct")
+			{	SetValue(config.rc_undershoot_pct, args[i + 1]); i++;	}
+			
+			else if(arg == "--overshoot-pct")
+			{	SetValue(config.rc_overshoot_pct, args[i + 1]); i++;	}
+
+			else if(arg == "--buf-sz")
+			{	SetValue(config.rc_buf_sz, args[i + 1]); i++;	}
+
+			else if(arg == "--buf-initial-sz")
+			{	SetValue(config.rc_buf_initial_sz, args[i + 1]); i++;	}
+
+			else if(arg == "--buf-optimal-sz")
+			{	SetValue(config.rc_buf_optimal_sz, args[i + 1]); i++;	}
+
+			else if(arg == "--bias-pct")
+			{	SetValue(config.rc_2pass_vbr_bias_pct, args[i + 1]); i++;	}
+
+			else if(arg == "--minsection-pct")
+			{	SetValue(config.rc_2pass_vbr_minsection_pct, args[i + 1]); i++;	}
+
+			else if(arg == "--maxsection-pct")
+			{	SetValue(config.rc_2pass_vbr_maxsection_pct, args[i + 1]); i++;	}
+
+			else if(arg == "--kf-min-dist")
+			{	SetValue(config.kf_min_dist, args[i + 1]); i++;	}
+
+			else if(arg == "--kf-max-dist")
+			{	SetValue(config.kf_max_dist, args[i + 1]); i++;	}
+
+			else if(arg == "--disable-kf")
+			{	config.kf_mode = VPX_KF_DISABLED;	}
+
+			else if(arg == "--periodicity")
+			{	SetValue(config.ts_periodicity, args[i + 1]); i++;	}
+
+			
+			i++;
+		}
+	
+		return true;
+	}
+	else
+		return false;
+}
+
+
+#define ConfigureValue(encoder, ctrl_id, s) \
+	do{							\
+		std::stringstream ss;	\
+		ss << s;				\
+		unsigned int v = 0;		\
+		ss >> v;				\
+		config_err = vpx_codec_control(encoder, ctrl_id, v); \
+	}while(0)
+
+bool
+ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
+{
+	std::vector<string> args;
+	
+	vpx_codec_err_t config_err = VPX_CODEC_OK;
+	
+	if( quotedTokenize(txt, args, " =\t\r\n") )
+	{
+		args.push_back(""); // so there's always an i+1
+		
+		int i = 0;
+		
+		while(i < args.size())
+		{
+			const string &arg = args[i];
+		
+			if(arg == "--noise-sensitivity")
+			{	ConfigureValue(encoder, VP8E_SET_NOISE_SENSITIVITY, args[i + 1]); i++;	}
+
+			else if(arg == "--sharpness")
+			{	ConfigureValue(encoder, VP8E_SET_SHARPNESS, args[i + 1]); i++;	}
+
+			else if(arg == "--cpu-used")
+			{	ConfigureValue(encoder, VP8E_SET_CPUUSED, args[i + 1]); i++;	}
+
+			else if(arg == "--token-parts")
+			{	ConfigureValue(encoder, VP8E_SET_TOKEN_PARTITIONS, args[i + 1]); i++;	}
+
+			else if(arg == "--tile-columns")
+			{	ConfigureValue(encoder, VP9E_SET_TILE_COLUMNS, args[i + 1]); i++;	}
+
+			else if(arg == "--auto-alt-ref")
+			{	ConfigureValue(encoder, VP8E_SET_ENABLEAUTOALTREF, args[i + 1]); i++;	}
+
+			else if(arg == "--arnr-maxframes")
+			{	ConfigureValue(encoder, VP8E_SET_ARNR_MAXFRAMES, args[i + 1]); i++;	}
+
+			else if(arg == "--arnr-strength")
+			{	ConfigureValue(encoder, VP8E_SET_ARNR_STRENGTH, args[i + 1]); i++;	}
+
+			else if(arg == "--arnr-type")
+			{	ConfigureValue(encoder, VP8E_SET_ARNR_TYPE, args[i + 1]); i++;	}
+
+			else if(arg == "--tune")
+			{
+				unsigned int val = args[i + 1] == "psnr" ? VP8_TUNE_PSNR :
+									args[i + 1] == "ssim" ? VP8_TUNE_SSIM :
+									0;
+			
+				ConfigureValue(encoder, VP8E_SET_TUNING, val);
+				i++;
+			}
+
+			else if(arg == "--cq-level")
+			{	ConfigureValue(encoder, VP8E_SET_CQ_LEVEL, args[i + 1]); i++;	}
+			
+			else if(arg == "--max-intra-rate")
+			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, args[i + 1]); i++;	}
+
+			else if(arg == "--lossless")
+			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, args[i + 1]); i++;	}
+			
+			
+			i++;	
+		}
+		
+		return true;
+	}
+	else
+		return false;
 }
 

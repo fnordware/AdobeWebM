@@ -43,7 +43,9 @@
 
 #include "WebM_Premiere_Export.h"
 
-
+extern "C" {
+#include "vpx/vpx_encoder.h"
+}
 
 typedef enum {
 	WEBM_CODEC_VP8 = 0,
@@ -74,6 +76,9 @@ typedef enum {
 #define WebMVideoBitrate	"WebMVideoBitrate"
 #define WebMVideoEncoding	"WebMVideoEncoding"
 
+#define WebMCustomGroup		"WebMCustomGroup"
+#define WebMCustomArgs		"WebMCustomArgs"
+
 #define WebMAudioQuality	"WebMAudioQuality"
 
 
@@ -102,6 +107,11 @@ prMALError
 exSDKValidateParamChanged (
 	exportStdParms		*stdParmsP, 
 	exParamChangedRec	*validateParamChangedRecP);
+	
+
+bool ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt);
+
+bool ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt);
 
 
 #endif // WEBM_PREMIERE_EXPORT_PARAMS_H

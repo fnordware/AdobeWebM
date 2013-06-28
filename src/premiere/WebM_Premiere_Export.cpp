@@ -165,6 +165,16 @@ utf16ncpy(prUTF16Char *dest, const char *src, int max_len)
 	}while(*c++ != '\0' && --max_len);
 }
 
+static void
+ncpyUTF16(char *dest, const prUTF16Char *src, int max_len)
+{
+	char *d = dest;
+	const prUTF16Char *c = src;
+	
+	do{
+		*d++ = *c;
+	}while(*c++ != '\0' && --max_len);
+}
 
 static prMALError
 exSDKStartup(
@@ -505,16 +515,20 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, audioQualityP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, customArgsP, audioQualityP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
+	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	
 	WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
-		
+	
+	char customArgs[256];
+	ncpyUTF16(customArgs, customArgsP.paramString, 255);
+	customArgs[255] = '\0';
 	
 	
 	SequenceRender_ParamsRec renderParms;
@@ -639,6 +653,8 @@ exSDKExport(
 			
 			config.g_timebase.num = fps.denominator;
 			config.g_timebase.den = fps.numerator;
+			
+			ConfigureEncoderPre(config, customArgs);
 		
 		
 			codec_err = vpx_codec_enc_init(&encoder, iface, &config, 0);
@@ -655,6 +671,8 @@ exSDKExport(
 					vpx_codec_err_t config_err = vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, quan);
 					
 					assert(config_err == VPX_CODEC_OK);
+					
+					ConfigureEncoderPost(&encoder, customArgs);
 				}
 			}
 		}
