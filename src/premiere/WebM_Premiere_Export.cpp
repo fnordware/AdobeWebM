@@ -513,6 +513,9 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	
+	WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
+		
+	
 	
 	SequenceRender_ParamsRec renderParms;
 	PrPixelFormat pixelFormats[] = { PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709,
@@ -551,10 +554,33 @@ exSDKExport(
 	}
 
 	
+	PrMemoryPtr vbr_buffer = NULL;
+	size_t vbr_buffer_size = 0;
+
+
 	try{
 	
-	if(result == malNoError)
+	const int passes = ( (exportInfoP->exportVideo && method == WEBM_METHOD_VBR) ? 2 : 1);
+	
+	for(int pass = 0; pass < passes && result == malNoError; pass++)
 	{
+		const bool vbr_pass = (passes > 1 && pass == 0);
+		
+
+		if(passes > 1)
+		{
+			prUTF16Char utf_str[256];
+		
+			if(vbr_pass)
+				utf16ncpy(utf_str, "Analyzing video", 255);
+			else
+				utf16ncpy(utf_str, "Encoding WebM movie", 255);
+			
+			mySettings->exportProgressSuite->SetProgressString(exID, utf_str);
+		}
+		
+		
+	
 		exRatioValue fps;
 		get_framerate(ticksPerSecond, frameRateP.value.timeValue, &fps);
 		
@@ -574,17 +600,36 @@ exSDKExport(
 			config.g_w = renderParms.inWidth;
 			config.g_h = renderParms.inHeight;
 			
-			WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 			
 			if(method == WEBM_METHOD_QUALITY)
 			{
 				config.g_usage = config.rc_end_usage = VPX_CQ;
-				config.rc_target_bitrate = 1000000; // what they do in libvpxenc.c
+				config.rc_target_bitrate = 1000000; // what they do in libvpxenc.c in FFmpeg
 			}
 			else
 			{
-				config.g_usage = VPX_CBR;
-				config.g_pass = VPX_RC_ONE_PASS;
+				if(method == WEBM_METHOD_VBR)
+				{
+					config.g_usage = config.rc_end_usage = VPX_VBR;
+					
+					if(vbr_pass)
+					{
+						config.g_pass = VPX_RC_FIRST_PASS;
+					}
+					else
+					{
+						config.g_pass = VPX_RC_LAST_PASS;
+						
+						config.rc_twopass_stats_in.buf = vbr_buffer;
+						config.rc_twopass_stats_in.sz = vbr_buffer_size;
+					}
+					
+				}
+				else
+				{
+					config.g_usage = config.rc_end_usage = VPX_CBR;
+					config.g_pass = VPX_RC_ONE_PASS;
+				}
 				
 				config.rc_target_bitrate = bitrateP.value.intValue;
 			}
@@ -627,7 +672,7 @@ exSDKExport(
 		size_t private_size = 0;
 		void *private_data = NULL;
 		
-		if(exportInfoP->exportAudio)
+		if(exportInfoP->exportAudio && !vbr_pass)
 		{
 			vorbis_info_init(&vi);
 			
@@ -714,7 +759,7 @@ exSDKExport(
 		
 			PrTime videoTime = exportInfoP->startTime;
 			
-			while(videoTime < exportInfoP->endTime && result == suiteError_NoError)
+			while(videoTime < exportInfoP->endTime && result == malNoError)
 			{
 				// this is for the encoder
 				// let's do the math
@@ -854,12 +899,25 @@ exSDKExport(
 								{
 									if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
 									{
+										assert(!vbr_pass);
+									
 										bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
 																			vid_track, timestamp_ns,
 																			(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
 																			
 										if(!added)
 											result = exportReturn_InternalError;
+									}
+									else if(pkt->kind == VPX_CODEC_STATS_PKT)
+									{
+										if(vbr_buffer_size == 0)
+											vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
+										else
+											memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.frame.sz);
+										
+										memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.frame.buf, pkt->data.frame.sz);
+										
+										vbr_buffer_size += pkt->data.frame.sz;
 									}
 								}
 							}
@@ -891,10 +949,26 @@ exSDKExport(
 							
 							if(pkt != NULL)
 							{
-								bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
-																	vid_track, timestamp_ns,
-																	(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
-								assert(added);
+								if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
+								{
+									assert(!vbr_pass);
+									
+									bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+																		vid_track, timestamp_ns,
+																		(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
+									assert(added);
+								}
+								else if(pkt->kind == VPX_CODEC_STATS_PKT)
+								{
+									if(vbr_buffer_size == 0)
+										vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
+									else
+										memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.frame.sz);
+									
+									memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.frame.buf, pkt->data.frame.sz);
+									
+									vbr_buffer_size += pkt->data.frame.sz;
+								}
 							}
 							
 						}while(pkt != NULL);
@@ -902,7 +976,7 @@ exSDKExport(
 				}
 				
 				
-				if(exportInfoP->exportAudio)
+				if(exportInfoP->exportAudio && !vbr_pass)
 				{
 					const int samples = sampleRateP.value.floatValue * fps.denominator / fps.numerator;
 					
@@ -983,7 +1057,7 @@ exSDKExport(
 			
 			bool final = muxer_segment.Finalize();
 			
-			if(!final)
+			if(!final && !vbr_pass)
 				result = exportReturn_InternalError;
 		}
 		else
@@ -997,7 +1071,7 @@ exSDKExport(
 			assert(destroy_err == VPX_CODEC_OK);
 		}
 			
-		if(exportInfoP->exportAudio)
+		if(exportInfoP->exportAudio && !vbr_pass)
 		{
 			vorbis_block_clear(&vb);
 			vorbis_dsp_clear(&vd);
@@ -1009,11 +1083,16 @@ exSDKExport(
 	}catch(...) { result = exportReturn_InternalError; }
 	
 	
+	if(vbr_buffer != NULL)
+		memorySuite->PrDisposePtr(vbr_buffer);
+	
+	
 	if(exportInfoP->exportVideo)
 		renderSuite->ReleaseVideoRenderer(exID, videoRenderID);
 
 	if(exportInfoP->exportAudio)
 		audioSuite->ReleaseAudioRenderer(exID, audioRenderID);
+	
 
 	return result;
 }

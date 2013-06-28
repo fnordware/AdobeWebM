@@ -711,7 +711,7 @@ exSDKPostProcessParams(
 	
 	const char *vidMethodStrings[]	= {	"Constant Quality",
 										"Constant Bitrate",
-										"2-Pass Variable Bitrate" };
+										"Variable Bitrate (2-pass)" };
 
 	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoMethod);
 	
@@ -941,26 +941,24 @@ exSDKGetParamSummary(
 	
 	std::stringstream stream3;
 	
-	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? "VP9" : "VP8");
-	
-	
 	if(method == WEBM_METHOD_QUALITY)
 	{
-		stream3 << ", " << "Quality " << videoQualityP.value.intValue;
+		stream3 << "Quality " << videoQualityP.value.intValue;
 	}
 	else
 	{
-		stream3 << ", " << videoBitrateP.value.intValue << " kb/s";
+		stream3 << videoBitrateP.value.intValue << " kb/s";
+		
+		if(method == WEBM_METHOD_VBR)
+			stream3 << " VBR";
 	}
 	
-	stream3 << ", ";
-	
+	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");	
+
 	if(vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME)
-		stream3 << "Realtime Encoding";
+		stream3 << ", Realtime";
 	else if(vidEncodingP.value.intValue == WEBM_ENCODING_BEST)
-		stream3 << "Best Encoding";
-	else
-		stream3 << "Normal Encoding";
+		stream3 << ", Best";
 	
 	summary3 = stream3.str();
 	
