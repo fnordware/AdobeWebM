@@ -296,6 +296,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\src\premiere\WebM_Premiere_Export_Params.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\premiere\WebM_Premiere_Export_Params.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\premiere\WebM_Premiere_Import.cpp"
 			>
 		</File>
