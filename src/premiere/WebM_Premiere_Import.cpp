@@ -1051,9 +1051,7 @@ SDKPreferredFrameSize(
 static inline int
 tstamp2frame(long long tstamp, int fps_num, int fps_den)
 {
-	const long long half_frame_time = (1000000000UL * fps_den / fps_num) / 2;
-
-	return ((tstamp + half_frame_time) / fps_den) * fps_num / 1000000000UL;
+	return (((tstamp * fps_num) / fps_den) + 500000000UL) / 1000000000UL;
 }
 
 static inline long long
@@ -1220,7 +1218,7 @@ SDKGetSourceVideo(
 												
 												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
-												assert(got_frame || ts2fr(tstamp) >= ts2fr(packet_tstamp)); // we either have the frame and we're still working toward getting it
+												assert(got_frame || ts2fr(tstamp) >= ts2fr(packet_tstamp)); // we either have the frame or we're still working toward getting it
 
 												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 												

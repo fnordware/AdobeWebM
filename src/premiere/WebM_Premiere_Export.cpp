@@ -482,25 +482,11 @@ static void get_framerate(PrTime ticksPerSecond, PrTime ticks_per_frame, exRatio
 	{
 		fps->numerator = frameRateNumDens[frameRateIndex][0];
 		fps->denominator = frameRateNumDens[frameRateIndex][1];
-		
-		// TODO: Understand what's going on here
-		// seems like I have to set the denominator to 1000000
-		// But why?
-		if(fps->denominator == 1)
-		{
-			fps->numerator *= 1000000;
-			fps->denominator *= 1000000;
-		}
-		else if(fps->denominator == 1001)
-		{
-			fps->numerator *= 1000;
-			fps->denominator *= 1000;
-		}
 	}
 	else
 	{
-		fps->numerator = 1000000 * ticksPerSecond / ticks_per_frame;
-		fps->denominator = 1000000;
+		fps->numerator = 1000 * ticksPerSecond / ticks_per_frame;
+		fps->denominator = 1000;
 	}
 }
 
@@ -730,7 +716,7 @@ exSDKExport(
 			
 			mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
 			
-			info->set_timecode_scale(fps.denominator);
+			//info->set_timecode_scale(fps.denominator);
 			info->set_writing_app("fnord WebM for Premiere");
 			
 			
@@ -743,6 +729,7 @@ exSDKExport(
 				mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment.GetTrackByNumber(vid_track));
 				
 				video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
+
 				video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? "V_VP9" :
 										mkvmuxer::Tracks::kVp8CodecId);
 				
@@ -778,11 +765,18 @@ exSDKExport(
 			
 			while(videoTime < exportInfoP->endTime && result == suiteError_NoError)
 			{
-				vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * fps.denominator / ticksPerSecond;
-				vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * fps.denominator / ticksPerSecond;
+				// this is for the encoder
+				// let's do the math
+				// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
+				// timestamp = time / timebase
+				// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
+				vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
+				vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
 				unsigned long duration = nextTimeStamp - timeStamp;
 				
-				uint64 timestamp_ns = timeStamp * 1000000000UL / fps.denominator;
+				// this is for the muxer
+				//uint64 timestamp_ns = videoTime * 1000000000UL / ticksPerSecond; // afraid of overflow
+				uint64 timestamp_ns = (videoTime - exportInfoP->startTime) * 100000UL / (ticksPerSecond / 10000);
 				
 				
 				if(exportInfoP->exportVideo)
