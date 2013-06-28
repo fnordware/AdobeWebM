@@ -251,7 +251,7 @@ SDKGetIndFormat(
 	imIndFormatRec	*SDKIndFormatRec)
 {
 	prMALError	result		= malNoError;
-	char formatname[255]	= "WebM Format";
+	char formatname[255]	= "WebM";
 	char shortname[32]		= "WebM";
 	char platformXten[256]	= "webm\0\0";
 

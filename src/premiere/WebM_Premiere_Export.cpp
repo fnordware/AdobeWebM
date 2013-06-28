@@ -1060,6 +1060,9 @@ exSDKExport(
 				{
 					float progress = (double)(videoTime - exportInfoP->startTime) / (double)(exportInfoP->endTime - exportInfoP->startTime);
 					
+					if(passes == 2)
+						progress = (progress / 2.f) + (0.5f * pass);
+
 					result = mySettings->exportProgressSuite->UpdateProgressPercent(exID, progress);
 					
 					if(result == suiteError_ExporterSuspended)
