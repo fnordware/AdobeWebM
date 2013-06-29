@@ -504,13 +504,41 @@ exSDKExport(
 	csSDK_uint32 exID = exportInfoP->exporterPluginID;
 	csSDK_int32 gIdx = 0;
 	
-	exParamValues widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP, alphaP;
+	exParamValues matchSourceP, widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
 	
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEVideoMatchSource, &matchSourceP);
+	
+	if(matchSourceP.value.intValue)
+	{
+		// get current settings
+		PrParam curr_widthP, curr_heightP, curr_parN, curr_parD, curr_fieldTypeP, curr_frameRateP;
+		
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoWidth, &curr_widthP);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoHeight, &curr_heightP);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectNumerator, &curr_parN);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectDenominator, &curr_parD);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFieldType, &curr_fieldTypeP);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFrameRate, &curr_frameRateP);
+		
+		widthP.value.intValue = curr_widthP.mInt32;
+		heightP.value.intValue = curr_heightP.mInt32;
+		
+		pixelAspectRatioP.value.ratioValue.numerator = curr_parN.mInt32;
+		pixelAspectRatioP.value.ratioValue.denominator = curr_parD.mInt32;
+		
+		fieldTypeP.value.intValue = curr_fieldTypeP.mInt32;
+		frameRateP.value.timeValue = curr_frameRateP.mInt64;
+	}
+	else
+	{
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	}
+	
+	exParamValues alphaP;
 	//paramSuite->GetParamValue(exID, gIdx, ADBEVideoAlpha, &alphaP);
 	alphaP.value.intValue = 0;
 	

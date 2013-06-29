@@ -216,13 +216,30 @@ exSDKGenerateDefaultParams(
 									ADBEVideoTabGroup, ADBEBasicVideoGroup, groupString,
 									kPrFalse, kPrFalse, kPrFalse);
 	
+	// Match source
+	exParamValues matchSourceValues;
+	matchSourceValues.structVersion = 1;
+	matchSourceValues.value.intValue = kPrTrue;
+	matchSourceValues.disabled = kPrFalse;
+	matchSourceValues.hidden = kPrFalse;
+	
+	exNewParamInfo matchSourceParam;
+	matchSourceParam.structVersion = 1;
+	strncpy(matchSourceParam.identifier, ADBEVideoMatchSource, 255);
+	matchSourceParam.paramType = exParamType_bool;
+	matchSourceParam.flags = exParamFlag_none;
+	matchSourceParam.paramValues = matchSourceValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &matchSourceParam);
+	
+	
 	// width
 	exParamValues widthValues;
 	widthValues.structVersion = 1;
 	widthValues.rangeMin.intValue = 16;
 	widthValues.rangeMax.intValue = 8192;
 	widthValues.value.intValue = widthP.mInt32;
-	widthValues.disabled = kPrFalse;
+	widthValues.disabled = kPrTrue;
 	widthValues.hidden = kPrFalse;
 	
 	exNewParamInfo widthParam;
@@ -241,7 +258,7 @@ exSDKGenerateDefaultParams(
 	heightValues.rangeMin.intValue = 16;
 	heightValues.rangeMax.intValue = 8192;
 	heightValues.value.intValue = heightP.mInt32;
-	heightValues.disabled = kPrFalse;
+	heightValues.disabled = kPrTrue;
 	heightValues.hidden = kPrFalse;
 	
 	exNewParamInfo heightParam;
@@ -263,7 +280,7 @@ exSDKGenerateDefaultParams(
 	parValues.rangeMax.ratioValue.denominator = 1;
 	parValues.value.ratioValue.numerator = parN.mInt32;
 	parValues.value.ratioValue.denominator = parD.mInt32;
-	parValues.disabled = kPrFalse;
+	parValues.disabled = kPrTrue;
 	parValues.hidden = kPrFalse;
 	
 	exNewParamInfo parParam;
@@ -280,7 +297,7 @@ exSDKGenerateDefaultParams(
 	exParamValues fieldOrderValues;
 	fieldOrderValues.structVersion = 1;
 	fieldOrderValues.value.intValue = fieldTypeP.mInt32;
-	fieldOrderValues.disabled = kPrFalse;
+	fieldOrderValues.disabled = kPrTrue;
 	fieldOrderValues.hidden = kPrFalse;
 	
 	exNewParamInfo fieldOrderParam;
@@ -299,7 +316,7 @@ exSDKGenerateDefaultParams(
 	fpsValues.rangeMin.timeValue = 1;
 	timeSuite->GetTicksPerSecond(&fpsValues.rangeMax.timeValue);
 	fpsValues.value.timeValue = frameRateP.mInt64;
-	fpsValues.disabled = kPrFalse;
+	fpsValues.disabled = kPrTrue;
 	fpsValues.hidden = kPrFalse;
 	
 	exNewParamInfo fpsParam;
@@ -576,6 +593,11 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicVideoGroup, paramString);
 	
 									
+	// Match source
+	utf16ncpy(paramString, "Match source", 255);
+	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoMatchSource, paramString);
+	
+	
 	// width
 	utf16ncpy(paramString, "Width", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoWidth, paramString);
@@ -1028,7 +1050,28 @@ exSDKValidateParamChanged (
 	
 	std::string param = validateParamChangedRecP->changedParamIdentifier;
 	
-	if(param == WebMVideoMethod)
+	if(param == ADBEVideoMatchSource)
+	{
+		exParamValues matchSourceP, widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
+		
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoMatchSource, &matchSourceP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
+		
+		bool disabled = (matchSourceP.value.intValue != 0);
+		
+		widthP.disabled = heightP.disabled = pixelAspectRatioP.disabled = fieldTypeP.disabled = frameRateP.disabled = disabled;
+		
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoWidth, &widthP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoHeight, &heightP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	}
+	else if(param == WebMVideoMethod)
 	{
 		exParamValues methodValue, videoQualityValue, videoBitrateValue;
 		

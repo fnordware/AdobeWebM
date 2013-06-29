@@ -70,6 +70,8 @@ typedef enum {
 
 #define WebMPluginVersion	"WebMPluginVersion"
 
+#define ADBEVideoMatchSource "ADBEVideoMatchSource"
+
 #define WebMVideoCodec		"WebMVideoCodec"
 #define WebMVideoMethod		"WebMVideoMethod"
 #define WebMVideoQuality	"WebMVideoQuality"
