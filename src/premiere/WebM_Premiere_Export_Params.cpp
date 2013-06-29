@@ -1116,7 +1116,7 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 {
 	std::vector<string> args;
 	
-	if( quotedTokenize(txt, args, " =\t\r\n") )
+	if(quotedTokenize(txt, args, " =\t\r\n") && args.size() > 0)
 	{
 		args.push_back(""); // so there's always an i+1
 		
@@ -1216,7 +1216,7 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 	
 	vpx_codec_err_t config_err = VPX_CODEC_OK;
 	
-	if( quotedTokenize(txt, args, " =\t\r\n") )
+	if(quotedTokenize(txt, args, " =\t\r\n") && args.size() > 0)
 	{
 		args.push_back(""); // so there's always an i+1
 		
