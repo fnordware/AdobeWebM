@@ -63,9 +63,6 @@
 #include	"PrSDKWindowSuite.h"
 #include	"PrSDKAppInfoSuite.h"
 #include	"SDK_Segment_Utils.h"
-#ifdef		PRMAC_ENV
-#include	<wchar.h>
-#endif
 
 
 

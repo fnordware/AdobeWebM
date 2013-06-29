@@ -599,6 +599,7 @@ exSDKExport(
 			else
 				utf16ncpy(utf_str, "Encoding WebM movie", 255);
 			
+			// This doesn't seem to be doing anything
 			mySettings->exportProgressSuite->SetProgressString(exID, utf_str);
 		}
 		
@@ -646,7 +647,6 @@ exSDKExport(
 						config.rc_twopass_stats_in.buf = vbr_buffer;
 						config.rc_twopass_stats_in.sz = vbr_buffer_size;
 					}
-					
 				}
 				else
 				{
@@ -703,7 +703,7 @@ exSDKExport(
 		{
 			vorbis_info_init(&vi);
 			
-			// non-VBR vorbis_encode_init() is giving me crashes for some reason
+			// TODO: figure out why non-VBR vorbis_encode_init() is giving me crashes
 			v_err = vorbis_encode_init_vbr(&vi,
 											audioChannels,
 											sampleRateP.value.floatValue,
@@ -739,7 +739,6 @@ exSDKExport(
 			
 			mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
 			
-			//info->set_timecode_scale(fps.denominator);
 			info->set_writing_app("fnord WebM for Premiere");
 			
 			
@@ -830,6 +829,11 @@ exSDKExport(
 						const int width = bounds.right - bounds.left;
 						const int height = bounds.bottom - bounds.top;
 						
+						
+						// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
+						// (the latter two are in "vpx color space"?)
+						// see validate_img() in vp8_cx_iface.c
+								
 						vpx_image_t img_data;
 						vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);;
 						
@@ -908,9 +912,6 @@ exSDKExport(
 							}
 							else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
 							{
-								// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
-								// see validate_img() in vp8_cx_iface.c
-								
 								// so here's our dumb RGB to YUV conversion
 							
 								char *frameBufferP = NULL;
@@ -955,6 +956,7 @@ exSDKExport(
 								}
 							}
 							
+							
 							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, duration, 0, deadline);
 							
 							if(encode_err == VPX_CODEC_OK)
@@ -977,6 +979,8 @@ exSDKExport(
 									}
 									else if(pkt->kind == VPX_CODEC_STATS_PKT)
 									{
+										assert(vbr_pass);
+										
 										if(vbr_buffer_size == 0)
 											vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
 										else
@@ -1027,6 +1031,8 @@ exSDKExport(
 								}
 								else if(pkt->kind == VPX_CODEC_STATS_PKT)
 								{
+									assert(!vbr_pass);
+									
 									if(vbr_buffer_size == 0)
 										vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
 									else

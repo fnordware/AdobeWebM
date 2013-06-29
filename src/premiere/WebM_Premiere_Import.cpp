@@ -54,6 +54,7 @@ extern "C" {
 #include <assert.h>
 #include <math.h>
 
+#include <string>
 
 #ifdef PRMAC_ENV
 	#include <mach/mach.h>
@@ -156,6 +157,11 @@ int PrMkvReader::Length(long long* total, long long* available)
 #endif
 }
 
+typedef enum {
+	CODEC_NONE = 0,
+	CODEC_VP8,
+	CODEC_VP9
+} VideoCodec;
 
 typedef struct
 {	
@@ -171,6 +177,7 @@ typedef struct
 	PrMkvReader				*reader;
 	mkvparser::Segment		*segment;
 	int						video_track;
+	VideoCodec				video_codec;
 	int						audio_track;
 	
 	PrAudioSample			next_audio_sample;
@@ -193,36 +200,21 @@ SDKInit(
 	imStdParms		*stdParms, 
 	imImportInfoRec	*importInfo)
 {
-	PrSDKAppInfoSuite *appInfoSuite = NULL;
-	stdParms->piSuites->utilFuncs->getSPBasicSuite()->AcquireSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion, (const void**)&appInfoSuite);
-	
-	if(appInfoSuite)
-	{
-		int fourCC = 0;
-	
-		appInfoSuite->GetAppInfo(PrSDKAppInfoSuite::kAppInfo_AppFourCC, (void *)&fourCC);
-	
-		stdParms->piSuites->utilFuncs->getSPBasicSuite()->ReleaseSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion);
-		
-		// return this error if you don't want to run in AE
-		//if(fourCC == kAppAfterEffects)
-		//	return imOtherErr;
-	}
-	
-	importInfo->setupOnDblClk		= kPrFalse;		// If user dbl-clicks file you imported, pop your setup dialog
-	importInfo->canSave				= kPrFalse;		// Can 'save as' files to disk, real file only
-	
+	importInfo->canSave				= kPrFalse;		// Can 'save as' files to disk, real file only.
 	importInfo->canDelete			= kPrFalse;		// File importers only, use if you only if you have child files
-	importInfo->dontCache			= kPrFalse;		// Don't let Premiere cache these files
+	importInfo->canCalcSizes		= kPrFalse;		// These are for importers that look at a whole tree of files so
+													// Premiere doesn't know about all of them.
+	importInfo->canTrim				= kPrFalse;
+	
 	importInfo->hasSetup			= kPrFalse;		// Set to kPrTrue if you have a setup dialog
+	importInfo->setupOnDblClk		= kPrFalse;		// If user dbl-clicks file you imported, pop your setup dialog
+	
+	importInfo->dontCache			= kPrFalse;		// Don't let Premiere cache these files
 	importInfo->keepLoaded			= kPrFalse;		// If you MUST stay loaded use, otherwise don't: play nice
 	importInfo->priority			= 0;
-	importInfo->canTrim				= kPrFalse;
-	importInfo->canCalcSizes		= kPrFalse;
-	if(stdParms->imInterfaceVer >= IMPORTMOD_VERSION_6)
-	{
-		importInfo->avoidAudioConform = kPrTrue;
-	}							
+	
+	importInfo->avoidAudioConform	= kPrTrue;		// If I let Premiere conform the audio, I get silence when
+													// I try to play it in the program.  Seems like a bug to me.
 
 #ifdef PRMAC_ENV
 	// get number of CPUs using Mach calls
@@ -243,6 +235,7 @@ SDKInit(
 
 	return malNoError;
 }
+
 
 static prMALError 
 SDKGetIndFormat(
@@ -298,11 +291,6 @@ SDKOpenFile8(
 	ImporterLocalRec8H	localRecH = NULL;
 	ImporterLocalRec8Ptr localRecP = NULL;
 
-	// Private data stores:
-	// 1. Pointers to suites
-	// 2. Width, height, and timing information
-	// 3. File path
-
 	if(SDKfileOpenRec8->privatedata)
 	{
 		localRecH = (ImporterLocalRec8H)SDKfileOpenRec8->privatedata;
@@ -323,6 +311,7 @@ SDKOpenFile8(
 		localRecP->reader = NULL;
 		localRecP->segment = NULL;
 		localRecP->video_track = -1;
+		localRecP->video_codec = CODEC_NONE;
 		localRecP->audio_track = -1;
 		localRecP->next_audio_sample = -1;
 		
@@ -442,6 +431,10 @@ SDKOpenFile8(
 							
 							if(pVideoTrack)
 							{
+								localRecP->video_codec = pVideoTrack->GetCodecId() == std::string("V_VP8") ? CODEC_VP8 :
+															pVideoTrack->GetCodecId() == std::string("V_VP9") ? CODEC_VP9 :
+															CODEC_NONE;
+							
 								localRecP->video_track = trackNumber;
 							}
 						}
@@ -485,13 +478,6 @@ SDKOpenFile8(
 }
 
 
-//-------------------------------------------------------------------
-//	"Quiet" the file (it's being closed, but you maintain your Private data).
-//  Premiere does this when you put the app in the background so it's not
-//  sitting there with a bunch of open (locked) files.
-//	
-//	NOTE:	If you don't set any privateData, you will not get an imCloseFile call
-//			so close it up here.
 
 static prMALError 
 SDKQuietFile(
@@ -499,8 +485,12 @@ SDKQuietFile(
 	imFileRef			*SDKfileRef, 
 	void				*privateData)
 {
+	// "Quet File" really means close the file handle, but we're still
+	// using it and might open it again, so hold on to any stored data
+	// structures you don't want to re-create.
+
 	// If file has not yet been closed
-	if (SDKfileRef && *SDKfileRef != imInvalidHandleValue)
+	if(SDKfileRef && *SDKfileRef != imInvalidHandleValue)
 	{
 		ImporterLocalRec8H ldataH	= reinterpret_cast<ImporterLocalRec8H>(privateData);
 
@@ -536,10 +526,6 @@ SDKQuietFile(
 	return malNoError; 
 }
 
-
-//-------------------------------------------------------------------
-//	Close the file.  You MUST have allocated Private data in imGetPrefs or you will not
-//	receive this call.
 
 static prMALError 
 SDKCloseFile(
@@ -577,142 +563,6 @@ SDKCloseFile(
 }
 
 
-// Go ahead and overwrite any existing file. Premiere will have already checked and warned the user if file will be overwritten.
-// Of course, if there are child files, you should check and return imSaveErr if appropriate.
-//
-// I'm not actually sure if this will ever get called.  It was in the Premiere sample so
-// I just left it.  All the calls are not format specific.
-static prMALError 
-SDKSaveFile8(
-	imStdParms			*stdParms, 
-	imSaveFileRec8		*SDKSaveFileRec8) 
-{
-	prMALError	result = malNoError;
-	#ifdef PRMAC_ENV
-	CFStringRef			sourceFilePathCFSR,
-						destFilePathCFSR,
-						destFolderCFSR,
-						destFileNameCFSR;
-	CFRange				destFileNameRange,
-						destFolderRange;
-	CFURLRef			sourceFilePathURL,
-						destFolderURL;
-	FSRef				sourceFileRef,
-						destFolderRef;
-												
-	// Convert prUTF16Char filePaths to FSRefs for paths
-	sourceFilePathCFSR = CFStringCreateWithCharacters(	kCFAllocatorDefault,
-														SDKSaveFileRec8->sourcePath,
-														prUTF16CharLength(SDKSaveFileRec8->sourcePath));
-	destFilePathCFSR = CFStringCreateWithCharacters(	kCFAllocatorDefault,
-														SDKSaveFileRec8->destPath,
-														prUTF16CharLength(SDKSaveFileRec8->destPath));
-														
-	// Separate the folder path from the file name
-	destFileNameRange = CFStringFind(	destFilePathCFSR,
-										CFSTR("/"),
-										kCFCompareBackwards);
-	destFolderRange.location = 0;
-	destFolderRange.length = destFileNameRange.location;
-	destFileNameRange.location += destFileNameRange.length;
-	destFileNameRange.length = CFStringGetLength(destFilePathCFSR) - destFileNameRange.location;
-	destFolderCFSR = CFStringCreateWithSubstring(	kCFAllocatorDefault,
-													destFilePathCFSR,
-													destFolderRange);
-	destFileNameCFSR = CFStringCreateWithSubstring(	kCFAllocatorDefault,
-													destFilePathCFSR,
-													destFileNameRange);
-		
-	// Make FSRefs
-	sourceFilePathURL = CFURLCreateWithFileSystemPath(	kCFAllocatorDefault,
-														sourceFilePathCFSR,
-														kCFURLPOSIXPathStyle,
-														false);
-	destFolderURL = CFURLCreateWithFileSystemPath(	kCFAllocatorDefault,
-													destFolderCFSR,
-													kCFURLPOSIXPathStyle,
-													true);
-	CFURLGetFSRef(sourceFilePathURL, &sourceFileRef);
-	CFURLGetFSRef(destFolderURL, &destFolderRef);						
-	#endif
-	
-	if (SDKSaveFileRec8->move)
-	{
-		#ifdef PRWIN_ENV
-		if( MoveFileW(SDKSaveFileRec8->sourcePath, SDKSaveFileRec8->destPath) == 0)
-		{
-			result = imSaveErr;
-		}
-		#else
-		if( FSCopyObjectSync(	&sourceFileRef,
-								&destFolderRef,
-								destFileNameCFSR,
-								NULL,
-								kFSFileOperationOverwrite))
-		{
-			result = imSaveErr;
-		}
-		#endif
-	}
-	else
-	{
-		#ifdef PRWIN_ENV
-		if( CopyFileW (SDKSaveFileRec8->sourcePath, SDKSaveFileRec8->destPath, kPrTrue) == 0)
-		{
-			result = imSaveErr;
-		}
-		#else
-		if ( FSMoveObjectSync(	&sourceFileRef,
-								&destFolderRef,
-								destFileNameCFSR,
-								NULL,
-								kFSFileOperationOverwrite))
-		{
-			result = imSaveErr;
-		}
-		#endif
-	}
-	return result;
-}
-
-
-// This was also in the SDK sample, so figured I'd just leave it here.
-static prMALError 
-SDKDeleteFile8(
-	imStdParms			*stdParms, 
-	imDeleteFileRec8	*SDKDeleteFileRec8)
-{
-	prMALError	result = malNoError;
-
-	#ifdef PRWIN_ENV
-	if( DeleteFileW(SDKDeleteFileRec8->deleteFilePath) )
-	{
-		result = imDeleteErr;
-	}
-	#else
-	CFStringRef	filePathCFSR;
-	CFURLRef	filePathURL;
-	FSRef		fileRef;
-
-	filePathCFSR = CFStringCreateWithCharacters(kCFAllocatorDefault,
-												SDKDeleteFileRec8->deleteFilePath,
-												prUTF16CharLength(SDKDeleteFileRec8->deleteFilePath));
-	filePathURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-												filePathCFSR,
-												kCFURLPOSIXPathStyle,
-												false);
-	CFURLGetFSRef(filePathURL, &fileRef);					
-	if( FSDeleteObject(&fileRef) )
-	{
-		result = imDeleteErr;
-	}
-	#endif
-	
-	return result;
-}
-
-
-
 static prMALError 
 SDKGetIndPixelFormat(
 	imStdParms			*stdParms,
@@ -724,7 +574,6 @@ SDKGetIndPixelFormat(
 
 	switch(idx)
 	{
-		// just support one pixel format, 8-bit BGRA
 		case 0:
 			SDKIndPixelFormatRec->outPixelFormat = PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
 			break;
@@ -738,18 +587,24 @@ SDKGetIndPixelFormat(
 }
 
 
-// File analysis - Supplies supplemental compression information to File Properties dialog
-// I'm just using this opportunity for inform the user that they can double-click.
+// TODO: Support imDataRateAnalysis and we'll get a pretty graph in the Properties panel!
+// Sounds like a good task for someone who wants to contribute to this open source project.
+
+
 static prMALError 
 SDKAnalysis(
 	imStdParms		*stdParms,
 	imFileRef		SDKfileRef,
 	imAnalysisRec	*SDKAnalysisRec)
 {
-	// if you wanted to get the private data
-	//ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(SDKAnalysisRec->privatedata);
+	// Is this all I'm supposed to do here?
+	// The string shows up in the properties dialog.
+	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(SDKAnalysisRec->privatedata);
+	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
-	const char *properties_messsage = "WebM info goes here";
+	const char *properties_messsage = localRecP->video_codec == CODEC_VP8 ? "VP8 codec" :
+										localRecP->video_codec == CODEC_VP9 ? "VP9 codec" :
+										"Unknown codec";
 
 	if(SDKAnalysisRec->buffersize > strlen(properties_messsage))
 		strcpy(SDKAnalysisRec->buffer, properties_messsage);
@@ -764,6 +619,13 @@ webm_guess_framerate(mkvparser::Segment *segment,
 						unsigned int	*fps_den,
 						unsigned int	*fps_num)
 {
+	// Quite a way to deduce the framerate.  Of course *we* are flagging
+	// our WebM files with the appropriate frame rate, but many files
+	// do not have it.  They just play sound and then pop frames on screen
+	// at the right timestamp.  What a life.
+	// But some of us have to work for a living, so we watch the
+	// timestamps go by and make a judgement to tell our host.
+
 	unsigned int frame = 0;
 	uint64_t     tstamp = 0;
 
@@ -842,17 +704,6 @@ webm_guess_framerate(mkvparser::Segment *segment,
 }
 
 
-
-//-------------------------------------------------------------------
-// Populate the imFileInfoRec8 structure describing this file instance
-// to Premiere.  Check file validity, allocate any private instance data 
-// to share between different calls.
-//
-// Actually, I'm currently verifying the file back during the open phase.
-// Is that a problem?  Doing it that way because some FFmpeg structures
-// are associated with the file reading operations but we have to know
-// if it's actually a PNG first.
-
 prMALError 
 SDKGetInfo8(
 	imStdParms			*stdParms, 
@@ -879,107 +730,111 @@ SDKGetInfo8(
 	SDKFileInfo8->hasAudio = kPrFalse;
 	
 	
-	if(localRecP)
+	if(localRecP && localRecP->segment)
 	{
-		assert(localRecP->segment != NULL);
+		const mkvparser::SegmentInfo* const pSegmentInfo = localRecP->segment->GetInfo();
 		
-		if(localRecP->segment != NULL)
+		const long long duration = pSegmentInfo->GetDuration();
+		
+		// I think this doesn't matter because we use GetTime(), not GetTimeCode()
+		// Maybe we should get the code instead!  Might explain the rouded off time stamps.
+		// Then again, GetTime() appears to just do the math for me.
+		// http://matroska.org/technical/specs/notes.html#TimecodeScale
+		// So far have only seen 1000000
+		assert(pSegmentInfo->GetTimeCodeScale() == 1000000UL);
+		
+		const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
+		
+		if(localRecP->video_track >= 0)
 		{
-			const mkvparser::SegmentInfo* const pSegmentInfo = localRecP->segment->GetInfo();
+			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
 			
-			const long long duration = pSegmentInfo->GetDuration();
-			
-			const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
-			
-			if(localRecP->video_track >= 0)
+			if(pTrack != NULL)
 			{
-				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
-				
-				if(pTrack != NULL)
+				const long trackType = pTrack->GetType();
+			
+				if(trackType == mkvparser::Track::kVideo)
 				{
-					const long trackType = pTrack->GetType();
-				
-					if(trackType == mkvparser::Track::kVideo)
+					const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+					
+					if(pVideoTrack)
 					{
-						const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+						const double embedded_rate = pVideoTrack->GetFrameRate(); // never seems to contain anything
 						
-						if(pVideoTrack)
-						{
-							const double embedded_rate = pVideoTrack->GetFrameRate(); // never seems to contain anything
-							
-							unsigned int fps_num = 0;
-							unsigned int fps_den = 0;
-							
-							webm_guess_framerate(localRecP->segment, localRecP->video_track, &fps_den, &fps_num);
+						unsigned int fps_num = 0;
+						unsigned int fps_den = 0;
+						
+						webm_guess_framerate(localRecP->segment, localRecP->video_track, &fps_den, &fps_num);
 
-							if(embedded_rate > 0)
-								assert( fabs(embedded_rate - ((double)fps_num / (double)fps_den)) < 0.01 );
-							
-							
-							// Video information
-							SDKFileInfo8->hasVideo				= kPrTrue;
-							SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
-							SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
-							SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
-							SDKFileInfo8->vidInfo.depth			= 24;	// for RGB, no A
-							SDKFileInfo8->vidInfo.fieldType		= prFieldsNone; // or prFieldsUnknown
-							SDKFileInfo8->vidInfo.isStill		= kPrFalse;
-							SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-							SDKFileInfo8->vidDuration			= duration * fps_num / 1000000000UL;
-							SDKFileInfo8->vidScale				= fps_num;
-							SDKFileInfo8->vidSampleSize			= fps_den;
+						if(embedded_rate > 0)
+							assert( fabs(embedded_rate - ((double)fps_num / (double)fps_den)) < 0.01 );
+						
+						
+						// Video information
+						SDKFileInfo8->hasVideo				= kPrTrue;
+						SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
+						SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
+						SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
+						SDKFileInfo8->vidInfo.depth			= 24;	// for RGB, no A
+						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talk about DefaultDecodedFieldDuration but...
+						SDKFileInfo8->vidInfo.isStill		= kPrFalse;
+						SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
+						SDKFileInfo8->vidDuration			= duration * fps_num / 1000000000UL;
+						SDKFileInfo8->vidScale				= fps_num;
+						SDKFileInfo8->vidSampleSize			= fps_den;
 
-							SDKFileInfo8->vidInfo.alphaType	= alphaNone;
+						SDKFileInfo8->vidInfo.alphaType		= alphaNone;
 
-							// I don't know how to get the pixel aspect ratio, will let Premiere guess
-							//SDKFileInfo8->vidInfo.pixelAspectNum = 1;
-							//SDKFileInfo8->vidInfo.pixelAspectDen = 1;
+						// Matroska defined a chunk called DisplayUnit, but libwebm doesn't support it
+						// http://www.matroska.org/technical/specs/index.html#DisplayUnit
+						// We'll just let Premiere guess what the pixel aspect ratio is
+						//SDKFileInfo8->vidInfo.pixelAspectNum = 1;
+						//SDKFileInfo8->vidInfo.pixelAspectDen = 1;
 
-							// store some values we want to get without going to the file
-							localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
-							localRecP->height = SDKFileInfo8->vidInfo.imageHeight;
+						// store some values we want to get without going to the file
+						localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
+						localRecP->height = SDKFileInfo8->vidInfo.imageHeight;
 
-							localRecP->frameRateNum = SDKFileInfo8->vidScale;
-							localRecP->frameRateDen = SDKFileInfo8->vidSampleSize;
-						}
+						localRecP->frameRateNum = SDKFileInfo8->vidScale;
+						localRecP->frameRateDen = SDKFileInfo8->vidSampleSize;
 					}
 				}
 			}
+		}
+		
+		if(localRecP->audio_track >= 0)
+		{
+			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
 			
-			if(localRecP->audio_track >= 0)
+			if(pTrack != NULL)
 			{
-				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
+				const long trackType = pTrack->GetType();
 				
-				if(pTrack != NULL)
+				if(trackType == mkvparser::Track::kAudio)
 				{
-					const long trackType = pTrack->GetType();
+					const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
 					
-					if(trackType == mkvparser::Track::kAudio)
+					if(pAudioTrack)
 					{
-						const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
+						const long long bitDepth = pAudioTrack->GetBitDepth();
 						
-						if(pAudioTrack)
-						{
-							const long long bitDepth = pAudioTrack->GetBitDepth();
-							
-							
-							// Audio information
-							SDKFileInfo8->hasAudio				= kPrTrue;
-							SDKFileInfo8->audInfo.numChannels	= pAudioTrack->GetChannels();
-							SDKFileInfo8->audInfo.sampleRate	= pAudioTrack->GetSamplingRate();
-							SDKFileInfo8->audInfo.sampleType	= bitDepth == 8 ? kPrAudioSampleType_8BitInt :
-																	bitDepth == 16 ? kPrAudioSampleType_16BitInt :
-																	bitDepth == 24 ? kPrAudioSampleType_24BitInt :
-																	bitDepth == 32 ? kPrAudioSampleType_32BitFloat :
-																	bitDepth == 64 ? kPrAudioSampleType_64BitFloat :
-																	kPrAudioSampleType_Compressed;
-																	
-							SDKFileInfo8->audDuration			= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
-							
-							
-							localRecP->audioSampleRate			= SDKFileInfo8->audInfo.sampleRate;
-							localRecP->numChannels				= SDKFileInfo8->audInfo.numChannels;
-						}
+						
+						// Audio information
+						SDKFileInfo8->hasAudio				= kPrTrue;
+						SDKFileInfo8->audInfo.numChannels	= pAudioTrack->GetChannels();
+						SDKFileInfo8->audInfo.sampleRate	= pAudioTrack->GetSamplingRate();
+						SDKFileInfo8->audInfo.sampleType	= bitDepth == 8 ? kPrAudioSampleType_8BitInt :
+																bitDepth == 16 ? kPrAudioSampleType_16BitInt :
+																bitDepth == 24 ? kPrAudioSampleType_24BitInt :
+																bitDepth == 32 ? kPrAudioSampleType_32BitFloat :
+																bitDepth == 64 ? kPrAudioSampleType_64BitFloat :
+																kPrAudioSampleType_Compressed;
+																
+						SDKFileInfo8->audDuration			= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
+						
+						
+						localRecP->audioSampleRate			= SDKFileInfo8->audInfo.sampleRate;
+						localRecP->numChannels				= SDKFileInfo8->audInfo.numChannels;
 					}
 				}
 			}
@@ -989,18 +844,6 @@ SDKGetInfo8(
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
 
 	return result;
-}
-
-
-static prMALError 
-SDKCalcSize8(
-	imStdParms			*stdParms, 
-	imCalcSizeRec		*calcSizeRec,
-	imFileAccessRec8	*fileAccessRec8)
-{
-	// tell Premiere the file size
-	
-	return imUnsupported;
 }
 
 
@@ -1017,7 +860,8 @@ SDKPreferredFrameSize(
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
 
-	bool can_shrink = false; // doesn't look like we can decode a smaller frame
+	// TODO: Make sure it really isn't possible to decode a smaller frame
+	bool can_shrink = false;
 
 	if(preferredFrameSizeRec->inIndex == 0)
 	{
@@ -1176,6 +1020,10 @@ SDKGetSourceVideo(
 									config.w = frameFormat->inFrameWidth;
 									config.h = frameFormat->inFrameHeight;
 									
+									// TODO: Explore possibilities of decoding options by setting
+									// vpx_codec_flags_t here.  Things like VP8_DEMACROBLOCK and
+									// VP8_MFQE (Multiframe Quality Enhancement) could be cool.
+									
 									codec_err = vpx_codec_dec_init(&decoder, iface, &config, 0);
 								}
 								else
@@ -1250,6 +1098,9 @@ SDKGetSourceVideo(
 																// otherwise it turns out I should have been skipped to here
 																// but I guess this keyframe wasn't the first frame in the cluster
 																// too bad the only way to find this (that I know) is by parsing the stream
+																
+																// TODO: See if seeking can be improved so we always land on the keyframe
+																// before the requested frame
 															}
 														}
 														else
@@ -1265,10 +1116,7 @@ SDKGetSourceVideo(
 															{
 																csSDK_int32 decodedFrame = ts2fr(packet_tstamp);
 																
-																csSDK_int32 hopingforFrame = ts2fr(tstamp);
-																assert(hopingforFrame == theFrame); // just checking - we can delete these lines
-																
-																vpx_codec_iter_t iter = NULL;
+																vpx_codec_iter_t iter = NULL; // might there 
 																
 																vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
 																
@@ -1311,10 +1159,19 @@ SDKGetSourceVideo(
 																			memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
 																			memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
 																		}
+																		
+																		// It says we can get more than one frame off one decode operation?  What would I do with it?
+																		assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
 																	}
 																	else
-																		assert(false); // didn't get the pixel format I wanted
+																		assert(false); // looks like Premiere is happy to always give me this kind of buffer
 																	
+																	// This is a nice Premiere feature.  We often have to decode many frames
+																	// in a GOP (group of pictures) before we decode the one Premiere asked for.
+																	// This suite lets us cache those frames for later.  We keep going past the
+																	// requested frame to the next keyframe to save us the trouble in the future.
+																	// TODO: See if maybe the next keyframe isn't far enough.  Maybe there's a 
+																	// cluster boundry we should stop at. Something to do with Cues?
 																	localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
 																												0,
 																												ppix,
@@ -1330,6 +1187,8 @@ SDKGetSourceVideo(
 																	}
 																	else
 																	{
+																		// Premiere copied the frame to its cache, so we dispose ours.
+																		// Very obvious memory leak if we don't.
 																		localRecP->PPixSuite->Dispose(ppix);
 																	}
 																	
@@ -1479,7 +1338,7 @@ SDKImportAudio7(
 		
 		// I set up a method for reading directly from the last sample in one call to the first
 		// sample of the next where Premiere asks for adjacent samples.
-		// This had the effect of making the audio drift over time however.
+		// This had the effect of making the audio drift over time, however.
 		// We'll hold off on totally deleting this code until further evaluation.
 		bool continuous_read = false; //(audioRec7->position == localRecP->next_audio_sample);
 		
@@ -1549,6 +1408,17 @@ SDKImportAudio7(
 								if(v_err == OV_OK)
 									v_err = vorbis_block_init(&vd, &vb);
 								
+								// TODO: Figure out how to seek compressed audio exactly.
+								// From watching the audio encoding process, I know that you don't
+								// get to put a frame's worth of audio into each block, you have to
+								// do what the encoder lets you.  That means some of the audio you intended
+								// for this block could find its way into the next one.
+								// Movie players typically just worry about playing the audio straight
+								// through and then put up frames at the appointed times.  You sync video
+								// to audio, not the other way around.
+								// But Premiere asks for a specific sample of audio.  The only guaranteed way
+								// to provide that would be to decompress the entire audio stream from the
+								// beginning.  Uncompressed formats have it easy.
 								
 								const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 								
@@ -1575,7 +1445,7 @@ SDKImportAudio7(
 											{
 												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
-												// skip if we're doing continuous read and this isn't the packet we want
+												// skip if we're doing continuous read (which we're not) and this isn't the packet we want
 												if(!continuous_read || packet_tstamp == localRecP->last_timestamp)
 												{
 													PrAudioSample packet_offset = 0;
@@ -1653,20 +1523,20 @@ SDKImportAudio7(
 																				memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
 																			}
 																			
-																			// now samples_to_copy is more like samples_i_just_copied
+																			// now samples_to_copy is more like samples_I_just_copied
 																			samples_copied += samples_to_copy;
 																			samples_left -= samples_to_copy;
 																			
 																			
-																			// if we copied any, that means the offset is done
-																			// otherwise, reduce the offset by number of samples
+																			// If we copied any samples, that means the offset has been gobbled up
+																			// If we didn't, reduce the offset by number of samples
 																			if(samples_to_copy > 0)
 																				packet_offset = 0;
 																			else
 																				packet_offset -= samples;
 																			
 																			
-																			// part on the continuous reading stuff we're not using right now
+																			// part of the continuous reading stuff we're not using right now
 																			if(samples_left == 0)
 																			{
 																				localRecP->next_audio_sample = audioRec7->position + audioRec7->size;
@@ -1797,16 +1667,6 @@ PREMPLUGENTRY DllExport xImportEntry (
 										reinterpret_cast<imIndFormatRec*>(param2));
 			break;
 
-		case imSaveFile8:
-			result =	SDKSaveFile8(	stdParms, 
-										reinterpret_cast<imSaveFileRec8*>(param1));
-			break;
-			
-		case imDeleteFile8:
-			result =	SDKDeleteFile8(	stdParms, 
-										reinterpret_cast<imDeleteFileRec8*>(param1));
-			break;
-
 		case imGetIndPixelFormat:
 			result = SDKGetIndPixelFormat(	stdParms,
 											reinterpret_cast<csSDK_size_t>(param1),
@@ -1816,12 +1676,6 @@ PREMPLUGENTRY DllExport xImportEntry (
 		// Importers that support the Premiere Pro 2.0 API must return malSupports8 for this selector
 		case imGetSupports8:
 			result = malSupports8;
-			break;
-
-		case imCalcSize8:
-			result =	SDKCalcSize8(	stdParms,
-										reinterpret_cast<imCalcSizeRec*>(param1),
-										reinterpret_cast<imFileAccessRec8*>(param2));
 			break;
 
 		case imGetPreferredFrameSize:

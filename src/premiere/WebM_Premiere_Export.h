@@ -55,9 +55,6 @@
 #include	"PrSDKMemoryManagerSuite.h"
 #include	"PrSDKWindowSuite.h"
 #include	"PrSDKAppInfoSuite.h"
-#ifdef		PRMAC_ENV
-#include	<wchar.h>
-#endif
 
 
 typedef struct ExportSettings
