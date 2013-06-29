@@ -420,6 +420,14 @@ static void get_framerate(PrTime ticksPerSecond, PrTime ticks_per_frame, exRatio
 }
 
 
+// converting from the Adobe 16-bit, i.e. max_val is 0x8000
+static inline uint8
+Convert16to8(const uint16 &v)
+{
+	return ( (((long)(v) * 255) + 16384) / 32768);
+}
+
+
 static int
 xiph_len(int l)
 {
@@ -533,10 +541,11 @@ exSDKExport(
 	
 	SequenceRender_ParamsRec renderParms;
 	PrPixelFormat pixelFormats[] = { PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709,
-									PrPixelFormat_BGRA_4444_8u }; // must support BGRA, even if I don't want to
+									PrPixelFormat_BGRA_4444_16u, // must support BGRA, even if I don't want to
+									PrPixelFormat_BGRA_4444_8u };
 	
 	renderParms.inRequestedPixelFormatArray = pixelFormats;
-	renderParms.inRequestedPixelFormatArrayCount = 2;
+	renderParms.inRequestedPixelFormatArrayCount = 3;
 	renderParms.inWidth = widthP.value.intValue;
 	renderParms.inHeight = heightP.value.intValue;
 	renderParms.inPixelAspectRatioNumerator = pixelAspectRatioP.value.ratioValue.numerator;
@@ -855,6 +864,46 @@ exSDKExport(
 									
 									memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
 									memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
+								}
+							}
+							else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
+							{
+								// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
+								char *frameBufferP = NULL;
+								csSDK_int32 rowbytes = 0;
+								
+								pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+								pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+								
+								
+								for(int y = 0; y < img->d_h; y++)
+								{
+									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
+									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+									
+									unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+									
+									unsigned short *prB = prBGRA + 0;
+									unsigned short *prG = prBGRA + 1;
+									unsigned short *prR = prBGRA + 2;
+									unsigned short *prA = prBGRA + 3;
+									
+									for(int x=0; x < img->d_w; x++)
+									{
+										*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
+										
+										if( (y % 2 == 0) && (x % 2 == 0) )
+										{
+											*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
+											*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
+										}
+										
+										prR += 4;
+										prG += 4;
+										prB += 4;
+										prA += 4;
+									}
 								}
 							}
 							else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
