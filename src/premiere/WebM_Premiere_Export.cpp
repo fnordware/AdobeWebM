@@ -741,6 +741,8 @@ exSDKExport(
 			
 			info->set_writing_app("fnord WebM for Premiere");
 			
+			// I'd say think about lowering this to get better precision,
+			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
 			long long timeCodeScale = 1000000UL;
 			
 			info->set_timecode_scale(timeCodeScale);
@@ -794,8 +796,18 @@ exSDKExport(
 				const PrTime fileTime = videoTime - exportInfoP->startTime;
 				const PrTime nextFileTime = fileTime + frameRateP.value.timeValue;
 				
+				// this is for the encoder, which does its own math based on config.g_timebase
+				// let's do the math
+				// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
+				// timestamp = time / timebase
+				// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
+				const vpx_codec_pts_t encoder_timeStamp = fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
+				const vpx_codec_pts_t encoder_nextTimeStamp = (nextFileTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
+				const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
+				
+				
 				// This is the key step, where we quantize our time based on the timeCode
-				// to match how the frames are actually stored.  If you want more precision,
+				// to match how the frames are actually stored by the muxer.  If you want more precision,
 				// lower timeCodeScale.  Time (in nanoseconds) = TimeCode * TimeCodeScale.
 				const long long timeCode = ((fileTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
 				const long long nextTimeCode = ((nextFileTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
@@ -961,7 +973,7 @@ exSDKExport(
 							}
 							
 							
-							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, duration, 0, deadline);
+							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_timeStamp, encoder_duration, 0, deadline);
 							
 							if(encode_err == VPX_CODEC_OK)
 							{
@@ -1018,7 +1030,7 @@ exSDKExport(
 						vpx_codec_iter_t iter = NULL;
 						
 						do{
-							vpx_codec_encode(&encoder, NULL, timeStamp, duration, 0, deadline);
+							vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
 							
 							pkt = vpx_codec_get_cx_data(&encoder, &iter);
 							
