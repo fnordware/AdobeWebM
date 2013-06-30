@@ -1075,7 +1075,7 @@ exSDKExport(
 								}
 								else if(pkt->kind == VPX_CODEC_STATS_PKT)
 								{
-									assert(!vbr_pass);
+									assert(vbr_pass);
 									
 									if(vbr_buffer_size == 0)
 										vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
