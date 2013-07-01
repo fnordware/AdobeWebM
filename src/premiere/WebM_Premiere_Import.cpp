@@ -485,7 +485,7 @@ SDKQuietFile(
 	imFileRef			*SDKfileRef, 
 	void				*privateData)
 {
-	// "Quet File" really means close the file handle, but we're still
+	// "Quiet File" really means close the file handle, but we're still
 	// using it and might open it again, so hold on to any stored data
 	// structures you don't want to re-create.
 

@@ -81,7 +81,16 @@ typedef enum {
 #define WebMCustomGroup		"WebMCustomGroup"
 #define WebMCustomArgs		"WebMCustomArgs"
 
+
+typedef enum {
+	OGG_QUALITY = 0,
+	OGG_BITRATE
+} Ogg_Method;
+
+#define WebMAudioMethod	"WebMAudioMethod"
 #define WebMAudioQuality	"WebMAudioQuality"
+#define WebMAudioBitrate	"WebMAudioBitrate"
+
 
 
 

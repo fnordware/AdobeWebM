@@ -493,9 +493,6 @@ exSDKExport(
 	PrSDKPPixSuite				*pixSuite				= mySettings->ppixSuite;
 	PrSDKPPix2Suite				*pix2Suite				= mySettings->ppix2Suite;
 
-	if(!exportInfoP->exportVideo)
-		return malNoError;
-
 
 	PrTime ticksPerSecond = 0;
 	mySettings->timeSuite->GetTicksPerSecond(&ticksPerSecond);
@@ -551,20 +548,25 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, customArgsP, audioQualityP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
-	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	
 	WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 	
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
 	customArgs[255] = '\0';
+	
+
+	exParamValues audioMethodP, audioQualityP, audioBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
 	
 	
 	SequenceRender_ParamsRec renderParms;
@@ -731,11 +733,22 @@ exSDKExport(
 		{
 			vorbis_info_init(&vi);
 			
-			// TODO: figure out why non-VBR vorbis_encode_init() is giving me crashes
-			v_err = vorbis_encode_init_vbr(&vi,
+			if(audioMethodP.value.intValue == OGG_BITRATE)
+			{
+				v_err = vorbis_encode_init(&vi,
 											audioChannels,
 											sampleRateP.value.floatValue,
-											audioQualityP.value.floatValue);
+											-1,
+											audioBitrateP.value.intValue * 1000,
+											-1);
+			}
+			else
+			{
+				v_err = vorbis_encode_init_vbr(&vi,
+												audioChannels,
+												sampleRateP.value.floatValue,
+												audioQualityP.value.floatValue);
+			}
 			
 			if(v_err == OV_OK)
 			{
