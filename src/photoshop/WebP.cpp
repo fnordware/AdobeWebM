@@ -169,7 +169,7 @@ static void mySetHandleSize(GPtr globals, Handle h, const int32 inSize)
 
 static void myDisposeHandle(GPtr globals, Handle h)
 {
-	if(gStuff->handleProcs != NULL && gStuff->handleProcs->numHandleProcs >= 6 && gStuff->handleProcs->newProc != NULL)
+	if(gStuff->handleProcs != NULL && gStuff->handleProcs->numHandleProcs >= 6 && gStuff->handleProcs->disposeProc != NULL)
 	{
 		gStuff->handleProcs->disposeProc(h);
 	}
@@ -993,6 +993,7 @@ static void DoWriteStart(GPtr globals)
 					config.thread_level = TRUE;
 					config.lossless = gOptions.lossless;
 					config.quality = gOptions.quality;
+					config.method = 6;
 					
 					if(use_alpha && !gOptions.lossless && gOptions.lossy_alpha)
 						config.alpha_quality = gOptions.quality;

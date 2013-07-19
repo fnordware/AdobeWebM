@@ -5,11 +5,22 @@ This is a project where I'm building plug-ins for Google's [WebM](http://www.web
 
 Right now there's a working WebM plug-in for Premiere Pro, along with a [WebP](https://developers.google.com/speed/webp/) plug-in for Photoshop. Both are considered to be beta releases.
 
-To download binaries, check my postings on the relevant [discussion](https://groups.google.com/a/webmproject.org/group/webm-discuss) [forums](https://groups.google.com/a/webmproject.org/group/webp-discuss), where I will post links.
+
+Download
+--------
+Here are the latest binaries:
+
+**WebM for Premiere Pro** _v0.5b2, 28 June 2013_
+[Mac](http://www.fnordware.com/downloads/WebM_v0.5b2_mac.zip) | [Win](http://www.fnordware.com/downloads/WebM_v0.5b2_win.zip)
+
+**WebP for Photoshop** _v0.5b4, 18 July 2013_
+[Mac](http://www.fnordware.com/downloads/WebP_v0.5b4_mac.zip) | [Win](http://www.fnordware.com/downloads/WebP_v0.5b4_win.zip)
+
 
 License
 -------
 BSD
+
 
 Author
 ------
