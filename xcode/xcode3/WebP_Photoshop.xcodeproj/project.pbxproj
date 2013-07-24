@@ -50,7 +50,6 @@
 
 /* Begin PBXFileReference section */
 		08EA7FFBFE8413EDC02AAC07 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
-		2A017443112F19D6005CDE51 /* Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info copy.plist"; path = "../../../../kits/Adobe Photoshop CS5 SDK/samplecode/common/resources/Info copy.plist"; sourceTree = SOURCE_ROOT; };
 		2A0E424D176D0ED100420489 /* WebP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebP.cpp; sourceTree = "<group>"; };
 		2A0E424E176D0ED100420489 /* WebP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebP.h; sourceTree = "<group>"; };
 		2A0E424F176D0ED100420489 /* WebP.r */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = WebP.r; sourceTree = "<group>"; };
@@ -1263,7 +1262,6 @@
 			children = (
 				E2880D630B0EECF5001C1C00 /* Info.plist */,
 				64126B9A09F97565006DF4E6 /* PIUtilities.r */,
-				2A017443112F19D6005CDE51 /* Info copy.plist */,
 			);
 			path = resources;
 			sourceTree = "<group>";
