@@ -421,8 +421,8 @@ static void get_framerate(PrTime ticksPerSecond, PrTime ticks_per_frame, exRatio
 
 
 // converting from the Adobe 16-bit, i.e. max_val is 0x8000
-static inline uint8
-Convert16to8(const uint16 &v)
+static inline unsigned char
+Convert16to8(const unsigned short &v)
 {
 	return ( (((long)(v) * 255) + 16384) / 32768);
 }
