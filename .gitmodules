@@ -7,3 +7,9 @@
 [submodule "ext/libwebm"]
 	path = ext/libwebm
 	url = http://git.chromium.org/webm/libwebm.git
+[submodule "ext/libvorbis"]
+	path = ext/libvorbis
+	url = https://git.xiph.org/mirrors/vorbis.git
+[submodule "ext/libogg"]
+	path = ext/libogg
+	url = https://git.xiph.org/mirrors/ogg.git
