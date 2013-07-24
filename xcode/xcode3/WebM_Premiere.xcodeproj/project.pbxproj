@@ -405,7 +405,6 @@
 				GCC_PREFIX_HEADER = WebM_Premiere_Prefix.pch;
 				INFOPLIST_FILE = WebM_Premiere_Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../SharedSupport";
 				PRODUCT_NAME = "WebM Premiere";
 				WRAPPER_EXTENSION = bundle;
 				ZERO_LINK = YES;
@@ -421,7 +420,6 @@
 				GCC_PREFIX_HEADER = WebM_Premiere_Prefix.pch;
 				INFOPLIST_FILE = WebM_Premiere_Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../SharedSupport";
 				PRODUCT_NAME = "WebM Premiere";
 				WRAPPER_EXTENSION = bundle;
 			};

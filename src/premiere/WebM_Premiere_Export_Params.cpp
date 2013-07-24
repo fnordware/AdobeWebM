@@ -216,13 +216,30 @@ exSDKGenerateDefaultParams(
 									ADBEVideoTabGroup, ADBEBasicVideoGroup, groupString,
 									kPrFalse, kPrFalse, kPrFalse);
 	
+	// Match source
+	exParamValues matchSourceValues;
+	matchSourceValues.structVersion = 1;
+	matchSourceValues.value.intValue = kPrTrue;
+	matchSourceValues.disabled = kPrFalse;
+	matchSourceValues.hidden = kPrFalse;
+	
+	exNewParamInfo matchSourceParam;
+	matchSourceParam.structVersion = 1;
+	strncpy(matchSourceParam.identifier, ADBEVideoMatchSource, 255);
+	matchSourceParam.paramType = exParamType_bool;
+	matchSourceParam.flags = exParamFlag_none;
+	matchSourceParam.paramValues = matchSourceValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &matchSourceParam);
+	
+	
 	// width
 	exParamValues widthValues;
 	widthValues.structVersion = 1;
 	widthValues.rangeMin.intValue = 16;
 	widthValues.rangeMax.intValue = 8192;
 	widthValues.value.intValue = widthP.mInt32;
-	widthValues.disabled = kPrFalse;
+	widthValues.disabled = kPrTrue;
 	widthValues.hidden = kPrFalse;
 	
 	exNewParamInfo widthParam;
@@ -241,7 +258,7 @@ exSDKGenerateDefaultParams(
 	heightValues.rangeMin.intValue = 16;
 	heightValues.rangeMax.intValue = 8192;
 	heightValues.value.intValue = heightP.mInt32;
-	heightValues.disabled = kPrFalse;
+	heightValues.disabled = kPrTrue;
 	heightValues.hidden = kPrFalse;
 	
 	exNewParamInfo heightParam;
@@ -263,7 +280,7 @@ exSDKGenerateDefaultParams(
 	parValues.rangeMax.ratioValue.denominator = 1;
 	parValues.value.ratioValue.numerator = parN.mInt32;
 	parValues.value.ratioValue.denominator = parD.mInt32;
-	parValues.disabled = kPrFalse;
+	parValues.disabled = kPrTrue;
 	parValues.hidden = kPrFalse;
 	
 	exNewParamInfo parParam;
@@ -280,7 +297,7 @@ exSDKGenerateDefaultParams(
 	exParamValues fieldOrderValues;
 	fieldOrderValues.structVersion = 1;
 	fieldOrderValues.value.intValue = fieldTypeP.mInt32;
-	fieldOrderValues.disabled = kPrFalse;
+	fieldOrderValues.disabled = kPrTrue;
 	fieldOrderValues.hidden = kPrFalse;
 	
 	exNewParamInfo fieldOrderParam;
@@ -299,7 +316,7 @@ exSDKGenerateDefaultParams(
 	fpsValues.rangeMin.timeValue = 1;
 	timeSuite->GetTicksPerSecond(&fpsValues.rangeMax.timeValue);
 	fpsValues.value.timeValue = frameRateP.mInt64;
-	fpsValues.disabled = kPrFalse;
+	fpsValues.disabled = kPrTrue;
 	fpsValues.hidden = kPrFalse;
 	
 	exNewParamInfo fpsParam;
@@ -526,6 +543,25 @@ exSDKGenerateDefaultParams(
 									ADBEAudioTabGroup, ADBEAudioCodecGroup, groupString,
 									kPrFalse, kPrFalse, kPrFalse);
 									
+	// Method
+	exParamValues audioMethodValues;
+	audioMethodValues.structVersion = 1;
+	audioMethodValues.rangeMin.intValue = OGG_QUALITY;
+	audioMethodValues.rangeMax.intValue = OGG_BITRATE;
+	audioMethodValues.value.intValue = OGG_QUALITY;
+	audioMethodValues.disabled = kPrFalse;
+	audioMethodValues.hidden = kPrFalse;
+	
+	exNewParamInfo audioMethodParam;
+	audioMethodParam.structVersion = 1;
+	strncpy(audioMethodParam.identifier, WebMAudioMethod, 255);
+	audioMethodParam.paramType = exParamType_int;
+	audioMethodParam.flags = exParamFlag_none;
+	audioMethodParam.paramValues = audioMethodValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &audioMethodParam);
+	
+	
 	// Quality
 	exParamValues audioQualityValues;
 	audioQualityValues.structVersion = 1;
@@ -544,7 +580,25 @@ exSDKGenerateDefaultParams(
 	
 	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &audioQualityParam);
 	
+
+	// Bitrate
+	exParamValues audioBitrateValues;
+	audioBitrateValues.structVersion = 1;
+	audioBitrateValues.rangeMin.intValue = 40;
+	audioBitrateValues.rangeMax.intValue = 1000;
+	audioBitrateValues.value.intValue = 128;
+	audioBitrateValues.disabled = kPrFalse;
+	audioBitrateValues.hidden = kPrTrue;
 	
+	exNewParamInfo audioBitrateParam;
+	audioBitrateParam.structVersion = 1;
+	strncpy(audioBitrateParam.identifier, WebMAudioBitrate, 255);
+	audioBitrateParam.paramType = exParamType_int;
+	audioBitrateParam.flags = exParamFlag_slider;
+	audioBitrateParam.paramValues = audioBitrateValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &audioBitrateParam);
+
 
 	exportParamSuite->SetParamsVersion(exID, 1);
 	
@@ -576,6 +630,11 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicVideoGroup, paramString);
 	
 									
+	// Match source
+	utf16ncpy(paramString, "Match source", 255);
+	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoMatchSource, paramString);
+	
+	
 	// width
 	utf16ncpy(paramString, "Width", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoWidth, paramString);
@@ -871,6 +930,28 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioCodecGroup, paramString);
 
 
+	// Method
+	utf16ncpy(paramString, "Method", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMAudioMethod, paramString);
+	
+	
+	int audioMethods[] = {	OGG_QUALITY,
+							OGG_BITRATE };
+	
+	const char *audioMethodStrings[]	= {	"Quality",
+											"Bitrate" };
+
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMAudioMethod);
+	
+	exOneParamValueRec tempAudioEncodingMethod;
+	for(int i=0; i < 2; i++)
+	{
+		tempAudioEncodingMethod.intValue = audioMethods[i];
+		utf16ncpy(paramString, audioMethodStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMAudioMethod, &tempAudioEncodingMethod, paramString);
+	}
+	
+	
 	// Quality
 	utf16ncpy(paramString, "Quality", 255);
 	exportParamSuite->SetParamName(exID, gIdx, WebMAudioQuality, paramString);
@@ -883,7 +964,19 @@ exSDKPostProcessParams(
 	
 	exportParamSuite->ChangeParam(exID, gIdx, WebMAudioQuality, &qualityValues);
 	
+
+	// Bitrate
+	utf16ncpy(paramString, "Bitrate (kb/s)", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMAudioBitrate, paramString);
 	
+	exParamValues audioBitrateValues;
+	exportParamSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateValues);
+
+	audioBitrateValues.rangeMin.intValue = 40;
+	audioBitrateValues.rangeMax.intValue = 1000;
+	
+	exportParamSuite->ChangeParam(exID, gIdx, WebMAudioBitrate, &audioBitrateValues);
+
 	return result;
 }
 
@@ -913,15 +1006,19 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, videoQualityP, videoBitrateP, vidEncodingP, audioQualityP;
+	exParamValues codecP, methodP, videoQualityP, videoBitrateP, vidEncodingP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
-	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	
 
+	exParamValues audioMethodP, audioQualityP, audioBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+	
 	// oh boy, figure out frame rate
 	PrTime frameRates[] = {	10, 15, 23,
 							24, 25, 29,
@@ -976,6 +1073,18 @@ exSDKGetParamSummary(
 	stream2 << ", " << (channelTypeP.value.intValue == kPrAudioChannelType_51 ? "Dolby 5.1" :
 						channelTypeP.value.intValue == kPrAudioChannelType_Mono ? "Mono" :
 						"Stereo");
+
+	stream2 << ", ";
+	
+	if(audioMethodP.value.intValue == OGG_BITRATE)
+	{
+		stream2 << audioBitrateP.value.intValue << " kbps";
+	}
+	else
+	{
+		stream2 << "Quality " << audioQualityP.value.floatValue;
+	}
+
 	
 	summary2 = stream2.str();
 	
@@ -1028,7 +1137,28 @@ exSDKValidateParamChanged (
 	
 	std::string param = validateParamChangedRecP->changedParamIdentifier;
 	
-	if(param == WebMVideoMethod)
+	if(param == ADBEVideoMatchSource)
+	{
+		exParamValues matchSourceP, widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
+		
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoMatchSource, &matchSourceP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
+		
+		bool disabled = (matchSourceP.value.intValue != 0);
+		
+		widthP.disabled = heightP.disabled = pixelAspectRatioP.disabled = fieldTypeP.disabled = frameRateP.disabled = disabled;
+		
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoWidth, &widthP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoHeight, &heightP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
+		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	}
+	else if(param == WebMVideoMethod)
 	{
 		exParamValues methodValue, videoQualityValue, videoBitrateValue;
 		
@@ -1042,7 +1172,19 @@ exSDKValidateParamChanged (
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoQuality, &videoQualityValue);
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &videoBitrateValue);
 	}
-	
+	else if(param == WebMAudioMethod)
+	{
+		exParamValues audioMethodP, audioQualityP, audioBitrateP;
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+		
+		audioQualityP.hidden = (audioMethodP.value.intValue == OGG_BITRATE);
+		audioBitrateP.hidden = !audioQualityP.hidden;
+		
+		paramSuite->ChangeParam(exID, gIdx, WebMAudioQuality, &audioQualityP);
+		paramSuite->ChangeParam(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+	}
 
 	return malNoError;
 }
@@ -1116,7 +1258,7 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 {
 	std::vector<string> args;
 	
-	if( quotedTokenize(txt, args, " =\t\r\n") )
+	if(quotedTokenize(txt, args, " =\t\r\n") && args.size() > 0)
 	{
 		args.push_back(""); // so there's always an i+1
 		
@@ -1216,7 +1358,7 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 	
 	vpx_codec_err_t config_err = VPX_CODEC_OK;
 	
-	if( quotedTokenize(txt, args, " =\t\r\n") )
+	if(quotedTokenize(txt, args, " =\t\r\n") && args.size() > 0)
 	{
 		args.push_back(""); // so there's always an i+1
 		

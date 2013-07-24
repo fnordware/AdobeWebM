@@ -485,7 +485,7 @@ SDKQuietFile(
 	imFileRef			*SDKfileRef, 
 	void				*privateData)
 {
-	// "Quet File" really means close the file handle, but we're still
+	// "Quiet File" really means close the file handle, but we're still
 	// using it and might open it again, so hold on to any stored data
 	// structures you don't want to re-create.
 
@@ -736,13 +736,6 @@ SDKGetInfo8(
 		
 		const long long duration = pSegmentInfo->GetDuration();
 		
-		// I think this doesn't matter because we use GetTime(), not GetTimeCode()
-		// Maybe we should get the code instead!  Might explain the rouded off time stamps.
-		// Then again, GetTime() appears to just do the math for me.
-		// http://matroska.org/technical/specs/notes.html#TimecodeScale
-		// So far have only seen 1000000
-		assert(pSegmentInfo->GetTimeCodeScale() == 1000000UL);
-		
 		const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 		
 		if(localRecP->video_track >= 0)
@@ -892,22 +885,6 @@ SDKPreferredFrameSize(
 }
 
 
-static inline int
-tstamp2frame(long long tstamp, int fps_num, int fps_den)
-{
-	return (((tstamp * fps_num) / fps_den) + 500000000UL) / 1000000000UL;
-}
-
-static inline long long
-frame2tstamp(int frame, int fps_num, int fps_den)
-{
-	return ((long long)frame * fps_den * 1000000000UL / fps_num);
-}
-
-#define ts2fr(ts)	(tstamp2frame((ts), fps_num, fps_den))
-#define fr2ts(fr)	(frame2tstamp((fr), fps_num, fps_den))
-
-
 static prMALError 
 SDKGetSourceVideo(
 	imStdParms			*stdParms, 
@@ -975,11 +952,19 @@ SDKGetSourceVideo(
 			const uint64_t fps_num = localRecP->frameRateNum;
 			const uint64_t fps_den = localRecP->frameRateDen;
 			
-			uint64_t tstamp = fr2ts(theFrame);
-			uint64_t tstamp2 = (uint64_t)sourceVideoRec->inFrameTime * 1000UL / ((uint64_t)ticksPerSecond / 1000000UL); // alternate way of calculating it
 			
-			assert(tstamp == tstamp2);
-			assert(theFrame == ts2fr( fr2ts( theFrame ) ) );
+			// convert PrTime to timeCode and then to absolute time
+			// http://matroska.org/technical/specs/notes.html#TimecodeScale
+			// Time (in nanoseconds) = TimeCode * TimeCodeScale.
+			// This is the source of some very imprecise timings.  If the time scale is 1 million (as it is by default),
+			// That means 1 second is time code of 1000.  For 24 frames per second, each frame would
+			// be 41.6666 of time code, but that gets rounded off to 42.  If the TimeCode scale were lower,
+			// we could be more precise, the problem presumably being that our biggest time would be
+			// reduced.
+			const long long timeCodeScale = localRecP->segment->GetInfo()->GetTimeCodeScale();
+			const long long timeCode = ((sourceVideoRec->inFrameTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+			uint64_t tstamp = timeCode * timeCodeScale;
+			
 			
 			if(localRecP->video_track >= 0)
 			{
@@ -1050,7 +1035,7 @@ SDKGetSourceVideo(
 									{
 										assert(pCluster->GetTime() >= 0);
 										assert(pCluster->GetTime() == pCluster->GetFirstTime());
-										assert(got_frame || ts2fr(tstamp) >= ts2fr(pCluster->GetTime()));
+										assert(got_frame || tstamp >= pCluster->GetTime());
 
 										const mkvparser::BlockEntry* pBlockEntry = NULL;
 										
@@ -1066,7 +1051,10 @@ SDKGetSourceVideo(
 												
 												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
-												assert(got_frame || ts2fr(tstamp) >= ts2fr(packet_tstamp)); // we either have the frame or we're still working toward getting it
+												long long packet_tcode = pBlock->GetTimeCode(pCluster);
+												long long tcode_scale = localRecP->segment->GetInfo()->GetTimeCodeScale();
+												
+												assert(got_frame || tstamp >= packet_tstamp); // we either have the frame or we're still working toward getting it
 
 												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 												
@@ -1114,7 +1102,7 @@ SDKGetSourceVideo(
 
 															if(decode_err == VPX_CODEC_OK)
 															{
-																csSDK_int32 decodedFrame = ts2fr(packet_tstamp);
+																csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
 																
 																vpx_codec_iter_t iter = NULL; // might there 
 																

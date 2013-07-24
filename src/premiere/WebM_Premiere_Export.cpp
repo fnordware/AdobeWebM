@@ -493,9 +493,6 @@ exSDKExport(
 	PrSDKPPixSuite				*pixSuite				= mySettings->ppixSuite;
 	PrSDKPPix2Suite				*pix2Suite				= mySettings->ppix2Suite;
 
-	if(!exportInfoP->exportVideo)
-		return malNoError;
-
 
 	PrTime ticksPerSecond = 0;
 	mySettings->timeSuite->GetTicksPerSecond(&ticksPerSecond);
@@ -504,13 +501,41 @@ exSDKExport(
 	csSDK_uint32 exID = exportInfoP->exporterPluginID;
 	csSDK_int32 gIdx = 0;
 	
-	exParamValues widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP, alphaP;
+	exParamValues matchSourceP, widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
 	
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEVideoMatchSource, &matchSourceP);
+	
+	if(matchSourceP.value.intValue)
+	{
+		// get current settings
+		PrParam curr_widthP, curr_heightP, curr_parN, curr_parD, curr_fieldTypeP, curr_frameRateP;
+		
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoWidth, &curr_widthP);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoHeight, &curr_heightP);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectNumerator, &curr_parN);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_PixelAspectDenominator, &curr_parD);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFieldType, &curr_fieldTypeP);
+		exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_VideoFrameRate, &curr_frameRateP);
+		
+		widthP.value.intValue = curr_widthP.mInt32;
+		heightP.value.intValue = curr_heightP.mInt32;
+		
+		pixelAspectRatioP.value.ratioValue.numerator = curr_parN.mInt32;
+		pixelAspectRatioP.value.ratioValue.denominator = curr_parD.mInt32;
+		
+		fieldTypeP.value.intValue = curr_fieldTypeP.mInt32;
+		frameRateP.value.timeValue = curr_frameRateP.mInt64;
+	}
+	else
+	{
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
+		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	}
+	
+	exParamValues alphaP;
 	//paramSuite->GetParamValue(exID, gIdx, ADBEVideoAlpha, &alphaP);
 	alphaP.value.intValue = 0;
 	
@@ -523,20 +548,25 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, customArgsP, audioQualityP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
-	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	
 	WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 	
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
 	customArgs[255] = '\0';
+	
+
+	exParamValues audioMethodP, audioQualityP, audioBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
 	
 	
 	SequenceRender_ParamsRec renderParms;
@@ -703,11 +733,22 @@ exSDKExport(
 		{
 			vorbis_info_init(&vi);
 			
-			// TODO: figure out why non-VBR vorbis_encode_init() is giving me crashes
-			v_err = vorbis_encode_init_vbr(&vi,
+			if(audioMethodP.value.intValue == OGG_BITRATE)
+			{
+				v_err = vorbis_encode_init(&vi,
 											audioChannels,
 											sampleRateP.value.floatValue,
-											audioQualityP.value.floatValue);
+											-1,
+											audioBitrateP.value.intValue * 1000,
+											-1);
+			}
+			else
+			{
+				v_err = vorbis_encode_init_vbr(&vi,
+												audioChannels,
+												sampleRateP.value.floatValue,
+												audioQualityP.value.floatValue);
+			}
 			
 			if(v_err == OV_OK)
 			{
@@ -740,6 +781,12 @@ exSDKExport(
 			mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
 			
 			info->set_writing_app("fnord WebM for Premiere");
+			
+			// I'd say think about lowering this to get better precision,
+			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
+			long long timeCodeScale = 1000000UL;
+			
+			info->set_timecode_scale(timeCodeScale);
 			
 			
 			uint64 vid_track = 0;
@@ -787,19 +834,29 @@ exSDKExport(
 			
 			while(videoTime < exportInfoP->endTime && result == malNoError)
 			{
-				// this is for the encoder
+				const PrTime fileTime = videoTime - exportInfoP->startTime;
+				const PrTime nextFileTime = fileTime + frameRateP.value.timeValue;
+				
+				// this is for the encoder, which does its own math based on config.g_timebase
 				// let's do the math
 				// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
 				// timestamp = time / timebase
 				// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
-				vpx_codec_pts_t timeStamp = (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
-				vpx_codec_pts_t nextTimeStamp = ((videoTime + frameRateP.value.timeValue) - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
-				unsigned long duration = nextTimeStamp - timeStamp;
+				const vpx_codec_pts_t encoder_timeStamp = fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
+				const vpx_codec_pts_t encoder_nextTimeStamp = (nextFileTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
+				const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
 				
-				// this is for the muxer
-				//uint64 timestamp_ns = (videoTime - exportInfoP->startTime) * 1000000000UL / ticksPerSecond; // I'm afraid of overflow so...
-				uint64 timestamp_ns = (videoTime - exportInfoP->startTime) * 100000UL / (ticksPerSecond / 10000);
 				
+				// This is the key step, where we quantize our time based on the timeCode
+				// to match how the frames are actually stored by the muxer.  If you want more precision,
+				// lower timeCodeScale.  Time (in nanoseconds) = TimeCode * TimeCodeScale.
+				const long long timeCode = ((fileTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+				const long long nextTimeCode = ((nextFileTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+				
+				const uint64_t timeStamp = timeCode * timeCodeScale;
+				const uint64_t nextTimeStamp = nextTimeCode * timeCodeScale;
+				const unsigned long duration = nextTimeStamp - timeStamp;
+			
 				
 				if(exportInfoP->exportVideo)
 				{
@@ -957,7 +1014,7 @@ exSDKExport(
 							}
 							
 							
-							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, timeStamp, duration, 0, deadline);
+							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_timeStamp, encoder_duration, 0, deadline);
 							
 							if(encode_err == VPX_CODEC_OK)
 							{
@@ -971,7 +1028,7 @@ exSDKExport(
 										assert(!vbr_pass);
 									
 										bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
-																			vid_track, timestamp_ns,
+																			vid_track, timeStamp,
 																			(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
 																			
 										if(!added)
@@ -1014,7 +1071,7 @@ exSDKExport(
 						vpx_codec_iter_t iter = NULL;
 						
 						do{
-							vpx_codec_encode(&encoder, NULL, timeStamp, duration, 0, deadline);
+							vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
 							
 							pkt = vpx_codec_get_cx_data(&encoder, &iter);
 							
@@ -1025,13 +1082,13 @@ exSDKExport(
 									assert(!vbr_pass);
 									
 									bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
-																		vid_track, timestamp_ns,
+																		vid_track, timeStamp,
 																		(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
 									assert(added);
 								}
 								else if(pkt->kind == VPX_CODEC_STATS_PKT)
 								{
-									assert(!vbr_pass);
+									assert(vbr_pass);
 									
 									if(vbr_buffer_size == 0)
 										vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
@@ -1051,62 +1108,72 @@ exSDKExport(
 				
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
-					const int samples = sampleRateP.value.floatValue * fps.denominator / fps.numerator;
+					int samples_to_get = (PrTime)sampleRateP.value.floatValue * duration / 1000000000UL;
 					
 					csSDK_int32 maxBlip = 0;
 					mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
 					
-					assert(maxBlip >= samples);
-					
-					
-					float **buffer = vorbis_analysis_buffer(&vd, samples);
-					
-					result = audioSuite->GetAudio(audioRenderID, samples, buffer, false);
-					
-					if(result == malNoError)
+					// The varying frame sizes (due to rounding) mean that we might sometimes need
+					// a little less than a frame of audio, sometimes we need more.  But Premiere
+					// doesn't like to give more, so I have to call GetAudio twice;
+					while(samples_to_get > 0)
 					{
-						vorbis_analysis_wrote(&vd, samples);
-				
-						while(vorbis_analysis_blockout(&vd, &vb) == 1)
-						{
-							vorbis_analysis(&vb, NULL);
-							vorbis_bitrate_addblock(&vb);
-
-							ogg_packet op;
-							
-							while( vorbis_bitrate_flushpacket(&vd, &op) )
-							{
-								bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																	audio_track, timestamp_ns, 0);
-																		
-								if(!added)
-									result = exportReturn_InternalError;
-							}
-						}
-					}
+						int samples = samples_to_get;
 						
-					// save the rest of the audio if this is the last frame
-					if(result == malNoError &&
-						(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
-					{
-						vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
-				
-						while(vorbis_analysis_blockout(&vd, &vb) == 1)
+						if(samples > maxBlip)
+							samples = maxBlip;
+						
+						float **buffer = vorbis_analysis_buffer(&vd, samples);
+						
+						result = audioSuite->GetAudio(audioRenderID, samples, buffer, false);
+						
+						if(result == malNoError)
 						{
-							vorbis_analysis(&vb, NULL);
-							vorbis_bitrate_addblock(&vb);
-
-							ogg_packet op;
-							
-							while( vorbis_bitrate_flushpacket(&vd, &op) )
+							vorbis_analysis_wrote(&vd, samples);
+					
+							while(vorbis_analysis_blockout(&vd, &vb) == 1)
 							{
-								bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																	audio_track, timestamp_ns, 0);
-																		
-								if(!added)
-									result = exportReturn_InternalError;
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+
+								ogg_packet op;
+								
+								while( vorbis_bitrate_flushpacket(&vd, &op) )
+								{
+									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																		audio_track, timeStamp, 0);
+																			
+									if(!added)
+										result = exportReturn_InternalError;
+								}
 							}
 						}
+							
+						// save the rest of the audio if this is the last frame
+						if(result == malNoError &&
+							(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
+						{
+							vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
+					
+							while(vorbis_analysis_blockout(&vd, &vb) == 1)
+							{
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+
+								ogg_packet op;
+								
+								while( vorbis_bitrate_flushpacket(&vd, &op) )
+								{
+									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																		audio_track, timeStamp, 0);
+																			
+									if(!added)
+										result = exportReturn_InternalError;
+								}
+							}
+						}
+						
+						samples_to_get -= samples;
 					}
 				}
 				
