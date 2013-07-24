@@ -28,7 +28,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="call obj_int_extract.bat ..\..\..\..\ext\libvpx"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -97,7 +97,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="call obj_int_extract.bat ..\..\..\..\ext\libvpx"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -594,14 +594,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\common\vp8_asm_com_offsets.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\decoder\vp8_asm_dec_offsets.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\vp8_asm_enc_offsets.c"
 				>
 			</File>
@@ -1080,18 +1072,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_asm_com_offsets.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_asm_dec_offsets.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_asm_enc_offsets.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_asm_stubs.c"
 				>
 			</File>
@@ -1124,11 +1104,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_common_data.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_convolve.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_convolve.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_copy_sse2.asm"
 				>
 			</File>
 			<File
@@ -1193,6 +1181,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_detokenize.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.h"
 				>
 			</File>
 			<File
@@ -1264,6 +1260,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_error_sse2.asm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_extend.c"
 				>
 			</File>
@@ -1320,15 +1320,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_implicit_segmentation.c"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_intrapred_sse2.asm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_invtrans.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_invtrans.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_intrapred_ssse3.asm"
 				>
 			</File>
 			<File
@@ -1392,10 +1388,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_mbpitch.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_mcomp.c"
 				>
 			</File>
@@ -1405,18 +1397,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_mcomp_x86.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_modecont.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_modecont.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_modecontext.c"
 				>
 			</File>
 			<File
@@ -1536,6 +1516,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_quantize_ssse3.asm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ratectrl.c"
 				>
 			</File>
@@ -1564,10 +1548,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_recon_wrapper_sse2.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_reconinter.c"
 				>
 			</File>
@@ -1585,10 +1565,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_rtcd.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_rtcd_defs.sh"
 				>
 			</File>
 			<File
@@ -1652,7 +1628,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpel_variance_impl_sse2.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_subexp.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_subexp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subpel_variance.asm"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subpel_variance_impl_sse2.asm"
 				>
 			</File>
 			<File
@@ -1661,10 +1649,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_ssse3.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_variance_sse2.c"
 				>
 			</File>
 			<File
@@ -1765,10 +1749,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_sse2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_ssse3.c"
 				>
 			</File>
 			<File
