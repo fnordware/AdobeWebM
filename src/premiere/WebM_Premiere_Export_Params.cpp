@@ -1412,7 +1412,7 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, args[i + 1]); i++;	}
 
 			else if(arg == "--lossless")
-			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, 1);	}
 			
 			
 			i++;	

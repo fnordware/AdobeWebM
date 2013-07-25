@@ -890,9 +890,12 @@ exSDKExport(
 						// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
 						// (the latter two are in "vpx color space"?)
 						// see validate_img() in vp8_cx_iface.c
+						// TODO: VP9 can take VPX_IMG_FMT_I422 and VPX_IMG_FMT_I444
+						// although you probably want to switch to YV12 and yuvconfig2image()
+						// Enable CONFIG_ALPHA to use alpha
 								
 						vpx_image_t img_data;
-						vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);;
+						vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);
 						
 						if(img)
 						{
