@@ -710,9 +710,9 @@ exSDKExport(
 					vpx_codec_err_t config_err = vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, quan);
 					
 					assert(config_err == VPX_CODEC_OK);
-					
-					ConfigureEncoderPost(&encoder, customArgs);
 				}
+				
+				ConfigureEncoderPost(&encoder, customArgs);
 			}
 		}
 		
