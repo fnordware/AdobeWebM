@@ -10,8 +10,8 @@ Download
 --------
 Here are the latest binaries:
 
-**WebM for Premiere Pro** _v0.5b2, 28 June 2013_
-[Mac](http://www.fnordware.com/downloads/WebM_v0.5b2_mac.zip) | [Win](http://www.fnordware.com/downloads/WebM_v0.5b2_win.zip)
+**WebM for Premiere Pro** _v0.5b3, 30 July 2013_
+[Mac](http://www.fnordware.com/downloads/WebM_v0.5b3_mac.zip) | [Win](http://www.fnordware.com/downloads/WebM_v0.5b3_win.zip)
 
 **WebP for Photoshop** _v0.5b4, 18 July 2013_
 [Mac](http://www.fnordware.com/downloads/WebP_v0.5b4_mac.zip) | [Win](http://www.fnordware.com/downloads/WebP_v0.5b4_win.zip)
