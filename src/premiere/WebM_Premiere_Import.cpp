@@ -1074,7 +1074,8 @@ SDKGetSourceVideo(
 														
 														if(peek_err == VPX_CODEC_OK)
 														{
-															assert(stream_info.is_kf); // I guess we can only parse the stream if we're on a keyframe
+															// I guess we can only parse the stream if we're on a keyframe for VP8
+															assert(stream_info.is_kf || codec_id == std::string("V_VP9"));
 
 															if(!first_frame && stream_info.is_kf)
 															{
