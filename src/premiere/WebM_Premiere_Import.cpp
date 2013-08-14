@@ -1005,11 +1005,15 @@ SDKGetSourceVideo(
 									config.w = frameFormat->inFrameWidth;
 									config.h = frameFormat->inFrameHeight;
 									
+									vpx_codec_flags_t flags = VPX_CODEC_CAP_FRAME_THREADING |
+																//VPX_CODEC_USE_ERROR_CONCEALMENT | // this doesn't seem to work
+																VPX_CODEC_USE_FRAME_THREADING;
+									
 									// TODO: Explore possibilities of decoding options by setting
-									// vpx_codec_flags_t here.  Things like VP8_DEMACROBLOCK and
+									// VPX_CODEC_USE_POSTPROC here.  Things like VP8_DEMACROBLOCK and
 									// VP8_MFQE (Multiframe Quality Enhancement) could be cool.
 									
-									codec_err = vpx_codec_dec_init(&decoder, iface, &config, 0);
+									codec_err = vpx_codec_dec_init(&decoder, iface, &config, flags);
 								}
 								else
 									codec_err = VPX_CODEC_ERROR;
