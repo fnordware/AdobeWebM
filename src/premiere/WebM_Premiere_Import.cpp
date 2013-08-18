@@ -76,7 +76,7 @@ typedef PrSDKPPixCacheSuite PrCacheSuite;
 class PrMkvReader : public mkvparser::IMkvReader
 {
   public:
-	PrMkvReader(imFileRef fileRef) : _fileRef(fileRef) {}
+	PrMkvReader(imFileRef fileRef);
 	virtual ~PrMkvReader() {}
 	
 	virtual int Read(long long pos, long len, unsigned char* buf);
@@ -91,8 +91,31 @@ class PrMkvReader : public mkvparser::IMkvReader
 	
   private:
 	const imFileRef _fileRef;
+	
+	long long _size;
 };
 
+
+PrMkvReader::PrMkvReader(imFileRef fileRef) :
+	_fileRef(fileRef),
+	_size(-1)
+{
+#ifdef PRWIN_ENV
+	LARGE_INTEGER len;
+
+	BOOL ok = GetFileSizeEx(_fileRef, &len);
+	
+	if(ok)
+		_size = len.QuadPart;
+#else
+	SInt64 fork_size = 0;
+	
+	OSErr result = FSGetForkSize(CAST_REFNUM(_fileRef), &fork_size);
+		
+	if(result == noErr)
+		_size = fork_size;
+#endif
+}
 
 int PrMkvReader::Read(long long pos, long len, unsigned char* buf)
 {
@@ -120,42 +143,20 @@ int PrMkvReader::Read(long long pos, long len, unsigned char* buf)
 
 int PrMkvReader::Length(long long* total, long long* available)
 {
-#ifdef PRWIN_ENV
-	LARGE_INTEGER len;
-
-	BOOL ok = GetFileSizeEx(_fileRef, &len);
+	// total appears to mean the total length of the file, while
+	// available means the amount of data that has been downloaded,
+	// as in for a stream.  For a disk-based file, these two are the same.
 	
-	if(ok)
+	if(_size >= 0)
 	{
-		if(total)
-			*total = len.QuadPart;
-
-		if(available)
-			*available = len.QuadPart;
-
-		return PrMkvSuccess;
-	}
-	else
-		return PrMkvError;
-#else
-	SInt64 fork_size = 0;
-	
-	OSErr result = FSGetForkSize(CAST_REFNUM(_fileRef), &fork_size);
-		
-	if(result == noErr)
-	{
-		if(total)
-			*total = fork_size;
-		
-		if(available)
-			*available = fork_size;
+		*total = *available = _size;
 		
 		return PrMkvSuccess;
 	}
 	else
 		return PrMkvError;
-#endif
 }
+
 
 typedef enum {
 	CODEC_NONE = 0,
@@ -963,7 +964,7 @@ SDKGetSourceVideo(
 			// reduced.
 			const long long timeCodeScale = localRecP->segment->GetInfo()->GetTimeCodeScale();
 			const long long timeCode = ((sourceVideoRec->inFrameTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
-			uint64_t tstamp = timeCode * timeCodeScale;
+			const long long tstamp = timeCode * timeCodeScale;
 			
 			
 			if(localRecP->video_track >= 0)
@@ -985,6 +986,9 @@ SDKGetSourceVideo(
 							const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 							
 							pVideoTrack->Seek(tstamp, pSeekBlockEntry);
+							
+							// TODO: Any way I can seek with cues instead of a binary search through clusters?
+							//const mkvparser::Cues* cues = localRecP->segment->GetCues();
 							
 							if(pSeekBlockEntry != NULL)
 							{
@@ -1026,16 +1030,15 @@ SDKGetSourceVideo(
 									// The seek took us to this Cluster for a reason.
 									// It stars with a keyframe, although not necessarily the last keyframe before
 									// the requested frame. I have to decode each frame starting with the keyframe,
-									// and then I continue afterwards until I get to the next keyframe.
+									// and then I continue afterwards until I decode the entire cluster.
+									// TODO: Maybe we should seek for keyframes within the cluster.
 
 									assert(tstamp >= pSeekBlockEntry->GetBlock()->GetTime(pCluster));
 									assert(tstamp >= pCluster->GetTime());
 
-									bool first_frame = true;
 									bool got_frame = false;
-									bool reached_next_iframe = false;
 									
-									while((pCluster != NULL) && !pCluster->EOS() && !reached_next_iframe && result == malNoError)
+									while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
 									{
 										assert(pCluster->GetTime() >= 0);
 										assert(pCluster->GetTime() == pCluster->GetFirstTime());
@@ -1045,7 +1048,7 @@ SDKGetSourceVideo(
 										
 										pCluster->GetFirst(pBlockEntry);
 
-										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && !reached_next_iframe && result == malNoError)
+										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && result == malNoError)
 										{
 											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 										
@@ -1071,126 +1074,93 @@ SDKGetSourceVideo(
 													
 													if(read_err == PrMkvReader::PrMkvSuccess)
 													{
-														vpx_codec_stream_info_t stream_info;
-														stream_info.sz = sizeof(stream_info);
-													
-														vpx_codec_err_t peek_err = vpx_codec_peek_stream_info(iface, data, length, &stream_info);
+														vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
 														
-														if(peek_err == VPX_CODEC_OK)
+														assert(decode_err == VPX_CODEC_OK);
+
+														if(decode_err == VPX_CODEC_OK)
 														{
-															// I guess we can only parse the stream if we're on a keyframe for VP8
-															assert(stream_info.is_kf || codec_id == std::string("V_VP9"));
-
-															if(!first_frame && stream_info.is_kf)
+															csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
+															
+															vpx_codec_iter_t iter = NULL; // might there 
+															
+															vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
+															
+															if(img)
 															{
-																// we only reached the next keyframe (where we stop)
-																// if we already got the frame we wanted
-																if(got_frame)
-																	reached_next_iframe = true;
-
-																// otherwise it turns out I should have been skipped to here
-																// but I guess this keyframe wasn't the first frame in the cluster
-																// too bad the only way to find this (that I know) is by parsing the stream
+																PPixHand ppix;
 																
-																// TODO: See if seeking can be improved so we always land on the keyframe
-																// before the requested frame
+																localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
+
+																if(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
+																{
+																	char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+																	csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+																	
+																	localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
+																													&Y_PixelAddress, &Y_RowBytes,
+																													&U_PixelAddress, &U_RowBytes,
+																													&V_PixelAddress, &V_RowBytes);
+																												
+																	assert(frameFormat->inFrameHeight == img->d_h);
+																	assert(frameFormat->inFrameWidth == img->d_w);
+
+																	for(int y = 0; y < img->d_h; y++)
+																	{
+																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+																		
+																		unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+																		
+																		memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+																	}
+																	
+																	for(int y = 0; y < img->d_h / 2; y++)
+																	{
+																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+																		
+																		unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+																		unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+																		
+																		memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
+																		memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
+																	}
+																	
+																	// It says we can get more than one frame off one decode operation?  What would I do with it?
+																	assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
+																}
+																else
+																	assert(false); // looks like Premiere is happy to always give me this kind of buffer
+																
+																// This is a nice Premiere feature.  We often have to decode many frames
+																// in a GOP (group of pictures) before we decode the one Premiere asked for.
+																// This suite lets us cache those frames for later.  We keep going past the
+																// requested frame to end of the cluster to save us the trouble in the future.
+																localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
+																											0,
+																											ppix,
+																											decodedFrame,
+																											NULL,
+																											NULL);
+																
+																if(decodedFrame == theFrame)
+																{
+																	*sourceVideoRec->outFrame = ppix;
+																	
+																	got_frame = true;
+																}
+																else
+																{
+																	// Premiere copied the frame to its cache, so we dispose ours.
+																	// Very obvious memory leak if we don't.
+																	localRecP->PPixSuite->Dispose(ppix);
+																}
+																
+																vpx_img_free(img);
 															}
 														}
 														else
-															assert(!first_frame); // this is how I know the first frame is always a keyframe
-														
-														if(!reached_next_iframe)
-														{
-															vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
-															
-															assert(decode_err == VPX_CODEC_OK);
-
-															if(decode_err == VPX_CODEC_OK)
-															{
-																csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
-																
-																vpx_codec_iter_t iter = NULL; // might there 
-																
-																vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
-																
-																if(img)
-																{
-																	PPixHand ppix;
-																	
-																	localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
-
-																	if(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
-																	{
-																		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-																		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-																		
-																		localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
-																														&Y_PixelAddress, &Y_RowBytes,
-																														&U_PixelAddress, &U_RowBytes,
-																														&V_PixelAddress, &V_RowBytes);
-																													
-																		assert(frameFormat->inFrameHeight == img->d_h);
-																		assert(frameFormat->inFrameWidth == img->d_w);
-
-																		for(int y = 0; y < img->d_h; y++)
-																		{
-																			unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-																			
-																			unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-																			
-																			memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
-																		}
-																		
-																		for(int y = 0; y < img->d_h / 2; y++)
-																		{
-																			unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-																			unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-																			
-																			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-																			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-																			
-																			memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
-																			memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
-																		}
-																		
-																		// It says we can get more than one frame off one decode operation?  What would I do with it?
-																		assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
-																	}
-																	else
-																		assert(false); // looks like Premiere is happy to always give me this kind of buffer
-																	
-																	// This is a nice Premiere feature.  We often have to decode many frames
-																	// in a GOP (group of pictures) before we decode the one Premiere asked for.
-																	// This suite lets us cache those frames for later.  We keep going past the
-																	// requested frame to the next keyframe to save us the trouble in the future.
-																	// TODO: See if maybe the next keyframe isn't far enough.  Maybe there's a 
-																	// cluster boundry we should stop at. Something to do with Cues?
-																	localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
-																												0,
-																												ppix,
-																												decodedFrame,
-																												NULL,
-																												NULL);
-																	
-																	if(decodedFrame == theFrame)
-																	{
-																		*sourceVideoRec->outFrame = ppix;
-																		
-																		got_frame = true;
-																	}
-																	else
-																	{
-																		// Premiere copied the frame to its cache, so we dispose ours.
-																		// Very obvious memory leak if we don't.
-																		localRecP->PPixSuite->Dispose(ppix);
-																	}
-																	
-																	vpx_img_free(img);
-																}
-															}
-															else
-																result = imFileReadFailed;
-														}
+															result = imFileReadFailed;
 													}
 													else
 														result = imFileReadFailed;
@@ -1201,12 +1171,12 @@ SDKGetSourceVideo(
 													result = imMemErr;
 											}
 											
-											first_frame = false;
-																			
 											long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
 											
 											assert(status == 0);
 										}
+										
+										//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
 										
 										pCluster = localRecP->segment->GetNext(pCluster);
 									}

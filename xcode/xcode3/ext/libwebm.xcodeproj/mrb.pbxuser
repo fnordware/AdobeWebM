@@ -1,0 +1,32 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeTarget = D2AAC045055464E500DB518D /* libwebm */;
+		codeSenseManager = 2A5FF43817C05CD40068E2C1 /* Code sense */;
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 398482614;
+			PBXWorkspaceStateSaveDate = 398482614;
+		};
+		sourceControlManager = 2A5FF43717C05CD40068E2C1 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	2A5FF43717C05CD40068E2C1 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	2A5FF43817C05CD40068E2C1 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	D2AAC045055464E500DB518D /* libwebm */ = {
+		activeExec = 0;
+	};
+}
