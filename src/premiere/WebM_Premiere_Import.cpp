@@ -1061,8 +1061,6 @@ SDKGetSourceVideo(
 												long long packet_tcode = pBlock->GetTimeCode(pCluster);
 												long long tcode_scale = localRecP->segment->GetInfo()->GetTimeCodeScale();
 												
-												assert(got_frame || tstamp >= packet_tstamp); // we either have the frame or we're still working toward getting it
-
 												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 												
 												unsigned int length = blockFrame.len;
