@@ -1080,7 +1080,7 @@ SDKGetSourceVideo(
 														{
 															csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
 															
-															vpx_codec_iter_t iter = NULL; // might there 
+															vpx_codec_iter_t iter = NULL;
 															
 															vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
 															
