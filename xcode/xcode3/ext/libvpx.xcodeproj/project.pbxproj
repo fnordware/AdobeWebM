@@ -408,6 +408,11 @@
 		2A550E741768193300BE5A72 /* y4minput.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C261768193300BE5A72 /* y4minput.c */; };
 		2A550E751768193300BE5A72 /* y4minput.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C271768193300BE5A72 /* y4minput.h */; };
 		2A550FF91768777D00BE5A72 /* vp9_systemdependent.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550AF51768193200BE5A72 /* vp9_systemdependent.c */; };
+		2A8E3AC217D3BA2D008EA603 /* vp9_thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E3AC017D3BA2D008EA603 /* vp9_thread.c */; };
+		2A8E3AC317D3BA2D008EA603 /* vp9_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8E3AC117D3BA2D008EA603 /* vp9_thread.h */; };
+		2A8E3ACB17D3BA91008EA603 /* vp9_dct32x32_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E3ACA17D3BA91008EA603 /* vp9_dct32x32_sse2.c */; };
+		2A8E3AD017D3BAE1008EA603 /* vp9_scale.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E3ACE17D3BAE1008EA603 /* vp9_scale.c */; };
+		2A8E3AD117D3BAE1008EA603 /* vp9_scale.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8E3ACF17D3BAE1008EA603 /* vp9_scale.h */; };
 		2A975B8417A0562500FFFC04 /* vp9_dsubexp.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */; };
 		2A975B8517A0562500FFFC04 /* vp9_dsubexp.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A975B8117A0562500FFFC04 /* vp9_dsubexp.h */; };
 		2A975B8617A0562500FFFC04 /* vp9_idct_blk.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A975B8217A0562500FFFC04 /* vp9_idct_blk.h */; };
@@ -945,11 +950,6 @@
 		2A550C0C1768193300BE5A72 /* x86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x86.h; sourceTree = "<group>"; };
 		2A550C0D1768193300BE5A72 /* x86_abi_support.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = x86_abi_support.asm; sourceTree = "<group>"; };
 		2A550C0E1768193300BE5A72 /* x86_cpuid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = x86_cpuid.c; sourceTree = "<group>"; };
-		2A550C121768193300BE5A72 /* vp8_vpxyv12_copy_y_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_vpxyv12_copy_y_neon.asm; sourceTree = "<group>"; };
-		2A550C131768193300BE5A72 /* vp8_vpxyv12_copyframe_func_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_vpxyv12_copyframe_func_neon.asm; sourceTree = "<group>"; };
-		2A550C141768193300BE5A72 /* vp8_vpxyv12_copysrcframe_func_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_vpxyv12_copysrcframe_func_neon.asm; sourceTree = "<group>"; };
-		2A550C151768193300BE5A72 /* vp8_vpxyv12_extendframeborders_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_vpxyv12_extendframeborders_neon.asm; sourceTree = "<group>"; };
-		2A550C161768193300BE5A72 /* yv12extend_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = yv12extend_arm.c; sourceTree = "<group>"; };
 		2A550C181768193300BE5A72 /* gen_scalers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gen_scalers.c; sourceTree = "<group>"; };
 		2A550C191768193300BE5A72 /* vpx_scale.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_scale.c; sourceTree = "<group>"; };
 		2A550C1A1768193300BE5A72 /* yv12config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = yv12config.c; sourceTree = "<group>"; };
@@ -957,12 +957,16 @@
 		2A550C1C1768193300BE5A72 /* vpx_scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_scale.h; sourceTree = "<group>"; };
 		2A550C1E1768193300BE5A72 /* vpx_scale_asm_offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_scale_asm_offsets.c; sourceTree = "<group>"; };
 		2A550C1F1768193300BE5A72 /* vpx_scale_rtcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_scale_rtcd.c; sourceTree = "<group>"; };
-		2A550C221768193300BE5A72 /* scaleopt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scaleopt.c; sourceTree = "<group>"; };
 		2A550C231768193300BE5A72 /* yv12config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yv12config.h; sourceTree = "<group>"; };
 		2A550C241768193300BE5A72 /* vpxdec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpxdec.c; sourceTree = "<group>"; };
 		2A550C251768193300BE5A72 /* vpxenc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpxenc.c; sourceTree = "<group>"; };
 		2A550C261768193300BE5A72 /* y4minput.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = y4minput.c; sourceTree = "<group>"; };
 		2A550C271768193300BE5A72 /* y4minput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = y4minput.h; sourceTree = "<group>"; };
+		2A8E3AC017D3BA2D008EA603 /* vp9_thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_thread.c; sourceTree = "<group>"; };
+		2A8E3AC117D3BA2D008EA603 /* vp9_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_thread.h; sourceTree = "<group>"; };
+		2A8E3ACA17D3BA91008EA603 /* vp9_dct32x32_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct32x32_sse2.c; sourceTree = "<group>"; };
+		2A8E3ACE17D3BAE1008EA603 /* vp9_scale.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_scale.c; sourceTree = "<group>"; };
+		2A8E3ACF17D3BAE1008EA603 /* vp9_scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_scale.h; sourceTree = "<group>"; };
 		2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dsubexp.c; sourceTree = "<group>"; };
 		2A975B8117A0562500FFFC04 /* vp9_dsubexp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_dsubexp.h; sourceTree = "<group>"; };
 		2A975B8217A0562500FFFC04 /* vp9_idct_blk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_idct_blk.h; sourceTree = "<group>"; };
@@ -1630,6 +1634,8 @@
 		2A550AF31768193200BE5A72 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				2A8E3ACE17D3BAE1008EA603 /* vp9_scale.c */,
+				2A8E3ACF17D3BAE1008EA603 /* vp9_scale.h */,
 				2A975B9617A056C500FFFC04 /* vp9_common_data.c */,
 				2A975B9717A056C500FFFC04 /* vp9_common_data.h */,
 				2A975B9817A056C500FFFC04 /* vp9_enums.h */,
@@ -1722,6 +1728,8 @@
 		2A550B601768193300BE5A72 /* decoder */ = {
 			isa = PBXGroup;
 			children = (
+				2A8E3AC017D3BA2D008EA603 /* vp9_thread.c */,
+				2A8E3AC117D3BA2D008EA603 /* vp9_thread.h */,
 				2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */,
 				2A975B8117A0562500FFFC04 /* vp9_dsubexp.h */,
 				2A975B8217A0562500FFFC04 /* vp9_idct_blk.h */,
@@ -1814,6 +1822,7 @@
 		2A550BAE1768193300BE5A72 /* x86 */ = {
 			isa = PBXGroup;
 			children = (
+				2A8E3ACA17D3BA91008EA603 /* vp9_dct32x32_sse2.c */,
 				2A975B8817A0564500FFFC04 /* vp9_error_sse2.asm */,
 				2A975B8917A0564500FFFC04 /* vp9_quantize_ssse3.asm */,
 				2A975B8A17A0564500FFFC04 /* vp9_subpel_variance_impl_sse2.asm */,
@@ -1948,35 +1957,13 @@
 		2A550C0F1768193300BE5A72 /* vpx_scale */ = {
 			isa = PBXGroup;
 			children = (
-				2A550C101768193300BE5A72 /* arm */,
 				2A550C171768193300BE5A72 /* generic */,
 				2A550C1C1768193300BE5A72 /* vpx_scale.h */,
 				2A550C1E1768193300BE5A72 /* vpx_scale_asm_offsets.c */,
 				2A550C1F1768193300BE5A72 /* vpx_scale_rtcd.c */,
-				2A550C211768193300BE5A72 /* win32 */,
 				2A550C231768193300BE5A72 /* yv12config.h */,
 			);
 			path = vpx_scale;
-			sourceTree = "<group>";
-		};
-		2A550C101768193300BE5A72 /* arm */ = {
-			isa = PBXGroup;
-			children = (
-				2A550C111768193300BE5A72 /* neon */,
-			);
-			path = arm;
-			sourceTree = "<group>";
-		};
-		2A550C111768193300BE5A72 /* neon */ = {
-			isa = PBXGroup;
-			children = (
-				2A550C121768193300BE5A72 /* vp8_vpxyv12_copy_y_neon.asm */,
-				2A550C131768193300BE5A72 /* vp8_vpxyv12_copyframe_func_neon.asm */,
-				2A550C141768193300BE5A72 /* vp8_vpxyv12_copysrcframe_func_neon.asm */,
-				2A550C151768193300BE5A72 /* vp8_vpxyv12_extendframeborders_neon.asm */,
-				2A550C161768193300BE5A72 /* yv12extend_arm.c */,
-			);
-			path = neon;
 			sourceTree = "<group>";
 		};
 		2A550C171768193300BE5A72 /* generic */ = {
@@ -1988,14 +1975,6 @@
 				2A550C1B1768193300BE5A72 /* yv12extend.c */,
 			);
 			path = generic;
-			sourceTree = "<group>";
-		};
-		2A550C211768193300BE5A72 /* win32 */ = {
-			isa = PBXGroup;
-			children = (
-				2A550C221768193300BE5A72 /* scaleopt.c */,
-			);
-			path = win32;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2182,6 +2161,8 @@
 				2A975B9517A0565400FFFC04 /* vp9_write_bit_buffer.h in Headers */,
 				2A975B9A17A056C500FFFC04 /* vp9_common_data.h in Headers */,
 				2A975B9B17A056C500FFFC04 /* vp9_enums.h in Headers */,
+				2A8E3AC317D3BA2D008EA603 /* vp9_thread.h in Headers */,
+				2A8E3AD117D3BAE1008EA603 /* vp9_scale.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2476,6 +2457,9 @@
 				2A975BAC17A05A9100FFFC04 /* vp9_copy_sse2.asm in Sources */,
 				2A975BAD17A05A9100FFFC04 /* vp9_intrapred_sse2.asm in Sources */,
 				2A975BAE17A05A9100FFFC04 /* vp9_intrapred_ssse3.asm in Sources */,
+				2A8E3AC217D3BA2D008EA603 /* vp9_thread.c in Sources */,
+				2A8E3ACB17D3BA91008EA603 /* vp9_dct32x32_sse2.c in Sources */,
+				2A8E3AD017D3BAE1008EA603 /* vp9_scale.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
