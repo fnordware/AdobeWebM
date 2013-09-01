@@ -548,7 +548,7 @@ SDKCloseFile(
 	{
 		stdParms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
 
-		ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );;
+		ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKPPixCreatorSuite, kPrSDKPPixCreatorSuiteVersion);
 		localRecP->BasicSuite->ReleaseSuite(kPrSDKPPixCacheSuite, PrCacheVersion);
@@ -1294,7 +1294,7 @@ SDKImportAudio7(
 		assert(audioRec7->position >= 0); // Do they really want contiguous samples?
 
 
-		uint64_t tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
+		const long long tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
 		
 		
 		// I set up a method for reading directly from the last sample in one call to the first
