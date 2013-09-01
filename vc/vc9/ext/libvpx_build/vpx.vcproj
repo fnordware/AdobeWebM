@@ -1136,6 +1136,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct32x32_sse2.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.h"
 				>
 			</File>
@@ -1560,6 +1564,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scale.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scale.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_seg_common.c"
 				>
 			</File>
@@ -1637,6 +1649,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_textblit.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_thread.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_thread.h"
 				>
 			</File>
 			<File

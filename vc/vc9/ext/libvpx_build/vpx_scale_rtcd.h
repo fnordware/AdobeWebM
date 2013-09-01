@@ -33,11 +33,11 @@ void vp8_vertical_band_2_1_scale_i_c(unsigned char *source, unsigned int src_pit
 void vp8_yv12_extend_frame_borders_c(struct yv12_buffer_config *ybf);
 #define vp8_yv12_extend_frame_borders vp8_yv12_extend_frame_borders_c
 
-void vp8_yv12_copy_frame_c(struct yv12_buffer_config *src_ybc, struct yv12_buffer_config *dst_ybc);
+void vp8_yv12_copy_frame_c(const struct yv12_buffer_config *src_ybc, struct yv12_buffer_config *dst_ybc);
 #define vp8_yv12_copy_frame vp8_yv12_copy_frame_c
 
-void vp8_yv12_copy_y_c(struct yv12_buffer_config *src_ybc, struct yv12_buffer_config *dst_ybc);
-#define vp8_yv12_copy_y vp8_yv12_copy_y_c
+void vpx_yv12_copy_y_c(const struct yv12_buffer_config *src_ybc, struct yv12_buffer_config *dst_ybc);
+#define vpx_yv12_copy_y vpx_yv12_copy_y_c
 
 void vp9_extend_frame_borders_c(struct yv12_buffer_config *ybf, int subsampling_x, int subsampling_y);
 #define vp9_extend_frame_borders vp9_extend_frame_borders_c
