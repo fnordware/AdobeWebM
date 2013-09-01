@@ -94,6 +94,8 @@
 		2A0E4210176D061F00420489 /* mux.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A0E419F176D061F00420489 /* mux.h */; };
 		2A0E4211176D061F00420489 /* mux_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A0E41A0176D061F00420489 /* mux_types.h */; };
 		2A0E4212176D061F00420489 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A0E41A1176D061F00420489 /* types.h */; };
+		2A8E3A6617D3B887008EA603 /* alpha_processing.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E3A6417D3B887008EA603 /* alpha_processing.c */; };
+		2A8E3A6717D3B887008EA603 /* alpha_processing.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8E3A6517D3B887008EA603 /* alpha_processing.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -184,6 +186,8 @@
 		2A0E419F176D061F00420489 /* mux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mux.h; sourceTree = "<group>"; };
 		2A0E41A0176D061F00420489 /* mux_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mux_types.h; sourceTree = "<group>"; };
 		2A0E41A1176D061F00420489 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		2A8E3A6417D3B887008EA603 /* alpha_processing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alpha_processing.c; sourceTree = "<group>"; };
+		2A8E3A6517D3B887008EA603 /* alpha_processing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alpha_processing.h; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libwebp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwebp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -334,6 +338,8 @@
 		2A0E4182176D061F00420489 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				2A8E3A6417D3B887008EA603 /* alpha_processing.c */,
+				2A8E3A6517D3B887008EA603 /* alpha_processing.h */,
 				2A0E4183176D061F00420489 /* bit_reader.c */,
 				2A0E4184176D061F00420489 /* bit_reader.h */,
 				2A0E4185176D061F00420489 /* bit_writer.c */,
@@ -413,6 +419,7 @@
 				2A0E4210176D061F00420489 /* mux.h in Headers */,
 				2A0E4211176D061F00420489 /* mux_types.h in Headers */,
 				2A0E4212176D061F00420489 /* types.h in Headers */,
+				2A8E3A6717D3B887008EA603 /* alpha_processing.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,6 +527,7 @@
 				2A0E4206176D061F00420489 /* rescaler.c in Sources */,
 				2A0E4208176D061F00420489 /* thread.c in Sources */,
 				2A0E420A176D061F00420489 /* utils.c in Sources */,
+				2A8E3A6617D3B887008EA603 /* alpha_processing.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
