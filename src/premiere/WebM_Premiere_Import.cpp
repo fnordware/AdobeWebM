@@ -181,10 +181,6 @@ typedef struct
 	VideoCodec				video_codec;
 	int						audio_track;
 	
-	PrAudioSample			next_audio_sample;
-	long long				last_timestamp;
-	int						next_sample_in_timestamp;
-	
 	PlugMemoryFuncsPtr		memFuncs;
 	SPBasicSuite			*BasicSuite;
 	PrSDKPPixCreatorSuite	*PPixCreatorSuite;
@@ -314,7 +310,6 @@ SDKOpenFile8(
 		localRecP->video_track = -1;
 		localRecP->video_codec = CODEC_NONE;
 		localRecP->audio_track = -1;
-		localRecP->next_audio_sample = -1;
 		
 		// Acquire needed suites
 		localRecP->memFuncs = stdParms->piSuites->memFuncs;
@@ -1297,13 +1292,6 @@ SDKImportAudio7(
 		const long long tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
 		
 		
-		// I set up a method for reading directly from the last sample in one call to the first
-		// sample of the next where Premiere asks for adjacent samples.
-		// This had the effect of making the audio drift over time, however.
-		// We'll hold off on totally deleting this code until further evaluation.
-		bool continuous_read = false; //(audioRec7->position == localRecP->next_audio_sample);
-		
-
 		if(localRecP->audio_track >= 0)
 		{
 			const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
@@ -1406,126 +1394,105 @@ SDKImportAudio7(
 											{
 												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
-												// skip if we're doing continuous read (which we're not) and this isn't the packet we want
-												if(!continuous_read || packet_tstamp == localRecP->last_timestamp)
+												PrAudioSample packet_offset = 0;
+													
+												PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+													
+												if(audioRec7->position > packet_start)
+													packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+												
+													
+												int position_in_packet = 0;
+												
+													
+												for(int f=0; f < pBlock->GetFrameCount(); f++)
 												{
-													PrAudioSample packet_offset = 0;
+													const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
 													
-													if(continuous_read)
-													{
-														packet_offset = localRecP->next_sample_in_timestamp;
-														
-														continuous_read = false; // only get to do this once
-													}
-													else
-													{
-														PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
-														
-														if(audioRec7->position > packet_start)
-															packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
-													}
+													unsigned int length = blockFrame.len;
+													uint8_t *data = (uint8_t *)malloc(length);
 													
-														
-													int position_in_packet = 0;
-													
-														
-													for(int f=0; f < pBlock->GetFrameCount(); f++)
+													if(data != NULL)
 													{
-														const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+														int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
 														
-														unsigned int length = blockFrame.len;
-														uint8_t *data = (uint8_t *)malloc(length);
-														
-														if(data != NULL)
+														if(read_err == PrMkvReader::PrMkvSuccess)
 														{
-															int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
-															
-															if(read_err == PrMkvReader::PrMkvSuccess)
-															{
-																ogg_packet packet;
-											
-																packet.packet = data;
-																packet.bytes = length;
-																packet.b_o_s = false;
-																packet.e_o_s = false;
-																packet.granulepos = -1;
-																packet.packetno = ogg_packet_num++;
+															ogg_packet packet;
+										
+															packet.packet = data;
+															packet.bytes = length;
+															packet.b_o_s = false;
+															packet.e_o_s = false;
+															packet.granulepos = -1;
+															packet.packetno = ogg_packet_num++;
 
-																int synth_err = vorbis_synthesis(&vb, &packet);
+															int synth_err = vorbis_synthesis(&vb, &packet);
+															
+															if(synth_err == OV_OK)
+															{
+																int block_err = vorbis_synthesis_blockin(&vd, &vb);
 																
-																if(synth_err == OV_OK)
+																if(block_err == OV_OK)
 																{
-																	int block_err = vorbis_synthesis_blockin(&vd, &vb);
+																	float **pcm = NULL;
+																	int samples = 0;
 																	
-																	if(block_err == OV_OK)
+																	int synth_result = 1;
+																	
+																	while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
 																	{
-																		float **pcm = NULL;
-																		int samples = 0;
+																		// I feel like the code here is hard to read.  Sorry about that.
+																	
+																		int samples_to_copy = 0;
 																		
-																		int synth_result = 1;
-																		
-																		while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+																		// if the offset is bigger than the samples, we'll just move along
+																		if(packet_offset < samples)
 																		{
-																			// I feel like the code here is hard to read.  Sorry about that.
-																		
-																			int samples_to_copy = 0;
+																			int samples_after_offset = samples - packet_offset;
 																			
-																			// if the offset is bigger than the samples, we'll just move along
-																			if(packet_offset < samples)
-																			{
-																				int samples_after_offset = samples - packet_offset;
-																				
-																				samples_to_copy = minimum<int>(samples_left, samples_after_offset);
-																			}
-																		
-																			// how nice, audio samples are float, just like Premiere wants 'em
-																			for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
-																			{
-																				memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
-																			}
-																			
-																			// now samples_to_copy is more like samples_I_just_copied
-																			samples_copied += samples_to_copy;
-																			samples_left -= samples_to_copy;
-																			
-																			
-																			// If we copied any samples, that means the offset has been gobbled up
-																			// If we didn't, reduce the offset by number of samples
-																			if(samples_to_copy > 0)
-																				packet_offset = 0;
-																			else
-																				packet_offset -= samples;
-																			
-																			
-																			// part of the continuous reading stuff we're not using right now
-																			if(samples_left == 0)
-																			{
-																				localRecP->next_audio_sample = audioRec7->position + audioRec7->size;
-																				
-																				localRecP->last_timestamp = packet_tstamp;
-																				localRecP->next_sample_in_timestamp = position_in_packet;
-																			}
-																			else
-																				position_in_packet += samples_to_copy;
-																			
-																			
-																			synth_result = vorbis_synthesis_read(&vd, samples);
+																			samples_to_copy = minimum<int>(samples_left, samples_after_offset);
 																		}
+																	
+																		// how nice, audio samples are float, just like Premiere wants 'em
+																		for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
+																		{
+																			memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+																		}
+																		
+																		// now samples_to_copy is more like samples_I_just_copied
+																		samples_copied += samples_to_copy;
+																		samples_left -= samples_to_copy;
+																		
+																		
+																		// If we copied any samples, that means the offset has been gobbled up
+																		// If we didn't, reduce the offset by number of samples
+																		if(samples_to_copy > 0)
+																		{
+																			packet_offset = 0;
+																			
+																			position_in_packet += samples_to_copy;
+																		}
+																		else
+																			packet_offset -= samples;
+																		
+																		
+																		synth_result = vorbis_synthesis_read(&vd, samples);
 																	}
-																	else
-																		result = imFileReadFailed;
 																}
 																else
 																	result = imFileReadFailed;
 															}
 															else
 																result = imFileReadFailed;
-															
-															free(data);
 														}
 														else
-															result = imMemErr;
+															result = imFileReadFailed;
+														
+														free(data);
 													}
+													else
+														result = imMemErr;
 												}
 											}
 											
