@@ -729,6 +729,8 @@ exSDKExport(
 		size_t private_size = 0;
 		void *private_data = NULL;
 		
+		csSDK_int32 maxBlip = 0;
+		
 		if(exportInfoP->exportAudio && !vbr_pass)
 		{
 			vorbis_info_init(&vi);
@@ -765,6 +767,8 @@ exSDKExport(
 				
 				private_data = MakePrivateData(header, header_comm, header_code, private_size);
 			}
+			
+			mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
 		}
 		
 		
@@ -1112,9 +1116,6 @@ exSDKExport(
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
 					int samples_to_get = (PrTime)sampleRateP.value.floatValue * duration / 1000000000UL;
-					
-					csSDK_int32 maxBlip = 0;
-					mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
 					
 					// The varying frame sizes (due to rounding) mean that we might sometimes need
 					// a little less than a frame of audio, sometimes we need more.  But Premiere
