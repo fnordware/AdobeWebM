@@ -862,6 +862,75 @@ exSDKExport(
 				const unsigned long duration = nextTimeStamp - timeStamp;
 			
 				
+				if(exportInfoP->exportAudio && !vbr_pass)
+				{
+					int samples_to_get = (PrTime)sampleRateP.value.floatValue * duration / 1000000000UL;
+					
+					// The varying frame sizes (due to rounding) mean that we might sometimes need
+					// a little less than a frame of audio, sometimes we need more.  But Premiere
+					// doesn't like to give more, so I have to call GetAudio twice;
+					while(samples_to_get > 0)
+					{
+						int samples = samples_to_get;
+						
+						if(samples > maxBlip)
+							samples = maxBlip;
+						
+						float **buffer = vorbis_analysis_buffer(&vd, samples);
+						
+						result = audioSuite->GetAudio(audioRenderID, samples, buffer, false);
+						
+						if(result == malNoError)
+						{
+							vorbis_analysis_wrote(&vd, samples);
+					
+							while(vorbis_analysis_blockout(&vd, &vb) == 1)
+							{
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+
+								ogg_packet op;
+								
+								while( vorbis_bitrate_flushpacket(&vd, &op) )
+								{
+									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																		audio_track, timeStamp, 0);
+																			
+									if(!added)
+										result = exportReturn_InternalError;
+								}
+							}
+						}
+							
+						// save the rest of the audio if this is the last frame
+						if(result == malNoError &&
+							(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
+						{
+							vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
+					
+							while(vorbis_analysis_blockout(&vd, &vb) == 1)
+							{
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+
+								ogg_packet op;
+								
+								while( vorbis_bitrate_flushpacket(&vd, &op) )
+								{
+									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																		audio_track, timeStamp, 0);
+																			
+									if(!added)
+										result = exportReturn_InternalError;
+								}
+							}
+						}
+						
+						samples_to_get -= samples;
+					}
+				}
+				
+				
 				if(exportInfoP->exportVideo)
 				{
 					unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
@@ -1109,75 +1178,6 @@ exSDKExport(
 							}
 							
 						}while(pkt != NULL);
-					}
-				}
-				
-				
-				if(exportInfoP->exportAudio && !vbr_pass)
-				{
-					int samples_to_get = (PrTime)sampleRateP.value.floatValue * duration / 1000000000UL;
-					
-					// The varying frame sizes (due to rounding) mean that we might sometimes need
-					// a little less than a frame of audio, sometimes we need more.  But Premiere
-					// doesn't like to give more, so I have to call GetAudio twice;
-					while(samples_to_get > 0)
-					{
-						int samples = samples_to_get;
-						
-						if(samples > maxBlip)
-							samples = maxBlip;
-						
-						float **buffer = vorbis_analysis_buffer(&vd, samples);
-						
-						result = audioSuite->GetAudio(audioRenderID, samples, buffer, false);
-						
-						if(result == malNoError)
-						{
-							vorbis_analysis_wrote(&vd, samples);
-					
-							while(vorbis_analysis_blockout(&vd, &vb) == 1)
-							{
-								vorbis_analysis(&vb, NULL);
-								vorbis_bitrate_addblock(&vb);
-
-								ogg_packet op;
-								
-								while( vorbis_bitrate_flushpacket(&vd, &op) )
-								{
-									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																		audio_track, timeStamp, 0);
-																			
-									if(!added)
-										result = exportReturn_InternalError;
-								}
-							}
-						}
-							
-						// save the rest of the audio if this is the last frame
-						if(result == malNoError &&
-							(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
-						{
-							vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
-					
-							while(vorbis_analysis_blockout(&vd, &vb) == 1)
-							{
-								vorbis_analysis(&vb, NULL);
-								vorbis_bitrate_addblock(&vb);
-
-								ogg_packet op;
-								
-								while( vorbis_bitrate_flushpacket(&vd, &op) )
-								{
-									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																		audio_track, timeStamp, 0);
-																			
-									if(!added)
-										result = exportReturn_InternalError;
-								}
-							}
-						}
-						
-						samples_to_get -= samples;
 					}
 				}
 				
