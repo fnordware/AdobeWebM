@@ -1172,10 +1172,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\x86\vp9_dequantize_sse2.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_detokenize.c"
 				>
 			</File>
@@ -1297,14 +1293,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_idct.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_idct_blk.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_idct_blk.h"
 				>
 			</File>
 			<File
@@ -1430,6 +1418,22 @@
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_postproc.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_postproc.h"
@@ -1572,6 +1576,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scan.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scan.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_seg_common.c"
 				>
 			</File>
@@ -1613,6 +1625,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_subpelvar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_sse2.asm"
 				>
 			</File>
 			<File
@@ -1693,6 +1709,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_treewriter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_vaq.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_vaq.h"
 				>
 			</File>
 			<File

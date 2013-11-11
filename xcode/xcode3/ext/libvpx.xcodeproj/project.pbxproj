@@ -240,8 +240,6 @@
 		2A550D961768193300BE5A72 /* vp9_mvref_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B281768193300BE5A72 /* vp9_mvref_common.h */; };
 		2A550D971768193300BE5A72 /* vp9_onyx.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B291768193300BE5A72 /* vp9_onyx.h */; };
 		2A550D981768193300BE5A72 /* vp9_onyxc_int.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B2A1768193300BE5A72 /* vp9_onyxc_int.h */; };
-		2A550D991768193300BE5A72 /* vp9_postproc.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B2B1768193300BE5A72 /* vp9_postproc.c */; };
-		2A550D9A1768193300BE5A72 /* vp9_postproc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B2C1768193300BE5A72 /* vp9_postproc.h */; };
 		2A550D9B1768193300BE5A72 /* vp9_ppflags.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B2D1768193300BE5A72 /* vp9_ppflags.h */; };
 		2A550D9C1768193300BE5A72 /* vp9_pragmas.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B2E1768193300BE5A72 /* vp9_pragmas.h */; };
 		2A550D9D1768193300BE5A72 /* vp9_pred_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B2F1768193300BE5A72 /* vp9_pred_common.c */; };
@@ -256,7 +254,6 @@
 		2A550DA81768193300BE5A72 /* vp9_sadmxn.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */; };
 		2A550DA91768193300BE5A72 /* vp9_seg_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B3B1768193300BE5A72 /* vp9_seg_common.c */; };
 		2A550DAA1768193300BE5A72 /* vp9_seg_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3C1768193300BE5A72 /* vp9_seg_common.h */; };
-		2A550DAD1768193300BE5A72 /* vp9_subpelvar.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3F1768193300BE5A72 /* vp9_subpelvar.h */; };
 		2A550DB11768193300BE5A72 /* vp9_textblit.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B441768193300BE5A72 /* vp9_textblit.c */; };
 		2A550DB21768193300BE5A72 /* vp9_textblit.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B451768193300BE5A72 /* vp9_textblit.h */; };
 		2A550DB31768193300BE5A72 /* vp9_tile_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B461768193300BE5A72 /* vp9_tile_common.c */; };
@@ -267,9 +264,6 @@
 		2A550DB81768193300BE5A72 /* vp9_idct_intrin_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */; };
 		2A550DBD1768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B511768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c */; };
 		2A550DBE1768193300BE5A72 /* vp9_loopfilter_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B521768193300BE5A72 /* vp9_loopfilter_mmx.asm */; };
-		2A550DC21768193300BE5A72 /* vp9_postproc_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B561768193300BE5A72 /* vp9_postproc_mmx.asm */; };
-		2A550DC31768193300BE5A72 /* vp9_postproc_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B571768193300BE5A72 /* vp9_postproc_sse2.asm */; };
-		2A550DC41768193300BE5A72 /* vp9_postproc_x86.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B581768193300BE5A72 /* vp9_postproc_x86.h */; };
 		2A550DCA1768193300BE5A72 /* vp9_subpixel_8t_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B5E1768193300BE5A72 /* vp9_subpixel_8t_ssse3.asm */; };
 		2A550DCD1768193300BE5A72 /* vp9_dboolhuff.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B621768193300BE5A72 /* vp9_dboolhuff.c */; };
 		2A550DCE1768193300BE5A72 /* vp9_dboolhuff.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B631768193300BE5A72 /* vp9_dboolhuff.h */; };
@@ -279,12 +273,10 @@
 		2A550DD21768193300BE5A72 /* vp9_decodframe.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B671768193300BE5A72 /* vp9_decodframe.h */; };
 		2A550DD51768193300BE5A72 /* vp9_detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6A1768193300BE5A72 /* vp9_detokenize.c */; };
 		2A550DD61768193300BE5A72 /* vp9_detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6B1768193300BE5A72 /* vp9_detokenize.h */; };
-		2A550DD71768193300BE5A72 /* vp9_idct_blk.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6C1768193300BE5A72 /* vp9_idct_blk.c */; };
 		2A550DD81768193300BE5A72 /* vp9_onyxd.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6D1768193300BE5A72 /* vp9_onyxd.h */; };
 		2A550DD91768193300BE5A72 /* vp9_onyxd_if.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6E1768193300BE5A72 /* vp9_onyxd_if.c */; };
 		2A550DDA1768193300BE5A72 /* vp9_onyxd_int.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */; };
 		2A550DDB1768193300BE5A72 /* vp9_treereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B701768193300BE5A72 /* vp9_treereader.h */; };
-		2A550DDC1768193300BE5A72 /* vp9_dequantize_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B721768193300BE5A72 /* vp9_dequantize_sse2.c */; };
 		2A550DE61768193300BE5A72 /* vp9_bitstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B7E1768193300BE5A72 /* vp9_bitstream.c */; };
 		2A550DE71768193300BE5A72 /* vp9_bitstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B7F1768193300BE5A72 /* vp9_bitstream.h */; };
 		2A550DE81768193300BE5A72 /* vp9_block.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B801768193300BE5A72 /* vp9_block.h */; };
@@ -360,8 +352,6 @@
 		2A550E3B1768193300BE5A72 /* vp8cx.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BDF1768193300BE5A72 /* vp8cx.h */; };
 		2A550E3C1768193300BE5A72 /* vp8dx.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE01768193300BE5A72 /* vp8dx.h */; };
 		2A550E3D1768193300BE5A72 /* vpx_codec.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE11768193300BE5A72 /* vpx_codec.h */; };
-		2A550E3E1768193300BE5A72 /* vpx_codec_impl_bottom.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE31768193300BE5A72 /* vpx_codec_impl_bottom.h */; };
-		2A550E3F1768193300BE5A72 /* vpx_codec_impl_top.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE41768193300BE5A72 /* vpx_codec_impl_top.h */; };
 		2A550E401768193300BE5A72 /* vpx_decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE51768193300BE5A72 /* vpx_decoder.h */; };
 		2A550E411768193300BE5A72 /* vpx_encoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE61768193300BE5A72 /* vpx_encoder.h */; };
 		2A550E421768193300BE5A72 /* vpx_image.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BE71768193300BE5A72 /* vpx_image.h */; };
@@ -413,9 +403,14 @@
 		2A8E3ACB17D3BA91008EA603 /* vp9_dct32x32_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E3ACA17D3BA91008EA603 /* vp9_dct32x32_sse2.c */; };
 		2A8E3AD017D3BAE1008EA603 /* vp9_scale.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E3ACE17D3BAE1008EA603 /* vp9_scale.c */; };
 		2A8E3AD117D3BAE1008EA603 /* vp9_scale.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8E3ACF17D3BAE1008EA603 /* vp9_scale.h */; };
+		2A929F0618319B64005C7D1A /* vp9_dct.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A929F0318319B64005C7D1A /* vp9_dct.h */; };
+		2A929F0718319B64005C7D1A /* vp9_vaq.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A929F0418319B64005C7D1A /* vp9_vaq.c */; };
+		2A929F0818319B64005C7D1A /* vp9_vaq.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A929F0518319B64005C7D1A /* vp9_vaq.h */; };
+		2A929F0E18319C10005C7D1A /* vp9_scan.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A929F0C18319C10005C7D1A /* vp9_scan.c */; };
+		2A929F0F18319C10005C7D1A /* vp9_scan.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A929F0D18319C10005C7D1A /* vp9_scan.h */; };
+		2A929F1318319C21005C7D1A /* vp9_subpixel_8t_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A929F1118319C21005C7D1A /* vp9_subpixel_8t_sse2.asm */; };
 		2A975B8417A0562500FFFC04 /* vp9_dsubexp.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */; };
 		2A975B8517A0562500FFFC04 /* vp9_dsubexp.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A975B8117A0562500FFFC04 /* vp9_dsubexp.h */; };
-		2A975B8617A0562500FFFC04 /* vp9_idct_blk.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A975B8217A0562500FFFC04 /* vp9_idct_blk.h */; };
 		2A975B8717A0562500FFFC04 /* vp9_read_bit_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A975B8317A0562500FFFC04 /* vp9_read_bit_buffer.h */; };
 		2A975B8C17A0564500FFFC04 /* vp9_error_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A975B8817A0564500FFFC04 /* vp9_error_sse2.asm */; };
 		2A975B8D17A0564500FFFC04 /* vp9_quantize_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A975B8917A0564500FFFC04 /* vp9_quantize_ssse3.asm */; };
@@ -449,14 +444,6 @@
 		2A55098E1768193200BE5A72 /* args.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = args.c; sourceTree = "<group>"; };
 		2A55098F1768193200BE5A72 /* args.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = args.h; sourceTree = "<group>"; };
 		2A5509901768193200BE5A72 /* example_xma.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = example_xma.c; sourceTree = "<group>"; };
-		2A5509921768193200BE5A72 /* EbmlBufferWriter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EbmlBufferWriter.c; sourceTree = "<group>"; };
-		2A5509931768193200BE5A72 /* EbmlBufferWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EbmlBufferWriter.h; sourceTree = "<group>"; };
-		2A5509941768193200BE5A72 /* EbmlIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EbmlIDs.h; sourceTree = "<group>"; };
-		2A5509951768193200BE5A72 /* EbmlWriter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EbmlWriter.c; sourceTree = "<group>"; };
-		2A5509961768193200BE5A72 /* EbmlWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EbmlWriter.h; sourceTree = "<group>"; };
-		2A5509971768193200BE5A72 /* testlibmkv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testlibmkv.c; sourceTree = "<group>"; };
-		2A5509981768193200BE5A72 /* WebMElement.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WebMElement.c; sourceTree = "<group>"; };
-		2A5509991768193200BE5A72 /* WebMElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebMElement.h; sourceTree = "<group>"; };
 		2A55099A1768193200BE5A72 /* md5_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5_utils.c; sourceTree = "<group>"; };
 		2A55099B1768193200BE5A72 /* md5_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5_utils.h; sourceTree = "<group>"; };
 		2A55099F1768193200BE5A72 /* halloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = halloc.h; sourceTree = "<group>"; };
@@ -807,7 +794,6 @@
 		2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_sadmxn.h; sourceTree = "<group>"; };
 		2A550B3B1768193300BE5A72 /* vp9_seg_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_seg_common.c; sourceTree = "<group>"; };
 		2A550B3C1768193300BE5A72 /* vp9_seg_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_seg_common.h; sourceTree = "<group>"; };
-		2A550B3F1768193300BE5A72 /* vp9_subpelvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_subpelvar.h; sourceTree = "<group>"; };
 		2A550B421768193300BE5A72 /* vp9_systemdependent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_systemdependent.h; sourceTree = "<group>"; };
 		2A550B441768193300BE5A72 /* vp9_textblit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_textblit.c; sourceTree = "<group>"; };
 		2A550B451768193300BE5A72 /* vp9_textblit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_textblit.h; sourceTree = "<group>"; };
@@ -831,12 +817,10 @@
 		2A550B671768193300BE5A72 /* vp9_decodframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodframe.h; sourceTree = "<group>"; };
 		2A550B6A1768193300BE5A72 /* vp9_detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_detokenize.c; sourceTree = "<group>"; };
 		2A550B6B1768193300BE5A72 /* vp9_detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_detokenize.h; sourceTree = "<group>"; };
-		2A550B6C1768193300BE5A72 /* vp9_idct_blk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct_blk.c; sourceTree = "<group>"; };
 		2A550B6D1768193300BE5A72 /* vp9_onyxd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_onyxd.h; sourceTree = "<group>"; };
 		2A550B6E1768193300BE5A72 /* vp9_onyxd_if.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_onyxd_if.c; sourceTree = "<group>"; };
 		2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_onyxd_int.h; sourceTree = "<group>"; };
 		2A550B701768193300BE5A72 /* vp9_treereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_treereader.h; sourceTree = "<group>"; };
-		2A550B721768193300BE5A72 /* vp9_dequantize_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dequantize_sse2.c; sourceTree = "<group>"; };
 		2A550B7E1768193300BE5A72 /* vp9_bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_bitstream.c; sourceTree = "<group>"; };
 		2A550B7F1768193300BE5A72 /* vp9_bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_bitstream.h; sourceTree = "<group>"; };
 		2A550B801768193300BE5A72 /* vp9_block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_block.h; sourceTree = "<group>"; };
@@ -912,8 +896,6 @@
 		2A550BDF1768193300BE5A72 /* vp8cx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp8cx.h; sourceTree = "<group>"; };
 		2A550BE01768193300BE5A72 /* vp8dx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp8dx.h; sourceTree = "<group>"; };
 		2A550BE11768193300BE5A72 /* vpx_codec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_codec.h; sourceTree = "<group>"; };
-		2A550BE31768193300BE5A72 /* vpx_codec_impl_bottom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_codec_impl_bottom.h; sourceTree = "<group>"; };
-		2A550BE41768193300BE5A72 /* vpx_codec_impl_top.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_codec_impl_top.h; sourceTree = "<group>"; };
 		2A550BE51768193300BE5A72 /* vpx_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_decoder.h; sourceTree = "<group>"; };
 		2A550BE61768193300BE5A72 /* vpx_encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_encoder.h; sourceTree = "<group>"; };
 		2A550BE71768193300BE5A72 /* vpx_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_image.h; sourceTree = "<group>"; };
@@ -967,9 +949,14 @@
 		2A8E3ACA17D3BA91008EA603 /* vp9_dct32x32_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct32x32_sse2.c; sourceTree = "<group>"; };
 		2A8E3ACE17D3BAE1008EA603 /* vp9_scale.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_scale.c; sourceTree = "<group>"; };
 		2A8E3ACF17D3BAE1008EA603 /* vp9_scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_scale.h; sourceTree = "<group>"; };
+		2A929F0318319B64005C7D1A /* vp9_dct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_dct.h; sourceTree = "<group>"; };
+		2A929F0418319B64005C7D1A /* vp9_vaq.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_vaq.c; sourceTree = "<group>"; };
+		2A929F0518319B64005C7D1A /* vp9_vaq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_vaq.h; sourceTree = "<group>"; };
+		2A929F0C18319C10005C7D1A /* vp9_scan.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_scan.c; sourceTree = "<group>"; };
+		2A929F0D18319C10005C7D1A /* vp9_scan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_scan.h; sourceTree = "<group>"; };
+		2A929F1118319C21005C7D1A /* vp9_subpixel_8t_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_subpixel_8t_sse2.asm; sourceTree = "<group>"; };
 		2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dsubexp.c; sourceTree = "<group>"; };
 		2A975B8117A0562500FFFC04 /* vp9_dsubexp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_dsubexp.h; sourceTree = "<group>"; };
-		2A975B8217A0562500FFFC04 /* vp9_idct_blk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_idct_blk.h; sourceTree = "<group>"; };
 		2A975B8317A0562500FFFC04 /* vp9_read_bit_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_read_bit_buffer.h; sourceTree = "<group>"; };
 		2A975B8817A0564500FFFC04 /* vp9_error_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_error_sse2.asm; sourceTree = "<group>"; };
 		2A975B8917A0564500FFFC04 /* vp9_quantize_ssse3.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_quantize_ssse3.asm; sourceTree = "<group>"; };
@@ -1021,7 +1008,6 @@
 				2A55098E1768193200BE5A72 /* args.c */,
 				2A55098F1768193200BE5A72 /* args.h */,
 				2A5509901768193200BE5A72 /* example_xma.c */,
-				2A5509911768193200BE5A72 /* libmkv */,
 				2A55099A1768193200BE5A72 /* md5_utils.c */,
 				2A55099B1768193200BE5A72 /* md5_utils.h */,
 				2A55099C1768193200BE5A72 /* nestegg */,
@@ -1044,21 +1030,6 @@
 			name = libvpx;
 			path = ../../../ext/libvpx;
 			sourceTree = SOURCE_ROOT;
-		};
-		2A5509911768193200BE5A72 /* libmkv */ = {
-			isa = PBXGroup;
-			children = (
-				2A5509921768193200BE5A72 /* EbmlBufferWriter.c */,
-				2A5509931768193200BE5A72 /* EbmlBufferWriter.h */,
-				2A5509941768193200BE5A72 /* EbmlIDs.h */,
-				2A5509951768193200BE5A72 /* EbmlWriter.c */,
-				2A5509961768193200BE5A72 /* EbmlWriter.h */,
-				2A5509971768193200BE5A72 /* testlibmkv.c */,
-				2A5509981768193200BE5A72 /* WebMElement.c */,
-				2A5509991768193200BE5A72 /* WebMElement.h */,
-			);
-			path = libmkv;
-			sourceTree = "<group>";
 		};
 		2A55099C1768193200BE5A72 /* nestegg */ = {
 			isa = PBXGroup;
@@ -1634,6 +1605,8 @@
 		2A550AF31768193200BE5A72 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				2A929F0C18319C10005C7D1A /* vp9_scan.c */,
+				2A929F0D18319C10005C7D1A /* vp9_scan.h */,
 				2A8E3ACE17D3BAE1008EA603 /* vp9_scale.c */,
 				2A8E3ACF17D3BAE1008EA603 /* vp9_scale.h */,
 				2A975B9617A056C500FFFC04 /* vp9_common_data.c */,
@@ -1686,7 +1659,6 @@
 				2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */,
 				2A550B3B1768193300BE5A72 /* vp9_seg_common.c */,
 				2A550B3C1768193300BE5A72 /* vp9_seg_common.h */,
-				2A550B3F1768193300BE5A72 /* vp9_subpelvar.h */,
 				2A550B421768193300BE5A72 /* vp9_systemdependent.h */,
 				2A550B441768193300BE5A72 /* vp9_textblit.c */,
 				2A550B451768193300BE5A72 /* vp9_textblit.h */,
@@ -1710,6 +1682,7 @@
 		2A550B4A1768193300BE5A72 /* x86 */ = {
 			isa = PBXGroup;
 			children = (
+				2A929F1118319C21005C7D1A /* vp9_subpixel_8t_sse2.asm */,
 				2A975BA917A05A9100FFFC04 /* vp9_copy_sse2.asm */,
 				2A975BAA17A05A9100FFFC04 /* vp9_intrapred_sse2.asm */,
 				2A975BAB17A05A9100FFFC04 /* vp9_intrapred_ssse3.asm */,
@@ -1732,7 +1705,6 @@
 				2A8E3AC117D3BA2D008EA603 /* vp9_thread.h */,
 				2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */,
 				2A975B8117A0562500FFFC04 /* vp9_dsubexp.h */,
-				2A975B8217A0562500FFFC04 /* vp9_idct_blk.h */,
 				2A975B8317A0562500FFFC04 /* vp9_read_bit_buffer.h */,
 				2A550B621768193300BE5A72 /* vp9_dboolhuff.c */,
 				2A550B631768193300BE5A72 /* vp9_dboolhuff.h */,
@@ -1742,7 +1714,6 @@
 				2A550B671768193300BE5A72 /* vp9_decodframe.h */,
 				2A550B6A1768193300BE5A72 /* vp9_detokenize.c */,
 				2A550B6B1768193300BE5A72 /* vp9_detokenize.h */,
-				2A550B6C1768193300BE5A72 /* vp9_idct_blk.c */,
 				2A550B6D1768193300BE5A72 /* vp9_onyxd.h */,
 				2A550B6E1768193300BE5A72 /* vp9_onyxd_if.c */,
 				2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */,
@@ -1755,7 +1726,6 @@
 		2A550B711768193300BE5A72 /* x86 */ = {
 			isa = PBXGroup;
 			children = (
-				2A550B721768193300BE5A72 /* vp9_dequantize_sse2.c */,
 			);
 			path = x86;
 			sourceTree = "<group>";
@@ -1763,6 +1733,9 @@
 		2A550B741768193300BE5A72 /* encoder */ = {
 			isa = PBXGroup;
 			children = (
+				2A929F0318319B64005C7D1A /* vp9_dct.h */,
+				2A929F0418319B64005C7D1A /* vp9_vaq.c */,
+				2A929F0518319B64005C7D1A /* vp9_vaq.h */,
 				2A975B9017A0565400FFFC04 /* vp9_subexp.c */,
 				2A975B9117A0565400FFFC04 /* vp9_subexp.h */,
 				2A975B9217A0565400FFFC04 /* vp9_write_bit_buffer.h */,
@@ -1855,8 +1828,6 @@
 				2A550BDF1768193300BE5A72 /* vp8cx.h */,
 				2A550BE01768193300BE5A72 /* vp8dx.h */,
 				2A550BE11768193300BE5A72 /* vpx_codec.h */,
-				2A550BE31768193300BE5A72 /* vpx_codec_impl_bottom.h */,
-				2A550BE41768193300BE5A72 /* vpx_codec_impl_top.h */,
 				2A550BE51768193300BE5A72 /* vpx_decoder.h */,
 				2A550BE61768193300BE5A72 /* vpx_encoder.h */,
 				2A550BE71768193300BE5A72 /* vpx_image.h */,
@@ -2076,7 +2047,6 @@
 				2A550D961768193300BE5A72 /* vp9_mvref_common.h in Headers */,
 				2A550D971768193300BE5A72 /* vp9_onyx.h in Headers */,
 				2A550D981768193300BE5A72 /* vp9_onyxc_int.h in Headers */,
-				2A550D9A1768193300BE5A72 /* vp9_postproc.h in Headers */,
 				2A550D9B1768193300BE5A72 /* vp9_ppflags.h in Headers */,
 				2A550D9C1768193300BE5A72 /* vp9_pragmas.h in Headers */,
 				2A550D9E1768193300BE5A72 /* vp9_pred_common.h in Headers */,
@@ -2085,11 +2055,9 @@
 				2A550DA51768193300BE5A72 /* vp9_reconintra.h in Headers */,
 				2A550DA81768193300BE5A72 /* vp9_sadmxn.h in Headers */,
 				2A550DAA1768193300BE5A72 /* vp9_seg_common.h in Headers */,
-				2A550DAD1768193300BE5A72 /* vp9_subpelvar.h in Headers */,
 				2A550DB21768193300BE5A72 /* vp9_textblit.h in Headers */,
 				2A550DB41768193300BE5A72 /* vp9_tile_common.h in Headers */,
 				2A550DB61768193300BE5A72 /* vp9_treecoder.h in Headers */,
-				2A550DC41768193300BE5A72 /* vp9_postproc_x86.h in Headers */,
 				2A550DCE1768193300BE5A72 /* vp9_dboolhuff.h in Headers */,
 				2A550DD01768193300BE5A72 /* vp9_decodemv.h in Headers */,
 				2A550DD21768193300BE5A72 /* vp9_decodframe.h in Headers */,
@@ -2127,8 +2095,6 @@
 				2A550E3B1768193300BE5A72 /* vp8cx.h in Headers */,
 				2A550E3C1768193300BE5A72 /* vp8dx.h in Headers */,
 				2A550E3D1768193300BE5A72 /* vpx_codec.h in Headers */,
-				2A550E3E1768193300BE5A72 /* vpx_codec_impl_bottom.h in Headers */,
-				2A550E3F1768193300BE5A72 /* vpx_codec_impl_top.h in Headers */,
 				2A550E401768193300BE5A72 /* vpx_decoder.h in Headers */,
 				2A550E411768193300BE5A72 /* vpx_encoder.h in Headers */,
 				2A550E421768193300BE5A72 /* vpx_image.h in Headers */,
@@ -2155,7 +2121,6 @@
 				2A550E711768193300BE5A72 /* yv12config.h in Headers */,
 				2A550E751768193300BE5A72 /* y4minput.h in Headers */,
 				2A975B8517A0562500FFFC04 /* vp9_dsubexp.h in Headers */,
-				2A975B8617A0562500FFFC04 /* vp9_idct_blk.h in Headers */,
 				2A975B8717A0562500FFFC04 /* vp9_read_bit_buffer.h in Headers */,
 				2A975B9417A0565400FFFC04 /* vp9_subexp.h in Headers */,
 				2A975B9517A0565400FFFC04 /* vp9_write_bit_buffer.h in Headers */,
@@ -2163,6 +2128,9 @@
 				2A975B9B17A056C500FFFC04 /* vp9_enums.h in Headers */,
 				2A8E3AC317D3BA2D008EA603 /* vp9_thread.h in Headers */,
 				2A8E3AD117D3BAE1008EA603 /* vp9_scale.h in Headers */,
+				2A929F0618319B64005C7D1A /* vp9_dct.h in Headers */,
+				2A929F0818319B64005C7D1A /* vp9_vaq.h in Headers */,
+				2A929F0F18319C10005C7D1A /* vp9_scan.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2357,7 +2325,6 @@
 				2A550D8C1768193300BE5A72 /* vp9_loopfilter.c in Sources */,
 				2A550D8E1768193300BE5A72 /* vp9_loopfilter_filters.c in Sources */,
 				2A550D951768193300BE5A72 /* vp9_mvref_common.c in Sources */,
-				2A550D991768193300BE5A72 /* vp9_postproc.c in Sources */,
 				2A550D9D1768193300BE5A72 /* vp9_pred_common.c in Sources */,
 				2A550D9F1768193300BE5A72 /* vp9_quant_common.c in Sources */,
 				2A550DA21768193300BE5A72 /* vp9_reconinter.c in Sources */,
@@ -2371,16 +2338,12 @@
 				2A550DB81768193300BE5A72 /* vp9_idct_intrin_sse2.c in Sources */,
 				2A550DBD1768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c in Sources */,
 				2A550DBE1768193300BE5A72 /* vp9_loopfilter_mmx.asm in Sources */,
-				2A550DC21768193300BE5A72 /* vp9_postproc_mmx.asm in Sources */,
-				2A550DC31768193300BE5A72 /* vp9_postproc_sse2.asm in Sources */,
 				2A550DCA1768193300BE5A72 /* vp9_subpixel_8t_ssse3.asm in Sources */,
 				2A550DCD1768193300BE5A72 /* vp9_dboolhuff.c in Sources */,
 				2A550DCF1768193300BE5A72 /* vp9_decodemv.c in Sources */,
 				2A550DD11768193300BE5A72 /* vp9_decodframe.c in Sources */,
 				2A550DD51768193300BE5A72 /* vp9_detokenize.c in Sources */,
-				2A550DD71768193300BE5A72 /* vp9_idct_blk.c in Sources */,
 				2A550DD91768193300BE5A72 /* vp9_onyxd_if.c in Sources */,
-				2A550DDC1768193300BE5A72 /* vp9_dequantize_sse2.c in Sources */,
 				2A550DE61768193300BE5A72 /* vp9_bitstream.c in Sources */,
 				2A550DE91768193300BE5A72 /* vp9_boolhuff.c in Sources */,
 				2A550DEB1768193300BE5A72 /* vp9_dct.c in Sources */,
@@ -2460,6 +2423,9 @@
 				2A8E3AC217D3BA2D008EA603 /* vp9_thread.c in Sources */,
 				2A8E3ACB17D3BA91008EA603 /* vp9_dct32x32_sse2.c in Sources */,
 				2A8E3AD017D3BAE1008EA603 /* vp9_scale.c in Sources */,
+				2A929F0718319B64005C7D1A /* vp9_vaq.c in Sources */,
+				2A929F0E18319C10005C7D1A /* vp9_scan.c in Sources */,
+				2A929F1318319C21005C7D1A /* vp9_subpixel_8t_sse2.asm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
