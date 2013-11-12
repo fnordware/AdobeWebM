@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A0099FA1831A7FD00F3993D /* random.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A0099F81831A7FD00F3993D /* random.c */; };
+		2A0099FB1831A7FD00F3993D /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A0099F91831A7FD00F3993D /* random.h */; };
 		2A0E41BC176D061F00420489 /* alpha.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E413A176D061F00420489 /* alpha.c */; };
 		2A0E41BD176D061F00420489 /* alphai.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A0E413B176D061F00420489 /* alphai.h */; };
 		2A0E41BE176D061F00420489 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A0E413C176D061F00420489 /* buffer.c */; };
@@ -99,6 +101,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2A0099F81831A7FD00F3993D /* random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = random.c; sourceTree = "<group>"; };
+		2A0099F91831A7FD00F3993D /* random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random.h; sourceTree = "<group>"; };
 		2A0E413A176D061F00420489 /* alpha.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alpha.c; sourceTree = "<group>"; };
 		2A0E413B176D061F00420489 /* alphai.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alphai.h; sourceTree = "<group>"; };
 		2A0E413C176D061F00420489 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
@@ -338,6 +342,8 @@
 		2A0E4182176D061F00420489 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				2A0099F81831A7FD00F3993D /* random.c */,
+				2A0099F91831A7FD00F3993D /* random.h */,
 				2A8E3A6417D3B887008EA603 /* alpha_processing.c */,
 				2A8E3A6517D3B887008EA603 /* alpha_processing.h */,
 				2A0E4183176D061F00420489 /* bit_reader.c */,
@@ -420,6 +426,7 @@
 				2A0E4211176D061F00420489 /* mux_types.h in Headers */,
 				2A0E4212176D061F00420489 /* types.h in Headers */,
 				2A8E3A6717D3B887008EA603 /* alpha_processing.h in Headers */,
+				2A0099FB1831A7FD00F3993D /* random.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,6 +535,7 @@
 				2A0E4208176D061F00420489 /* thread.c in Sources */,
 				2A0E420A176D061F00420489 /* utils.c in Sources */,
 				2A8E3A6617D3B887008EA603 /* alpha_processing.c in Sources */,
+				2A0099FA1831A7FD00F3993D /* random.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
