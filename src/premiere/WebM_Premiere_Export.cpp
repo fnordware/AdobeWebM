@@ -992,10 +992,8 @@ exSDKExport(
 												VPX_DL_GOOD_QUALITY;
 												
 					bool made_frame = false;
-					bool do_final = false;
-					bool final_prepped = false;
 					
-					while((!made_frame || do_final) && result == suiteError_NoError)
+					while((!made_frame) && result == suiteError_NoError)
 					{
 						const vpx_codec_cx_pkt_t *pkt = NULL;
 						
@@ -1030,9 +1028,17 @@ exSDKExport(
 							}
 						}
 						
-						// this was the codec's last gasp, so we're done
-						if(final_prepped)
-							break;
+						if(vbr_pass)
+						{
+							// if that was the last VBR packet, we have to finalize and write a summary packet,
+							// so go through the loop once more
+							if(videoEncoderTime >= exportInfoP->endTime)
+								made_frame = false;
+							
+							// the final packet was just written, so break
+							if(videoEncoderTime == ULONG_LONG_MAX)
+								break;
+						}
 						
 						// this is for the encoder, which does its own math based on config.g_timebase
 						// let's do the math
@@ -1046,19 +1052,7 @@ exSDKExport(
 						const vpx_codec_pts_t encoder_nextTimeStamp = (encoder_nextFileTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
 						const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
 			
-						if(do_final && result == suiteError_NoError)
-						{
-							// squeeze the last bit out of the encoder
-							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
-							
-							if(encode_err == VPX_CODEC_OK)
-								encoder_iter = NULL;
-							else
-								result = exportReturn_InternalError;
-							
-							final_prepped = true;
-						}
-						else if(!made_frame && result == suiteError_NoError)
+						if(!made_frame && result == suiteError_NoError)
 						{
 							if(videoEncoderTime < exportInfoP->endTime)
 							{
@@ -1087,9 +1081,8 @@ exSDKExport(
 									// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
 									// (the latter two are in "vpx color space"?)
 									// see validate_img() in vp8_cx_iface.c
-									// TODO: VP9 can take VPX_IMG_FMT_I422 and VPX_IMG_FMT_I444
-									// although you probably want to switch to YV12 and yuvconfig2image()
-									// Enable CONFIG_ALPHA to use alpha
+									// TODO: VP9 will eventually accept VPX_IMG_FMT_I422 and VPX_IMG_FMT_I444
+									// not to mention VPX_IMG_FMT_444A for lossless and/or alpha support
 											
 									vpx_image_t img_data;
 									vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);
@@ -1235,10 +1228,19 @@ exSDKExport(
 									pixSuite->Dispose(renderResult.outFrame);
 								}
 							}
-
-							if(videoEncoderTime >= exportInfoP->endTime)
+							else
 							{
-								do_final = true;
+								// squeeze the last bit out of the encoder
+								vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
+								
+								if(encode_err == VPX_CODEC_OK)
+								{
+									videoEncoderTime = ULONG_LONG_MAX;
+									
+									encoder_iter = NULL;
+								}
+								else
+									result = exportReturn_InternalError;
 							}
 						}
 					}
