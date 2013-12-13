@@ -135,7 +135,6 @@
 		2A550CF81768193300BE5A72 /* decodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550A791768193200BE5A72 /* decodemv.c */; };
 		2A550CF91768193300BE5A72 /* decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550A7A1768193200BE5A72 /* decodemv.h */; };
 		2A550CFA1768193300BE5A72 /* decoderthreading.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550A7B1768193200BE5A72 /* decoderthreading.h */; };
-		2A550CFB1768193300BE5A72 /* decodframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550A7C1768193200BE5A72 /* decodframe.c */; };
 		2A550CFC1768193300BE5A72 /* detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550A7D1768193200BE5A72 /* detokenize.c */; };
 		2A550CFD1768193300BE5A72 /* detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550A7E1768193200BE5A72 /* detokenize.h */; };
 		2A550CFE1768193300BE5A72 /* ec_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550A7F1768193200BE5A72 /* ec_types.h */; };
@@ -217,15 +216,12 @@
 		2A550D761768193300BE5A72 /* vp9_convolve.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B081768193300BE5A72 /* vp9_convolve.c */; };
 		2A550D771768193300BE5A72 /* vp9_convolve.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B091768193300BE5A72 /* vp9_convolve.h */; };
 		2A550D781768193300BE5A72 /* vp9_debugmodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B0A1768193300BE5A72 /* vp9_debugmodes.c */; };
-		2A550D791768193300BE5A72 /* vp9_default_coef_probs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B0B1768193300BE5A72 /* vp9_default_coef_probs.h */; };
 		2A550D7A1768193300BE5A72 /* vp9_entropy.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B0C1768193300BE5A72 /* vp9_entropy.c */; };
 		2A550D7B1768193300BE5A72 /* vp9_entropy.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B0D1768193300BE5A72 /* vp9_entropy.h */; };
 		2A550D7C1768193300BE5A72 /* vp9_entropymode.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B0E1768193300BE5A72 /* vp9_entropymode.c */; };
 		2A550D7D1768193300BE5A72 /* vp9_entropymode.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B0F1768193300BE5A72 /* vp9_entropymode.h */; };
 		2A550D7E1768193300BE5A72 /* vp9_entropymv.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B101768193300BE5A72 /* vp9_entropymv.c */; };
 		2A550D7F1768193300BE5A72 /* vp9_entropymv.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B111768193300BE5A72 /* vp9_entropymv.h */; };
-		2A550D801768193300BE5A72 /* vp9_extend.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B121768193300BE5A72 /* vp9_extend.c */; };
-		2A550D811768193300BE5A72 /* vp9_extend.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B131768193300BE5A72 /* vp9_extend.h */; };
 		2A550D821768193300BE5A72 /* vp9_filter.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B141768193300BE5A72 /* vp9_filter.c */; };
 		2A550D831768193300BE5A72 /* vp9_filter.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B151768193300BE5A72 /* vp9_filter.h */; };
 		2A550D841768193300BE5A72 /* vp9_findnearmv.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B161768193300BE5A72 /* vp9_findnearmv.c */; };
@@ -251,14 +247,12 @@
 		2A550DA41768193300BE5A72 /* vp9_reconintra.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B361768193300BE5A72 /* vp9_reconintra.c */; };
 		2A550DA51768193300BE5A72 /* vp9_reconintra.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B371768193300BE5A72 /* vp9_reconintra.h */; };
 		2A550DA71768193300BE5A72 /* vp9_rtcd.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B391768193300BE5A72 /* vp9_rtcd.c */; };
-		2A550DA81768193300BE5A72 /* vp9_sadmxn.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */; };
 		2A550DA91768193300BE5A72 /* vp9_seg_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B3B1768193300BE5A72 /* vp9_seg_common.c */; };
 		2A550DAA1768193300BE5A72 /* vp9_seg_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B3C1768193300BE5A72 /* vp9_seg_common.h */; };
 		2A550DB11768193300BE5A72 /* vp9_textblit.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B441768193300BE5A72 /* vp9_textblit.c */; };
 		2A550DB21768193300BE5A72 /* vp9_textblit.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B451768193300BE5A72 /* vp9_textblit.h */; };
 		2A550DB31768193300BE5A72 /* vp9_tile_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B461768193300BE5A72 /* vp9_tile_common.c */; };
 		2A550DB41768193300BE5A72 /* vp9_tile_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B471768193300BE5A72 /* vp9_tile_common.h */; };
-		2A550DB51768193300BE5A72 /* vp9_treecoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B481768193300BE5A72 /* vp9_treecoder.c */; };
 		2A550DB61768193300BE5A72 /* vp9_treecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B491768193300BE5A72 /* vp9_treecoder.h */; };
 		2A550DB71768193300BE5A72 /* vp9_asm_stubs.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4B1768193300BE5A72 /* vp9_asm_stubs.c */; };
 		2A550DB81768193300BE5A72 /* vp9_idct_intrin_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */; };
@@ -269,14 +263,11 @@
 		2A550DCE1768193300BE5A72 /* vp9_dboolhuff.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B631768193300BE5A72 /* vp9_dboolhuff.h */; };
 		2A550DCF1768193300BE5A72 /* vp9_decodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B641768193300BE5A72 /* vp9_decodemv.c */; };
 		2A550DD01768193300BE5A72 /* vp9_decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B651768193300BE5A72 /* vp9_decodemv.h */; };
-		2A550DD11768193300BE5A72 /* vp9_decodframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B661768193300BE5A72 /* vp9_decodframe.c */; };
-		2A550DD21768193300BE5A72 /* vp9_decodframe.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B671768193300BE5A72 /* vp9_decodframe.h */; };
 		2A550DD51768193300BE5A72 /* vp9_detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6A1768193300BE5A72 /* vp9_detokenize.c */; };
 		2A550DD61768193300BE5A72 /* vp9_detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6B1768193300BE5A72 /* vp9_detokenize.h */; };
 		2A550DD81768193300BE5A72 /* vp9_onyxd.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6D1768193300BE5A72 /* vp9_onyxd.h */; };
 		2A550DD91768193300BE5A72 /* vp9_onyxd_if.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B6E1768193300BE5A72 /* vp9_onyxd_if.c */; };
 		2A550DDA1768193300BE5A72 /* vp9_onyxd_int.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */; };
-		2A550DDB1768193300BE5A72 /* vp9_treereader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B701768193300BE5A72 /* vp9_treereader.h */; };
 		2A550DE61768193300BE5A72 /* vp9_bitstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B7E1768193300BE5A72 /* vp9_bitstream.c */; };
 		2A550DE71768193300BE5A72 /* vp9_bitstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B7F1768193300BE5A72 /* vp9_bitstream.h */; };
 		2A550DE81768193300BE5A72 /* vp9_block.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B801768193300BE5A72 /* vp9_block.h */; };
@@ -285,8 +276,6 @@
 		2A550DEB1768193300BE5A72 /* vp9_dct.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B831768193300BE5A72 /* vp9_dct.c */; };
 		2A550DEC1768193300BE5A72 /* vp9_encodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B841768193300BE5A72 /* vp9_encodeframe.c */; };
 		2A550DED1768193300BE5A72 /* vp9_encodeframe.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B851768193300BE5A72 /* vp9_encodeframe.h */; };
-		2A550DEE1768193300BE5A72 /* vp9_encodeintra.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B861768193300BE5A72 /* vp9_encodeintra.c */; };
-		2A550DEF1768193300BE5A72 /* vp9_encodeintra.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B871768193300BE5A72 /* vp9_encodeintra.h */; };
 		2A550DF01768193300BE5A72 /* vp9_encodemb.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B881768193300BE5A72 /* vp9_encodemb.c */; };
 		2A550DF11768193300BE5A72 /* vp9_encodemb.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B891768193300BE5A72 /* vp9_encodemb.h */; };
 		2A550DF21768193300BE5A72 /* vp9_encodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B8A1768193300BE5A72 /* vp9_encodemv.c */; };
@@ -299,8 +288,6 @@
 		2A550DF91768193300BE5A72 /* vp9_mbgraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B911768193300BE5A72 /* vp9_mbgraph.h */; };
 		2A550DFA1768193300BE5A72 /* vp9_mcomp.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B921768193300BE5A72 /* vp9_mcomp.c */; };
 		2A550DFB1768193300BE5A72 /* vp9_mcomp.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B931768193300BE5A72 /* vp9_mcomp.h */; };
-		2A550DFC1768193300BE5A72 /* vp9_modecosts.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B941768193300BE5A72 /* vp9_modecosts.c */; };
-		2A550DFD1768193300BE5A72 /* vp9_modecosts.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B951768193300BE5A72 /* vp9_modecosts.h */; };
 		2A550DFE1768193300BE5A72 /* vp9_onyx_if.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B961768193300BE5A72 /* vp9_onyx_if.c */; };
 		2A550DFF1768193300BE5A72 /* vp9_onyx_int.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550B971768193300BE5A72 /* vp9_onyx_int.h */; };
 		2A550E001768193300BE5A72 /* vp9_picklpf.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550B981768193300BE5A72 /* vp9_picklpf.c */; };
@@ -425,6 +412,12 @@
 		2A975BAC17A05A9100FFFC04 /* vp9_copy_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A975BA917A05A9100FFFC04 /* vp9_copy_sse2.asm */; };
 		2A975BAD17A05A9100FFFC04 /* vp9_intrapred_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A975BAA17A05A9100FFFC04 /* vp9_intrapred_sse2.asm */; };
 		2A975BAE17A05A9100FFFC04 /* vp9_intrapred_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A975BAB17A05A9100FFFC04 /* vp9_intrapred_ssse3.asm */; };
+		2AC4169C185B0E14000EFF77 /* vp9_decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AC4169A185B0E14000EFF77 /* vp9_decodeframe.c */; };
+		2AC4169D185B0E14000EFF77 /* vp9_decodeframe.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AC4169B185B0E14000EFF77 /* vp9_decodeframe.h */; };
+		2AC416A1185B0E24000EFF77 /* vp9_extend.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AC4169E185B0E24000EFF77 /* vp9_extend.c */; };
+		2AC416A2185B0E24000EFF77 /* vp9_extend.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AC4169F185B0E24000EFF77 /* vp9_extend.h */; };
+		2AC416A3185B0E24000EFF77 /* vp9_sadmxn.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AC416A0185B0E24000EFF77 /* vp9_sadmxn.h */; };
+		2AC416A7185B0E4A000EFF77 /* decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AC416A6185B0E4A000EFF77 /* decodeframe.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -643,7 +636,6 @@
 		2A550A791768193200BE5A72 /* decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decodemv.c; sourceTree = "<group>"; };
 		2A550A7A1768193200BE5A72 /* decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decodemv.h; sourceTree = "<group>"; };
 		2A550A7B1768193200BE5A72 /* decoderthreading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decoderthreading.h; sourceTree = "<group>"; };
-		2A550A7C1768193200BE5A72 /* decodframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decodframe.c; sourceTree = "<group>"; };
 		2A550A7D1768193200BE5A72 /* detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = detokenize.c; sourceTree = "<group>"; };
 		2A550A7E1768193200BE5A72 /* detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = detokenize.h; sourceTree = "<group>"; };
 		2A550A7F1768193200BE5A72 /* ec_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ec_types.h; sourceTree = "<group>"; };
@@ -755,15 +747,12 @@
 		2A550B081768193300BE5A72 /* vp9_convolve.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_convolve.c; sourceTree = "<group>"; };
 		2A550B091768193300BE5A72 /* vp9_convolve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_convolve.h; sourceTree = "<group>"; };
 		2A550B0A1768193300BE5A72 /* vp9_debugmodes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_debugmodes.c; sourceTree = "<group>"; };
-		2A550B0B1768193300BE5A72 /* vp9_default_coef_probs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_default_coef_probs.h; sourceTree = "<group>"; };
 		2A550B0C1768193300BE5A72 /* vp9_entropy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_entropy.c; sourceTree = "<group>"; };
 		2A550B0D1768193300BE5A72 /* vp9_entropy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_entropy.h; sourceTree = "<group>"; };
 		2A550B0E1768193300BE5A72 /* vp9_entropymode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_entropymode.c; sourceTree = "<group>"; };
 		2A550B0F1768193300BE5A72 /* vp9_entropymode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_entropymode.h; sourceTree = "<group>"; };
 		2A550B101768193300BE5A72 /* vp9_entropymv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_entropymv.c; sourceTree = "<group>"; };
 		2A550B111768193300BE5A72 /* vp9_entropymv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_entropymv.h; sourceTree = "<group>"; };
-		2A550B121768193300BE5A72 /* vp9_extend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_extend.c; sourceTree = "<group>"; };
-		2A550B131768193300BE5A72 /* vp9_extend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_extend.h; sourceTree = "<group>"; };
 		2A550B141768193300BE5A72 /* vp9_filter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_filter.c; sourceTree = "<group>"; };
 		2A550B151768193300BE5A72 /* vp9_filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_filter.h; sourceTree = "<group>"; };
 		2A550B161768193300BE5A72 /* vp9_findnearmv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_findnearmv.c; sourceTree = "<group>"; };
@@ -791,7 +780,6 @@
 		2A550B361768193300BE5A72 /* vp9_reconintra.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_reconintra.c; sourceTree = "<group>"; };
 		2A550B371768193300BE5A72 /* vp9_reconintra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_reconintra.h; sourceTree = "<group>"; };
 		2A550B391768193300BE5A72 /* vp9_rtcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_rtcd.c; sourceTree = "<group>"; };
-		2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_sadmxn.h; sourceTree = "<group>"; };
 		2A550B3B1768193300BE5A72 /* vp9_seg_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_seg_common.c; sourceTree = "<group>"; };
 		2A550B3C1768193300BE5A72 /* vp9_seg_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_seg_common.h; sourceTree = "<group>"; };
 		2A550B421768193300BE5A72 /* vp9_systemdependent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_systemdependent.h; sourceTree = "<group>"; };
@@ -799,7 +787,6 @@
 		2A550B451768193300BE5A72 /* vp9_textblit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_textblit.h; sourceTree = "<group>"; };
 		2A550B461768193300BE5A72 /* vp9_tile_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_tile_common.c; sourceTree = "<group>"; };
 		2A550B471768193300BE5A72 /* vp9_tile_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_tile_common.h; sourceTree = "<group>"; };
-		2A550B481768193300BE5A72 /* vp9_treecoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_treecoder.c; sourceTree = "<group>"; };
 		2A550B491768193300BE5A72 /* vp9_treecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_treecoder.h; sourceTree = "<group>"; };
 		2A550B4B1768193300BE5A72 /* vp9_asm_stubs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_asm_stubs.c; sourceTree = "<group>"; };
 		2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct_intrin_sse2.c; sourceTree = "<group>"; };
@@ -813,14 +800,11 @@
 		2A550B631768193300BE5A72 /* vp9_dboolhuff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_dboolhuff.h; sourceTree = "<group>"; };
 		2A550B641768193300BE5A72 /* vp9_decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_decodemv.c; sourceTree = "<group>"; };
 		2A550B651768193300BE5A72 /* vp9_decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodemv.h; sourceTree = "<group>"; };
-		2A550B661768193300BE5A72 /* vp9_decodframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_decodframe.c; sourceTree = "<group>"; };
-		2A550B671768193300BE5A72 /* vp9_decodframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodframe.h; sourceTree = "<group>"; };
 		2A550B6A1768193300BE5A72 /* vp9_detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_detokenize.c; sourceTree = "<group>"; };
 		2A550B6B1768193300BE5A72 /* vp9_detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_detokenize.h; sourceTree = "<group>"; };
 		2A550B6D1768193300BE5A72 /* vp9_onyxd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_onyxd.h; sourceTree = "<group>"; };
 		2A550B6E1768193300BE5A72 /* vp9_onyxd_if.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_onyxd_if.c; sourceTree = "<group>"; };
 		2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_onyxd_int.h; sourceTree = "<group>"; };
-		2A550B701768193300BE5A72 /* vp9_treereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_treereader.h; sourceTree = "<group>"; };
 		2A550B7E1768193300BE5A72 /* vp9_bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_bitstream.c; sourceTree = "<group>"; };
 		2A550B7F1768193300BE5A72 /* vp9_bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_bitstream.h; sourceTree = "<group>"; };
 		2A550B801768193300BE5A72 /* vp9_block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_block.h; sourceTree = "<group>"; };
@@ -829,8 +813,6 @@
 		2A550B831768193300BE5A72 /* vp9_dct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct.c; sourceTree = "<group>"; };
 		2A550B841768193300BE5A72 /* vp9_encodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_encodeframe.c; sourceTree = "<group>"; };
 		2A550B851768193300BE5A72 /* vp9_encodeframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_encodeframe.h; sourceTree = "<group>"; };
-		2A550B861768193300BE5A72 /* vp9_encodeintra.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_encodeintra.c; sourceTree = "<group>"; };
-		2A550B871768193300BE5A72 /* vp9_encodeintra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_encodeintra.h; sourceTree = "<group>"; };
 		2A550B881768193300BE5A72 /* vp9_encodemb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_encodemb.c; sourceTree = "<group>"; };
 		2A550B891768193300BE5A72 /* vp9_encodemb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_encodemb.h; sourceTree = "<group>"; };
 		2A550B8A1768193300BE5A72 /* vp9_encodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_encodemv.c; sourceTree = "<group>"; };
@@ -843,8 +825,6 @@
 		2A550B911768193300BE5A72 /* vp9_mbgraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_mbgraph.h; sourceTree = "<group>"; };
 		2A550B921768193300BE5A72 /* vp9_mcomp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_mcomp.c; sourceTree = "<group>"; };
 		2A550B931768193300BE5A72 /* vp9_mcomp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_mcomp.h; sourceTree = "<group>"; };
-		2A550B941768193300BE5A72 /* vp9_modecosts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_modecosts.c; sourceTree = "<group>"; };
-		2A550B951768193300BE5A72 /* vp9_modecosts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_modecosts.h; sourceTree = "<group>"; };
 		2A550B961768193300BE5A72 /* vp9_onyx_if.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_onyx_if.c; sourceTree = "<group>"; };
 		2A550B971768193300BE5A72 /* vp9_onyx_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_onyx_int.h; sourceTree = "<group>"; };
 		2A550B981768193300BE5A72 /* vp9_picklpf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_picklpf.c; sourceTree = "<group>"; };
@@ -971,6 +951,14 @@
 		2A975BA917A05A9100FFFC04 /* vp9_copy_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_copy_sse2.asm; sourceTree = "<group>"; };
 		2A975BAA17A05A9100FFFC04 /* vp9_intrapred_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_intrapred_sse2.asm; sourceTree = "<group>"; };
 		2A975BAB17A05A9100FFFC04 /* vp9_intrapred_ssse3.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_intrapred_ssse3.asm; sourceTree = "<group>"; };
+		2AC4169A185B0E14000EFF77 /* vp9_decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_decodeframe.c; sourceTree = "<group>"; };
+		2AC4169B185B0E14000EFF77 /* vp9_decodeframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodeframe.h; sourceTree = "<group>"; };
+		2AC4169E185B0E24000EFF77 /* vp9_extend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_extend.c; sourceTree = "<group>"; };
+		2AC4169F185B0E24000EFF77 /* vp9_extend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_extend.h; sourceTree = "<group>"; };
+		2AC416A0185B0E24000EFF77 /* vp9_sadmxn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_sadmxn.h; sourceTree = "<group>"; };
+		2AC416A6185B0E4A000EFF77 /* decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decodeframe.c; sourceTree = "<group>"; };
+		2AC416B8185B1049000EFF77 /* vp9_dct_avx2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct_avx2.c; sourceTree = "<group>"; };
+		2AC416B9185B1049000EFF77 /* vp9_dct32x32_avx2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct32x32_avx2.c; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libvpx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libvpx.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -1425,12 +1413,12 @@
 		2A550A761768193200BE5A72 /* decoder */ = {
 			isa = PBXGroup;
 			children = (
+				2AC416A6185B0E4A000EFF77 /* decodeframe.c */,
 				2A550A771768193200BE5A72 /* dboolhuff.c */,
 				2A550A781768193200BE5A72 /* dboolhuff.h */,
 				2A550A791768193200BE5A72 /* decodemv.c */,
 				2A550A7A1768193200BE5A72 /* decodemv.h */,
 				2A550A7B1768193200BE5A72 /* decoderthreading.h */,
-				2A550A7C1768193200BE5A72 /* decodframe.c */,
 				2A550A7D1768193200BE5A72 /* detokenize.c */,
 				2A550A7E1768193200BE5A72 /* detokenize.h */,
 				2A550A7F1768193200BE5A72 /* ec_types.h */,
@@ -1620,15 +1608,12 @@
 				2A550B081768193300BE5A72 /* vp9_convolve.c */,
 				2A550B091768193300BE5A72 /* vp9_convolve.h */,
 				2A550B0A1768193300BE5A72 /* vp9_debugmodes.c */,
-				2A550B0B1768193300BE5A72 /* vp9_default_coef_probs.h */,
 				2A550B0C1768193300BE5A72 /* vp9_entropy.c */,
 				2A550B0D1768193300BE5A72 /* vp9_entropy.h */,
 				2A550B0E1768193300BE5A72 /* vp9_entropymode.c */,
 				2A550B0F1768193300BE5A72 /* vp9_entropymode.h */,
 				2A550B101768193300BE5A72 /* vp9_entropymv.c */,
 				2A550B111768193300BE5A72 /* vp9_entropymv.h */,
-				2A550B121768193300BE5A72 /* vp9_extend.c */,
-				2A550B131768193300BE5A72 /* vp9_extend.h */,
 				2A550B141768193300BE5A72 /* vp9_filter.c */,
 				2A550B151768193300BE5A72 /* vp9_filter.h */,
 				2A550B161768193300BE5A72 /* vp9_findnearmv.c */,
@@ -1656,7 +1641,6 @@
 				2A550B361768193300BE5A72 /* vp9_reconintra.c */,
 				2A550B371768193300BE5A72 /* vp9_reconintra.h */,
 				2A550B391768193300BE5A72 /* vp9_rtcd.c */,
-				2A550B3A1768193300BE5A72 /* vp9_sadmxn.h */,
 				2A550B3B1768193300BE5A72 /* vp9_seg_common.c */,
 				2A550B3C1768193300BE5A72 /* vp9_seg_common.h */,
 				2A550B421768193300BE5A72 /* vp9_systemdependent.h */,
@@ -1664,7 +1648,6 @@
 				2A550B451768193300BE5A72 /* vp9_textblit.h */,
 				2A550B461768193300BE5A72 /* vp9_tile_common.c */,
 				2A550B471768193300BE5A72 /* vp9_tile_common.h */,
-				2A550B481768193300BE5A72 /* vp9_treecoder.c */,
 				2A550B491768193300BE5A72 /* vp9_treecoder.h */,
 				2A550B4A1768193300BE5A72 /* x86 */,
 			);
@@ -1701,6 +1684,8 @@
 		2A550B601768193300BE5A72 /* decoder */ = {
 			isa = PBXGroup;
 			children = (
+				2AC4169A185B0E14000EFF77 /* vp9_decodeframe.c */,
+				2AC4169B185B0E14000EFF77 /* vp9_decodeframe.h */,
 				2A8E3AC017D3BA2D008EA603 /* vp9_thread.c */,
 				2A8E3AC117D3BA2D008EA603 /* vp9_thread.h */,
 				2A975B8017A0562500FFFC04 /* vp9_dsubexp.c */,
@@ -1710,14 +1695,11 @@
 				2A550B631768193300BE5A72 /* vp9_dboolhuff.h */,
 				2A550B641768193300BE5A72 /* vp9_decodemv.c */,
 				2A550B651768193300BE5A72 /* vp9_decodemv.h */,
-				2A550B661768193300BE5A72 /* vp9_decodframe.c */,
-				2A550B671768193300BE5A72 /* vp9_decodframe.h */,
 				2A550B6A1768193300BE5A72 /* vp9_detokenize.c */,
 				2A550B6B1768193300BE5A72 /* vp9_detokenize.h */,
 				2A550B6D1768193300BE5A72 /* vp9_onyxd.h */,
 				2A550B6E1768193300BE5A72 /* vp9_onyxd_if.c */,
 				2A550B6F1768193300BE5A72 /* vp9_onyxd_int.h */,
-				2A550B701768193300BE5A72 /* vp9_treereader.h */,
 				2A550B711768193300BE5A72 /* x86 */,
 			);
 			path = decoder;
@@ -1733,6 +1715,9 @@
 		2A550B741768193300BE5A72 /* encoder */ = {
 			isa = PBXGroup;
 			children = (
+				2AC4169E185B0E24000EFF77 /* vp9_extend.c */,
+				2AC4169F185B0E24000EFF77 /* vp9_extend.h */,
+				2AC416A0185B0E24000EFF77 /* vp9_sadmxn.h */,
 				2A929F0318319B64005C7D1A /* vp9_dct.h */,
 				2A929F0418319B64005C7D1A /* vp9_vaq.c */,
 				2A929F0518319B64005C7D1A /* vp9_vaq.h */,
@@ -1747,8 +1732,6 @@
 				2A550B831768193300BE5A72 /* vp9_dct.c */,
 				2A550B841768193300BE5A72 /* vp9_encodeframe.c */,
 				2A550B851768193300BE5A72 /* vp9_encodeframe.h */,
-				2A550B861768193300BE5A72 /* vp9_encodeintra.c */,
-				2A550B871768193300BE5A72 /* vp9_encodeintra.h */,
 				2A550B881768193300BE5A72 /* vp9_encodemb.c */,
 				2A550B891768193300BE5A72 /* vp9_encodemb.h */,
 				2A550B8A1768193300BE5A72 /* vp9_encodemv.c */,
@@ -1761,8 +1744,6 @@
 				2A550B911768193300BE5A72 /* vp9_mbgraph.h */,
 				2A550B921768193300BE5A72 /* vp9_mcomp.c */,
 				2A550B931768193300BE5A72 /* vp9_mcomp.h */,
-				2A550B941768193300BE5A72 /* vp9_modecosts.c */,
-				2A550B951768193300BE5A72 /* vp9_modecosts.h */,
 				2A550B961768193300BE5A72 /* vp9_onyx_if.c */,
 				2A550B971768193300BE5A72 /* vp9_onyx_int.h */,
 				2A550B981768193300BE5A72 /* vp9_picklpf.c */,
@@ -1795,6 +1776,8 @@
 		2A550BAE1768193300BE5A72 /* x86 */ = {
 			isa = PBXGroup;
 			children = (
+				2AC416B8185B1049000EFF77 /* vp9_dct_avx2.c */,
+				2AC416B9185B1049000EFF77 /* vp9_dct32x32_avx2.c */,
 				2A8E3ACA17D3BA91008EA603 /* vp9_dct32x32_sse2.c */,
 				2A975B8817A0564500FFFC04 /* vp9_error_sse2.asm */,
 				2A975B8917A0564500FFFC04 /* vp9_quantize_ssse3.asm */,
@@ -2034,11 +2017,9 @@
 				2A550D721768193300BE5A72 /* vp9_blockd.h in Headers */,
 				2A550D741768193300BE5A72 /* vp9_common.h in Headers */,
 				2A550D771768193300BE5A72 /* vp9_convolve.h in Headers */,
-				2A550D791768193300BE5A72 /* vp9_default_coef_probs.h in Headers */,
 				2A550D7B1768193300BE5A72 /* vp9_entropy.h in Headers */,
 				2A550D7D1768193300BE5A72 /* vp9_entropymode.h in Headers */,
 				2A550D7F1768193300BE5A72 /* vp9_entropymv.h in Headers */,
-				2A550D811768193300BE5A72 /* vp9_extend.h in Headers */,
 				2A550D831768193300BE5A72 /* vp9_filter.h in Headers */,
 				2A550D851768193300BE5A72 /* vp9_findnearmv.h in Headers */,
 				2A550D881768193300BE5A72 /* vp9_idct.h in Headers */,
@@ -2053,30 +2034,25 @@
 				2A550DA01768193300BE5A72 /* vp9_quant_common.h in Headers */,
 				2A550DA31768193300BE5A72 /* vp9_reconinter.h in Headers */,
 				2A550DA51768193300BE5A72 /* vp9_reconintra.h in Headers */,
-				2A550DA81768193300BE5A72 /* vp9_sadmxn.h in Headers */,
 				2A550DAA1768193300BE5A72 /* vp9_seg_common.h in Headers */,
 				2A550DB21768193300BE5A72 /* vp9_textblit.h in Headers */,
 				2A550DB41768193300BE5A72 /* vp9_tile_common.h in Headers */,
 				2A550DB61768193300BE5A72 /* vp9_treecoder.h in Headers */,
 				2A550DCE1768193300BE5A72 /* vp9_dboolhuff.h in Headers */,
 				2A550DD01768193300BE5A72 /* vp9_decodemv.h in Headers */,
-				2A550DD21768193300BE5A72 /* vp9_decodframe.h in Headers */,
 				2A550DD61768193300BE5A72 /* vp9_detokenize.h in Headers */,
 				2A550DD81768193300BE5A72 /* vp9_onyxd.h in Headers */,
 				2A550DDA1768193300BE5A72 /* vp9_onyxd_int.h in Headers */,
-				2A550DDB1768193300BE5A72 /* vp9_treereader.h in Headers */,
 				2A550DE71768193300BE5A72 /* vp9_bitstream.h in Headers */,
 				2A550DE81768193300BE5A72 /* vp9_block.h in Headers */,
 				2A550DEA1768193300BE5A72 /* vp9_boolhuff.h in Headers */,
 				2A550DED1768193300BE5A72 /* vp9_encodeframe.h in Headers */,
-				2A550DEF1768193300BE5A72 /* vp9_encodeintra.h in Headers */,
 				2A550DF11768193300BE5A72 /* vp9_encodemb.h in Headers */,
 				2A550DF31768193300BE5A72 /* vp9_encodemv.h in Headers */,
 				2A550DF51768193300BE5A72 /* vp9_firstpass.h in Headers */,
 				2A550DF71768193300BE5A72 /* vp9_lookahead.h in Headers */,
 				2A550DF91768193300BE5A72 /* vp9_mbgraph.h in Headers */,
 				2A550DFB1768193300BE5A72 /* vp9_mcomp.h in Headers */,
-				2A550DFD1768193300BE5A72 /* vp9_modecosts.h in Headers */,
 				2A550DFF1768193300BE5A72 /* vp9_onyx_int.h in Headers */,
 				2A550E011768193300BE5A72 /* vp9_picklpf.h in Headers */,
 				2A550E031768193300BE5A72 /* vp9_psnr.h in Headers */,
@@ -2131,6 +2107,9 @@
 				2A929F0618319B64005C7D1A /* vp9_dct.h in Headers */,
 				2A929F0818319B64005C7D1A /* vp9_vaq.h in Headers */,
 				2A929F0F18319C10005C7D1A /* vp9_scan.h in Headers */,
+				2AC4169D185B0E14000EFF77 /* vp9_decodeframe.h in Headers */,
+				2AC416A2185B0E24000EFF77 /* vp9_extend.h in Headers */,
+				2AC416A3185B0E24000EFF77 /* vp9_sadmxn.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2265,7 +2244,6 @@
 				2A550CF51768193300BE5A72 /* vp8_asm_stubs.c in Sources */,
 				2A550CF61768193300BE5A72 /* dboolhuff.c in Sources */,
 				2A550CF81768193300BE5A72 /* decodemv.c in Sources */,
-				2A550CFB1768193300BE5A72 /* decodframe.c in Sources */,
 				2A550CFC1768193300BE5A72 /* detokenize.c in Sources */,
 				2A550D011768193300BE5A72 /* onyxd_if.c in Sources */,
 				2A550D031768193300BE5A72 /* threading.c in Sources */,
@@ -2318,7 +2296,6 @@
 				2A550D7A1768193300BE5A72 /* vp9_entropy.c in Sources */,
 				2A550D7C1768193300BE5A72 /* vp9_entropymode.c in Sources */,
 				2A550D7E1768193300BE5A72 /* vp9_entropymv.c in Sources */,
-				2A550D801768193300BE5A72 /* vp9_extend.c in Sources */,
 				2A550D821768193300BE5A72 /* vp9_filter.c in Sources */,
 				2A550D841768193300BE5A72 /* vp9_findnearmv.c in Sources */,
 				2A550D871768193300BE5A72 /* vp9_idct.c in Sources */,
@@ -2333,7 +2310,6 @@
 				2A550DA91768193300BE5A72 /* vp9_seg_common.c in Sources */,
 				2A550DB11768193300BE5A72 /* vp9_textblit.c in Sources */,
 				2A550DB31768193300BE5A72 /* vp9_tile_common.c in Sources */,
-				2A550DB51768193300BE5A72 /* vp9_treecoder.c in Sources */,
 				2A550DB71768193300BE5A72 /* vp9_asm_stubs.c in Sources */,
 				2A550DB81768193300BE5A72 /* vp9_idct_intrin_sse2.c in Sources */,
 				2A550DBD1768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c in Sources */,
@@ -2341,21 +2317,18 @@
 				2A550DCA1768193300BE5A72 /* vp9_subpixel_8t_ssse3.asm in Sources */,
 				2A550DCD1768193300BE5A72 /* vp9_dboolhuff.c in Sources */,
 				2A550DCF1768193300BE5A72 /* vp9_decodemv.c in Sources */,
-				2A550DD11768193300BE5A72 /* vp9_decodframe.c in Sources */,
 				2A550DD51768193300BE5A72 /* vp9_detokenize.c in Sources */,
 				2A550DD91768193300BE5A72 /* vp9_onyxd_if.c in Sources */,
 				2A550DE61768193300BE5A72 /* vp9_bitstream.c in Sources */,
 				2A550DE91768193300BE5A72 /* vp9_boolhuff.c in Sources */,
 				2A550DEB1768193300BE5A72 /* vp9_dct.c in Sources */,
 				2A550DEC1768193300BE5A72 /* vp9_encodeframe.c in Sources */,
-				2A550DEE1768193300BE5A72 /* vp9_encodeintra.c in Sources */,
 				2A550DF01768193300BE5A72 /* vp9_encodemb.c in Sources */,
 				2A550DF21768193300BE5A72 /* vp9_encodemv.c in Sources */,
 				2A550DF41768193300BE5A72 /* vp9_firstpass.c in Sources */,
 				2A550DF61768193300BE5A72 /* vp9_lookahead.c in Sources */,
 				2A550DF81768193300BE5A72 /* vp9_mbgraph.c in Sources */,
 				2A550DFA1768193300BE5A72 /* vp9_mcomp.c in Sources */,
-				2A550DFC1768193300BE5A72 /* vp9_modecosts.c in Sources */,
 				2A550DFE1768193300BE5A72 /* vp9_onyx_if.c in Sources */,
 				2A550E001768193300BE5A72 /* vp9_picklpf.c in Sources */,
 				2A550E021768193300BE5A72 /* vp9_psnr.c in Sources */,
@@ -2426,6 +2399,9 @@
 				2A929F0718319B64005C7D1A /* vp9_vaq.c in Sources */,
 				2A929F0E18319C10005C7D1A /* vp9_scan.c in Sources */,
 				2A929F1318319C21005C7D1A /* vp9_subpixel_8t_sse2.asm in Sources */,
+				2AC4169C185B0E14000EFF77 /* vp9_decodeframe.c in Sources */,
+				2AC416A1185B0E24000EFF77 /* vp9_extend.c in Sources */,
+				2AC416A7185B0E4A000EFF77 /* decodeframe.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
