@@ -202,11 +202,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\decodemv.c"
+				RelativePath="..\..\..\..\ext\libvpx\vp8\decoder\decodeframe.c"
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\decodframe.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\decodemv.c"
 				>
 			</File>
 			<File
@@ -1152,19 +1152,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodemv.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodemv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodframe.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodframe.h"
 				>
 			</File>
 			<File
@@ -1197,14 +1197,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeframe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeintra.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeintra.h"
 				>
 			</File>
 			<File
@@ -1256,11 +1248,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_extend.c"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_extend.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.h"
 				>
 			</File>
 			<File
@@ -1357,14 +1349,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_mcomp_x86.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_modecosts.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_modecosts.h"
 				>
 			</File>
 			<File
@@ -1564,6 +1548,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sadmxn.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_sadmxn.h"
 				>
 			</File>
@@ -1689,10 +1677,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_tokenize.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_treecoder.c"
 				>
 			</File>
 			<File
