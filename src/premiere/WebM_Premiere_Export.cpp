@@ -642,6 +642,9 @@ exSDKExport(
 		vpx_codec_err_t codec_err = VPX_CODEC_OK;
 		
 		vpx_codec_ctx_t encoder;
+		vpx_codec_iter_t encoder_iter = NULL;
+		
+		PrTime videoEncoderTime = exportInfoP->startTime;
 		
 		if(exportInfoP->exportVideo)
 		{
@@ -848,16 +851,6 @@ exSDKExport(
 				const PrTime fileTime = videoTime - exportInfoP->startTime;
 				const PrTime nextFileTime = fileTime + frameRateP.value.timeValue;
 				
-				// this is for the encoder, which does its own math based on config.g_timebase
-				// let's do the math
-				// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
-				// timestamp = time / timebase
-				// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
-				const vpx_codec_pts_t encoder_timeStamp = fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
-				const vpx_codec_pts_t encoder_nextTimeStamp = (nextFileTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
-				const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
-				
-				
 				// This is the key step, where we quantize our time based on the timeCode
 				// to match how the frames are actually stored by the muxer.  If you want more precision,
 				// lower timeCodeScale.  Time (in nanoseconds) = TimeCode * TimeCodeScale.
@@ -867,6 +860,11 @@ exSDKExport(
 				const uint64_t timeStamp = timeCode * timeCodeScale;
 				const uint64_t nextTimeStamp = nextTimeCode * timeCodeScale;
 			
+				
+				// When writing WebM, we want blocks of audio and video interleaved.
+				// But encoders don't always cooperate with our wishes.  We feed them some data,
+				// but they may not be ready to produce output right away.  So what we do is keep
+				// feeding in the data until the output we want is produced.
 				
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
@@ -989,251 +987,262 @@ exSDKExport(
 				
 				if(exportInfoP->exportVideo)
 				{
-					unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
+					const unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
 												vidEncodingP.value.intValue == WEBM_ENCODING_BEST ? VPX_DL_BEST_QUALITY :
 												VPX_DL_GOOD_QUALITY;
 												
-							
-					SequenceRender_GetFrameReturnRec renderResult;
+					bool made_frame = false;
 					
-					result = renderSuite->RenderVideoFrame(videoRenderID,
-															videoTime,
-															&renderParms,
-															kRenderCacheType_None,
-															&renderResult);
-					
-					if(result == suiteError_NoError)
+					while((!made_frame) && result == suiteError_NoError)
 					{
-						PrPixelFormat pixFormat;
-						prRect bounds;
-						csSDK_uint32 parN, parD;
+						const vpx_codec_cx_pkt_t *pkt = NULL;
 						
-						pixSuite->GetPixelFormat(renderResult.outFrame, &pixFormat);
-						pixSuite->GetBounds(renderResult.outFrame, &bounds);
-						pixSuite->GetPixelAspectRatio(renderResult.outFrame, &parN, &parD);
-						
-						const int width = bounds.right - bounds.left;
-						const int height = bounds.bottom - bounds.top;
-						
-						
-						// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
-						// (the latter two are in "vpx color space"?)
-						// see validate_img() in vp8_cx_iface.c
-						// TODO: VP9 can take VPX_IMG_FMT_I422 and VPX_IMG_FMT_I444
-						// although you probably want to switch to YV12 and yuvconfig2image()
-						// Enable CONFIG_ALPHA to use alpha
-								
-						vpx_image_t img_data;
-						vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);
-						
-						if(img)
+						if( (pkt = vpx_codec_get_cx_data(&encoder, &encoder_iter)) )
 						{
-							if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
+							if(pkt->kind == VPX_CODEC_STATS_PKT)
 							{
-								char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-								csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+								assert(vbr_pass);
+							
+								if(vbr_buffer_size == 0)
+									vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
+								else
+									memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.frame.sz);
 								
-								pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
-																	&Y_PixelAddress, &Y_RowBytes,
-																	&U_PixelAddress, &U_RowBytes,
-																	&V_PixelAddress, &V_RowBytes);
+								memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.frame.buf, pkt->data.frame.sz);
 								
-								for(int y = 0; y < img->d_h; y++)
-								{
-									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-									
-									unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-									
-									memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
-								}
+								vbr_buffer_size += pkt->data.frame.sz;
 								
-								for(int y = 0; y < img->d_h / 2; y++)
-								{
-									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-									
-									unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-									unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-									
-									memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
-									memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
-								}
+								made_frame = true;
 							}
-							else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
+							else if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
 							{
-								// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
-								char *frameBufferP = NULL;
-								csSDK_int32 rowbytes = 0;
+								assert(!vbr_pass);
+							
+								bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+																	vid_track, timeStamp,
+																	(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
+								made_frame = true;
 								
-								pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-								pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+								if(!added)
+									result = exportReturn_InternalError;
+							}
+						}
+						
+						if(vbr_pass)
+						{
+							// if that was the last VBR packet, we have to finalize and write a summary packet,
+							// so go through the loop once more
+							if(videoEncoderTime >= exportInfoP->endTime)
+								made_frame = false;
+							
+							// the final packet was just written, so break
+							if(videoEncoderTime == ULONG_LONG_MAX)
+								break;
+						}
+						
+						// this is for the encoder, which does its own math based on config.g_timebase
+						// let's do the math
+						// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
+						// timestamp = time / timebase
+						// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
+						const PrTime encoder_fileTime = videoEncoderTime - exportInfoP->startTime;
+						const PrTime encoder_nextFileTime = encoder_fileTime + frameRateP.value.timeValue;
+						
+						const vpx_codec_pts_t encoder_timeStamp = encoder_fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
+						const vpx_codec_pts_t encoder_nextTimeStamp = (encoder_nextFileTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
+						const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
+			
+						if(!made_frame && result == suiteError_NoError)
+						{
+							if(videoEncoderTime < exportInfoP->endTime)
+							{
+								SequenceRender_GetFrameReturnRec renderResult;
 								
+								result = renderSuite->RenderVideoFrame(videoRenderID,
+																		videoEncoderTime,
+																		&renderParms,
+																		kRenderCacheType_None,
+																		&renderResult);
 								
-								for(int y = 0; y < img->d_h; y++)
+								if(result == suiteError_NoError)
 								{
-									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
-									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+									PrPixelFormat pixFormat;
+									prRect bounds;
+									csSDK_uint32 parN, parD;
 									
-									unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+									pixSuite->GetPixelFormat(renderResult.outFrame, &pixFormat);
+									pixSuite->GetBounds(renderResult.outFrame, &bounds);
+									pixSuite->GetPixelAspectRatio(renderResult.outFrame, &parN, &parD);
 									
-									unsigned short *prB = prBGRA + 0;
-									unsigned short *prG = prBGRA + 1;
-									unsigned short *prR = prBGRA + 2;
-									unsigned short *prA = prBGRA + 3;
+									const int width = bounds.right - bounds.left;
+									const int height = bounds.bottom - bounds.top;
 									
-									for(int x=0; x < img->d_w; x++)
+									
+									// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
+									// (the latter two are in "vpx color space"?)
+									// see validate_img() in vp8_cx_iface.c
+									// TODO: VP9 will eventually accept VPX_IMG_FMT_I422 and VPX_IMG_FMT_I444
+									// not to mention VPX_IMG_FMT_444A for lossless and/or alpha support
+											
+									vpx_image_t img_data;
+									vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);
+									
+									if(img)
 									{
-										*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
-										
-										if( (y % 2 == 0) && (x % 2 == 0) )
+										if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
 										{
-											*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
-											*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
+											char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+											csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+											
+											pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
+																				&Y_PixelAddress, &Y_RowBytes,
+																				&U_PixelAddress, &U_RowBytes,
+																				&V_PixelAddress, &V_RowBytes);
+											
+											for(int y = 0; y < img->d_h; y++)
+											{
+												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+												
+												unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+												
+												memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
+											}
+											
+											for(int y = 0; y < img->d_h / 2; y++)
+											{
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+												
+												unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+												unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+												
+												memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
+												memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
+											}
+										}
+										else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
+										{
+											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
+											char *frameBufferP = NULL;
+											csSDK_int32 rowbytes = 0;
+											
+											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+											
+											
+											for(int y = 0; y < img->d_h; y++)
+											{
+												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+												
+												unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+												
+												unsigned short *prB = prBGRA + 0;
+												unsigned short *prG = prBGRA + 1;
+												unsigned short *prR = prBGRA + 2;
+												unsigned short *prA = prBGRA + 3;
+												
+												for(int x=0; x < img->d_w; x++)
+												{
+													*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
+													
+													if( (y % 2 == 0) && (x % 2 == 0) )
+													{
+														*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
+														*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
+													}
+													
+													prR += 4;
+													prG += 4;
+													prB += 4;
+													prA += 4;
+												}
+											}
+										}
+										else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
+										{
+											// so here's our dumb RGB to YUV conversion
+										
+											char *frameBufferP = NULL;
+											csSDK_int32 rowbytes = 0;
+											
+											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+											
+											
+											for(int y = 0; y < img->d_h; y++)
+											{
+												// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
+												
+												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+												
+												// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
+												unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+												
+												unsigned char *prB = prBGRA + 0;
+												unsigned char *prG = prBGRA + 1;
+												unsigned char *prR = prBGRA + 2;
+												unsigned char *prA = prBGRA + 3;
+												
+												for(int x=0; x < img->d_w; x++)
+												{
+													// like the clever integer (fixed point) math?
+													*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
+													
+													if( (y % 2 == 0) && (x % 2 == 0) )
+													{
+														*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
+														*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;
+													}
+													
+													prR += 4;
+													prG += 4;
+													prB += 4;
+													prA += 4;
+												}
+											}
 										}
 										
-										prR += 4;
-										prG += 4;
-										prB += 4;
-										prA += 4;
-									}
-								}
-							}
-							else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
-							{
-								// so here's our dumb RGB to YUV conversion
-							
-								char *frameBufferP = NULL;
-								csSDK_int32 rowbytes = 0;
-								
-								pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-								pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-								
-								
-								for(int y = 0; y < img->d_h; y++)
-								{
-									// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
-									
-									unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-									unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
-									unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
-									
-									// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
-									unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-									
-									unsigned char *prB = prBGRA + 0;
-									unsigned char *prG = prBGRA + 1;
-									unsigned char *prR = prBGRA + 2;
-									unsigned char *prA = prBGRA + 3;
-									
-									for(int x=0; x < img->d_w; x++)
-									{
-										// like the clever integer (fixed point) math?
-										*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
 										
-										if( (y % 2 == 0) && (x % 2 == 0) )
+										vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_timeStamp, encoder_duration, 0, deadline);
+										
+										if(encode_err == VPX_CODEC_OK)
 										{
-											*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
-											*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;
+											videoEncoderTime += frameRateP.value.timeValue;
+
+											encoder_iter = NULL;
 										}
-										
-										prR += 4;
-										prG += 4;
-										prB += 4;
-										prA += 4;
-									}
-								}
-							}
-							
-							
-							vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_timeStamp, encoder_duration, 0, deadline);
-							
-							if(encode_err == VPX_CODEC_OK)
-							{
-								const vpx_codec_cx_pkt_t *pkt = NULL;
-								vpx_codec_iter_t iter = NULL;
-								 
-								while( (pkt = vpx_codec_get_cx_data(&encoder, &iter)) )
-								{
-									if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
-									{
-										assert(!vbr_pass);
-									
-										bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
-																			vid_track, timeStamp,
-																			(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
-																			
-										if(!added)
-											result = exportReturn_InternalError;
-									}
-									else if(pkt->kind == VPX_CODEC_STATS_PKT)
-									{
-										assert(vbr_pass);
-										
-										if(vbr_buffer_size == 0)
-											vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
 										else
-											memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.frame.sz);
+											result = exportReturn_InternalError;
 										
-										memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.frame.buf, pkt->data.frame.sz);
 										
-										vbr_buffer_size += pkt->data.frame.sz;
+										vpx_img_free(img);
 									}
+									else
+										result = exportReturn_ErrMemory;
+									
+									
+									pixSuite->Dispose(renderResult.outFrame);
 								}
 							}
 							else
-								result = exportReturn_InternalError;
-							
-							vpx_img_free(img);
-						}
-						else
-							result = exportReturn_ErrMemory;
-						
-						pixSuite->Dispose(renderResult.outFrame);
-					}
-					else
-						assert(false); // error retreiving frame?
-					
-					
-					// squeeze last bits from encoder
-					if(result == malNoError &&
-						(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
-					{
-						const vpx_codec_cx_pkt_t *pkt = NULL;
-						vpx_codec_iter_t iter = NULL;
-						
-						do{
-							vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
-							
-							pkt = vpx_codec_get_cx_data(&encoder, &iter);
-							
-							if(pkt != NULL)
 							{
-								if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
+								// squeeze the last bit out of the encoder
+								vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
+								
+								if(encode_err == VPX_CODEC_OK)
 								{
-									assert(!vbr_pass);
+									videoEncoderTime = ULONG_LONG_MAX;
 									
-									bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
-																		vid_track, timeStamp,
-																		(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
-									assert(added);
+									encoder_iter = NULL;
 								}
-								else if(pkt->kind == VPX_CODEC_STATS_PKT)
-								{
-									assert(vbr_pass);
-									
-									if(vbr_buffer_size == 0)
-										vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
-									else
-										memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.frame.sz);
-									
-									memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.frame.buf, pkt->data.frame.sz);
-									
-									vbr_buffer_size += pkt->data.frame.sz;
-								}
+								else
+									result = exportReturn_InternalError;
 							}
-							
-						}while(pkt != NULL);
+						}
 					}
 				}
 				
@@ -1270,6 +1279,8 @@ exSDKExport(
 
 		if(exportInfoP->exportVideo)
 		{
+			assert(NULL == vpx_codec_get_cx_data(&encoder, &encoder_iter));
+		
 			vpx_codec_err_t destroy_err = vpx_codec_destroy(&encoder);
 			assert(destroy_err == VPX_CODEC_OK);
 		}
