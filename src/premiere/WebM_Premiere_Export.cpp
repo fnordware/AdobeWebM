@@ -660,7 +660,8 @@ exSDKExport(
 			
 			if(method == WEBM_METHOD_QUALITY)
 			{
-				config.g_usage = config.rc_end_usage = VPX_CQ;
+				config.rc_end_usage = VPX_CQ;
+				config.g_pass = VPX_RC_ONE_PASS;
 				
 				const int min_q = config.rc_min_quantizer + 1;
 				const int max_q = config.rc_max_quantizer;
@@ -672,7 +673,7 @@ exSDKExport(
 			{
 				if(method == WEBM_METHOD_VBR)
 				{
-					config.g_usage = config.rc_end_usage = VPX_VBR;
+					config.rc_end_usage = VPX_VBR;
 					
 					if(vbr_pass)
 					{
@@ -688,7 +689,7 @@ exSDKExport(
 				}
 				else
 				{
-					config.g_usage = config.rc_end_usage = VPX_CBR;
+					config.rc_end_usage = VPX_CBR;
 					config.g_pass = VPX_RC_ONE_PASS;
 				}
 				
