@@ -219,7 +219,7 @@ exSDKGenerateDefaultParams(
 	// Match source
 	exParamValues matchSourceValues;
 	matchSourceValues.structVersion = 1;
-	matchSourceValues.value.intValue = kPrTrue;
+	matchSourceValues.value.intValue = kPrFalse;
 	matchSourceValues.disabled = kPrFalse;
 	matchSourceValues.hidden = kPrFalse;
 	
@@ -239,7 +239,7 @@ exSDKGenerateDefaultParams(
 	widthValues.rangeMin.intValue = 16;
 	widthValues.rangeMax.intValue = 8192;
 	widthValues.value.intValue = widthP.mInt32;
-	widthValues.disabled = kPrTrue;
+	widthValues.disabled = kPrFalse;
 	widthValues.hidden = kPrFalse;
 	
 	exNewParamInfo widthParam;
@@ -258,7 +258,7 @@ exSDKGenerateDefaultParams(
 	heightValues.rangeMin.intValue = 16;
 	heightValues.rangeMax.intValue = 8192;
 	heightValues.value.intValue = heightP.mInt32;
-	heightValues.disabled = kPrTrue;
+	heightValues.disabled = kPrFalse;
 	heightValues.hidden = kPrFalse;
 	
 	exNewParamInfo heightParam;
@@ -280,7 +280,7 @@ exSDKGenerateDefaultParams(
 	parValues.rangeMax.ratioValue.denominator = 1;
 	parValues.value.ratioValue.numerator = parN.mInt32;
 	parValues.value.ratioValue.denominator = parD.mInt32;
-	parValues.disabled = kPrTrue;
+	parValues.disabled = kPrFalse;
 	parValues.hidden = kPrFalse;
 	
 	exNewParamInfo parParam;
@@ -297,7 +297,7 @@ exSDKGenerateDefaultParams(
 	exParamValues fieldOrderValues;
 	fieldOrderValues.structVersion = 1;
 	fieldOrderValues.value.intValue = fieldTypeP.mInt32;
-	fieldOrderValues.disabled = kPrTrue;
+	fieldOrderValues.disabled = kPrFalse;
 	fieldOrderValues.hidden = kPrFalse;
 	
 	exNewParamInfo fieldOrderParam;
@@ -316,7 +316,7 @@ exSDKGenerateDefaultParams(
 	fpsValues.rangeMin.timeValue = 1;
 	timeSuite->GetTicksPerSecond(&fpsValues.rangeMax.timeValue);
 	fpsValues.value.timeValue = frameRateP.mInt64;
-	fpsValues.disabled = kPrTrue;
+	fpsValues.disabled = kPrFalse;
 	fpsValues.hidden = kPrFalse;
 	
 	exNewParamInfo fpsParam;
