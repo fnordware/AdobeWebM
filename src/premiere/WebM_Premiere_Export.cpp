@@ -863,9 +863,9 @@ exSDKExport(
 				
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
-					const PrAudioSample nextBlockAudoSample = nextTimeStamp * (PrAudioSample)sampleRateP.value.floatValue / 1000000000UL;
+					const PrAudioSample nextBlockAudioSample = nextTimeStamp * (PrAudioSample)sampleRateP.value.floatValue / 1000000000UL;
 					
-					while(op.granulepos < nextBlockAudoSample && currentAudioSample < endAudioSample && result == malNoError)
+					while(op.granulepos < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
 					{
 						if(packet_waiting && op.packet != NULL && op.bytes > 0)
 						{
@@ -886,7 +886,7 @@ exSDKExport(
 									{
 										assert(packet_waiting == false);
 									
-										if(op.granulepos < nextBlockAudoSample)
+										if(op.granulepos < nextBlockAudioSample)
 										{
 											bool added = muxer_segment.AddFrame(op.packet, op.bytes,
 																				audio_track, timeStamp, 0);
@@ -937,7 +937,7 @@ exSDKExport(
 									{
 										assert(packet_waiting == false);
 									
-										if(op.granulepos < nextBlockAudoSample)
+										if(op.granulepos < nextBlockAudioSample)
 										{
 											bool added = muxer_segment.AddFrame(op.packet, op.bytes,
 																				audio_track, timeStamp, 0);
