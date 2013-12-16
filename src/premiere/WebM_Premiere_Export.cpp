@@ -47,8 +47,8 @@
 	#include <mach/mach.h>
 #else
 	#include <assert.h>
-	#include <time.h>
-	#include <sys/timeb.h>
+
+	#define ULONG_LONG_MAX ULLONG_MAX
 #endif
 
 
