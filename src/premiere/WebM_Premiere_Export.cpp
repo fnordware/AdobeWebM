@@ -661,7 +661,12 @@ exSDKExport(
 			if(method == WEBM_METHOD_QUALITY)
 			{
 				config.g_usage = config.rc_end_usage = VPX_CQ;
-				config.rc_target_bitrate = 1000000; // what they do in libvpxenc.c in FFmpeg
+				
+				const int min_q = config.rc_min_quantizer + 1;
+				const int max_q = config.rc_max_quantizer;
+				
+				// our 0...100 slider will be used to bring max_q down to min_q
+				config.rc_max_quantizer = min_q + ((((float)(100 - videoQualityP.value.intValue) / 100.f) * (max_q - min_q)) + 0.5f);
 			}
 			else
 			{
@@ -704,17 +709,6 @@ exSDKExport(
 			
 			if(codec_err == VPX_CODEC_OK)
 			{
-				if(method == WEBM_METHOD_QUALITY)
-				{
-					// our slider goes 0..100, quality goes 0..63, and it's reversed
-					int qual = ((float)videoQualityP.value.intValue * 63.f / 100.f) + 0.5f; // old formula for the header that says it's 0..63
-					int quan = (((float)(100 - videoQualityP.value.intValue) / 100.f) * (config.rc_max_quantizer - config.rc_min_quantizer)) + config.rc_min_quantizer + 0.5f;
-				
-					vpx_codec_err_t config_err = vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, quan);
-					
-					assert(config_err == VPX_CODEC_OK);
-				}
-				
 				ConfigureEncoderPost(&encoder, customArgs);
 			}
 		}
