@@ -1304,223 +1304,224 @@ SDKImportAudio7(
 			
 				if(trackType == mkvparser::Track::kAudio)
 				{
-					assert(pTrack->GetCodecId() == std::string("A_VORBIS"));
-				
 					const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
 					
 					if(pAudioTrack)
 					{
-						size_t private_size = 0;
-						const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
-						
-						if(private_data && private_size && PrivateDataCount(private_data, private_size) == 3)
+						if(pTrack->GetCodecId() == std::string("A_VORBIS"))
 						{
-							vorbis_info vi;
-							vorbis_comment vc;
-							vorbis_dsp_state vd;
-							vorbis_block vb;
+							size_t private_size = 0;
+							const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
 							
-							vorbis_info_init(&vi);
-							vorbis_comment_init(&vc);
-							
-							int ogg_packet_num = 0;
-							
-						#define OV_OK 0
-						
-							int v_err = OV_OK;
-							
-							for(int h=0; h < 3 && v_err == OV_OK; h++)
+							if(private_data && private_size && PrivateDataCount(private_data, private_size) == 3)
 							{
-								size_t length = 0;
-								const unsigned char *data = GetPrivateDataPart(private_data, private_size,
-																				h, &length);
+								vorbis_info vi;
+								vorbis_comment vc;
+								vorbis_dsp_state vd;
+								vorbis_block vb;
 								
-								if(data != NULL)
+								vorbis_info_init(&vi);
+								vorbis_comment_init(&vc);
+								
+								int ogg_packet_num = 0;
+								
+							#define OV_OK 0
+							
+								int v_err = OV_OK;
+								
+								for(int h=0; h < 3 && v_err == OV_OK; h++)
 								{
-									ogg_packet packet;
+									size_t length = 0;
+									const unsigned char *data = GetPrivateDataPart(private_data, private_size,
+																					h, &length);
 									
-									packet.packet = (unsigned char *)data;
-									packet.bytes = length;
-									packet.b_o_s = (h == 0);
-									packet.e_o_s = false;
-									packet.granulepos = 0;
-									packet.packetno = ogg_packet_num++;
-									
-									v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
-								}
-							}
-									
-							if(v_err == OV_OK)
-							{
-								v_err = vorbis_synthesis_init(&vd, &vi);
-								
-								if(v_err == OV_OK)
-									v_err = vorbis_block_init(&vd, &vb);
-								
-								// TODO: Figure out how to seek compressed audio exactly.
-								// From watching the audio encoding process, I know that you don't
-								// get to put a frame's worth of audio into each block, you have to
-								// do what the encoder lets you.  That means some of the audio you intended
-								// for this block could find its way into the next one.
-								// Movie players typically just worry about playing the audio straight
-								// through and then put up frames at the appointed times.  You sync video
-								// to audio, not the other way around.
-								// But Premiere asks for a specific sample of audio.  The only guaranteed way
-								// to provide that would be to decompress the entire audio stream from the
-								// beginning.  Uncompressed formats have it easy.
-								
-								const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
-								
-								pAudioTrack->Seek(tstamp, pSeekBlockEntry);
-								
-								if(pSeekBlockEntry != NULL)
-								{
-									csSDK_uint32 samples_copied = 0;
-									csSDK_uint32 samples_left = audioRec7->size;
-									
-									const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
-									
-									while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
+									if(data != NULL)
 									{
-										const mkvparser::BlockEntry* pBlockEntry = NULL;
+										ogg_packet packet;
 										
-										pCluster->GetFirst(pBlockEntry);
+										packet.packet = (unsigned char *)data;
+										packet.bytes = length;
+										packet.b_o_s = (h == 0);
+										packet.e_o_s = false;
+										packet.granulepos = 0;
+										packet.packetno = ogg_packet_num++;
 										
-										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && samples_left > 0 && result == malNoError)
+										v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
+									}
+								}
+										
+								if(v_err == OV_OK)
+								{
+									v_err = vorbis_synthesis_init(&vd, &vi);
+									
+									if(v_err == OV_OK)
+										v_err = vorbis_block_init(&vd, &vb);
+									
+									// TODO: Figure out how to seek compressed audio exactly.
+									// From watching the audio encoding process, I know that you don't
+									// get to put a frame's worth of audio into each block, you have to
+									// do what the encoder lets you.  That means some of the audio you intended
+									// for this block could find its way into the next one.
+									// Movie players typically just worry about playing the audio straight
+									// through and then put up frames at the appointed times.  You sync video
+									// to audio, not the other way around.
+									// But Premiere asks for a specific sample of audio.  The only guaranteed way
+									// to provide that would be to decompress the entire audio stream from the
+									// beginning.  Uncompressed formats have it easy.
+									
+									const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+									
+									pAudioTrack->Seek(tstamp, pSeekBlockEntry);
+									
+									if(pSeekBlockEntry != NULL)
+									{
+										csSDK_uint32 samples_copied = 0;
+										csSDK_uint32 samples_left = audioRec7->size;
+										
+										const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
+										
+										while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
 										{
-											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+											const mkvparser::BlockEntry* pBlockEntry = NULL;
 											
-											if(pBlock->GetTrackNumber() == localRecP->audio_track)
+											pCluster->GetFirst(pBlockEntry);
+											
+											while((pBlockEntry != NULL) && !pBlockEntry->EOS() && samples_left > 0 && result == malNoError)
 											{
-												long long packet_tstamp = pBlock->GetTime(pCluster);
+												const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 												
-												PrAudioSample packet_offset = 0;
-													
-												PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
-													
-												if(audioRec7->position > packet_start)
-													packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
-												
-													
-												int position_in_packet = 0;
-												
-													
-												for(int f=0; f < pBlock->GetFrameCount(); f++)
+												if(pBlock->GetTrackNumber() == localRecP->audio_track)
 												{
-													const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+													long long packet_tstamp = pBlock->GetTime(pCluster);
 													
-													unsigned int length = blockFrame.len;
-													uint8_t *data = (uint8_t *)malloc(length);
-													
-													if(data != NULL)
-													{
-														int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+													PrAudioSample packet_offset = 0;
 														
-														if(read_err == PrMkvReader::PrMkvSuccess)
+													PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+														
+													if(audioRec7->position > packet_start)
+														packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+													
+														
+													int position_in_packet = 0;
+													
+														
+													for(int f=0; f < pBlock->GetFrameCount(); f++)
+													{
+														const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+														
+														unsigned int length = blockFrame.len;
+														uint8_t *data = (uint8_t *)malloc(length);
+														
+														if(data != NULL)
 														{
-															ogg_packet packet;
-										
-															packet.packet = data;
-															packet.bytes = length;
-															packet.b_o_s = false;
-															packet.e_o_s = false;
-															packet.granulepos = -1;
-															packet.packetno = ogg_packet_num++;
-
-															int synth_err = vorbis_synthesis(&vb, &packet);
+															int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
 															
-															if(synth_err == OV_OK)
+															if(read_err == PrMkvReader::PrMkvSuccess)
 															{
-																int block_err = vorbis_synthesis_blockin(&vd, &vb);
+																ogg_packet packet;
+											
+																packet.packet = data;
+																packet.bytes = length;
+																packet.b_o_s = false;
+																packet.e_o_s = false;
+																packet.granulepos = -1;
+																packet.packetno = ogg_packet_num++;
+
+																int synth_err = vorbis_synthesis(&vb, &packet);
 																
-																if(block_err == OV_OK)
+																if(synth_err == OV_OK)
 																{
-																	float **pcm = NULL;
-																	int samples = 0;
+																	int block_err = vorbis_synthesis_blockin(&vd, &vb);
 																	
-																	int synth_result = 1;
-																	
-																	while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+																	if(block_err == OV_OK)
 																	{
-																		// I feel like the code here is hard to read.  Sorry about that.
-																	
-																		int samples_to_copy = 0;
+																		float **pcm = NULL;
+																		int samples = 0;
 																		
-																		// if the offset is bigger than the samples, we'll just move along
-																		if(packet_offset < samples)
+																		int synth_result = 1;
+																		
+																		while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
 																		{
-																			int samples_after_offset = samples - packet_offset;
+																			// I feel like the code here is hard to read.  Sorry about that.
+																		
+																			int samples_to_copy = 0;
 																			
-																			samples_to_copy = minimum<int>(samples_left, samples_after_offset);
-																		}
-																	
-																		// how nice, audio samples are float, just like Premiere wants 'em
-																		for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
-																		{
-																			memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
-																		}
+																			// if the offset is bigger than the samples, we'll just move along
+																			if(packet_offset < samples)
+																			{
+																				int samples_after_offset = samples - packet_offset;
+																				
+																				samples_to_copy = minimum<int>(samples_left, samples_after_offset);
+																			}
 																		
-																		// now samples_to_copy is more like samples_I_just_copied
-																		samples_copied += samples_to_copy;
-																		samples_left -= samples_to_copy;
-																		
-																		
-																		// If we copied any samples, that means the offset has been gobbled up
-																		// If we didn't, reduce the offset by number of samples
-																		if(samples_to_copy > 0)
-																		{
-																			packet_offset = 0;
+																			// how nice, audio samples are float, just like Premiere wants 'em
+																			for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
+																			{
+																				memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+																			}
 																			
-																			position_in_packet += samples_to_copy;
+																			// now samples_to_copy is more like samples_I_just_copied
+																			samples_copied += samples_to_copy;
+																			samples_left -= samples_to_copy;
+																			
+																			
+																			// If we copied any samples, that means the offset has been gobbled up
+																			// If we didn't, reduce the offset by number of samples
+																			if(samples_to_copy > 0)
+																			{
+																				packet_offset = 0;
+																				
+																				position_in_packet += samples_to_copy;
+																			}
+																			else
+																				packet_offset -= samples;
+																			
+																			
+																			synth_result = vorbis_synthesis_read(&vd, samples);
 																		}
-																		else
-																			packet_offset -= samples;
-																		
-																		
-																		synth_result = vorbis_synthesis_read(&vd, samples);
 																	}
+																	else
+																		result = imFileReadFailed;
 																}
 																else
 																	result = imFileReadFailed;
 															}
 															else
 																result = imFileReadFailed;
+															
+															free(data);
 														}
 														else
-															result = imFileReadFailed;
-														
-														free(data);
+															result = imMemErr;
 													}
-													else
-														result = imMemErr;
 												}
+												
+												long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+												
+												assert(status == 0);
 											}
 											
-											long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
-											
-											assert(status == 0);
+											pCluster = localRecP->segment->GetNext(pCluster);
 										}
-										
-										pCluster = localRecP->segment->GetNext(pCluster);
-									}
 
-									// there might not be samples left at the end; not much we can do about that
-									assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
+										// there might not be samples left at the end; not much we can do about that
+										assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
+									}
+									else
+										result = imFileReadFailed;
 								}
 								else
 									result = imFileReadFailed;
+								
+								
+								vorbis_block_clear(&vb);
+								vorbis_dsp_clear(&vd);
+								vorbis_info_clear(&vi);
+								vorbis_comment_clear(&vc);
 							}
 							else
 								result = imFileReadFailed;
-							
-							
-							vorbis_block_clear(&vb);
-							vorbis_dsp_clear(&vd);
-							vorbis_info_clear(&vi);
-							vorbis_comment_clear(&vc);
 						}
-						else
-							result = imFileReadFailed;
 					}
 					else
 						result = imFileReadFailed;
