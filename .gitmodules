@@ -13,3 +13,6 @@
 [submodule "ext/libogg"]
 	path = ext/libogg
 	url = https://git.xiph.org/mirrors/ogg.git
+[submodule "ext/opus"]
+	path = ext/opus
+	url = git://git.opus-codec.org/opus.git
