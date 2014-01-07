@@ -15,6 +15,7 @@
 		2A58AED9176CF23F00669435 /* WebM_Premiere_Export.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A58AED4176CF23F00669435 /* WebM_Premiere_Export.cpp */; };
 		2A58AEDA176CF23F00669435 /* WebM_Premiere_Import.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A58AED6176CF23F00669435 /* WebM_Premiere_Import.cpp */; };
 		2A6E91F717796859003B0F87 /* libwebm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A6E91F417796854003B0F87 /* libwebm.a */; };
+		2A8BBBC8187BD305004EC034 /* libopus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A8BBBC5187BD302004EC034 /* libopus.a */; };
 		8D01CCCA0486CAD60068D4B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D01CCCE0486CAD60068D4B7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08EA7FFBFE8413EDC02AAC07 /* Carbon.framework */; };
 /* End PBXBuildFile section */
@@ -76,6 +77,20 @@
 			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = libwebm;
 		};
+		2A8BBBC4187BD302004EC034 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A8BBBBD187BD302004EC034 /* opus.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
+			remoteInfo = opus;
+		};
+		2A8BBBC9187BD312004EC034 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A8BBBBD187BD302004EC034 /* opus.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = opus;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -111,6 +126,7 @@
 		2A58AED6176CF23F00669435 /* WebM_Premiere_Import.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebM_Premiere_Import.cpp; sourceTree = "<group>"; };
 		2A58AED7176CF23F00669435 /* WebM_Premiere_Import.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebM_Premiere_Import.h; sourceTree = "<group>"; };
 		2A6E91E817796854003B0F87 /* libwebm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libwebm.xcodeproj; path = ext/libwebm.xcodeproj; sourceTree = "<group>"; };
+		2A8BBBBD187BD302004EC034 /* opus.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = opus.xcodeproj; path = ext/opus.xcodeproj; sourceTree = "<group>"; };
 		8D01CCD10486CAD60068D4B7 /* WebM_Premiere_Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = WebM_Premiere_Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -124,6 +140,7 @@
 				2A553330176ADB4E00BE5A72 /* libvorbis.a in Frameworks */,
 				2A553331176ADB4E00BE5A72 /* libvpx.a in Frameworks */,
 				2A6E91F717796859003B0F87 /* libwebm.a in Frameworks */,
+				2A8BBBC8187BD305004EC034 /* libopus.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +156,7 @@
 				2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */,
 				2A55321D176AA87700BE5A72 /* libogg.xcodeproj */,
 				2A553220176AA87700BE5A72 /* libvorbis.xcodeproj */,
+				2A8BBBBD187BD302004EC034 /* opus.xcodeproj */,
 				089C1671FE841209C02AAC07 /* External Frameworks and Libraries */,
 				19C28FB4FE9D528D11CA2CBB /* Products */,
 			);
@@ -223,6 +241,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		2A8BBBBE187BD302004EC034 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2A8BBBC5187BD302004EC034 /* libopus.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -243,6 +269,7 @@
 				2A553335176ADB5600BE5A72 /* PBXTargetDependency */,
 				2A553337176ADB5600BE5A72 /* PBXTargetDependency */,
 				2A6E91F917796863003B0F87 /* PBXTargetDependency */,
+				2A8BBBCA187BD312004EC034 /* PBXTargetDependency */,
 			);
 			name = "WebM Premiere";
 			productInstallPath = "$(HOME)/Library/Bundles";
@@ -284,6 +311,10 @@
 					ProductGroup = 2A6E91E917796854003B0F87 /* Products */;
 					ProjectRef = 2A6E91E817796854003B0F87 /* libwebm.xcodeproj */;
 				},
+				{
+					ProductGroup = 2A8BBBBE187BD302004EC034 /* Products */;
+					ProjectRef = 2A8BBBBD187BD302004EC034 /* opus.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -319,6 +350,13 @@
 			fileType = archive.ar;
 			path = libwebm.a;
 			remoteRef = 2A6E91F317796854003B0F87 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2A8BBBC5187BD302004EC034 /* libopus.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libopus.a;
+			remoteRef = 2A8BBBC4187BD302004EC034 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -378,6 +416,11 @@
 			isa = PBXTargetDependency;
 			name = libwebm;
 			targetProxy = 2A6E91F817796863003B0F87 /* PBXContainerItemProxy */;
+		};
+		2A8BBBCA187BD312004EC034 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = opus;
+			targetProxy = 2A8BBBC9187BD312004EC034 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -442,6 +485,7 @@
 					../../ext/libogg/include,
 					../../ext/libvorbis/include,
 					../../ext/libvorbis/lib,
+					../../ext/opus/include,
 				);
 				PREBINDING = NO;
 				PREMIERE_SDK = "\"../../ext/Premiere Pro CS5 Mac SDK\"";
@@ -467,6 +511,7 @@
 					../../ext/libogg/include,
 					../../ext/libvorbis/include,
 					../../ext/libvorbis/lib,
+					../../ext/opus/include,
 				);
 				PREBINDING = NO;
 				PREMIERE_SDK = "\"../../ext/Premiere Pro CS5 Mac SDK\"";

@@ -543,6 +543,25 @@ exSDKGenerateDefaultParams(
 									ADBEAudioTabGroup, ADBEAudioCodecGroup, groupString,
 									kPrFalse, kPrFalse, kPrFalse);
 									
+	// Audio Codec
+	exParamValues audioCodecValues;
+	audioCodecValues.structVersion = 1;
+	audioCodecValues.rangeMin.intValue = WEBM_CODEC_VORBIS;
+	audioCodecValues.rangeMax.intValue = WEBM_CODEC_OPUS;
+	audioCodecValues.value.intValue = WEBM_CODEC_VORBIS;
+	audioCodecValues.disabled = kPrFalse;
+	audioCodecValues.hidden = kPrFalse;
+	
+	exNewParamInfo audioCodecParam;
+	audioCodecParam.structVersion = 1;
+	strncpy(audioCodecParam.identifier, WebMAudioCodec, 255);
+	audioCodecParam.paramType = exParamType_int;
+	audioCodecParam.flags = exParamFlag_none;
+	audioCodecParam.paramValues = audioCodecValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &audioCodecParam);
+	
+	
 	// Method
 	exParamValues audioMethodValues;
 	audioMethodValues.structVersion = 1;
@@ -598,6 +617,42 @@ exSDKGenerateDefaultParams(
 	audioBitrateParam.paramValues = audioBitrateValues;
 	
 	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &audioBitrateParam);
+
+
+	// Opus autoBitrate
+	exParamValues autoBitrateValues;
+	autoBitrateValues.structVersion = 1;
+	autoBitrateValues.value.intValue = kPrTrue;
+	autoBitrateValues.disabled = kPrFalse;
+	autoBitrateValues.hidden = kPrTrue;
+	
+	exNewParamInfo autoBitrateParam;
+	autoBitrateParam.structVersion = 1;
+	strncpy(autoBitrateParam.identifier, WebMOpusAutoBitrate, 255);
+	autoBitrateParam.paramType = exParamType_bool;
+	autoBitrateParam.flags = exParamFlag_none;
+	autoBitrateParam.paramValues = autoBitrateValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &autoBitrateParam);
+
+
+	// Bitrate
+	exParamValues opusBitrateValues;
+	opusBitrateValues.structVersion = 1;
+	opusBitrateValues.rangeMin.intValue = 1;
+	opusBitrateValues.rangeMax.intValue = 512;
+	opusBitrateValues.value.intValue = 128;
+	opusBitrateValues.disabled = kPrTrue;
+	opusBitrateValues.hidden = kPrTrue;
+	
+	exNewParamInfo opusBitrateParam;
+	opusBitrateParam.structVersion = 1;
+	strncpy(opusBitrateParam.identifier, WebMOpusBitrate, 255);
+	opusBitrateParam.paramType = exParamType_int;
+	opusBitrateParam.flags = exParamFlag_slider;
+	opusBitrateParam.paramValues = opusBitrateValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEAudioCodecGroup, &opusBitrateParam);
 
 
 	exportParamSuite->SetParamsVersion(exID, 1);
@@ -930,6 +985,28 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioCodecGroup, paramString);
 
 
+	// Audio Codec
+	utf16ncpy(paramString, "Codec", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMAudioCodec, paramString);
+	
+	
+	WebM_Audio_Codec audio_codecs[] = {	WEBM_CODEC_VORBIS,
+										WEBM_CODEC_OPUS };
+	
+	const char *audioCodecStrings[]	= {	"Vorbis",
+										"Opus" };
+
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMAudioCodec);
+	
+	exOneParamValueRec tempAudioCodec;
+	for(int i=0; i < 2; i++)
+	{
+		tempAudioCodec.intValue = audio_codecs[i];
+		utf16ncpy(paramString, audioCodecStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMAudioCodec, &tempAudioCodec, paramString);
+	}
+	
+	
 	// Method
 	utf16ncpy(paramString, "Method", 255);
 	exportParamSuite->SetParamName(exID, gIdx, WebMAudioMethod, paramString);
@@ -977,6 +1054,25 @@ exSDKPostProcessParams(
 	
 	exportParamSuite->ChangeParam(exID, gIdx, WebMAudioBitrate, &audioBitrateValues);
 
+
+	// Auto bitrate
+	utf16ncpy(paramString, "Auto bitrate", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMOpusAutoBitrate, paramString);
+
+
+	// Opus Bitrate
+	utf16ncpy(paramString, "Bitrate (kb/s)", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMOpusBitrate, paramString);
+	
+	exParamValues opusBitrateValues;
+	exportParamSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateValues);
+
+	opusBitrateValues.rangeMin.intValue = 1;
+	opusBitrateValues.rangeMax.intValue = 512;
+	
+	exportParamSuite->ChangeParam(exID, gIdx, WebMOpusBitrate, &opusBitrateValues);
+
+
 	return result;
 }
 
@@ -1014,10 +1110,16 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	
 
-	exParamValues audioMethodP, audioQualityP, audioBitrateP;
+	exParamValues audioCodecP, audioMethodP, audioQualityP, audioBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioCodec, &audioCodecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+	
+	exParamValues autoBitrateP, opusBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMOpusAutoBitrate, &autoBitrateP);
+	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
+	
 	
 	// oh boy, figure out frame rate
 	PrTime frameRates[] = {	10, 15, 23,
@@ -1076,14 +1178,33 @@ exSDKGetParamSummary(
 
 	stream2 << ", ";
 	
-	if(audioMethodP.value.intValue == OGG_BITRATE)
+	if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 	{
-		stream2 << audioBitrateP.value.intValue << " kbps";
+		stream2 << "Opus ";
+		
+		if(autoBitrateP.value.intValue)
+		{
+			stream2 << "auto bitrate";
+		}
+		else
+		{
+			stream2 << opusBitrateP.value.intValue << " kbps";
+		}
 	}
 	else
 	{
-		stream2 << "Quality " << audioQualityP.value.floatValue;
+		stream2 << "Vorbis ";
+		
+		if(audioMethodP.value.intValue == OGG_BITRATE)
+		{
+			stream2 << audioBitrateP.value.intValue << " kbps";
+		}
+		else
+		{
+			stream2 << "Quality " << audioQualityP.value.floatValue;
+		}
 	}
+	
 
 	
 	summary2 = stream2.str();
@@ -1184,6 +1305,64 @@ exSDKValidateParamChanged (
 		
 		paramSuite->ChangeParam(exID, gIdx, WebMAudioQuality, &audioQualityP);
 		paramSuite->ChangeParam(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+	}
+	else if(param == WebMAudioCodec)
+	{
+		exParamValues audioCodecP;
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioCodec, &audioCodecP);
+		
+		exParamValues sampleRateP;
+		paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
+		
+		exParamValues audioMethodP, audioQualityP, audioBitrateP;
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
+		paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+		
+		exParamValues autoBitrateP, opusBitrateP;
+		paramSuite->GetParamValue(exID, gIdx, WebMOpusAutoBitrate, &autoBitrateP);
+		paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
+		
+		
+		bool showVorbis = (audioCodecP.value.intValue == WEBM_CODEC_VORBIS);
+		
+		audioMethodP.hidden = audioQualityP.hidden = audioBitrateP.hidden = !showVorbis;
+		autoBitrateP.hidden = opusBitrateP.hidden = showVorbis;
+		
+		if(audioMethodP.value.intValue == OGG_BITRATE)
+			audioQualityP.hidden = kPrTrue;
+		else
+			audioBitrateP.hidden = kPrTrue;
+		
+		if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+		{
+			sampleRateP.value.floatValue = 48000.0f;
+			sampleRateP.disabled = kPrTrue;
+		}
+		else
+		{
+			sampleRateP.disabled = kPrFalse;
+		}
+			
+		
+		paramSuite->ChangeParam(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
+		
+		paramSuite->ChangeParam(exID, gIdx, WebMAudioMethod, &audioMethodP);
+		paramSuite->ChangeParam(exID, gIdx, WebMAudioQuality, &audioQualityP);
+		paramSuite->ChangeParam(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+		
+		paramSuite->ChangeParam(exID, gIdx, WebMOpusAutoBitrate, &autoBitrateP);
+		paramSuite->ChangeParam(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
+	}
+	else if(param == WebMOpusAutoBitrate)
+	{
+		exParamValues autoBitrateP, opusBitrateP;
+		paramSuite->GetParamValue(exID, gIdx, WebMOpusAutoBitrate, &autoBitrateP);
+		paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
+		
+		opusBitrateP.disabled = !!autoBitrateP.value.intValue;
+		
+		paramSuite->ChangeParam(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	}
 
 	return malNoError;

@@ -49,12 +49,14 @@ extern "C" {
 
 }
 
+#include "opus_multistream.h"
+
 #include "mkvparser.hpp"
 
 #include <assert.h>
 #include <math.h>
 
-#include <string>
+#include <sstream>
 
 #ifdef PRMAC_ENV
 	#include <mach/mach.h>
@@ -164,6 +166,13 @@ typedef enum {
 	CODEC_VP9
 } VideoCodec;
 
+typedef enum {
+	CODEC_ANONE = 0,
+	CODEC_VORBIS,
+	CODEC_OPUS
+} AudioCodec;
+
+
 typedef struct
 {	
 	csSDK_int32				importerID;
@@ -180,6 +189,7 @@ typedef struct
 	int						video_track;
 	VideoCodec				video_codec;
 	int						audio_track;
+	AudioCodec				audio_codec;
 	
 	PlugMemoryFuncsPtr		memFuncs;
 	SPBasicSuite			*BasicSuite;
@@ -310,6 +320,7 @@ SDKOpenFile8(
 		localRecP->video_track = -1;
 		localRecP->video_codec = CODEC_NONE;
 		localRecP->audio_track = -1;
+		localRecP->audio_codec = CODEC_ANONE;
 		
 		// Acquire needed suites
 		localRecP->memFuncs = stdParms->piSuites->memFuncs;
@@ -440,6 +451,10 @@ SDKOpenFile8(
 							
 							if(pAudioTrack)
 							{
+								localRecP->audio_codec = pAudioTrack->GetCodecId() == std::string("A_VORBIS") ? CODEC_VORBIS :
+															pAudioTrack->GetCodecId() == std::string("A_OPUS") ? CODEC_OPUS :
+															CODEC_ANONE;
+															
 								localRecP->audio_track = trackNumber;
 							}
 						}
@@ -598,12 +613,35 @@ SDKAnalysis(
 	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(SDKAnalysisRec->privatedata);
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
-	const char *properties_messsage = localRecP->video_codec == CODEC_VP8 ? "VP8 codec" :
-										localRecP->video_codec == CODEC_VP9 ? "VP9 codec" :
-										"Unknown codec";
+	std::stringstream stream;
 
-	if(SDKAnalysisRec->buffersize > strlen(properties_messsage))
-		strcpy(SDKAnalysisRec->buffer, properties_messsage);
+	if(localRecP->video_track >= 0)
+	{
+		if(localRecP->video_codec == CODEC_VP8)
+			stream << "VP8";
+		else if(localRecP->video_codec == CODEC_VP9)
+			stream << "VP9";
+		else
+			stream << "unknown";
+		
+		stream << " video, ";
+	}
+	
+	if(localRecP->audio_track >= 0)
+	{
+		if(localRecP->audio_codec == CODEC_VORBIS)
+			stream << "Vorbis";
+		else if(localRecP->audio_codec == CODEC_OPUS)
+			stream << "Opus";
+		else
+			stream << "unknown";
+		
+		stream << " audio ";
+	}
+
+	
+	if(SDKAnalysisRec->buffersize > stream.str().size())
+		strcpy(SDKAnalysisRec->buffer, stream.str().c_str());
 
 	return malNoError;
 }
@@ -821,6 +859,13 @@ SDKGetInfo8(
 																
 						SDKFileInfo8->audDuration			= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
 						
+						
+						if(SDKFileInfo8->audInfo.numChannels > 2 && SDKFileInfo8->audInfo.numChannels != 6)
+						{
+							// Premiere can only handle 1, 2, or 6 channels
+							SDKFileInfo8->hasAudio = kPrFalse;
+							SDKFileInfo8->audInfo.numChannels = 0;
+						}
 						
 						localRecP->audioSampleRate			= SDKFileInfo8->audInfo.sampleRate;
 						localRecP->numChannels				= SDKFileInfo8->audInfo.numChannels;
@@ -1288,6 +1333,15 @@ SDKImportAudio7(
 	{
 		assert(audioRec7->position >= 0); // Do they really want contiguous samples?
 
+		// for surround channels
+		// Premiere uses Left, Right, Left Rear, Right Rear, Center, LFE
+		// Ogg (and Opus) uses Left, Center, Right, Left Read, Right Rear, LFE
+		// http://www.xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-800004.3.9
+		static const int surround_swizzle[] = {0, 2, 3, 4, 1, 5};
+		static const int stereo_swizzle[] = {0, 1, 2, 3, 4, 5}; // no swizzle, actually
+		
+		const int *swizzle = localRecP->numChannels > 2 ? surround_swizzle : stereo_swizzle;
+
 
 		const long long tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
 		
@@ -1457,7 +1511,7 @@ SDKImportAudio7(
 																			// how nice, audio samples are float, just like Premiere wants 'em
 																			for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
 																			{
-																				memcpy(audioRec7->buffer[c] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+																				memcpy(audioRec7->buffer[swizzle[c]] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
 																			}
 																			
 																			// now samples_to_copy is more like samples_I_just_copied
@@ -1518,6 +1572,179 @@ SDKImportAudio7(
 								vorbis_dsp_clear(&vd);
 								vorbis_info_clear(&vi);
 								vorbis_comment_clear(&vc);
+							}
+							else
+								result = imFileReadFailed;
+						}
+						else if(pTrack->GetCodecId() == std::string("A_OPUS"))
+						{
+							// Opus specs found here:
+							// http://wiki.xiph.org/MatroskaOpus
+							
+							size_t private_size = 0;
+							const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
+							
+							if(private_data && private_size >= 19 && !memcmp(private_data, "OpusHead", 8))
+							{
+								const unsigned char channels = private_data[9];
+								
+								const unsigned short pre_skip = private_data[10] | private_data[11] << 8;
+								
+								const unsigned int sample_rate = private_data[12] | private_data[13] << 8 |
+																	private_data[14] << 16 | private_data[15] << 24;
+								
+								const unsigned short output_gain_u = private_data[16] | private_data[17] << 8;
+								
+								const short output_gain = (output_gain_u ^ 0x8000) - 0x8000;
+								
+								unsigned char stream_count = 1;
+								unsigned char coupled_count = (channels > 1 ? 1 : 0);
+								unsigned char mapping[] = {0, 1, 0, 1, 0, 1};
+								
+								const unsigned char mapping_family = private_data[18];
+								
+								if(mapping_family == 1)
+								{
+									assert(private_size == 21 + channels);
+									
+									stream_count = private_data[19];
+									coupled_count = private_data[20];
+									
+									memcpy(mapping, &private_data[21], channels);
+								}
+								else
+								{
+									assert(mapping_family == 0);
+									assert(channels <= 2);
+								}
+								
+								assert(pAudioTrack->GetChannels() == channels);
+								assert(pAudioTrack->GetSamplingRate() == 48000);
+								
+								assert(sample_rate == 48000);
+								assert(output_gain == 0);
+								
+								
+								int err = -1;
+								
+								OpusMSDecoder *dec = opus_multistream_decoder_create(48000, channels,
+																						stream_count, coupled_count, mapping,
+																						&err);
+								
+								if(dec != NULL && err == OPUS_OK)
+								{
+									const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+									
+									pAudioTrack->Seek(tstamp, pSeekBlockEntry);
+									
+									if(pSeekBlockEntry != NULL)
+									{
+										const int frame_size = 5760; // maximum Opus frame size at 48kHz
+									
+										float *interleaved_buffer = (float *)malloc(sizeof(float) * channels * frame_size);
+										
+										if(interleaved_buffer != NULL)
+										{
+											csSDK_uint32 samples_copied = 0;
+											csSDK_uint32 samples_left = audioRec7->size;
+											
+											const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
+											
+											while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
+											{
+												const mkvparser::BlockEntry* pBlockEntry = NULL;
+												
+												pCluster->GetFirst(pBlockEntry);
+												
+												while((pBlockEntry != NULL) && !pBlockEntry->EOS() && samples_left > 0 && result == malNoError)
+												{
+													const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+													
+													if(pBlock->GetTrackNumber() == localRecP->audio_track)
+													{
+														long long packet_tstamp = pBlock->GetTime(pCluster);
+														
+														PrAudioSample packet_offset = 0;
+															
+														PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+															
+														if(audioRec7->position > packet_start)
+															packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+														
+														if(packet_tstamp == 0)
+															packet_offset += pre_skip;
+														
+														for(int f=0; f < pBlock->GetFrameCount(); f++)
+														{
+															const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+															
+															unsigned int length = blockFrame.len;
+															uint8_t *data = (uint8_t *)malloc(length);
+															
+															if(data != NULL)
+															{
+																int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+																
+																if(read_err == PrMkvReader::PrMkvSuccess)
+																{
+																	int len = opus_multistream_decode_float(dec, data, length, interleaved_buffer, frame_size, 0);
+																	
+																	int len_to_copy = len - packet_offset;
+																	
+																	if(len_to_copy > samples_left)
+																		len_to_copy = samples_left;
+																	else if(len_to_copy < 0)
+																		len_to_copy = 0;
+																	
+																	for(int i = 0; i < len_to_copy; i++)
+																	{
+																		for(int c=0; c < channels; c++)
+																		{
+																			audioRec7->buffer[swizzle[c]][samples_copied + i] = interleaved_buffer[((i + packet_offset) * channels) + c];
+																		}
+																	}
+																	
+																	if(packet_offset < len)
+																	{
+																		samples_copied += len_to_copy;
+																		samples_left -= len_to_copy;
+																		
+																		packet_offset = 0;
+																	}
+																	else
+																		packet_offset -= len;
+																}
+																else
+																	result = imFileReadFailed;
+																
+																free(data);
+															}
+															else
+																result = imMemErr;
+														}
+													}
+													
+													long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+													
+													assert(status == 0);
+												}
+												
+												pCluster = localRecP->segment->GetNext(pCluster);
+											}
+											
+											// there might not be samples left at the end; not much we can do about that
+											assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
+											
+											free(interleaved_buffer);
+										}
+										else
+											result = imMemErr;
+									}
+									
+									opus_multistream_decoder_destroy(dec);
+								}
+								else
+									result = imFileReadFailed;
 							}
 							else
 								result = imFileReadFailed;

@@ -62,6 +62,8 @@ extern "C" {
 
 }
 
+#include "opus_multistream.h"
+
 #include "mkvmuxer.hpp"
 
 
@@ -563,10 +565,15 @@ exSDKExport(
 	customArgs[255] = '\0';
 	
 
-	exParamValues audioMethodP, audioQualityP, audioBitrateP;
+	exParamValues audioCodecP, audioMethodP, audioQualityP, audioBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMAudioCodec, &audioCodecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioMethod, &audioMethodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioQuality, &audioQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMAudioBitrate, &audioBitrateP);
+	
+	exParamValues autoBitrateP, opusBitrateP;
+	paramSuite->GetParamValue(exID, gIdx, WebMOpusAutoBitrate, &autoBitrateP);
+	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	
 	
 	SequenceRender_ParamsRec renderParms;
@@ -727,7 +734,16 @@ exSDKExport(
 		
 		bool packet_waiting = false;
 		op.granulepos = 0;
+		
+		OpusMSEncoder *opus = NULL;
+		float *opus_buffer = NULL;
+		unsigned char *opus_compressed_buffer = NULL;
+		opus_int32 opus_compressed_buffer_size = 0;
+		int opus_pre_skip = 0;
 										
+		int frame_size = 960;
+		float *pr_audio_buffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
+		
 		size_t private_size = 0;
 		void *private_data = NULL;
 		
@@ -735,42 +751,157 @@ exSDKExport(
 		
 		if(exportInfoP->exportAudio && !vbr_pass)
 		{
-			vorbis_info_init(&vi);
+			mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
 			
-			if(audioMethodP.value.intValue == OGG_BITRATE)
+			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 			{
-				v_err = vorbis_encode_init(&vi,
-											audioChannels,
-											sampleRateP.value.floatValue,
-											-1,
-											audioBitrateP.value.intValue * 1000,
-											-1);
+				const int sample_rate = 48000;
+				
+				const int mapping_family = (audioChannels > 2 ? 1 : 0);
+				
+				const int streams = (audioChannels > 2 ? 4 : 1);
+				const int coupled_streams = (audioChannels > 2 ? 2 : 1);
+				
+				const unsigned char surround_mapping[6] = {0, 4, 1, 2, 3, 5};
+				const unsigned char stereo_mapping[6] = {0, 1, 0, 1, 0, 1};
+				
+				const unsigned char *mapping = (audioChannels > 2 ? surround_mapping : stereo_mapping);
+				
+				int err = -1;
+				
+				opus = opus_multistream_encoder_create(sample_rate, audioChannels,
+														streams, coupled_streams, mapping,
+														OPUS_APPLICATION_AUDIO, &err);
+				
+				if(opus != NULL && err == OPUS_OK)
+				{
+					if(!autoBitrateP.value.intValue) // OPUS_AUTO is the default
+						opus_multistream_encoder_ctl(opus, OPUS_SET_BITRATE(opusBitrateP.value.intValue * 1000));
+						
+				
+					// build Opus headers
+					// http://wiki.xiph.org/OggOpus
+					// http://tools.ietf.org/html/draft-terriberry-oggopus-01
+					// http://wiki.xiph.org/MatroskaOpus
+					
+					// ID header
+					unsigned char id_head[28];
+					memset(id_head, 0, 28);
+					size_t id_header_size = 0;
+					
+					strcpy((char *)id_head, "OpusHead");
+					id_head[8] = 1; // version
+					id_head[9] = audioChannels;
+					
+					
+					// pre-skip
+					opus_int32 skip = 0;
+					opus_multistream_encoder_ctl(opus, OPUS_GET_LOOKAHEAD(&skip));
+					opus_pre_skip = skip;
+					
+					const unsigned short skip_us = skip;
+					id_head[10] = skip_us & 0xff;
+					id_head[11] = skip_us >> 8;
+					
+					
+					// sample rate
+					const unsigned int sample_rate_ui = sample_rate;
+					id_head[12] = sample_rate_ui & 0xff;
+					id_head[13] = (sample_rate_ui & 0xff00) >> 8;
+					id_head[14] = (sample_rate_ui & 0xff0000) >> 16;
+					id_head[15] = (sample_rate_ui & 0xff000000) >> 24;
+					
+					
+					// output gain (set to 0)
+					id_head[16] = id_head[17] = 0;
+					
+					
+					// channel mapping
+					id_head[18] = mapping_family;
+					
+					if(mapping_family == 1)
+					{
+						assert(audioChannels == 6);
+					
+						id_head[19] = streams;
+						id_head[20] = coupled_streams;
+						memcpy(&id_head[21], mapping, 6);
+						
+						id_header_size = 27;
+					}
+					else
+					{
+						id_header_size = 19;
+					}
+					
+					private_size = id_header_size;
+					
+					private_data = malloc(private_size);
+					
+					memcpy(private_data, id_head, private_size);
+					
+					
+					// figure out the frame size to use
+					frame_size = sample_rate / 400;
+					
+					const int samples_per_frame = sample_rate * fps.denominator / fps.numerator;
+					
+					while(frame_size * 2 < samples_per_frame && frame_size * 2 < maxBlip)
+					{
+						frame_size *= 2;
+					}
+					
+					opus_buffer = (float *)malloc(sizeof(float) * audioChannels * frame_size);
+					
+					opus_compressed_buffer_size = sizeof(float) * audioChannels * frame_size * 2; // why not?
+					
+					opus_compressed_buffer = (unsigned char *)malloc(opus_compressed_buffer_size);
+				}
 			}
 			else
 			{
-				v_err = vorbis_encode_init_vbr(&vi,
+				vorbis_info_init(&vi);
+				
+				if(audioMethodP.value.intValue == OGG_BITRATE)
+				{
+					v_err = vorbis_encode_init(&vi,
 												audioChannels,
 												sampleRateP.value.floatValue,
-												audioQualityP.value.floatValue);
+												-1,
+												audioBitrateP.value.intValue * 1000,
+												-1);
+				}
+				else
+				{
+					v_err = vorbis_encode_init_vbr(&vi,
+													audioChannels,
+													sampleRateP.value.floatValue,
+													audioQualityP.value.floatValue);
+				}
+				
+				if(v_err == OV_OK)
+				{
+					vorbis_comment_init(&vc);
+					vorbis_analysis_init(&vd, &vi);
+					vorbis_block_init(&vd, &vb);
+					
+					
+					ogg_packet header;
+					ogg_packet header_comm;
+					ogg_packet header_code;
+					
+					vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
+					
+					private_data = MakePrivateData(header, header_comm, header_code, private_size);
+					
+					frame_size = maxBlip;
+				}
 			}
 			
-			if(v_err == OV_OK)
+			for(int i=0; i < audioChannels; i++)
 			{
-				vorbis_comment_init(&vc);
-				vorbis_analysis_init(&vd, &vi);
-				vorbis_block_init(&vd, &vb);
-				
-				
-				ogg_packet header;
-				ogg_packet header_comm;
-				ogg_packet header_code;
-				
-				vorbis_analysis_headerout(&vd, &vc, &header, &header_comm, &header_code);
-				
-				private_data = MakePrivateData(header, header_comm, header_code, private_size);
+				pr_audio_buffer[i] = (float *)malloc(sizeof(float) * frame_size);
 			}
-			
-			mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
 		}
 		
 		
@@ -820,7 +951,8 @@ exSDKExport(
 				
 				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
 				
-				audio->set_codec_id(mkvmuxer::Tracks::kVorbisCodecId);
+				audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? "A_OPUS" :
+									mkvmuxer::Tracks::kVorbisCodecId);
 				
 				if(private_data)
 				{
@@ -837,6 +969,9 @@ exSDKExport(
 			
 			PrAudioSample currentAudioSample = 0;
 			const PrAudioSample endAudioSample = exportInfoP->endTime * (PrAudioSample)sampleRateP.value.floatValue / ticksPerSecond;
+			
+			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+				currentAudioSample = -opus_pre_skip; // that's right, we're actually going to start negative
 			
 		
 			PrTime videoTime = exportInfoP->startTime;
@@ -863,117 +998,173 @@ exSDKExport(
 				
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
-					const PrAudioSample nextBlockAudioSample = nextTimeStamp * (PrAudioSample)sampleRateP.value.floatValue / 1000000000UL;
+					// Premiere uses Left, Right, Left Rear, Right Rear, Center, LFE
+					// Opus uses Left, Center, Right, Left Read, Right Rear, LFE
+					// http://www.xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-800004.3.9
+					static const int stereo_swizzle[] = {0, 1, 0, 1, 0, 1};
+					static const int surround_swizzle[] = {0, 4, 1, 2, 3, 5};
 					
-					while(op.granulepos < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
+					const int *swizzle = (audioChannels > 2 ? surround_swizzle : stereo_swizzle);
+					
+					
+					const PrAudioSample nextBlockAudioSample = nextTimeStamp * (PrAudioSample)sampleRateP.value.floatValue / 1000000000UL;
+						
+					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
-						if(packet_waiting && op.packet != NULL && op.bytes > 0)
+						while(currentAudioSample < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
 						{
-							bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																audio_track, timeStamp, 0);
-																	
-							if(added)
-							{
-								packet_waiting = false;
-								
-								// might also be extra blocks hanging around
-								while(vorbis_analysis_blockout(&vd, &vb) == 1)
-								{
-									vorbis_analysis(&vb, NULL);
-									vorbis_bitrate_addblock(&vb);
-									
-									while( vorbis_bitrate_flushpacket(&vd, &op) )
-									{
-										assert(packet_waiting == false);
-									
-										if(op.granulepos < nextBlockAudioSample)
-										{
-											bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																				audio_track, timeStamp, 0);
-																					
-											if(!added)
-												result = exportReturn_InternalError;
-										}
-										else
-											packet_waiting = true;
-									}
-									
-									if(packet_waiting)
-										break;
-								}
-							}
-							else
-								result = exportReturn_InternalError;
-						}
-						
-						
-						if(!packet_waiting)
-						{
-							int samples = maxBlip;
+							const int samples = frame_size;
 							
-							if(samples > (endAudioSample - currentAudioSample))
-								samples = (endAudioSample - currentAudioSample);
-							
-							float **buffer = vorbis_analysis_buffer(&vd, samples);
-							
-							
-							result = audioSuite->GetAudio(audioRenderID, samples, buffer, false);
-							
-							currentAudioSample += samples;
-							
+							result = audioSuite->GetAudio(audioRenderID, samples, pr_audio_buffer, false);
 							
 							if(result == malNoError)
 							{
-								vorbis_analysis_wrote(&vd, samples);
-						
-								while(vorbis_analysis_blockout(&vd, &vb) == 1)
+								for(int i=0; i < samples; i++)
 								{
-									vorbis_analysis(&vb, NULL);
-									vorbis_bitrate_addblock(&vb);
-
-									assert(packet_waiting == false);
-									
-									while( vorbis_bitrate_flushpacket(&vd, &op) )
+									for(int c=0; c < audioChannels; c++)
 									{
-										assert(packet_waiting == false);
-									
-										if(op.granulepos < nextBlockAudioSample)
-										{
-											bool added = muxer_segment.AddFrame(op.packet, op.bytes,
-																				audio_track, timeStamp, 0);
-																					
-											if(!added)
-												result = exportReturn_InternalError;
-										}
-										else
-											packet_waiting = true;
+										opus_buffer[(i * audioChannels) + swizzle[c]] = pr_audio_buffer[c][i];
 									}
-									
-									if(packet_waiting)
-										break;
 								}
+								
+								int len = opus_multistream_encode_float(opus, opus_buffer, frame_size,
+																			opus_compressed_buffer, opus_compressed_buffer_size);
+								
+								if(len > 0)
+								{
+									bool added = muxer_segment.AddFrame(opus_compressed_buffer, len,
+																		audio_track, timeStamp, 0);
+																			
+									if(!added)
+										result = exportReturn_InternalError;
+								}
+								else if(len < 0)
+									result = exportReturn_InternalError;
+								
+								currentAudioSample += samples;
 							}
 						}
 					}
-				
-					// save the rest of the audio if this is the last frame
-					if(result == malNoError &&
-						(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
+					else
 					{
-						vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
-				
-						while(vorbis_analysis_blockout(&vd, &vb) == 1)
+						while(op.granulepos < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
 						{
-							vorbis_analysis(&vb, NULL);
-							vorbis_bitrate_addblock(&vb);
-
-							while( vorbis_bitrate_flushpacket(&vd, &op) )
+							if(packet_waiting && op.packet != NULL && op.bytes > 0)
 							{
 								bool added = muxer_segment.AddFrame(op.packet, op.bytes,
 																	audio_track, timeStamp, 0);
 																		
-								if(!added)
+								if(added)
+								{
+									packet_waiting = false;
+									
+									// might also be extra blocks hanging around
+									while(vorbis_analysis_blockout(&vd, &vb) == 1)
+									{
+										vorbis_analysis(&vb, NULL);
+										vorbis_bitrate_addblock(&vb);
+										
+										while( vorbis_bitrate_flushpacket(&vd, &op) )
+										{
+											assert(packet_waiting == false);
+										
+											if(op.granulepos < nextBlockAudioSample)
+											{
+												bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																					audio_track, timeStamp, 0);
+																						
+												if(!added)
+													result = exportReturn_InternalError;
+											}
+											else
+												packet_waiting = true;
+										}
+										
+										if(packet_waiting)
+											break;
+									}
+								}
+								else
 									result = exportReturn_InternalError;
+							}
+							
+							
+							if(!packet_waiting)
+							{
+								int samples = frame_size;
+								
+								if(samples > (endAudioSample - currentAudioSample))
+									samples = (endAudioSample - currentAudioSample);
+								
+								float **buffer = vorbis_analysis_buffer(&vd, samples);
+								
+								
+								result = audioSuite->GetAudio(audioRenderID, samples, pr_audio_buffer, false);
+								
+								for(int c=0; c < audioChannels; c++)
+								{
+									for(int i=0; i < samples; i++)
+									{
+										buffer[swizzle[c]][i] = pr_audio_buffer[c][i];
+									}
+								}
+								
+								currentAudioSample += samples;
+								
+								
+								if(result == malNoError)
+								{
+									vorbis_analysis_wrote(&vd, samples);
+							
+									while(vorbis_analysis_blockout(&vd, &vb) == 1)
+									{
+										vorbis_analysis(&vb, NULL);
+										vorbis_bitrate_addblock(&vb);
+
+										assert(packet_waiting == false);
+										
+										while( vorbis_bitrate_flushpacket(&vd, &op) )
+										{
+											assert(packet_waiting == false);
+										
+											if(op.granulepos < nextBlockAudioSample)
+											{
+												bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																					audio_track, timeStamp, 0);
+																						
+												if(!added)
+													result = exportReturn_InternalError;
+											}
+											else
+												packet_waiting = true;
+										}
+										
+										if(packet_waiting)
+											break;
+									}
+								}
+							}
+						}
+					
+						// save the rest of the audio if this is the last frame
+						if(result == malNoError &&
+							(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
+						{
+							vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
+					
+							while(vorbis_analysis_blockout(&vd, &vb) == 1)
+							{
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+
+								while( vorbis_bitrate_flushpacket(&vd, &op) )
+								{
+									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+																		audio_track, timeStamp, 0);
+																			
+									if(!added)
+										result = exportReturn_InternalError;
+								}
 							}
 						}
 					}
@@ -1292,10 +1483,29 @@ exSDKExport(
 			
 		if(exportInfoP->exportAudio && !vbr_pass)
 		{
-			vorbis_block_clear(&vb);
-			vorbis_dsp_clear(&vd);
-			vorbis_comment_clear(&vc);
-			vorbis_info_clear(&vi);
+			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+			{
+				opus_multistream_encoder_destroy(opus);
+				
+				if(opus_buffer)
+					free(opus_buffer);
+				
+				if(opus_compressed_buffer)
+					free(opus_compressed_buffer);
+			}
+			else
+			{
+				vorbis_block_clear(&vb);
+				vorbis_dsp_clear(&vd);
+				vorbis_comment_clear(&vc);
+				vorbis_info_clear(&vi);
+			}
+			
+			for(int i=0; i < audioChannels; i++)
+			{
+				if(pr_audio_buffer[i] != NULL)
+					free(pr_audio_buffer[i]);
+			}
 		}
 	}
 	

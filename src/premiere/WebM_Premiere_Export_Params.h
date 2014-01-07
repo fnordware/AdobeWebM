@@ -83,15 +83,24 @@ typedef enum {
 
 
 typedef enum {
+	WEBM_CODEC_VORBIS = 0,
+	WEBM_CODEC_OPUS
+} WebM_Audio_Codec;
+
+typedef enum {
 	OGG_QUALITY = 0,
 	OGG_BITRATE
 } Ogg_Method;
+
+
+#define WebMAudioCodec	"WebMAudioCodec"
 
 #define WebMAudioMethod	"WebMAudioMethod"
 #define WebMAudioQuality	"WebMAudioQuality"
 #define WebMAudioBitrate	"WebMAudioBitrate"
 
-
+#define WebMOpusAutoBitrate	"WebMOpusAutoBitrate"
+#define WebMOpusBitrate		"WebMOpusBitrate"
 
 
 prMALError
