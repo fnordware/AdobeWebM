@@ -947,6 +947,13 @@ exSDKExport(
 			
 			if(exportInfoP->exportAudio)
 			{
+				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+				{
+					assert(sampleRateP.value.floatValue == 48000.f);
+					
+					sampleRateP.value.floatValue = 48000.f; // we'll just go ahead and enforce that
+				}
+			
 				audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
 				
 				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
