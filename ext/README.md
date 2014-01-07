@@ -14,6 +14,9 @@ If the submodule contents are missing, you should be able to get them by typing:
 `git submodule init`
 `git submodule update`
 
+Both Mac and Windows require the "yasm" shell program be installed for libvpx to compile.  On Windows you get it via Cygwin.
+
+
 #### Windows only ####
 There are currently a couple (annoying) manual steps you need to perform on Windows:
 
