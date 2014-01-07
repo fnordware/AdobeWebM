@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
+				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC"
 				RuntimeLibrary="3"
 				StructMemberAlignment="0"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
+				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC"
 				RuntimeLibrary="2"
 			/>
