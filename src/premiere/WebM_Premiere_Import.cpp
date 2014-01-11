@@ -1029,6 +1029,9 @@ SDKGetSourceVideo(
 							
 							// TODO: Any way I can seek with cues instead of a binary search through clusters?
 							//const mkvparser::Cues* cues = localRecP->segment->GetCues();
+
+							assert(pVideoTrack->GetSeekPreRoll() == 0);
+							assert(pVideoTrack->GetCodecDelay() == 0);
 							
 							if(pSeekBlockEntry != NULL)
 							{
@@ -1095,6 +1098,7 @@ SDKGetSourceVideo(
 											if(pBlock->GetTrackNumber() == localRecP->video_track)
 											{
 												assert(pBlock->GetFrameCount() == 1);
+												assert(pBlock->GetDiscardPadding() == 0);
 												
 												long long packet_tstamp = pBlock->GetTime(pCluster);
 												
@@ -1364,6 +1368,9 @@ SDKImportAudio7(
 					{
 						if(pTrack->GetCodecId() == std::string("A_VORBIS"))
 						{
+							assert(pAudioTrack->GetSeekPreRoll() == 0);
+							assert(pAudioTrack->GetCodecDelay() == 0);
+
 							size_t private_size = 0;
 							const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
 							
@@ -1446,6 +1453,8 @@ SDKImportAudio7(
 												
 												if(pBlock->GetTrackNumber() == localRecP->audio_track)
 												{
+													assert(pBlock->GetDiscardPadding() == 0);
+
 													long long packet_tstamp = pBlock->GetTime(pCluster);
 													
 													PrAudioSample packet_offset = 0;
@@ -1581,6 +1590,9 @@ SDKImportAudio7(
 							// Opus specs found here:
 							// http://wiki.xiph.org/MatroskaOpus
 							
+							assert(pAudioTrack->GetSeekPreRoll() == 80000000);
+							assert(pAudioTrack->GetCodecDelay() == 0);
+
 							size_t private_size = 0;
 							const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
 							
@@ -1619,15 +1631,15 @@ SDKImportAudio7(
 								}
 								
 								assert(pAudioTrack->GetChannels() == channels);
+								assert(pAudioTrack->GetSamplingRate() == sample_rate);
 								assert(pAudioTrack->GetSamplingRate() == 48000);
-								
 								assert(sample_rate == 48000);
 								assert(output_gain == 0);
 								
 								
 								int err = -1;
 								
-								OpusMSDecoder *dec = opus_multistream_decoder_create(48000, channels,
+								OpusMSDecoder *dec = opus_multistream_decoder_create(sample_rate, channels,
 																						stream_count, coupled_count, mapping,
 																						&err);
 								
@@ -1662,6 +1674,8 @@ SDKImportAudio7(
 													
 													if(pBlock->GetTrackNumber() == localRecP->audio_track)
 													{
+														assert(pBlock->GetDiscardPadding() == 0);
+
 														long long packet_tstamp = pBlock->GetTime(pCluster);
 														
 														PrAudioSample packet_offset = 0;

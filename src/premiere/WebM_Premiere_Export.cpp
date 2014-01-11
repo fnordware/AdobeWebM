@@ -857,6 +857,8 @@ exSDKExport(
 					
 					opus_compressed_buffer = (unsigned char *)malloc(opus_compressed_buffer_size);
 				}
+				else
+					exportInfoP->exportAudio = kPrFalse;
 			}
 			else
 			{
@@ -896,6 +898,8 @@ exSDKExport(
 					
 					frame_size = maxBlip;
 				}
+				else
+					exportInfoP->exportAudio = kPrFalse;
 			}
 			
 			for(int i=0; i < audioChannels; i++)
@@ -921,7 +925,7 @@ exSDKExport(
 			
 			// I'd say think about lowering this to get better precision,
 			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
-			long long timeCodeScale = 1000000UL;
+			const long long timeCodeScale = 1000000UL;
 			
 			info->set_timecode_scale(timeCodeScale);
 			
@@ -936,7 +940,7 @@ exSDKExport(
 				
 				video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
 
-				video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? "V_VP9" :
+				video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
 										mkvmuxer::Tracks::kVp8CodecId);
 				
 				muxer_segment.CuesTrack(vid_track);
@@ -958,9 +962,16 @@ exSDKExport(
 				
 				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
 				
-				audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? "A_OPUS" :
+				audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? mkvmuxer::Tracks::kOpusCodecId :
 									mkvmuxer::Tracks::kVorbisCodecId);
 				
+				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+				{
+					// http://wiki.xiph.org/MatroskaOpus
+					audio->set_seek_pre_roll(80000000);
+					//audio->set_codec_delay(0);
+				}
+
 				if(private_data)
 				{
 					bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
@@ -1018,6 +1029,8 @@ exSDKExport(
 						
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
+						assert(opus != NULL);
+
 						while(currentAudioSample < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
 						{
 							const int samples = frame_size;
