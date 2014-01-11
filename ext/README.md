@@ -16,9 +16,3 @@ If the submodule contents are missing, you should be able to get them by typing:
 
 Both Mac and Windows require the "yasm" shell program be installed for libvpx to compile.  On Windows you get it via Cygwin.
 
-
-#### Windows only ####
-There are currently a couple (annoying) manual steps you need to perform on Windows:
-
-1. Add x64 target to libwebm .vcproj
-2. Copy libvpx\build\x86-msvs\yasm.rules from Google's pre-built version

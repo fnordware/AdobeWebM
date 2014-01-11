@@ -21,7 +21,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "..\..\ext\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "..\..\ext\libvorbis\win32\VS2008\libvorbis\libvorbis_static.vcproj", "{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwebm", "..\..\ext\libwebm\libwebm_2008.vcproj", "{7B1F12CA-0724-430B-B61A-1D357C912CBA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwebm", "ext\libwebm.vcproj", "{7B1F12CA-0724-430B-B61A-1D357C912CBA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opus", "ext\opus.vcproj", "{DB95CD59-543F-4803-AFA8-202AB60468D9}"
 EndProject

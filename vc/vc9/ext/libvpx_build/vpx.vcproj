@@ -15,7 +15,7 @@
 	</Platforms>
 	<ToolFiles>
 		<ToolFile
-			RelativePath="..\..\..\..\ext\libvpx\build\x86-msvs\yasm.rules"
+			RelativePath=".\yasm.rules"
 		/>
 	</ToolFiles>
 	<Configurations>
