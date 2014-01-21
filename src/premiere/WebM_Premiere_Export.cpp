@@ -620,6 +620,25 @@ exSDKExport(
 
 	try{
 	
+	PrMkvWriter writer(mySettings->exportFileSuite, exportInfoP->fileObject);
+
+	mkvmuxer::Segment muxer_segment;
+	
+	muxer_segment.Init(&writer);
+	muxer_segment.set_mode(mkvmuxer::Segment::kFile);
+	
+	
+	mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
+	
+	info->set_writing_app("fnord WebM for Premiere");
+	
+	// I'd say think about lowering this to get better precision,
+	// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
+	const long long timeCodeScale = 1000000UL;
+	
+	info->set_timecode_scale(timeCodeScale);
+			
+			
 	const int passes = ( (exportInfoP->exportVideo && method == WEBM_METHOD_VBR) ? 2 : 1);
 	
 	for(int pass = 0; pass < passes && result == malNoError; pass++)
@@ -858,7 +877,7 @@ exSDKExport(
 					opus_compressed_buffer = (unsigned char *)malloc(opus_compressed_buffer_size);
 				}
 				else
-					exportInfoP->exportAudio = kPrFalse;
+					v_err = (err != 0 ? err : -1);
 			}
 			else
 			{
@@ -911,28 +930,9 @@ exSDKExport(
 		
 		if(codec_err == VPX_CODEC_OK && v_err == OV_OK)
 		{
-			PrMkvWriter writer(mySettings->exportFileSuite, exportInfoP->fileObject);
-
-			mkvmuxer::Segment muxer_segment;
-			
-			muxer_segment.Init(&writer);
-			muxer_segment.set_mode(mkvmuxer::Segment::kFile);
-			
-			
-			mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
-			
-			info->set_writing_app("fnord WebM for Premiere");
-			
-			// I'd say think about lowering this to get better precision,
-			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
-			const long long timeCodeScale = 1000000UL;
-			
-			info->set_timecode_scale(timeCodeScale);
-			
-			
 			uint64 vid_track = 0;
 			
-			if(exportInfoP->exportVideo)
+			if(exportInfoP->exportVideo && !vbr_pass)
 			{
 				vid_track = muxer_segment.AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
 				
@@ -949,7 +949,7 @@ exSDKExport(
 			
 			uint64 audio_track = 0;
 			
-			if(exportInfoP->exportAudio)
+			if(exportInfoP->exportAudio && !vbr_pass)
 			{
 				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 				{
@@ -1489,12 +1489,6 @@ exSDKExport(
 				
 				videoTime += frameRateP.value.timeValue;
 			}
-			
-			
-			bool final = muxer_segment.Finalize();
-			
-			if(!final && !vbr_pass)
-				result = exportReturn_InternalError;
 		}
 		else
 			result = exportReturn_InternalError;
@@ -1536,6 +1530,13 @@ exSDKExport(
 			}
 		}
 	}
+	
+	
+	bool final = muxer_segment.Finalize();
+	
+	if(!final)
+		result = exportReturn_InternalError;
+	
 	
 	}catch(...) { result = exportReturn_InternalError; }
 	
