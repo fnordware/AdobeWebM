@@ -741,7 +741,7 @@ exSDKExport(
 		opus_int32 opus_compressed_buffer_size = 0;
 		int opus_pre_skip = 0;
 										
-		int frame_size = 960;
+		int opus_frame_size = 960;
 		float *pr_audio_buffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 		
 		size_t private_size = 0;
@@ -842,18 +842,18 @@ exSDKExport(
 					
 					
 					// figure out the frame size to use
-					frame_size = sample_rate / 400;
+					opus_frame_size = sample_rate / 400;
 					
 					const int samples_per_frame = sample_rate * fps.denominator / fps.numerator;
 					
-					while(frame_size * 2 < samples_per_frame && frame_size * 2 < maxBlip)
+					while(opus_frame_size * 2 < samples_per_frame && opus_frame_size * 2 < maxBlip)
 					{
-						frame_size *= 2;
+						opus_frame_size *= 2;
 					}
 					
-					opus_buffer = (float *)malloc(sizeof(float) * audioChannels * frame_size);
+					opus_buffer = (float *)malloc(sizeof(float) * audioChannels * opus_frame_size);
 					
-					opus_compressed_buffer_size = sizeof(float) * audioChannels * frame_size * 2; // why not?
+					opus_compressed_buffer_size = sizeof(float) * audioChannels * opus_frame_size * 2; // why not?
 					
 					opus_compressed_buffer = (unsigned char *)malloc(opus_compressed_buffer_size);
 				}
@@ -896,7 +896,7 @@ exSDKExport(
 					
 					private_data = MakePrivateData(header, header_comm, header_code, private_size);
 					
-					frame_size = maxBlip;
+					opus_frame_size = maxBlip;
 				}
 				else
 					exportInfoP->exportAudio = kPrFalse;
@@ -904,7 +904,7 @@ exSDKExport(
 			
 			for(int i=0; i < audioChannels; i++)
 			{
-				pr_audio_buffer[i] = (float *)malloc(sizeof(float) * frame_size);
+				pr_audio_buffer[i] = (float *)malloc(sizeof(float) * opus_frame_size);
 			}
 		}
 		
@@ -968,8 +968,10 @@ exSDKExport(
 				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 				{
 					// http://wiki.xiph.org/MatroskaOpus
+					
 					audio->set_seek_pre_roll(80000000);
-					//audio->set_codec_delay(0);
+					
+					audio->set_codec_delay((PrAudioSample)opus_pre_skip * 1000000000UL / (PrAudioSample)sampleRateP.value.floatValue);
 				}
 
 				if(private_data)
@@ -988,9 +990,6 @@ exSDKExport(
 			PrAudioSample currentAudioSample = 0;
 			const PrAudioSample endAudioSample = (exportInfoP->endTime - exportInfoP->startTime) /
 													(ticksPerSecond / (PrAudioSample)sampleRateP.value.floatValue);
-			
-			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
-				currentAudioSample = -opus_pre_skip; // that's right, we're actually going to start negative
 			
 		
 			PrTime videoTime = exportInfoP->startTime;
@@ -1031,10 +1030,16 @@ exSDKExport(
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
 						assert(opus != NULL);
+						
+						PrAudioSample opusNextBlockAudioSample = nextBlockAudioSample;
+						
+						// on last frame, add samples for pre-skip
+						if(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue))
+							opusNextBlockAudioSample += opus_pre_skip;
 
-						while(currentAudioSample < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
+						while(currentAudioSample < opusNextBlockAudioSample && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
 						{
-							const int samples = frame_size;
+							const int samples = opus_frame_size;
 							
 							result = audioSuite->GetAudio(audioRenderID, samples, pr_audio_buffer, false);
 							
@@ -1048,11 +1053,13 @@ exSDKExport(
 									}
 								}
 								
-								int len = opus_multistream_encode_float(opus, opus_buffer, frame_size,
+								int len = opus_multistream_encode_float(opus, opus_buffer, opus_frame_size,
 																			opus_compressed_buffer, opus_compressed_buffer_size);
 								
 								if(len > 0)
 								{
+									// DiscardPadding = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip)
+								
 									bool added = muxer_segment.AddFrame(opus_compressed_buffer, len,
 																		audio_track, timeStamp, 0);
 																			
@@ -1112,7 +1119,7 @@ exSDKExport(
 							
 							if(!packet_waiting)
 							{
-								int samples = frame_size;
+								int samples = opus_frame_size;
 								
 								if(samples > (endAudioSample - currentAudioSample))
 									samples = (endAudioSample - currentAudioSample);

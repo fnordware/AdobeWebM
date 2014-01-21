@@ -1590,8 +1590,10 @@ SDKImportAudio7(
 							// Opus specs found here:
 							// http://wiki.xiph.org/MatroskaOpus
 							
-							assert(pAudioTrack->GetSeekPreRoll() == 80000000);
-							assert(pAudioTrack->GetCodecDelay() == 0);
+							const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
+							const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
+							
+							assert(seekPreRoll == 80000000);
 
 							size_t private_size = 0;
 							const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
@@ -1634,7 +1636,9 @@ SDKImportAudio7(
 								assert(pAudioTrack->GetSamplingRate() == sample_rate);
 								assert(pAudioTrack->GetSamplingRate() == 48000);
 								assert(sample_rate == 48000);
+								assert(localRecP->audioSampleRate == 48000);
 								assert(output_gain == 0);
+								assert(codecDelay == (unsigned long long)pre_skip * 1000000000UL / sample_rate); // maybe should give myself some leeway here
 								
 								
 								int err = -1;
@@ -1647,13 +1651,18 @@ SDKImportAudio7(
 								{
 									const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 									
-									pAudioTrack->Seek(tstamp, pSeekBlockEntry);
+									long long seek_tstamp = (tstamp - seekPreRoll) + codecDelay;
+									
+									if(seek_tstamp < 0)
+										seek_tstamp = 0;
+									
+									pAudioTrack->Seek(seek_tstamp, pSeekBlockEntry);
 									
 									if(pSeekBlockEntry != NULL)
 									{
-										const int frame_size = 5760; // maximum Opus frame size at 48kHz
+										const int opus_frame_size = 5760; // maximum Opus frame size at 48kHz
 									
-										float *interleaved_buffer = (float *)malloc(sizeof(float) * channels * frame_size);
+										float *interleaved_buffer = (float *)malloc(sizeof(float) * channels * opus_frame_size);
 										
 										if(interleaved_buffer != NULL)
 										{
@@ -1676,7 +1685,7 @@ SDKImportAudio7(
 													{
 														assert(pBlock->GetDiscardPadding() == 0);
 
-														long long packet_tstamp = pBlock->GetTime(pCluster);
+														long long packet_tstamp = pBlock->GetTime(pCluster) - codecDelay;
 														
 														PrAudioSample packet_offset = 0;
 															
@@ -1684,9 +1693,6 @@ SDKImportAudio7(
 															
 														if(audioRec7->position > packet_start)
 															packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
-														
-														if(packet_tstamp == 0)
-															packet_offset += pre_skip;
 														
 														for(int f=0; f < pBlock->GetFrameCount(); f++)
 														{
@@ -1701,7 +1707,7 @@ SDKImportAudio7(
 																
 																if(read_err == PrMkvReader::PrMkvSuccess)
 																{
-																	int len = opus_multistream_decode_float(dec, data, length, interleaved_buffer, frame_size, 0);
+																	int len = opus_multistream_decode_float(dec, data, length, interleaved_buffer, opus_frame_size, 0);
 																	
 																	int len_to_copy = len - packet_offset;
 																	
