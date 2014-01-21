@@ -986,7 +986,8 @@ exSDKExport(
 			}
 			
 			PrAudioSample currentAudioSample = 0;
-			const PrAudioSample endAudioSample = exportInfoP->endTime * (PrAudioSample)sampleRateP.value.floatValue / ticksPerSecond;
+			const PrAudioSample endAudioSample = (exportInfoP->endTime - exportInfoP->startTime) /
+													(ticksPerSecond / (PrAudioSample)sampleRateP.value.floatValue);
 			
 			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 				currentAudioSample = -opus_pre_skip; // that's right, we're actually going to start negative
