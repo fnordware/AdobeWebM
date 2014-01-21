@@ -618,27 +618,13 @@ exSDKExport(
 	size_t vbr_buffer_size = 0;
 
 
+	PrMkvWriter *writer = NULL;
+
+	mkvmuxer::Segment *muxer_segment = NULL;
+	
+			
 	try{
 	
-	PrMkvWriter writer(mySettings->exportFileSuite, exportInfoP->fileObject);
-
-	mkvmuxer::Segment muxer_segment;
-	
-	muxer_segment.Init(&writer);
-	muxer_segment.set_mode(mkvmuxer::Segment::kFile);
-	
-	
-	mkvmuxer::SegmentInfo* const info = muxer_segment.GetSegmentInfo();
-	
-	info->set_writing_app("fnord WebM for Premiere");
-	
-	// I'd say think about lowering this to get better precision,
-	// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
-	const long long timeCodeScale = 1000000UL;
-	
-	info->set_timecode_scale(timeCodeScale);
-			
-			
 	const int passes = ( (exportInfoP->exportVideo && method == WEBM_METHOD_VBR) ? 2 : 1);
 	
 	for(int pass = 0; pass < passes && result == malNoError; pass++)
@@ -930,20 +916,41 @@ exSDKExport(
 		
 		if(codec_err == VPX_CODEC_OK && v_err == OV_OK)
 		{
+			// I'd say think about lowering this to get better precision,
+			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
+			const long long timeCodeScale = 1000000UL;
+			
+			if(!vbr_pass)
+			{
+				writer = new PrMkvWriter(mySettings->exportFileSuite, exportInfoP->fileObject);
+				
+				muxer_segment = new mkvmuxer::Segment;
+				
+				muxer_segment->Init(writer);
+				muxer_segment->set_mode(mkvmuxer::Segment::kFile);
+				
+				
+				mkvmuxer::SegmentInfo* const info = muxer_segment->GetSegmentInfo();
+				
+				info->set_writing_app("fnord WebM for Premiere");
+				
+				info->set_timecode_scale(timeCodeScale);
+			}
+		
 			uint64 vid_track = 0;
 			
 			if(exportInfoP->exportVideo && !vbr_pass)
 			{
-				vid_track = muxer_segment.AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
+				vid_track = muxer_segment->AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
 				
-				mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment.GetTrackByNumber(vid_track));
+				mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment->GetTrackByNumber(vid_track));
 				
 				video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
 
 				video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
 										mkvmuxer::Tracks::kVp8CodecId);
 				
-				muxer_segment.CuesTrack(vid_track);
+				muxer_segment->CuesTrack(vid_track);
 			}
 			
 			
@@ -958,9 +965,9 @@ exSDKExport(
 					sampleRateP.value.floatValue = 48000.f; // we'll just go ahead and enforce that
 				}
 			
-				audio_track = muxer_segment.AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
+				audio_track = muxer_segment->AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
 				
-				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment.GetTrackByNumber(audio_track));
+				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment->GetTrackByNumber(audio_track));
 				
 				audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? mkvmuxer::Tracks::kOpusCodecId :
 									mkvmuxer::Tracks::kVorbisCodecId);
@@ -984,7 +991,7 @@ exSDKExport(
 				}
 
 				if(!exportInfoP->exportVideo)
-					muxer_segment.CuesTrack(audio_track);
+					muxer_segment->CuesTrack(audio_track);
 			}
 			
 			PrAudioSample currentAudioSample = 0;
@@ -1060,7 +1067,7 @@ exSDKExport(
 								{
 									// DiscardPadding = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip)
 								
-									bool added = muxer_segment.AddFrame(opus_compressed_buffer, len,
+									bool added = muxer_segment->AddFrame(opus_compressed_buffer, len,
 																		audio_track, timeStamp, 0);
 																			
 									if(!added)
@@ -1079,7 +1086,7 @@ exSDKExport(
 						{
 							if(packet_waiting && op.packet != NULL && op.bytes > 0)
 							{
-								bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+								bool added = muxer_segment->AddFrame(op.packet, op.bytes,
 																	audio_track, timeStamp, 0);
 																		
 								if(added)
@@ -1098,7 +1105,7 @@ exSDKExport(
 										
 											if(op.granulepos < nextBlockAudioSample)
 											{
-												bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+												bool added = muxer_segment->AddFrame(op.packet, op.bytes,
 																					audio_track, timeStamp, 0);
 																						
 												if(!added)
@@ -1157,7 +1164,7 @@ exSDKExport(
 										
 											if(op.granulepos < nextBlockAudioSample)
 											{
-												bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+												bool added = muxer_segment->AddFrame(op.packet, op.bytes,
 																					audio_track, timeStamp, 0);
 																						
 												if(!added)
@@ -1187,7 +1194,7 @@ exSDKExport(
 
 								while( vorbis_bitrate_flushpacket(&vd, &op) )
 								{
-									bool added = muxer_segment.AddFrame(op.packet, op.bytes,
+									bool added = muxer_segment->AddFrame(op.packet, op.bytes,
 																		audio_track, timeStamp, 0);
 																			
 									if(!added)
@@ -1231,8 +1238,9 @@ exSDKExport(
 							else if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
 							{
 								assert(!vbr_pass);
+								assert(muxer_segment != NULL);
 							
-								bool added = muxer_segment.AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+								bool added = muxer_segment->AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
 																	vid_track, timeStamp,
 																	(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
 								made_frame = true;
@@ -1532,13 +1540,21 @@ exSDKExport(
 	}
 	
 	
-	bool final = muxer_segment.Finalize();
-	
-	if(!final)
-		result = exportReturn_InternalError;
+	if(muxer_segment != NULL)
+	{
+		bool final = muxer_segment->Finalize();
+		
+		if(!final)
+			result = exportReturn_InternalError;
+	}
 	
 	
 	}catch(...) { result = exportReturn_InternalError; }
+	
+	
+	delete muxer_segment;
+	
+	delete writer;
 	
 	
 	if(vbr_buffer != NULL)
