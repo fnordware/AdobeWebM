@@ -1683,8 +1683,6 @@ SDKImportAudio7(
 													
 													if(pBlock->GetTrackNumber() == localRecP->audio_track)
 													{
-														assert(pBlock->GetDiscardPadding() == 0);
-
 														long long packet_tstamp = pBlock->GetTime(pCluster) - codecDelay;
 														
 														PrAudioSample packet_offset = 0;

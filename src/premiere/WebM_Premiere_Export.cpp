@@ -1065,10 +1065,23 @@ exSDKExport(
 								
 								if(len > 0)
 								{
-									// DiscardPadding = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip)
-								
-									bool added = muxer_segment->AddFrame(opus_compressed_buffer, len,
-																		audio_track, timeStamp, 0);
+									bool added = false;
+									
+									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
+									{
+										assert(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)); // last frame
+										
+										const int64 discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
+										const int64 discardPadding = discardPaddingSamples * 1000000000UL / (int64)sampleRateP.value.floatValue;
+										
+										added = muxer_segment->AddFrameWithDiscardPadding(opus_compressed_buffer, len,
+																		discardPadding, audio_track, timeStamp, false);
+									}
+									else
+									{
+										added = muxer_segment->AddFrame(opus_compressed_buffer, len,
+																			audio_track, timeStamp, false);
+									}
 																			
 									if(!added)
 										result = exportReturn_InternalError;
@@ -1165,7 +1178,7 @@ exSDKExport(
 											if(op.granulepos < nextBlockAudioSample)
 											{
 												bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																					audio_track, timeStamp, 0);
+																					audio_track, timeStamp, false);
 																						
 												if(!added)
 													result = exportReturn_InternalError;
