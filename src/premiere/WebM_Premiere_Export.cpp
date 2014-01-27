@@ -89,7 +89,6 @@ class PrMkvWriter : public mkvmuxer::IMkvWriter
   private:
 	const PrSDKExportFileSuite *_fileSuite;
 	const csSDK_uint32 _fileObject;
-	
 };
 
 PrMkvWriter::PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObject) :
@@ -114,7 +113,6 @@ PrMkvWriter::Write(const void* buf, uint32 len)
 	
 	return err;
 }
-
 
 int64
 PrMkvWriter::Position() const
@@ -920,6 +918,9 @@ exSDKExport(
 			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
 			const long long timeCodeScale = 1000000UL;
 			
+			uint64 vid_track = 0;
+			uint64 audio_track = 0;
+			
 			if(!vbr_pass)
 			{
 				writer = new PrMkvWriter(mySettings->exportFileSuite, exportInfoP->fileObject);
@@ -935,68 +936,67 @@ exSDKExport(
 				info->set_writing_app("fnord WebM for Premiere");
 				
 				info->set_timecode_scale(timeCodeScale);
-			}
+				
 		
-			uint64 vid_track = 0;
-			
-			if(exportInfoP->exportVideo && !vbr_pass)
-			{
-				vid_track = muxer_segment->AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
-				
-				mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment->GetTrackByNumber(vid_track));
-				
-				video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
-
-				video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
-										mkvmuxer::Tracks::kVp8CodecId);
-				
-				muxer_segment->CuesTrack(vid_track);
-			}
-			
-			
-			uint64 audio_track = 0;
-			
-			if(exportInfoP->exportAudio && !vbr_pass)
-			{
-				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+				if(exportInfoP->exportVideo)
 				{
-					assert(sampleRateP.value.floatValue == 48000.f);
+					vid_track = muxer_segment->AddVideoTrack(renderParms.inWidth, renderParms.inHeight, 1);
 					
-					sampleRateP.value.floatValue = 48000.f; // we'll just go ahead and enforce that
-				}
-			
-				audio_track = muxer_segment->AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
-				
-				mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment->GetTrackByNumber(audio_track));
-				
-				audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? mkvmuxer::Tracks::kOpusCodecId :
-									mkvmuxer::Tracks::kVorbisCodecId);
-				
-				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
-				{
-					// http://wiki.xiph.org/MatroskaOpus
+					mkvmuxer::VideoTrack* const video = static_cast<mkvmuxer::VideoTrack *>(muxer_segment->GetTrackByNumber(vid_track));
 					
-					audio->set_seek_pre_roll(80000000);
-					
-					audio->set_codec_delay((PrAudioSample)opus_pre_skip * 1000000000UL / (PrAudioSample)sampleRateP.value.floatValue);
-				}
+					video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
 
-				if(private_data)
-				{
-					bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
+					video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
+											mkvmuxer::Tracks::kVp8CodecId);
 					
-					assert(copied);
-					
-					free(private_data);
+					muxer_segment->CuesTrack(vid_track);
 				}
+				
+				
+				if(exportInfoP->exportAudio)
+				{
+					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+					{
+						assert(sampleRateP.value.floatValue == 48000.f);
+						
+						sampleRateP.value.floatValue = 48000.f; // we'll just go ahead and enforce that
+					}
+				
+					audio_track = muxer_segment->AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
+					
+					mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment->GetTrackByNumber(audio_track));
+					
+					audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? mkvmuxer::Tracks::kOpusCodecId :
+										mkvmuxer::Tracks::kVorbisCodecId);
+					
+					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+					{
+						// http://wiki.xiph.org/MatroskaOpus
+						
+						audio->set_seek_pre_roll(80000000);
+						
+						audio->set_codec_delay((PrAudioSample)opus_pre_skip * 1000000000UL / (PrAudioSample)sampleRateP.value.floatValue);
+					}
 
-				if(!exportInfoP->exportVideo)
-					muxer_segment->CuesTrack(audio_track);
+					if(private_data)
+					{
+						bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
+						
+						assert(copied);
+						
+						free(private_data);
+					}
+
+					if(!exportInfoP->exportVideo)
+						muxer_segment->CuesTrack(audio_track);
+				}
 			}
 			
 			PrAudioSample currentAudioSample = 0;
 			const PrAudioSample endAudioSample = (exportInfoP->endTime - exportInfoP->startTime) /
 													(ticksPerSecond / (PrAudioSample)sampleRateP.value.floatValue);
+													
+			assert(ticksPerSecond % (PrAudioSample)sampleRateP.value.floatValue == 0);
 			
 		
 			PrTime videoTime = exportInfoP->startTime;
@@ -1024,7 +1024,7 @@ exSDKExport(
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
 					// Premiere uses Left, Right, Left Rear, Right Rear, Center, LFE
-					// Opus uses Left, Center, Right, Left Read, Right Rear, LFE
+					// Opus and Vorbis use Left, Center, Right, Left Read, Right Rear, LFE
 					// http://www.xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-800004.3.9
 					static const int stereo_swizzle[] = {0, 1, 0, 1, 0, 1};
 					static const int surround_swizzle[] = {0, 4, 1, 2, 3, 5};
@@ -1284,8 +1284,18 @@ exSDKExport(
 						const PrTime encoder_nextFileTime = encoder_fileTime + frameRateP.value.timeValue;
 						
 						const vpx_codec_pts_t encoder_timeStamp = encoder_fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
-						const vpx_codec_pts_t encoder_nextTimeStamp = (encoder_nextFileTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator);
+						const vpx_codec_pts_t encoder_nextTimeStamp = encoder_nextFileTime * fps.numerator / (ticksPerSecond * fps.denominator);
 						const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
+						
+						// BUT, if we're setting timebase to 1/fps, then timestamp is just frame number.
+						// And since frame number isn't going to overflow at big times the way encoder_timeStamp is,
+						// let's just use that.
+						const vpx_codec_pts_t encoder_FrameNumber = encoder_fileTime / frameRateP.value.timeValue;
+						const unsigned long encoder_FrameDuration = 1;
+						
+						assert(encoder_FrameNumber == encoder_timeStamp); // will not be true for big time values (int64_t overflow)
+						assert(encoder_FrameDuration == encoder_duration);
+						
 			
 						if(!made_frame && result == suiteError_NoError)
 						{
@@ -1452,7 +1462,7 @@ exSDKExport(
 										}
 										
 										
-										vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_timeStamp, encoder_duration, 0, deadline);
+										vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_FrameNumber, encoder_FrameDuration, 0, deadline);
 										
 										if(encode_err == VPX_CODEC_OK)
 										{
@@ -1476,7 +1486,7 @@ exSDKExport(
 							else
 							{
 								// squeeze the last bit out of the encoder
-								vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, NULL, encoder_timeStamp, encoder_duration, 0, deadline);
+								vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, NULL, encoder_FrameNumber, encoder_FrameDuration, 0, deadline);
 								
 								if(encode_err == VPX_CODEC_OK)
 								{
