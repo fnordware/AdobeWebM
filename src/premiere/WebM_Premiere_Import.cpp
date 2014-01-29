@@ -40,14 +40,10 @@
 #include "WebM_Premiere_Import.h"
 
 
-extern "C" {
-
 #include "vpx/vpx_decoder.h"
 #include "vpx/vp8dx.h"
 
 #include <vorbis/codec.h>
-
-}
 
 #include "opus_multistream.h"
 

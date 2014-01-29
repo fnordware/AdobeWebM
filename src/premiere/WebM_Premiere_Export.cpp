@@ -52,15 +52,11 @@
 #endif
 
 
-extern "C" {
-
 #include "vpx/vpx_encoder.h"
 #include "vpx/vp8cx.h"
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
-
-}
 
 #include "opus_multistream.h"
 
