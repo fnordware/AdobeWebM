@@ -571,7 +571,7 @@ exSDKExport(
 	
 	
 	SequenceRender_ParamsRec renderParms;
-	PrPixelFormat pixelFormats[] = { PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709,
+	PrPixelFormat pixelFormats[] = { PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601,
 									PrPixelFormat_BGRA_4444_16u, // must support BGRA, even if I don't want to
 									PrPixelFormat_BGRA_4444_8u };
 	
@@ -1330,7 +1330,7 @@ exSDKExport(
 									
 									if(img)
 									{
-										if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
+										if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 										{
 											char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 											csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
