@@ -582,7 +582,7 @@ SDKGetIndPixelFormat(
 	switch(idx)
 	{
 		case 0:
-			SDKIndPixelFormatRec->outPixelFormat = PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
+			SDKIndPixelFormatRec->outPixelFormat = PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
 			break;
 	
 		default:
@@ -795,7 +795,7 @@ SDKGetInfo8(
 						
 						// Video information
 						SDKFileInfo8->hasVideo				= kPrTrue;
-						SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709;
+						SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
 						SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
 						SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
 						SDKFileInfo8->vidInfo.depth			= 24;	// for RGB, no A
@@ -1130,7 +1130,7 @@ SDKGetSourceVideo(
 																
 																localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
 
-																if(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_709)
+																if(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 																{
 																	char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 																	csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
