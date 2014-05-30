@@ -716,6 +716,17 @@ exSDKExport(
 			
 			if(codec_err == VPX_CODEC_OK)
 			{
+				if(method == WEBM_METHOD_QUALITY)
+				{
+					const int min_q = config.rc_min_quantizer;
+					const int max_q = config.rc_max_quantizer;
+					
+					// CQ Level should be between min_q and max_q
+					const int cq_level = (min_q + max_q) / 2;
+				
+					vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, cq_level);
+				}
+			
 				ConfigureEncoderPost(&encoder, customArgs);
 			}
 		}
