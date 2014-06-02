@@ -338,7 +338,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_block_sse2.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_block_sse2_x86_64.asm"
 				>
 			</File>
 			<File
@@ -414,10 +414,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\psnr.c"
-				>
-			</File>
-			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\quant_common.c"
 				>
 			</File>
@@ -438,7 +434,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_ssse3.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_ssse3.c"
 				>
 			</File>
 			<File
@@ -510,7 +506,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\ssim_opt.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\x86\ssim_opt_x86_64.asm"
 				>
 			</File>
 			<File
@@ -531,6 +527,10 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\subtract_sse2.asm"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vpx\src\svc_encodeframe.c"
 				>
 			</File>
 			<File
@@ -650,6 +650,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vpx\src\vpx_psnr.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vpx_scale\generic\vpx_scale.c"
 				>
 			</File>
@@ -659,10 +663,6 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\x86_abi_support.asm"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\x86_cpuid.c"
 				>
 			</File>
 			<File
@@ -1072,6 +1072,30 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_variance.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_variance.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_asm_stubs.c"
 				>
 			</File>
@@ -1088,15 +1112,11 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_blockd.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_blockd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_boolhuff.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_boolhuff.h"
 				>
 			</File>
 			<File
@@ -1105,6 +1125,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_common_data.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_context_tree.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_context_tree.h"
 				>
 			</File>
 			<File
@@ -1120,15 +1148,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_cost.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_cost.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\vp9_cx_iface.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dboolhuff.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dboolhuff.h"
 				>
 			</File>
 			<File
@@ -1140,11 +1168,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.asm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_sse2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_ssse3_x86_64.asm"
 				>
 			</File>
 			<File
@@ -1168,6 +1204,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decoder.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decoder.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_default_coef_probs.h"
 				>
 			</File>
@@ -1185,6 +1229,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dthread.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dthread.h"
 				>
 			</File>
 			<File
@@ -1213,6 +1265,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encoder.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encoder.h"
 				>
 			</File>
 			<File
@@ -1264,19 +1324,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_findnearmv.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_findnearmv.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_firstpass.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_firstpass.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_frame_buffers.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_frame_buffers.h"
 				>
 			</File>
 			<File
@@ -1289,6 +1349,18 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_ssse3.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_ssse3_x86_64.asm"
 				>
 			</File>
 			<File
@@ -1364,27 +1436,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_onyx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_onyx_if.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_onyx_int.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_onyxc_int.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_onyxd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_onyxd_if.c"
 				>
 			</File>
 			<File
@@ -1397,6 +1449,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_picklpf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_pickmode.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_pickmode.h"
 				>
 			</File>
 			<File
@@ -1452,11 +1512,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_psnr.c"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_prob.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_psnr.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_prob.h"
 				>
 			</File>
 			<File
@@ -1476,7 +1536,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_quantize_ssse3.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_quantize_ssse3_x86_64.asm"
 				>
 			</File>
 			<File
@@ -1496,7 +1556,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_read_bit_buffer.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_read_bit_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_reader.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_reader.h"
 				>
 			</File>
 			<File
@@ -1516,15 +1588,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_resize.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_resize.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_rtcd.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad4d_sse2.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sad.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sad_c.c"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad4d_sse2.asm"
 				>
 			</File>
 			<File
@@ -1548,11 +1628,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sadmxn.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_sadmxn.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_sadmxn.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sadmxn.h"
 				>
 			</File>
 			<File
@@ -1588,11 +1668,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ssim.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_ssim_opt.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ssim.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_ssim_opt_x86_64.asm"
 				>
 			</File>
 			<File
@@ -1608,11 +1700,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subpel_variance_impl_sse2.asm"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_subpelvar.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_subpelvar.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_intrin_ssse3.c"
 				>
 			</File>
 			<File
@@ -1624,11 +1716,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_bilinear_sse2.asm"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_bilinear_ssse3.asm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subtract_sse2.asm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\generic\vp9_systemdependent.c"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_svc_layercontext.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_svc_layercontext.h"
 				>
 			</File>
 			<File
@@ -1696,19 +1800,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_vaq.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_vaq.h"
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance_c.c"
 				>
 			</File>
 			<File
@@ -1728,7 +1824,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_write_bit_buffer.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_write_bit_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_writer.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_writer.h"
 				>
 			</File>
 		</Filter>
