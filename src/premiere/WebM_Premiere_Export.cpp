@@ -48,7 +48,7 @@
 #else
 	#include <assert.h>
 
-	#define ULONG_LONG_MAX ULLONG_MAX
+	#define LONG_LONG_MAX LLONG_MAX
 #endif
 
 
@@ -1278,34 +1278,37 @@ exSDKExport(
 								made_frame = false;
 							
 							// the final packet was just written, so break
-							if(videoEncoderTime == ULONG_LONG_MAX)
+							if(videoEncoderTime == LONG_LONG_MAX)
 								break;
 						}
 						
-						// this is for the encoder, which does its own math based on config.g_timebase
-						// let's do the math
-						// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
-						// timestamp = time / timebase
-						// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
-						const PrTime encoder_fileTime = videoEncoderTime - exportInfoP->startTime;
-						const PrTime encoder_nextFileTime = encoder_fileTime + frameRateP.value.timeValue;
 						
-						const vpx_codec_pts_t encoder_timeStamp = encoder_fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
-						const vpx_codec_pts_t encoder_nextTimeStamp = encoder_nextFileTime * fps.numerator / (ticksPerSecond * fps.denominator);
-						const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
-						
-						// BUT, if we're setting timebase to 1/fps, then timestamp is just frame number.
-						// And since frame number isn't going to overflow at big times the way encoder_timeStamp is,
-						// let's just use that.
-						const vpx_codec_pts_t encoder_FrameNumber = encoder_fileTime / frameRateP.value.timeValue;
-						const unsigned long encoder_FrameDuration = 1;
-						
-						assert(encoder_FrameNumber == encoder_timeStamp); // will not be true for big time values (int64_t overflow)
-						assert(encoder_FrameDuration == encoder_duration);
-						
-			
 						if(!made_frame && result == suiteError_NoError)
 						{
+							assert(videoEncoderTime != LONG_LONG_MAX);
+							
+							// this is for the encoder, which does its own math based on config.g_timebase
+							// let's do the math
+							// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
+							// timestamp = time / timebase
+							// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
+							const PrTime encoder_fileTime = videoEncoderTime - exportInfoP->startTime;
+							const PrTime encoder_nextFileTime = encoder_fileTime + frameRateP.value.timeValue;
+							
+							const vpx_codec_pts_t encoder_timeStamp = encoder_fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
+							const vpx_codec_pts_t encoder_nextTimeStamp = encoder_nextFileTime * fps.numerator / (ticksPerSecond * fps.denominator);
+							const unsigned long encoder_duration = encoder_nextTimeStamp - encoder_timeStamp;
+							
+							// BUT, if we're setting timebase to 1/fps, then timestamp is just frame number.
+							// And since frame number isn't going to overflow at big times the way encoder_timeStamp is,
+							// let's just use that.
+							const vpx_codec_pts_t encoder_FrameNumber = encoder_fileTime / frameRateP.value.timeValue;
+							const unsigned long encoder_FrameDuration = 1;
+							
+							assert(encoder_FrameNumber == encoder_timeStamp); // will not be true for big time values (int64_t overflow)
+							assert(encoder_FrameDuration == encoder_duration);
+							
+				
 							if(videoEncoderTime < exportInfoP->endTime)
 							{
 								SequenceRender_GetFrameReturnRec renderResult;
@@ -1497,7 +1500,7 @@ exSDKExport(
 								
 								if(encode_err == VPX_CODEC_OK)
 								{
-									videoEncoderTime = ULONG_LONG_MAX;
+									videoEncoderTime = LONG_LONG_MAX;
 									
 									encoder_iter = NULL;
 								}
