@@ -981,7 +981,7 @@ exSDKPostProcessParams(
 	
 	
 	// Audio codec settings
-	utf16ncpy(paramString, "Vorbis settings", 255);
+	utf16ncpy(paramString, "Codec settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEAudioCodecGroup, paramString);
 
 
