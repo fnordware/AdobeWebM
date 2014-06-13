@@ -424,6 +424,197 @@ Convert16to8(const unsigned short &v)
 }
 
 
+static void
+CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuite, PrSDKPPix2Suite *pix2Suite)
+{
+	PrPixelFormat pixFormat;
+	pixSuite->GetPixelFormat(outFrame, &pixFormat);
+
+	const unsigned int sub_x = img->x_chroma_shift + 1;
+	const unsigned int sub_y = img->y_chroma_shift + 1;
+
+	if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
+	{
+		assert(sub_x == 2 && sub_y == 2);
+		
+		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+		
+		pix2Suite->GetYUV420PlanarBuffers(outFrame, PrPPixBufferAccess_ReadOnly,
+											&Y_PixelAddress, &Y_RowBytes,
+											&U_PixelAddress, &U_RowBytes,
+											&V_PixelAddress, &V_RowBytes);
+		
+		for(int y = 0; y < img->d_h; y++)
+		{
+			unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+			
+			unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+			
+			memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
+		}
+		
+		for(int y = 0; y < img->d_h / 2; y++)
+		{
+			unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+			unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+			
+			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+			
+			memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
+			memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
+		}
+	}
+	else
+	{
+		char *frameBufferP = NULL;
+		csSDK_int32 rowbytes = 0;
+		
+		pixSuite->GetPixels(outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+		pixSuite->GetRowBytes(outFrame, &rowbytes);
+		
+		
+		if(pixFormat == PrPixelFormat_UYVY_422_8u_601)
+		{
+			assert(sub_x == 2 && sub_y == 1);
+			
+			for(int y = 0; y < img->d_h; y++)
+			{
+				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+			
+				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					if(x % 2 == 0)
+						*imgU++ = *prUYVY++;
+					else
+						*imgV++ = *prUYVY++;
+					
+					*imgY++ = *prUYVY++;;
+				}
+			}
+		}
+		else if(pixFormat == PrPixelFormat_VUYX_4444_8u)
+		{
+			assert(sub_x == 1 && sub_y == 1);
+			
+			for(int y = 0; y < img->d_h; y++)
+			{
+				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+			
+				unsigned char *prVUYA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				
+				unsigned char *prV = prVUYA + 0;
+				unsigned char *prU = prVUYA + 1;
+				unsigned char *prY = prVUYA + 2;
+				unsigned char *prA = prVUYA + 3;
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					*imgY++ = *prY;
+					*imgU++ = *prU;
+					*imgV++ = *prV;
+					
+					prY += 4;
+					prU += 4;
+					prV += 4;
+				}
+			}
+		}
+		else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
+		{
+			// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
+			
+			for(int y = 0; y < img->d_h; y++)
+			{
+				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+				
+				unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+				
+				unsigned short *prB = prBGRA + 0;
+				unsigned short *prG = prBGRA + 1;
+				unsigned short *prR = prBGRA + 2;
+				unsigned short *prA = prBGRA + 3;
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
+					
+					if( (y % sub_y == 0) && (x % sub_x == 0) )
+					{
+						*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
+						*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
+					}
+					
+					prR += 4;
+					prG += 4;
+					prB += 4;
+					prA += 4;
+				}
+			}
+		}
+		else if(pixFormat == PrPixelFormat_BGRA_4444_8u || pixFormat == PrPixelFormat_ARGB_4444_8u)
+		{
+			// so here's our dumb RGB to YUV conversion
+
+			for(int y = 0; y < img->d_h; y++)
+			{
+				// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
+				
+				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+				
+				// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
+				unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				
+				unsigned char *prB = prBGRA + 0;
+				unsigned char *prG = prBGRA + 1;
+				unsigned char *prR = prBGRA + 2;
+				unsigned char *prA = prBGRA + 3;
+				
+				if(pixFormat == PrPixelFormat_ARGB_4444_8u)
+				{
+					// Media Encoder CS5 insists on handing us this format in some cases,
+					// even though we didn't list it as an option
+					prA = prBGRA + 0;
+					prR = prBGRA + 1;
+					prG = prBGRA + 2;
+					prB = prBGRA + 3;
+				}
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					// like the clever integer (fixed point) math?
+					*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
+					
+					if( (y % sub_y == 0) && (x % sub_x == 0) )
+					{
+						*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
+						*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;
+					}
+					
+					prR += 4;
+					prG += 4;
+					prB += 4;
+					prA += 4;
+				}
+			}
+		}
+		else
+			assert(false);
+	}
+}
+
+
 static int
 xiph_len(int l)
 {
@@ -572,7 +763,7 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	
 	
-	PrPixelFormat yuv_format = chroma == WEBM_444 ? PrPixelFormat_VUYA_4444_8u :
+	PrPixelFormat yuv_format = chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
 								chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
 								PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
 	
@@ -1332,11 +1523,9 @@ exSDKExport(
 								
 								if(result == suiteError_NoError)
 								{
-									PrPixelFormat pixFormat;
 									prRect bounds;
 									csSDK_uint32 parN, parD;
 									
-									pixSuite->GetPixelFormat(renderResult.outFrame, &pixFormat);
 									pixSuite->GetBounds(renderResult.outFrame, &bounds);
 									pixSuite->GetPixelAspectRatio(renderResult.outFrame, &parN, &parD);
 									
@@ -1361,201 +1550,9 @@ exSDKExport(
 										const unsigned int sub_y = img->y_chroma_shift + 1;
 										
 										assert((sub_x == 2 && sub_y == 2) || (use_vp9 && chroma != WEBM_420 && encoder.config.enc->g_profile > 0));
-									
-										if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
-										{
-											assert(sub_x == 2 && sub_y == 2);
-											
-											char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-											csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-											
-											pix2Suite->GetYUV420PlanarBuffers(renderResult.outFrame, PrPPixBufferAccess_ReadOnly,
-																				&Y_PixelAddress, &Y_RowBytes,
-																				&U_PixelAddress, &U_RowBytes,
-																				&V_PixelAddress, &V_RowBytes);
-											
-											for(int y = 0; y < img->d_h; y++)
-											{
-												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												
-												unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-												
-												memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
-											}
-											
-											for(int y = 0; y < img->d_h / 2; y++)
-											{
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-												
-												unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-												unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-												
-												memcpy(imgU, prU, (img->d_w / 2) * sizeof(unsigned char));
-												memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
-											}
-										}
-										else if(pixFormat == PrPixelFormat_UYVY_422_8u_601)
-										{
-											assert(sub_x == 2 && sub_y == 1);
-											
-											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
-											char *frameBufferP = NULL;
-											csSDK_int32 rowbytes = 0;
-											
-											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-											
-											for(int y = 0; y < img->d_h; y++)
-											{
-												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-											
-												unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-												
-												for(int x=0; x < img->d_w; x++)
-												{
-													if(x % 2 == 0)
-														*imgU++ = *prUYVY++;
-													else
-														*imgV++ = *prUYVY++;
-													
-													*imgY++ = *prUYVY++;;
-												}
-											}
-										}
-										else if(pixFormat == PrPixelFormat_VUYA_4444_8u)
-										{
-											assert(sub_x == 1 && sub_y == 1);
-											
-											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
-											char *frameBufferP = NULL;
-											csSDK_int32 rowbytes = 0;
-											
-											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-											
-											for(int y = 0; y < img->d_h; y++)
-											{
-												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-											
-												unsigned char *prVUYA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-												
-												unsigned char *prV = prVUYA + 0;
-												unsigned char *prU = prVUYA + 1;
-												unsigned char *prY = prVUYA + 2;
-												unsigned char *prA = prVUYA + 3;
-												
-												for(int x=0; x < img->d_w; x++)
-												{
-													*imgY++ = *prY;
-													*imgU++ = *prU;
-													*imgV++ = *prV;
-													
-													prY += 4;
-													prU += 4;
-													prV += 4;
-												}
-											}
-										}
-										else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
-										{
-											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
-											char *frameBufferP = NULL;
-											csSDK_int32 rowbytes = 0;
-											
-											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-											
-											
-											for(int y = 0; y < img->d_h; y++)
-											{
-												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-												
-												unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-												
-												unsigned short *prB = prBGRA + 0;
-												unsigned short *prG = prBGRA + 1;
-												unsigned short *prR = prBGRA + 2;
-												unsigned short *prA = prBGRA + 3;
-												
-												for(int x=0; x < img->d_w; x++)
-												{
-													*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
-													
-													if( (y % sub_y == 0) && (x % sub_x == 0) )
-													{
-														*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
-														*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
-													}
-													
-													prR += 4;
-													prG += 4;
-													prB += 4;
-													prA += 4;
-												}
-											}
-										}
-										else if(pixFormat == PrPixelFormat_BGRA_4444_8u || pixFormat == PrPixelFormat_ARGB_4444_8u)
-										{
-											// so here's our dumb RGB to YUV conversion
 										
-											char *frameBufferP = NULL;
-											csSDK_int32 rowbytes = 0;
-											
-											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
-											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
-											
-											
-											for(int y = 0; y < img->d_h; y++)
-											{
-												// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
-												
-												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-												
-												// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
-												unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-												
-												unsigned char *prB = prBGRA + 0;
-												unsigned char *prG = prBGRA + 1;
-												unsigned char *prR = prBGRA + 2;
-												unsigned char *prA = prBGRA + 3;
-												
-												if(pixFormat == PrPixelFormat_ARGB_4444_8u)
-												{
-													// Media Encoder CS5 insists on handing us this format in some cases,
-													// even though we didn't list it as an option
-													prA = prBGRA + 0;
-													prR = prBGRA + 1;
-													prG = prBGRA + 2;
-													prB = prBGRA + 3;
-												}
-												
-												for(int x=0; x < img->d_w; x++)
-												{
-													// like the clever integer (fixed point) math?
-													*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
-													
-													if( (y % sub_y == 0) && (x % sub_x == 0) )
-													{
-														*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
-														*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;
-													}
-													
-													prR += 4;
-													prG += 4;
-													prB += 4;
-													prA += 4;
-												}
-											}
-										}
+										
+										CopyPixToImg(img, renderResult.outFrame, pixSuite, pix2Suite);
 										
 										
 										vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_FrameNumber, encoder_FrameDuration, 0, deadline);

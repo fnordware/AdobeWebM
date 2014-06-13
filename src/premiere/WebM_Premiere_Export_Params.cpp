@@ -1525,7 +1525,7 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 	do{							\
 		std::stringstream ss;	\
 		ss << s;				\
-		unsigned int v = 0;		\
+		int v = 0;		\
 		ss >> v;				\
 		config_err = vpx_codec_control(encoder, ctrl_id, v); \
 	}while(0)

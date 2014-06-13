@@ -790,7 +790,15 @@ SDKGetInfo8(
 						webm_guess_framerate(localRecP->segment, localRecP->video_track, &fps_den, &fps_num);
 
 						if(embedded_rate > 0)
-							assert( fabs(embedded_rate - ((double)fps_num / (double)fps_den)) < 0.01 );
+						{
+							if(duration < 1000000000UL)
+							{
+								fps_den = 1000;
+								fps_num = embedded_rate * fps_den;
+							}
+							else						
+								assert( fabs(embedded_rate - ((double)fps_num / (double)fps_den)) < 0.01 );
+						}
 						
 						
 						// Video information
@@ -921,6 +929,113 @@ SDKPreferredFrameSize(
 	return result;
 }
 
+
+static void
+CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPixSuite, PrSDKPPix2Suite *PPix2Suite)
+{
+	PrPixelFormat pix_format;
+	PPixSuite->GetPixelFormat(ppix, &pix_format);
+
+	const unsigned int sub_x = img->x_chroma_shift + 1;
+	const unsigned int sub_y = img->y_chroma_shift + 1;
+	
+	if(pix_format == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
+	{
+		assert(sub_x == 2 && sub_y == 2);
+
+		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
+		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
+		
+		PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
+														&Y_PixelAddress, &Y_RowBytes,
+														&U_PixelAddress, &U_RowBytes,
+														&V_PixelAddress, &V_RowBytes);
+													
+		for(int y = 0; y < img->d_h; y++)
+		{
+			unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+			
+			unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+			
+			memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+		}
+		
+		for(int y = 0; y < img->d_h / 2; y++)
+		{
+			unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+			unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+			
+			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+			
+			memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
+			memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
+		}
+	}
+	else
+	{
+		char *frameBufferP = NULL;
+		csSDK_int32 rowbytes = 0;
+		
+		PPixSuite->GetPixels(ppix, PrPPixBufferAccess_ReadWrite, &frameBufferP);
+		PPixSuite->GetRowBytes(ppix, &rowbytes);
+		
+								
+		if(pix_format == PrPixelFormat_UYVY_422_8u_601)
+		{
+			assert(sub_x == 2 && sub_y == 1);
+			
+			for(int y = 0; y < img->d_h; y++)
+			{
+				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+				
+				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					if(x % 2 == 0)
+						*prUYVY++ = *imgU++;
+					else
+						*prUYVY++ = *imgV++;
+					
+					*prUYVY++ = *imgY++;
+				}
+			}
+		}
+		else if(pix_format == PrPixelFormat_VUYX_4444_8u)
+		{
+			assert(sub_x == 1 && sub_y == 1);
+			
+			for(int y = 0; y < img->d_h; y++)
+			{
+				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+				
+				unsigned char *prVUYX = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				
+				unsigned char *prV = prVUYX + 0;
+				unsigned char *prU = prVUYX + 1;
+				unsigned char *prY = prVUYX + 2;
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					*prY = *imgY++;
+					*prU = *imgU++;
+					*prV = *imgV++;
+					
+					prY += 4;
+					prU += 4;
+					prV += 4;
+				}
+			}
+		}
+		else
+			assert(false);
+	}
+}
 
 static prMALError 
 SDKGetSourceVideo(
@@ -1144,108 +1259,13 @@ SDKGetSourceVideo(
 																
 																localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, pix_format, &theRect);
 																
-
-																if(pix_format == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
-																{
-																	assert(sub_x == 2 && sub_y == 2);
 																
-																	char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
-																	csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
-																	
-																	localRecP->PPix2Suite->GetYUV420PlanarBuffers(ppix, PrPPixBufferAccess_ReadWrite,
-																													&Y_PixelAddress, &Y_RowBytes,
-																													&U_PixelAddress, &U_RowBytes,
-																													&V_PixelAddress, &V_RowBytes);
-																												
-																	for(int y = 0; y < img->d_h; y++)
-																	{
-																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-																		
-																		unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-																		
-																		memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
-																	}
-																	
-																	for(int y = 0; y < img->d_h / 2; y++)
-																	{
-																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-																		
-																		unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-																		unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-																		
-																		memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
-																		memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
-																	}
-																	
-																	// It says we can get more than one frame off one decode operation?  What would I do with it?
-																	assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
-																}
-																else if(pix_format == PrPixelFormat_UYVY_422_8u_601)
-																{
-																	assert(sub_x == 2 && sub_y == 1);
-																	
-																	char *frameBufferP = NULL;
-																	csSDK_int32 rowbytes = 0;
-																	
-																	localRecP->PPixSuite->GetPixels(ppix, PrPPixBufferAccess_ReadWrite, &frameBufferP);
-																	localRecP->PPixSuite->GetRowBytes(ppix, &rowbytes);
-																							
-																	for(int y = 0; y < img->d_h; y++)
-																	{
-																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-																		
-																		unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-																		
-																		for(int x=0; x < img->d_w; x++)
-																		{
-																			if(x % 2 == 0)
-																				*prUYVY++ = *imgU++;
-																			else
-																				*prUYVY++ = *imgV++;
-																			
-																			*prUYVY++ = *imgY++;
-																		}
-																	}
-																}
-																else if(pix_format == PrPixelFormat_VUYX_4444_8u)
-																{
-																	assert(sub_x == 1 && sub_y == 1);
-																	
-																	char *frameBufferP = NULL;
-																	csSDK_int32 rowbytes = 0;
-																	
-																	localRecP->PPixSuite->GetPixels(ppix, PrPPixBufferAccess_ReadWrite, &frameBufferP);
-																	localRecP->PPixSuite->GetRowBytes(ppix, &rowbytes);
-																							
-																	for(int y = 0; y < img->d_h; y++)
-																	{
-																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-																		
-																		unsigned char *prVUYX = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-																		
-																		unsigned char *prV = prVUYX + 0;
-																		unsigned char *prU = prVUYX + 1;
-																		unsigned char *prY = prVUYX + 2;
-																		
-																		for(int x=0; x < img->d_w; x++)
-																		{
-																			*prY = *imgY++;
-																			*prU = *imgU++;
-																			*prV = *imgV++;
-																			
-																			prY += 4;
-																			prU += 4;
-																			prV += 4;
-																		}
-																	}
-																}
-																else
-																	assert(false); // looks like Premiere is happy to always give me this kind of buffer
+																CopyImgToPix(img, ppix, localRecP->PPixSuite, localRecP->PPix2Suite);
+																
+
+																// Should never have another image waiting in the queue
+																assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
+																
 																
 																// This is a nice Premiere feature.  We often have to decode many frames
 																// in a GOP (group of pictures) before we decode the one Premiere asked for.
@@ -1273,6 +1293,8 @@ SDKGetSourceVideo(
 																
 																vpx_img_free(img);
 															}
+															else
+																assert(false); // this would mean that I passed the decoder a frame, but didn't get an image
 														}
 														else
 															result = imFileReadFailed;
