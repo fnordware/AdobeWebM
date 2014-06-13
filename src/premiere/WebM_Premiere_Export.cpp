@@ -552,7 +552,9 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
 	
-	WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
+	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
+	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
+	const WebM_Chroma_Sampling chroma = (use_vp9 ? WEBM_420 : WEBM_420);
 	
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
@@ -570,11 +572,15 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	
 	
+	PrPixelFormat yuv_format = chroma == WEBM_444 ? PrPixelFormat_VUYA_4444_8u :
+								chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
+								PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+	
 	SequenceRender_ParamsRec renderParms;
-	PrPixelFormat pixelFormats[] = { PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601,
+	PrPixelFormat pixelFormats[] = { yuv_format,
 									PrPixelFormat_BGRA_4444_16u, // must support BGRA, even if I don't want to
 									PrPixelFormat_BGRA_4444_8u };
-	
+									
 	renderParms.inRequestedPixelFormatArray = pixelFormats;
 	renderParms.inRequestedPixelFormatArrayCount = 3;
 	renderParms.inWidth = widthP.value.intValue;
@@ -654,14 +660,19 @@ exSDKExport(
 		
 		if(exportInfoP->exportVideo)
 		{
-			vpx_codec_iface_t *iface = codecP.value.intValue == WEBM_CODEC_VP9 ? vpx_codec_vp9_cx() :
-										vpx_codec_vp8_cx();
+			vpx_codec_iface_t *iface = use_vp9 ? vpx_codec_vp9_cx() : vpx_codec_vp8_cx();
 			
 			vpx_codec_enc_cfg_t config;
 			vpx_codec_enc_config_default(iface, &config, 0);
 			
 			config.g_w = renderParms.inWidth;
 			config.g_h = renderParms.inHeight;
+			
+			// (only applies to VP9)
+			// Profile 0 is 4:2:0 only
+			// Profile 1 can do 4:4:4 and 4:2:2 and alpha
+			// Profile 2 can do 10- and 12-bit
+			config.g_profile = (chroma > WEBM_420 ? 1 : 0);
 			
 			
 			if(method == WEBM_METHOD_QUALITY)
@@ -1333,19 +1344,28 @@ exSDKExport(
 									const int height = bounds.bottom - bounds.top;
 									
 									
-									// libvpx can only take PX_IMG_FMT_YV12, VPX_IMG_FMT_I420, VPX_IMG_FMT_VPXI420, VPX_IMG_FMT_VPXYV12
-									// (the latter two are in "vpx color space"?)
-									// see validate_img() in vp8_cx_iface.c
-									// TODO: VP9 will eventually accept VPX_IMG_FMT_I422 and VPX_IMG_FMT_I444
-									// not to mention VPX_IMG_FMT_444A for lossless and/or alpha support
+									// see validate_img() and validate_config() in vp8_cx_iface.c and vp9_cx_iface.c
+									// TODO: use alpha and higher dit depth when libvpx supports it
+									// Right now (12 June 1014) libvpx is not accepting alpha or >8-bit worlds
+									// and vpx_img_alloc() in vpx_image.c isn't creating them properly.
+									const vpx_img_fmt_t imgfmt = chroma == WEBM_444 ? VPX_IMG_FMT_I444 :
+																	chroma == WEBM_422 ? VPX_IMG_FMT_I422 :
+																	VPX_IMG_FMT_I420;
 											
 									vpx_image_t img_data;
-									vpx_image_t *img = vpx_img_alloc(&img_data, VPX_IMG_FMT_I420, width, height, 32);
+									vpx_image_t *img = vpx_img_alloc(&img_data, imgfmt, width, height, 32);
 									
 									if(img)
 									{
+										const unsigned int sub_x = img->x_chroma_shift + 1;
+										const unsigned int sub_y = img->y_chroma_shift + 1;
+										
+										assert((sub_x == 2 && sub_y == 2) || (use_vp9 && chroma != WEBM_420 && encoder.config.enc->g_profile > 0));
+									
 										if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 										{
+											assert(sub_x == 2 && sub_y == 2);
+											
 											char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 											csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
 											
@@ -1375,6 +1395,72 @@ exSDKExport(
 												memcpy(imgV, prV, (img->d_w / 2) * sizeof(unsigned char));
 											}
 										}
+										else if(pixFormat == PrPixelFormat_UYVY_422_8u_601)
+										{
+											assert(sub_x == 2 && sub_y == 1);
+											
+											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
+											char *frameBufferP = NULL;
+											csSDK_int32 rowbytes = 0;
+											
+											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+											
+											for(int y = 0; y < img->d_h; y++)
+											{
+												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+											
+												unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+												
+												for(int x=0; x < img->d_w; x++)
+												{
+													if(x % 2 == 0)
+														*imgU++ = *prUYVY++;
+													else
+														*imgV++ = *prUYVY++;
+													
+													*imgY++ = *prUYVY++;;
+												}
+											}
+										}
+										else if(pixFormat == PrPixelFormat_VUYA_4444_8u)
+										{
+											assert(sub_x == 1 && sub_y == 1);
+											
+											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
+											char *frameBufferP = NULL;
+											csSDK_int32 rowbytes = 0;
+											
+											pixSuite->GetPixels(renderResult.outFrame, PrPPixBufferAccess_ReadOnly, &frameBufferP);
+											pixSuite->GetRowBytes(renderResult.outFrame, &rowbytes);
+											
+											for(int y = 0; y < img->d_h; y++)
+											{
+												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+											
+												unsigned char *prVUYA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+												
+												unsigned char *prV = prVUYA + 0;
+												unsigned char *prU = prVUYA + 1;
+												unsigned char *prY = prVUYA + 2;
+												unsigned char *prA = prVUYA + 3;
+												
+												for(int x=0; x < img->d_w; x++)
+												{
+													*imgY++ = *prY;
+													*imgU++ = *prU;
+													*imgV++ = *prV;
+													
+													prY += 4;
+													prU += 4;
+													prV += 4;
+												}
+											}
+										}
 										else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
 										{
 											// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
@@ -1388,8 +1474,8 @@ exSDKExport(
 											for(int y = 0; y < img->d_h; y++)
 											{
 												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
 												
 												unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
 												
@@ -1402,7 +1488,7 @@ exSDKExport(
 												{
 													*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
 													
-													if( (y % 2 == 0) && (x % 2 == 0) )
+													if( (y % sub_y == 0) && (x % sub_x == 0) )
 													{
 														*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
 														*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
@@ -1431,8 +1517,8 @@ exSDKExport(
 												// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
 												
 												unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / 2));
-												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / 2));
+												unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+												unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
 												
 												// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
 												unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
@@ -1457,7 +1543,7 @@ exSDKExport(
 													// like the clever integer (fixed point) math?
 													*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
 													
-													if( (y % 2 == 0) && (x % 2 == 0) )
+													if( (y % sub_y == 0) && (x % sub_x == 0) )
 													{
 														*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
 														*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;

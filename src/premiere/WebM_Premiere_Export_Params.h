@@ -64,6 +64,12 @@ typedef enum {
 	WEBM_ENCODING_BEST
 } WebM_Video_Encoding;
 
+typedef enum {
+	WEBM_420 = 0,
+	WEBM_422,
+	WEBM_444
+} WebM_Chroma_Sampling;
+
 
 #define ADBEVideoAlpha		"ADBEVideoAlpha"
 

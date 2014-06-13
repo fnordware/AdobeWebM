@@ -1108,7 +1108,8 @@ SDKGetSourceVideo(
 												
 												if(data != NULL)
 												{
-													int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+													//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+													long read_err = blockFrame.Read(localRecP->reader, data);
 													
 													if(read_err == PrMkvReader::PrMkvSuccess)
 													{
@@ -1126,12 +1127,28 @@ SDKGetSourceVideo(
 															
 															if(img)
 															{
+																const unsigned int sub_x = img->x_chroma_shift + 1;
+																const unsigned int sub_y = img->y_chroma_shift + 1;
+																
+																assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
+																assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
+																assert(img->fmt == VPX_IMG_FMT_I420 || img->fmt == VPX_IMG_FMT_I422 || img->fmt == VPX_IMG_FMT_I444);
+
+																
+																// apparently pix_format doesn't have to match frameFormat->inPixelFormat
+																const PrPixelFormat pix_format = img->fmt == VPX_IMG_FMT_I422 ? PrPixelFormat_UYVY_422_8u_601 :
+																									img->fmt == VPX_IMG_FMT_I444 ? PrPixelFormat_VUYX_4444_8u :
+																									PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+																									
 																PPixHand ppix;
 																
-																localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, frameFormat->inPixelFormat, &theRect);
+																localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, pix_format, &theRect);
+																
 
-																if(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
+																if(pix_format == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 																{
+																	assert(sub_x == 2 && sub_y == 2);
+																
 																	char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 																	csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
 																	
@@ -1140,9 +1157,6 @@ SDKGetSourceVideo(
 																													&U_PixelAddress, &U_RowBytes,
 																													&V_PixelAddress, &V_RowBytes);
 																												
-																	assert(frameFormat->inFrameHeight == img->d_h);
-																	assert(frameFormat->inFrameWidth == img->d_w);
-
 																	for(int y = 0; y < img->d_h; y++)
 																	{
 																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
@@ -1166,6 +1180,69 @@ SDKGetSourceVideo(
 																	
 																	// It says we can get more than one frame off one decode operation?  What would I do with it?
 																	assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
+																}
+																else if(pix_format == PrPixelFormat_UYVY_422_8u_601)
+																{
+																	assert(sub_x == 2 && sub_y == 1);
+																	
+																	char *frameBufferP = NULL;
+																	csSDK_int32 rowbytes = 0;
+																	
+																	localRecP->PPixSuite->GetPixels(ppix, PrPPixBufferAccess_ReadWrite, &frameBufferP);
+																	localRecP->PPixSuite->GetRowBytes(ppix, &rowbytes);
+																							
+																	for(int y = 0; y < img->d_h; y++)
+																	{
+																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+																		
+																		unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+																		
+																		for(int x=0; x < img->d_w; x++)
+																		{
+																			if(x % 2 == 0)
+																				*prUYVY++ = *imgU++;
+																			else
+																				*prUYVY++ = *imgV++;
+																			
+																			*prUYVY++ = *imgY++;
+																		}
+																	}
+																}
+																else if(pix_format == PrPixelFormat_VUYX_4444_8u)
+																{
+																	assert(sub_x == 1 && sub_y == 1);
+																	
+																	char *frameBufferP = NULL;
+																	csSDK_int32 rowbytes = 0;
+																	
+																	localRecP->PPixSuite->GetPixels(ppix, PrPPixBufferAccess_ReadWrite, &frameBufferP);
+																	localRecP->PPixSuite->GetRowBytes(ppix, &rowbytes);
+																							
+																	for(int y = 0; y < img->d_h; y++)
+																	{
+																		unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+																		unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+																		unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+																		
+																		unsigned char *prVUYX = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+																		
+																		unsigned char *prV = prVUYX + 0;
+																		unsigned char *prU = prVUYX + 1;
+																		unsigned char *prY = prVUYX + 2;
+																		
+																		for(int x=0; x < img->d_w; x++)
+																		{
+																			*prY = *imgY++;
+																			*prU = *imgU++;
+																			*prV = *imgV++;
+																			
+																			prY += 4;
+																			prU += 4;
+																			prV += 4;
+																		}
+																	}
 																}
 																else
 																	assert(false); // looks like Premiere is happy to always give me this kind of buffer
@@ -1473,7 +1550,8 @@ SDKImportAudio7(
 														
 														if(data != NULL)
 														{
-															int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+															//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+															long read_err = blockFrame.Read(localRecP->reader, data);
 															
 															if(read_err == PrMkvReader::PrMkvSuccess)
 															{
@@ -1697,7 +1775,8 @@ SDKImportAudio7(
 															
 															if(data != NULL)
 															{
-																int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+																//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+																long read_err = blockFrame.Read(localRecP->reader, data);
 																
 																if(read_err == PrMkvReader::PrMkvSuccess)
 																{
