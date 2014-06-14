@@ -187,6 +187,9 @@ typedef struct
 	int						audio_track;
 	AudioCodec				audio_codec;
 	
+	bool					vpx_setup;
+	vpx_codec_ctx_t			vpx_decoder;
+	
 	bool					vorbis_setup;
 	vorbis_info				vi;
 	vorbis_comment			vc;
@@ -392,6 +395,7 @@ SDKOpenFile8(
 		localRecP->video_codec = CODEC_NONE;
 		localRecP->audio_track = -1;
 		localRecP->audio_codec = CODEC_ANONE;
+		localRecP->vpx_setup = false;
 		localRecP->vorbis_setup = false;
 		localRecP->opus_dec = NULL;
 		
@@ -509,7 +513,7 @@ SDKOpenFile8(
 						{
 							const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
 							
-							if(pVideoTrack)
+							if(pVideoTrack && localRecP->video_track < 0)
 							{
 								localRecP->video_codec = pVideoTrack->GetCodecId() == std::string("V_VP8") ? CODEC_VP8 :
 															pVideoTrack->GetCodecId() == std::string("V_VP9") ? CODEC_VP9 :
@@ -522,7 +526,7 @@ SDKOpenFile8(
 						{
 							const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
 							
-							if(pAudioTrack)
+							if(pAudioTrack && localRecP->audio_track < 0)
 							{
 								localRecP->audio_codec = pAudioTrack->GetCodecId() == std::string("A_VORBIS") ? CODEC_VORBIS :
 															pAudioTrack->GetCodecId() == std::string("A_OPUS") ? CODEC_OPUS :
@@ -534,140 +538,183 @@ SDKOpenFile8(
  					}
 				}
 				
-				if(localRecP->video_track == -1 && localRecP->audio_track == -1)
+				
+				if(localRecP->video_track >= 0 && localRecP->vpx_setup == false)
 				{
-					result = imFileHasNoImportableStreams;
-				}
-				else
-				{
-					if(localRecP->audio_track >= 0)
-					{
-						const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
+					const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
 					
-						const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
+					if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kVideo)
+					{
+						const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
 						
-						if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kAudio)
+						if(pVideoTrack)
 						{
-							const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
+							const char* codec_id = pTrack->GetCodecId();
+						
+							const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() :
+																codec_id == std::string("V_VP9") ? vpx_codec_vp9_dx() :
+																NULL);
 							
-							if(pAudioTrack)
+							vpx_codec_err_t codec_err = VPX_CODEC_OK;
+							
+							vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
+							
+							if(iface != NULL)
 							{
-								if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup == false)
-								{
-									assert(pAudioTrack->GetSeekPreRoll() == 0);
-									assert(pAudioTrack->GetCodecDelay() == 0);
+								vpx_codec_dec_cfg_t config;
+								config.threads = g_num_cpus;
+								config.w = pVideoTrack->GetWidth();
+								config.h = pVideoTrack->GetHeight();
+								
+								vpx_codec_flags_t flags = VPX_CODEC_CAP_FRAME_THREADING |
+															//VPX_CODEC_USE_ERROR_CONCEALMENT | // this doesn't seem to work
+															VPX_CODEC_USE_FRAME_THREADING;
+								
+								// TODO: Explore possibilities of decoding options by setting
+								// VPX_CODEC_USE_POSTPROC here.  Things like VP8_DEMACROBLOCK and
+								// VP8_MFQE (Multiframe Quality Enhancement) could be cool.
+								
+								codec_err = vpx_codec_dec_init(&decoder, iface, &config, flags);
+								
+								if(codec_err == VPX_CODEC_OK)
+									localRecP->vpx_setup = true;
+							}
+						}
+					}
+				}
+		
+				if(localRecP->audio_track >= 0)
+				{
+					const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
+				
+					const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
+					
+					if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kAudio)
+					{
+						const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
+						
+						if(pAudioTrack)
+						{
+							if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup == false)
+							{
+								assert(pAudioTrack->GetSeekPreRoll() == 0);
+								assert(pAudioTrack->GetCodecDelay() == 0);
 
-									size_t private_size = 0;
-									const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
+								size_t private_size = 0;
+								const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
+								
+								if(private_data && private_size && PrivateDataCount(private_data, private_size) == 3)
+								{
+									vorbis_info &vi = localRecP->vi;
+									vorbis_comment &vc = localRecP->vc;
+									vorbis_dsp_state &vd = localRecP->vd;
+									vorbis_block &vb = localRecP->vb;
 									
-									if(private_data && private_size && PrivateDataCount(private_data, private_size) == 3)
+									vorbis_info_init(&vi);
+									vorbis_comment_init(&vc);
+									
+									int ogg_packet_num = 0;
+									
+								#define OV_OK 0
+								
+									int v_err = OV_OK;
+									
+									for(int h=0; h < 3 && v_err == OV_OK; h++)
 									{
-										vorbis_info &vi = localRecP->vi;
-										vorbis_comment &vc = localRecP->vc;
-										vorbis_dsp_state &vd = localRecP->vd;
-										vorbis_block &vb = localRecP->vb;
+										size_t length = 0;
+										const unsigned char *data = GetPrivateDataPart(private_data, private_size,
+																						h, &length);
 										
-										vorbis_info_init(&vi);
-										vorbis_comment_init(&vc);
-										
-										int ogg_packet_num = 0;
-										
-									#define OV_OK 0
-									
-										int v_err = OV_OK;
-										
-										for(int h=0; h < 3 && v_err == OV_OK; h++)
+										if(data != NULL)
 										{
-											size_t length = 0;
-											const unsigned char *data = GetPrivateDataPart(private_data, private_size,
-																							h, &length);
+											ogg_packet packet;
 											
-											if(data != NULL)
-											{
-												ogg_packet packet;
-												
-												packet.packet = (unsigned char *)data;
-												packet.bytes = length;
-												packet.b_o_s = (h == 0);
-												packet.e_o_s = false;
-												packet.granulepos = 0;
-												packet.packetno = ogg_packet_num++;
-												
-												v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
-												
-												if(v_err == OV_OK)
-													localRecP->vorbis_setup = true;
-											}
+											packet.packet = (unsigned char *)data;
+											packet.bytes = length;
+											packet.b_o_s = (h == 0);
+											packet.e_o_s = false;
+											packet.granulepos = 0;
+											packet.packetno = ogg_packet_num++;
+											
+											v_err = vorbis_synthesis_headerin(&vi, &vc, &packet);
+											
+											if(v_err == OV_OK)
+												localRecP->vorbis_setup = true;
 										}
 									}
 								}
-								else if(pTrack->GetCodecId() == std::string("A_OPUS") && localRecP->opus_dec == NULL)
-								{
-									// Opus specs found here:
-									// http://wiki.xiph.org/MatroskaOpus
-									
-									const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
-									const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
-									
-									assert(seekPreRoll == 80000000);
+							}
+							else if(pTrack->GetCodecId() == std::string("A_OPUS") && localRecP->opus_dec == NULL)
+							{
+								// Opus specs found here:
+								// http://wiki.xiph.org/MatroskaOpus
+								
+								const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
+								const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
+								
+								assert(seekPreRoll == 80000000);
 
-									size_t private_size = 0;
-									const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
+								size_t private_size = 0;
+								const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
+								
+								if(private_data && private_size >= 19 && !memcmp(private_data, "OpusHead", 8))
+								{
+									const unsigned char channels = private_data[9];
 									
-									if(private_data && private_size >= 19 && !memcmp(private_data, "OpusHead", 8))
+									const unsigned short pre_skip = private_data[10] | private_data[11] << 8;
+									
+									const unsigned int sample_rate = private_data[12] | private_data[13] << 8 |
+																		private_data[14] << 16 | private_data[15] << 24;
+									
+									const unsigned short output_gain_u = private_data[16] | private_data[17] << 8;
+									
+									const short output_gain = (output_gain_u ^ 0x8000) - 0x8000;
+									
+									unsigned char stream_count = 1;
+									unsigned char coupled_count = (channels > 1 ? 1 : 0);
+									unsigned char mapping[] = {0, 1, 0, 1, 0, 1};
+									
+									const unsigned char mapping_family = private_data[18];
+									
+									if(mapping_family == 1)
 									{
-										const unsigned char channels = private_data[9];
+										assert(private_size == 21 + channels);
 										
-										const unsigned short pre_skip = private_data[10] | private_data[11] << 8;
+										stream_count = private_data[19];
+										coupled_count = private_data[20];
 										
-										const unsigned int sample_rate = private_data[12] | private_data[13] << 8 |
-																			private_data[14] << 16 | private_data[15] << 24;
-										
-										const unsigned short output_gain_u = private_data[16] | private_data[17] << 8;
-										
-										const short output_gain = (output_gain_u ^ 0x8000) - 0x8000;
-										
-										unsigned char stream_count = 1;
-										unsigned char coupled_count = (channels > 1 ? 1 : 0);
-										unsigned char mapping[] = {0, 1, 0, 1, 0, 1};
-										
-										const unsigned char mapping_family = private_data[18];
-										
-										if(mapping_family == 1)
-										{
-											assert(private_size == 21 + channels);
-											
-											stream_count = private_data[19];
-											coupled_count = private_data[20];
-											
-											memcpy(mapping, &private_data[21], channels);
-										}
-										else
-										{
-											assert(mapping_family == 0);
-											assert(channels <= 2);
-										}
-										
-										assert(pAudioTrack->GetChannels() == channels);
-										assert(pAudioTrack->GetSamplingRate() == sample_rate);
-										assert(pAudioTrack->GetSamplingRate() == 48000);
-										assert(sample_rate == 48000);
-										assert(output_gain == 0);
-										assert(codecDelay == (unsigned long long)pre_skip * 1000000000UL / sample_rate); // maybe should give myself some leeway here
-										
-										
-										int err = -1;
-										
-										localRecP->opus_dec = opus_multistream_decoder_create(sample_rate, channels,
-																								stream_count, coupled_count, mapping,
-																								&err);
-										
-										assert(localRecP->opus_dec != NULL && err == OPUS_OK);
+										memcpy(mapping, &private_data[21], channels);
 									}
+									else
+									{
+										assert(mapping_family == 0);
+										assert(channels <= 2);
+									}
+									
+									assert(pAudioTrack->GetChannels() == channels);
+									assert(pAudioTrack->GetSamplingRate() == sample_rate);
+									assert(pAudioTrack->GetSamplingRate() == 48000);
+									assert(sample_rate == 48000);
+									assert(output_gain == 0);
+									assert(codecDelay == (unsigned long long)pre_skip * 1000000000UL / sample_rate); // maybe should give myself some leeway here
+									
+									
+									int err = -1;
+									
+									localRecP->opus_dec = opus_multistream_decoder_create(sample_rate, channels,
+																							stream_count, coupled_count, mapping,
+																							&err);
+									
+									assert(localRecP->opus_dec != NULL && err == OPUS_OK);
 								}
 							}
 						}
 					}
+				}
+				
+				if(localRecP->video_track == -1 && localRecP->audio_track == -1)
+				{
+					result = imFileHasNoImportableStreams;
 				}
 			}
 		}
@@ -713,6 +760,14 @@ SDKQuietFile(
 
 		ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
+		if(localRecP->vpx_setup)
+		{
+			vpx_codec_err_t destroy_err = vpx_codec_destroy(&localRecP->vpx_decoder);
+			assert(destroy_err == VPX_CODEC_OK);
+			
+			localRecP->vpx_setup = false;
+		}
+		
 		if(localRecP->vorbis_setup)
 		{
 			vorbis_info &vi = localRecP->vi;
@@ -1348,212 +1403,172 @@ SDKGetSourceVideo(
 			const long long tstamp = timeCode * timeCodeScale;
 			
 			
-			if(localRecP->video_track >= 0)
+			if(localRecP->video_track >= 0 && localRecP->vpx_setup)
 			{
+				vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
+			
 				const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 			
 				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
 				
-				if(pTrack != NULL)
+				if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kVideo)
 				{
-					const long trackType = pTrack->GetType();
-				
-					if(trackType == mkvparser::Track::kVideo)
+					const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+					
+					if(pVideoTrack)
 					{
-						const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+						assert(pVideoTrack->GetSeekPreRoll() == 0);
+						assert(pVideoTrack->GetCodecDelay() == 0);
 						
-						if(pVideoTrack)
+						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+						
+						pVideoTrack->Seek(tstamp, pSeekBlockEntry);
+						
+						// TODO: Any way I can seek with cues instead of a binary search through clusters?
+						//const mkvparser::Cues* cues = localRecP->segment->GetCues();
+
+						if(pSeekBlockEntry != NULL)
 						{
-							const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
-							
-							pVideoTrack->Seek(tstamp, pSeekBlockEntry);
-							
-							// TODO: Any way I can seek with cues instead of a binary search through clusters?
-							//const mkvparser::Cues* cues = localRecP->segment->GetCues();
+							const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
 
-							assert(pVideoTrack->GetSeekPreRoll() == 0);
-							assert(pVideoTrack->GetCodecDelay() == 0);
+							// The seek took us to this Cluster for a reason.
+							// It stars with a keyframe, although not necessarily the last keyframe before
+							// the requested frame. I have to decode each frame starting with the keyframe,
+							// and then I continue afterwards until I decode the entire cluster.
+							// TODO: Maybe we should seek for keyframes within the cluster.
+
+							assert(tstamp >= pSeekBlockEntry->GetBlock()->GetTime(pCluster));
+							assert(tstamp >= pCluster->GetTime());
+
+							bool got_frame = false;
 							
-							if(pSeekBlockEntry != NULL)
+							while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
 							{
-								const char* codec_id = pTrack->GetCodecId();
-							
-								const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() :
-																	codec_id == std::string("V_VP9") ? vpx_codec_vp9_dx() :
-																	NULL);
+								assert(pCluster->GetTime() >= 0);
+								assert(pCluster->GetTime() == pCluster->GetFirstTime());
+								assert(got_frame || tstamp >= pCluster->GetTime());
+
+								const mkvparser::BlockEntry* pBlockEntry = NULL;
 								
-								vpx_codec_err_t codec_err = VPX_CODEC_OK;
-								
-								vpx_codec_ctx_t decoder;
-								
-								if(iface != NULL)
+								pCluster->GetFirst(pBlockEntry);
+
+								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && result == malNoError)
 								{
-									vpx_codec_dec_cfg_t config;
-									config.threads = g_num_cpus;
-									config.w = frameFormat->inFrameWidth;
-									config.h = frameFormat->inFrameHeight;
-									
-									vpx_codec_flags_t flags = VPX_CODEC_CAP_FRAME_THREADING |
-																//VPX_CODEC_USE_ERROR_CONCEALMENT | // this doesn't seem to work
-																VPX_CODEC_USE_FRAME_THREADING;
-									
-									// TODO: Explore possibilities of decoding options by setting
-									// VPX_CODEC_USE_POSTPROC here.  Things like VP8_DEMACROBLOCK and
-									// VP8_MFQE (Multiframe Quality Enhancement) could be cool.
-									
-									codec_err = vpx_codec_dec_init(&decoder, iface, &config, flags);
-								}
-								else
-									codec_err = VPX_CODEC_ERROR;
+									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 								
-								
-								if(codec_err == VPX_CODEC_OK)
-								{
-									const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
-
-									// The seek took us to this Cluster for a reason.
-									// It stars with a keyframe, although not necessarily the last keyframe before
-									// the requested frame. I have to decode each frame starting with the keyframe,
-									// and then I continue afterwards until I decode the entire cluster.
-									// TODO: Maybe we should seek for keyframes within the cluster.
-
-									assert(tstamp >= pSeekBlockEntry->GetBlock()->GetTime(pCluster));
-									assert(tstamp >= pCluster->GetTime());
-
-									bool got_frame = false;
-									
-									while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
+									if(pBlock->GetTrackNumber() == localRecP->video_track)
 									{
-										assert(pCluster->GetTime() >= 0);
-										assert(pCluster->GetTime() == pCluster->GetFirstTime());
-										assert(got_frame || tstamp >= pCluster->GetTime());
-
-										const mkvparser::BlockEntry* pBlockEntry = NULL;
+										assert(pBlock->GetFrameCount() == 1);
+										assert(pBlock->GetDiscardPadding() == 0);
 										
-										pCluster->GetFirst(pBlockEntry);
-
-										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && result == malNoError)
+										long long packet_tstamp = pBlock->GetTime(pCluster);
+										
+										long long packet_tcode = pBlock->GetTimeCode(pCluster);
+										long long tcode_scale = localRecP->segment->GetInfo()->GetTimeCodeScale();
+										
+										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
+										
+										unsigned int length = blockFrame.len;
+										uint8_t *data = (uint8_t *)malloc(length);
+										
+										if(data != NULL)
 										{
-											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
-										
-											if(pBlock->GetTrackNumber() == localRecP->video_track)
+											//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+											long read_err = blockFrame.Read(localRecP->reader, data);
+											
+											if(read_err == PrMkvReader::PrMkvSuccess)
 											{
-												assert(pBlock->GetFrameCount() == 1);
-												assert(pBlock->GetDiscardPadding() == 0);
+												vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
 												
-												long long packet_tstamp = pBlock->GetTime(pCluster);
-												
-												long long packet_tcode = pBlock->GetTimeCode(pCluster);
-												long long tcode_scale = localRecP->segment->GetInfo()->GetTimeCodeScale();
-												
-												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
-												
-												unsigned int length = blockFrame.len;
-												uint8_t *data = (uint8_t *)malloc(length);
-												
-												if(data != NULL)
+												assert(decode_err == VPX_CODEC_OK);
+
+												if(decode_err == VPX_CODEC_OK)
 												{
-													//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
-													long read_err = blockFrame.Read(localRecP->reader, data);
+													csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
 													
-													if(read_err == PrMkvReader::PrMkvSuccess)
+													vpx_codec_iter_t iter = NULL;
+													
+													vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
+													
+													if(img)
 													{
-														vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
+														const unsigned int sub_x = img->x_chroma_shift + 1;
+														const unsigned int sub_y = img->y_chroma_shift + 1;
 														
-														assert(decode_err == VPX_CODEC_OK);
+														assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
+														assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
+														assert(img->fmt == VPX_IMG_FMT_I420 || img->fmt == VPX_IMG_FMT_I422 || img->fmt == VPX_IMG_FMT_I444);
 
-														if(decode_err == VPX_CODEC_OK)
+														
+														// apparently pix_format doesn't have to match frameFormat->inPixelFormat
+														const PrPixelFormat pix_format = img->fmt == VPX_IMG_FMT_I422 ? PrPixelFormat_UYVY_422_8u_601 :
+																							img->fmt == VPX_IMG_FMT_I444 ? PrPixelFormat_VUYX_4444_8u :
+																							PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+																							
+														PPixHand ppix;
+														
+														localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, pix_format, &theRect);
+														
+														
+														CopyImgToPix(img, ppix, localRecP->PPixSuite, localRecP->PPix2Suite);
+														
+
+														// Should never have another image waiting in the queue
+														assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
+														
+														
+														// This is a nice Premiere feature.  We often have to decode many frames
+														// in a GOP (group of pictures) before we decode the one Premiere asked for.
+														// This suite lets us cache those frames for later.  We keep going past the
+														// requested frame to end of the cluster to save us the trouble in the future.
+														localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
+																									0,
+																									ppix,
+																									decodedFrame,
+																									NULL,
+																									NULL);
+														
+														if(decodedFrame == theFrame)
 														{
-															csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
+															*sourceVideoRec->outFrame = ppix;
 															
-															vpx_codec_iter_t iter = NULL;
-															
-															vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
-															
-															if(img)
-															{
-																const unsigned int sub_x = img->x_chroma_shift + 1;
-																const unsigned int sub_y = img->y_chroma_shift + 1;
-																
-																assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
-																assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
-																assert(img->fmt == VPX_IMG_FMT_I420 || img->fmt == VPX_IMG_FMT_I422 || img->fmt == VPX_IMG_FMT_I444);
-
-																
-																// apparently pix_format doesn't have to match frameFormat->inPixelFormat
-																const PrPixelFormat pix_format = img->fmt == VPX_IMG_FMT_I422 ? PrPixelFormat_UYVY_422_8u_601 :
-																									img->fmt == VPX_IMG_FMT_I444 ? PrPixelFormat_VUYX_4444_8u :
-																									PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
-																									
-																PPixHand ppix;
-																
-																localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, pix_format, &theRect);
-																
-																
-																CopyImgToPix(img, ppix, localRecP->PPixSuite, localRecP->PPix2Suite);
-																
-
-																// Should never have another image waiting in the queue
-																assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
-																
-																
-																// This is a nice Premiere feature.  We often have to decode many frames
-																// in a GOP (group of pictures) before we decode the one Premiere asked for.
-																// This suite lets us cache those frames for later.  We keep going past the
-																// requested frame to end of the cluster to save us the trouble in the future.
-																localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
-																											0,
-																											ppix,
-																											decodedFrame,
-																											NULL,
-																											NULL);
-																
-																if(decodedFrame == theFrame)
-																{
-																	*sourceVideoRec->outFrame = ppix;
-																	
-																	got_frame = true;
-																}
-																else
-																{
-																	// Premiere copied the frame to its cache, so we dispose ours.
-																	// Very obvious memory leak if we don't.
-																	localRecP->PPixSuite->Dispose(ppix);
-																}
-																
-																vpx_img_free(img);
-															}
-															else
-																assert(false); // this would mean that I passed the decoder a frame, but didn't get an image
+															got_frame = true;
 														}
 														else
-															result = imFileReadFailed;
+														{
+															// Premiere copied the frame to its cache, so we dispose ours.
+															// Very obvious memory leak if we don't.
+															localRecP->PPixSuite->Dispose(ppix);
+														}
+														
+														vpx_img_free(img);
 													}
 													else
-														result = imFileReadFailed;
-													
-													free(data);
+														assert(false); // this would mean that I passed the decoder a frame, but didn't get an image
 												}
 												else
-													result = imMemErr;
+													result = imFileReadFailed;
 											}
+											else
+												result = imFileReadFailed;
 											
-											long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
-											
-											assert(status == 0);
+											free(data);
 										}
-										
-										//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
-										
-										pCluster = localRecP->segment->GetNext(pCluster);
+										else
+											result = imMemErr;
 									}
-
-									assert(got_frame);
 									
-									vpx_codec_err_t destroy_err = vpx_codec_destroy(&decoder);
-									assert(destroy_err == VPX_CODEC_OK);
+									long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+									
+									assert(status == 0);
 								}
+								
+								//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
+								
+								pCluster = localRecP->segment->GetNext(pCluster);
 							}
+
+							assert(got_frame);
 						}
 					}
 				}
@@ -1616,48 +1631,208 @@ SDKImportAudio7(
 		
 			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
 			
-			if(pTrack != NULL)
+			if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kAudio)
 			{
-				const long trackType = pTrack->GetType();
-			
-				if(trackType == mkvparser::Track::kAudio)
+				const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
+				
+				if(pAudioTrack)
 				{
-					const mkvparser::AudioTrack* const pAudioTrack = static_cast<const mkvparser::AudioTrack*>(pTrack);
-					
-					if(pAudioTrack)
+					if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup)
 					{
-						if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup)
+						vorbis_info &vi = localRecP->vi;
+						vorbis_comment &vc = localRecP->vc;
+						vorbis_dsp_state &vd = localRecP->vd;
+						vorbis_block &vb = localRecP->vb;
+						
+						int v_err = vorbis_synthesis_init(&vd, &vi);
+						
+						if(v_err == OV_OK)
+							v_err = vorbis_block_init(&vd, &vb);
+						
+						// TODO: Figure out how to seek compressed audio exactly.
+						// From watching the audio encoding process, I know that you don't
+						// get to put a frame's worth of audio into each block, you have to
+						// do what the encoder lets you.  That means some of the audio you intended
+						// for this block could find its way into the next one.
+						// Movie players typically just worry about playing the audio straight
+						// through and then put up frames at the appointed times.  You sync video
+						// to audio, not the other way around.
+						// But Premiere asks for a specific sample of audio.  The only guaranteed way
+						// to provide that would be to decompress the entire audio stream from the
+						// beginning.  Uncompressed formats have it easy.
+						
+						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+						
+						pAudioTrack->Seek(tstamp, pSeekBlockEntry);
+						
+						if(pSeekBlockEntry != NULL)
 						{
-							vorbis_info &vi = localRecP->vi;
-							vorbis_comment &vc = localRecP->vc;
-							vorbis_dsp_state &vd = localRecP->vd;
-							vorbis_block &vb = localRecP->vb;
+							int ogg_packet_num = 3;
+						
+							csSDK_uint32 samples_copied = 0;
+							csSDK_uint32 samples_left = audioRec7->size;
 							
-							int v_err = vorbis_synthesis_init(&vd, &vi);
+							const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
 							
-							if(v_err == OV_OK)
-								v_err = vorbis_block_init(&vd, &vb);
-							
-							// TODO: Figure out how to seek compressed audio exactly.
-							// From watching the audio encoding process, I know that you don't
-							// get to put a frame's worth of audio into each block, you have to
-							// do what the encoder lets you.  That means some of the audio you intended
-							// for this block could find its way into the next one.
-							// Movie players typically just worry about playing the audio straight
-							// through and then put up frames at the appointed times.  You sync video
-							// to audio, not the other way around.
-							// But Premiere asks for a specific sample of audio.  The only guaranteed way
-							// to provide that would be to decompress the entire audio stream from the
-							// beginning.  Uncompressed formats have it easy.
-							
-							const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
-							
-							pAudioTrack->Seek(tstamp, pSeekBlockEntry);
-							
-							if(pSeekBlockEntry != NULL)
+							while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
 							{
-								int ogg_packet_num = 3;
+								const mkvparser::BlockEntry* pBlockEntry = NULL;
+								
+								pCluster->GetFirst(pBlockEntry);
+								
+								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && samples_left > 0 && result == malNoError)
+								{
+									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+									
+									if(pBlock->GetTrackNumber() == localRecP->audio_track)
+									{
+										assert(pBlock->GetDiscardPadding() == 0);
+
+										long long packet_tstamp = pBlock->GetTime(pCluster);
+										
+										PrAudioSample packet_offset = 0;
+											
+										PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
+											
+										if(audioRec7->position > packet_start)
+											packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
+										
+											
+										int position_in_packet = 0;
+										
+											
+										for(int f=0; f < pBlock->GetFrameCount(); f++)
+										{
+											const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+											
+											unsigned int length = blockFrame.len;
+											uint8_t *data = (uint8_t *)malloc(length);
+											
+											if(data != NULL)
+											{
+												//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+												long read_err = blockFrame.Read(localRecP->reader, data);
+												
+												if(read_err == PrMkvReader::PrMkvSuccess)
+												{
+													ogg_packet packet;
+								
+													packet.packet = data;
+													packet.bytes = length;
+													packet.b_o_s = false;
+													packet.e_o_s = false;
+													packet.granulepos = -1;
+													packet.packetno = ogg_packet_num++;
+
+													int synth_err = vorbis_synthesis(&vb, &packet);
+													
+													if(synth_err == OV_OK)
+													{
+														int block_err = vorbis_synthesis_blockin(&vd, &vb);
+														
+														if(block_err == OV_OK)
+														{
+															float **pcm = NULL;
+															int samples = 0;
+															
+															int synth_result = 1;
+															
+															while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+															{
+																// I feel like the code here is hard to read.  Sorry about that.
+															
+																int samples_to_copy = 0;
+																
+																// if the offset is bigger than the samples, we'll just move along
+																if(packet_offset < samples)
+																{
+																	int samples_after_offset = samples - packet_offset;
+																	
+																	samples_to_copy = minimum<int>(samples_left, samples_after_offset);
+																}
+															
+																// how nice, audio samples are float, just like Premiere wants 'em
+																for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
+																{
+																	memcpy(audioRec7->buffer[swizzle[c]] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+																}
+																
+																// now samples_to_copy is more like samples_I_just_copied
+																samples_copied += samples_to_copy;
+																samples_left -= samples_to_copy;
+																
+																
+																// If we copied any samples, that means the offset has been gobbled up
+																// If we didn't, reduce the offset by number of samples
+																if(samples_to_copy > 0)
+																{
+																	packet_offset = 0;
+																	
+																	position_in_packet += samples_to_copy;
+																}
+																else
+																	packet_offset -= samples;
+																
+																
+																synth_result = vorbis_synthesis_read(&vd, samples);
+															}
+														}
+														else
+															result = imFileReadFailed;
+													}
+													else
+														result = imFileReadFailed;
+												}
+												else
+													result = imFileReadFailed;
+												
+												free(data);
+											}
+											else
+												result = imMemErr;
+										}
+									}
+									
+									long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+									
+									assert(status == 0);
+								}
+								
+								pCluster = localRecP->segment->GetNext(pCluster);
+							}
+
+							// there might not be samples left at the end; not much we can do about that
+							assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
+						}
+						else
+							result = imFileReadFailed;
+					}
+					else if(pTrack->GetCodecId() == std::string("A_OPUS") && localRecP->opus_dec != NULL)
+					{
+						int err = opus_multistream_decoder_ctl(localRecP->opus_dec, OPUS_RESET_STATE);
+						
+						assert(err == OPUS_OK);
+					
+						const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
+						const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
+						
+						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+						
+						long long seek_tstamp = (tstamp - seekPreRoll) + codecDelay;
+						
+						if(seek_tstamp < 0)
+							seek_tstamp = 0;
+						
+						pAudioTrack->Seek(seek_tstamp, pSeekBlockEntry);
+						
+						if(pSeekBlockEntry != NULL)
+						{
+							const int opus_frame_size = 5760; // maximum Opus frame size at 48kHz
+						
+							float *interleaved_buffer = (float *)malloc(sizeof(float) * localRecP->numChannels * opus_frame_size);
 							
+							if(interleaved_buffer != NULL)
+							{
 								csSDK_uint32 samples_copied = 0;
 								csSDK_uint32 samples_left = audioRec7->size;
 								
@@ -1675,9 +1850,7 @@ SDKImportAudio7(
 										
 										if(pBlock->GetTrackNumber() == localRecP->audio_track)
 										{
-											assert(pBlock->GetDiscardPadding() == 0);
-
-											long long packet_tstamp = pBlock->GetTime(pCluster);
+											long long packet_tstamp = pBlock->GetTime(pCluster) - codecDelay;
 											
 											PrAudioSample packet_offset = 0;
 												
@@ -1686,10 +1859,6 @@ SDKImportAudio7(
 											if(audioRec7->position > packet_start)
 												packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
 											
-												
-											int position_in_packet = 0;
-											
-												
 											for(int f=0; f < pBlock->GetFrameCount(); f++)
 											{
 												const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
@@ -1704,73 +1873,32 @@ SDKImportAudio7(
 													
 													if(read_err == PrMkvReader::PrMkvSuccess)
 													{
-														ogg_packet packet;
-									
-														packet.packet = data;
-														packet.bytes = length;
-														packet.b_o_s = false;
-														packet.e_o_s = false;
-														packet.granulepos = -1;
-														packet.packetno = ogg_packet_num++;
-
-														int synth_err = vorbis_synthesis(&vb, &packet);
+														int len = opus_multistream_decode_float(localRecP->opus_dec, data, length, interleaved_buffer, opus_frame_size, 0);
 														
-														if(synth_err == OV_OK)
+														int len_to_copy = len - packet_offset;
+														
+														if(len_to_copy > samples_left)
+															len_to_copy = samples_left;
+														else if(len_to_copy < 0)
+															len_to_copy = 0;
+														
+														for(int i = 0; i < len_to_copy; i++)
 														{
-															int block_err = vorbis_synthesis_blockin(&vd, &vb);
-															
-															if(block_err == OV_OK)
+															for(int c=0; c < localRecP->numChannels; c++)
 															{
-																float **pcm = NULL;
-																int samples = 0;
-																
-																int synth_result = 1;
-																
-																while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
-																{
-																	// I feel like the code here is hard to read.  Sorry about that.
-																
-																	int samples_to_copy = 0;
-																	
-																	// if the offset is bigger than the samples, we'll just move along
-																	if(packet_offset < samples)
-																	{
-																		int samples_after_offset = samples - packet_offset;
-																		
-																		samples_to_copy = minimum<int>(samples_left, samples_after_offset);
-																	}
-																
-																	// how nice, audio samples are float, just like Premiere wants 'em
-																	for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
-																	{
-																		memcpy(audioRec7->buffer[swizzle[c]] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
-																	}
-																	
-																	// now samples_to_copy is more like samples_I_just_copied
-																	samples_copied += samples_to_copy;
-																	samples_left -= samples_to_copy;
-																	
-																	
-																	// If we copied any samples, that means the offset has been gobbled up
-																	// If we didn't, reduce the offset by number of samples
-																	if(samples_to_copy > 0)
-																	{
-																		packet_offset = 0;
-																		
-																		position_in_packet += samples_to_copy;
-																	}
-																	else
-																		packet_offset -= samples;
-																	
-																	
-																	synth_result = vorbis_synthesis_read(&vd, samples);
-																}
+																audioRec7->buffer[swizzle[c]][samples_copied + i] = interleaved_buffer[((i + packet_offset) * localRecP->numChannels) + c];
 															}
-															else
-																result = imFileReadFailed;
+														}
+														
+														if(packet_offset < len)
+														{
+															samples_copied += len_to_copy;
+															samples_left -= len_to_copy;
+															
+															packet_offset = 0;
 														}
 														else
-															result = imFileReadFailed;
+															packet_offset -= len;
 													}
 													else
 														result = imFileReadFailed;
@@ -1789,138 +1917,18 @@ SDKImportAudio7(
 									
 									pCluster = localRecP->segment->GetNext(pCluster);
 								}
-
+								
 								// there might not be samples left at the end; not much we can do about that
 								assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
-							}
-							else
-								result = imFileReadFailed;
-						}
-						else if(pTrack->GetCodecId() == std::string("A_OPUS") && localRecP->opus_dec != NULL)
-						{
-							int err = opus_multistream_decoder_ctl(localRecP->opus_dec, OPUS_RESET_STATE);
-							
-							assert(err == OPUS_OK);
-						
-							const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
-							const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
-							
-							const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
-							
-							long long seek_tstamp = (tstamp - seekPreRoll) + codecDelay;
-							
-							if(seek_tstamp < 0)
-								seek_tstamp = 0;
-							
-							pAudioTrack->Seek(seek_tstamp, pSeekBlockEntry);
-							
-							if(pSeekBlockEntry != NULL)
-							{
-								const int opus_frame_size = 5760; // maximum Opus frame size at 48kHz
-							
-								float *interleaved_buffer = (float *)malloc(sizeof(float) * localRecP->numChannels * opus_frame_size);
 								
-								if(interleaved_buffer != NULL)
-								{
-									csSDK_uint32 samples_copied = 0;
-									csSDK_uint32 samples_left = audioRec7->size;
-									
-									const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
-									
-									while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
-									{
-										const mkvparser::BlockEntry* pBlockEntry = NULL;
-										
-										pCluster->GetFirst(pBlockEntry);
-										
-										while((pBlockEntry != NULL) && !pBlockEntry->EOS() && samples_left > 0 && result == malNoError)
-										{
-											const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
-											
-											if(pBlock->GetTrackNumber() == localRecP->audio_track)
-											{
-												long long packet_tstamp = pBlock->GetTime(pCluster) - codecDelay;
-												
-												PrAudioSample packet_offset = 0;
-													
-												PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
-													
-												if(audioRec7->position > packet_start)
-													packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
-												
-												for(int f=0; f < pBlock->GetFrameCount(); f++)
-												{
-													const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
-													
-													unsigned int length = blockFrame.len;
-													uint8_t *data = (uint8_t *)malloc(length);
-													
-													if(data != NULL)
-													{
-														//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
-														long read_err = blockFrame.Read(localRecP->reader, data);
-														
-														if(read_err == PrMkvReader::PrMkvSuccess)
-														{
-															int len = opus_multistream_decode_float(localRecP->opus_dec, data, length, interleaved_buffer, opus_frame_size, 0);
-															
-															int len_to_copy = len - packet_offset;
-															
-															if(len_to_copy > samples_left)
-																len_to_copy = samples_left;
-															else if(len_to_copy < 0)
-																len_to_copy = 0;
-															
-															for(int i = 0; i < len_to_copy; i++)
-															{
-																for(int c=0; c < localRecP->numChannels; c++)
-																{
-																	audioRec7->buffer[swizzle[c]][samples_copied + i] = interleaved_buffer[((i + packet_offset) * localRecP->numChannels) + c];
-																}
-															}
-															
-															if(packet_offset < len)
-															{
-																samples_copied += len_to_copy;
-																samples_left -= len_to_copy;
-																
-																packet_offset = 0;
-															}
-															else
-																packet_offset -= len;
-														}
-														else
-															result = imFileReadFailed;
-														
-														free(data);
-													}
-													else
-														result = imMemErr;
-												}
-											}
-											
-											long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
-											
-											assert(status == 0);
-										}
-										
-										pCluster = localRecP->segment->GetNext(pCluster);
-									}
-									
-									// there might not be samples left at the end; not much we can do about that
-									assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
-									
-									free(interleaved_buffer);
-								}
-								else
-									result = imMemErr;
+								free(interleaved_buffer);
 							}
 							else
-								result = imFileReadFailed;
+								result = imMemErr;
 						}
+						else
+							result = imFileReadFailed;
 					}
-					else
-						result = imFileReadFailed;
 				}
 				else
 					result = imFileReadFailed;
