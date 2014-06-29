@@ -143,7 +143,7 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 			noDuotone, noLABColor
 		},
 			
-		EnableInfo { "in (PSHOP_ImageMode, RGBMode)" },
+		EnableInfo { "in (PSHOP_ImageMode, RGBMode, RGBColorMode)" },
 	
 		FmtFileType { 'WebP', '8BIM' },
 		ReadTypes { { 'WebP', '    ' } },

@@ -426,7 +426,7 @@ static void DoReadStart(GPtr globals)
 	{
 		assert(globals->fileH == NULL);
 		
-		long file_size = my_GetFileSize(globals);
+		const long file_size = my_GetFileSize(globals);
 		
 		globals->fileH = myNewHandle(globals, file_size);
 		
@@ -444,9 +444,9 @@ static void DoReadStart(GPtr globals)
 
 				if(demux)
 				{
-					uint32_t width = WebPDemuxGetI(demux, WEBP_FF_CANVAS_WIDTH);
-					uint32_t height = WebPDemuxGetI(demux, WEBP_FF_CANVAS_HEIGHT);
-					uint32_t flags = WebPDemuxGetI(demux, WEBP_FF_FORMAT_FLAGS);
+					const uint32_t width = WebPDemuxGetI(demux, WEBP_FF_CANVAS_WIDTH);
+					const uint32_t height = WebPDemuxGetI(demux, WEBP_FF_CANVAS_HEIGHT);
+					const uint32_t flags = WebPDemuxGetI(demux, WEBP_FF_FORMAT_FLAGS);
 					
 					bool has_alpha = (flags & ALPHA_FLAG);
 					
@@ -468,7 +468,7 @@ static void DoReadStart(GPtr globals)
 					assert(WebPDemuxGetI(demux, WEBP_FF_FRAME_COUNT) >= 1);
 					
 
-					if(!reverting)
+					if(!reverting && gStuff->hostSig != 'FXTC')
 					{
 						WebP_InUI_Data params;
 						
