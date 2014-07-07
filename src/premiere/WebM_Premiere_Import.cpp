@@ -984,10 +984,10 @@ webm_guess_framerate(mkvparser::Segment *segment,
 
 
 	// known frame rates
-	static const int frameRateNumDens[10][2] = {{10, 1}, {15, 1}, {24000, 1001},
+	static const int frameRateNumDens[][2] = {	{10, 1}, {15, 1}, {24000, 1001},
 												{24, 1}, {25, 1}, {30000, 1001},
-												{30, 1}, {50, 1}, {60000, 1001},
-												{60, 1}};
+												{30, 1}, {48000, 1001}, {48, 1},
+												{50, 1}, {60000, 1001}, {60, 1}};
 
 	double fps = (double)(frame - 1) * 1000000000.0 / (double)tstamp;
 
@@ -1078,7 +1078,7 @@ SDKGetInfo8(
 						{
 							if(duration < 1000000000UL)
 							{
-								fps_den = 1000;
+								fps_den = 1001;
 								fps_num = embedded_rate * fps_den;
 							}
 							else						

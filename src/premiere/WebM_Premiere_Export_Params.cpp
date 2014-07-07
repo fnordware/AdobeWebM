@@ -775,24 +775,26 @@ exSDKPostProcessParams(
 	
 	PrTime frameRates[] = {	10, 15, 23,
 							24, 25, 29,
-							30, 50, 59,
-							60};
+							30, 48, 48,
+							50, 59, 60};
 													
-	PrTime frameRateNumDens[][2] = {{10, 1}, {15, 1}, {24000, 1001},
-									{24, 1}, {25, 1}, {30000, 1001},
-									{30, 1}, {50, 1}, {60000, 1001},
-									{60, 1}};
+	static const PrTime frameRateNumDens[][2] = {	{10, 1}, {15, 1}, {24000, 1001},
+													{24, 1}, {25, 1}, {30000, 1001},
+													{30, 1}, {48000, 1001}, {48, 1},
+													{50, 1}, {60000, 1001}, {60, 1}};
 	
-	const char *frameRateStrings[] = {	"10",
-										"15",
-										"23.976",
-										"24",
-										"25 (PAL)",
-										"29.97 (NTSC)",
-										"30",
-										"50",
-										"59.94",
-										"60"};
+	static const char *frameRateStrings[] = {	"10",
+												"15",
+												"23.976",
+												"24",
+												"25 (PAL)",
+												"29.97 (NTSC)",
+												"30",
+												"47.952",
+												"48",
+												"50",
+												"59.94",
+												"60"};
 	
 	PrTime ticksPerSecond = 0;
 	timeSuite->GetTicksPerSecond (&ticksPerSecond);
@@ -1124,24 +1126,26 @@ exSDKGetParamSummary(
 	// oh boy, figure out frame rate
 	PrTime frameRates[] = {	10, 15, 23,
 							24, 25, 29,
-							30, 50, 59,
-							60};
+							30, 48, 48,
+							50, 59, 60};
 													
-	PrTime frameRateNumDens[][2] = {{10, 1}, {15, 1}, {24000, 1001},
-									{24, 1}, {25, 1}, {30000, 1001},
-									{30, 1}, {50, 1}, {60000, 1001},
-									{60, 1}};
+	static const PrTime frameRateNumDens[][2] = {	{10, 1}, {15, 1}, {24000, 1001},
+													{24, 1}, {25, 1}, {30000, 1001},
+													{30, 1}, {48000, 1001}, {48, 1},
+													{50, 1}, {60000, 1001}, {60, 1}};
 	
-	const char *frameRateStrings[] = {	"10",
-										"15",
-										"23.976",
-										"24",
-										"25",
-										"29.97",
-										"30",
-										"50",
-										"59.94",
-										"60"};
+	static const char *frameRateStrings[] = {	"10",
+												"15",
+												"23.976",
+												"24",
+												"25 (PAL)",
+												"29.97 (NTSC)",
+												"30",
+												"47.952",
+												"48",
+												"50",
+												"59.94",
+												"60"};
 	
 	PrTime ticksPerSecond = 0;
 	privateData->timeSuite->GetTicksPerSecond(&ticksPerSecond);
