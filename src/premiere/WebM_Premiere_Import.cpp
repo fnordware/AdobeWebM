@@ -193,8 +193,6 @@ typedef struct
 	bool					vorbis_setup;
 	vorbis_info				vi;
 	vorbis_comment			vc;
-	vorbis_dsp_state		vd;
-	vorbis_block			vb;
 	
 	OpusMSDecoder			*opus_dec;
 	
@@ -607,8 +605,6 @@ SDKOpenFile8(
 								{
 									vorbis_info &vi = localRecP->vi;
 									vorbis_comment &vc = localRecP->vc;
-									vorbis_dsp_state &vd = localRecP->vd;
-									vorbis_block &vb = localRecP->vb;
 									
 									vorbis_info_init(&vi);
 									vorbis_comment_init(&vc);
@@ -772,11 +768,7 @@ SDKQuietFile(
 		{
 			vorbis_info &vi = localRecP->vi;
 			vorbis_comment &vc = localRecP->vc;
-			vorbis_dsp_state &vd = localRecP->vd;
-			vorbis_block &vb = localRecP->vb;
 			
-			vorbis_block_clear(&vb);
-			vorbis_dsp_clear(&vd);
 			vorbis_info_clear(&vi);
 			vorbis_comment_clear(&vc);
 			
@@ -1641,8 +1633,9 @@ SDKImportAudio7(
 					{
 						vorbis_info &vi = localRecP->vi;
 						vorbis_comment &vc = localRecP->vc;
-						vorbis_dsp_state &vd = localRecP->vd;
-						vorbis_block &vb = localRecP->vb;
+						
+						vorbis_dsp_state vd;
+						vorbis_block vb;
 						
 						int v_err = vorbis_synthesis_init(&vd, &vi);
 						
@@ -1665,7 +1658,7 @@ SDKImportAudio7(
 						
 						pAudioTrack->Seek(tstamp, pSeekBlockEntry);
 						
-						if(pSeekBlockEntry != NULL)
+						if(pSeekBlockEntry != NULL && v_err == OV_OK)
 						{
 							int ogg_packet_num = 3;
 						
@@ -1803,6 +1796,9 @@ SDKImportAudio7(
 
 							// there might not be samples left at the end; not much we can do about that
 							assert(pCluster == NULL || pCluster->EOS() || (samples_left == 0 && samples_copied == audioRec7->size));
+							
+							vorbis_block_clear(&vb);
+							vorbis_dsp_clear(&vd);
 						}
 						else
 							result = imFileReadFailed;
