@@ -413,8 +413,8 @@ exSDKGenerateDefaultParams(
 	exParamValues videoBitrateValues;
 	videoBitrateValues.structVersion = 1;
 	videoBitrateValues.rangeMin.intValue = 1;
-	videoBitrateValues.rangeMax.intValue = 9999;
-	videoBitrateValues.value.intValue = 500;
+	videoBitrateValues.rangeMax.intValue = 50000;
+	videoBitrateValues.value.intValue = 1000;
 	videoBitrateValues.disabled = kPrFalse;
 	videoBitrateValues.hidden = kPrTrue;
 	
@@ -894,7 +894,7 @@ exSDKPostProcessParams(
 	exportParamSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateValues);
 
 	bitrateValues.rangeMin.intValue = 1;
-	bitrateValues.rangeMax.intValue = 9999;
+	bitrateValues.rangeMax.intValue = 50000;
 	
 	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &bitrateValues);
 	

@@ -43,9 +43,7 @@
 
 #include "WebM_Premiere_Export.h"
 
-extern "C" {
 #include "vpx/vpx_encoder.h"
-}
 
 typedef enum {
 	WEBM_CODEC_VP8 = 0,
