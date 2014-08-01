@@ -941,13 +941,13 @@ webm_guess_framerate(mkvparser::Segment *segment,
 
 	long status = 0;
 
-	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && frame < 50)
+	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && frame < 100)
 	{
 		const mkvparser::BlockEntry* pBlockEntry = NULL;
 		
 		status = pCluster->GetFirst(pBlockEntry);
 		
-		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < 1000000000 && frame < 50)
+		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < 1000000000 && frame < 100)
 		{
 			const mkvparser::Block* const pBlock  = pBlockEntry->GetBlock();
 			const long long trackNum = pBlock->GetTrackNumber();
@@ -986,7 +986,7 @@ webm_guess_framerate(mkvparser::Segment *segment,
 	int match_index = -1;
 	double match_episilon = 999;
 
-	for(int i=0; i < 10; i++)
+	for(int i=0; i < 12; i++)
 	{
 		double rate = (double)frameRateNumDens[i][0] / (double)frameRateNumDens[i][1];
 		double episilon = fabs(fps - rate);
