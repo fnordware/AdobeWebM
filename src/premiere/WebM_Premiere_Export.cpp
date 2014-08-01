@@ -47,6 +47,7 @@
 	#include <mach/mach.h>
 #else
 	#include <assert.h>
+	#include <time.h>
 
 	#define LONG_LONG_MAX LLONG_MAX
 #endif
@@ -1142,7 +1143,21 @@ exSDKExport(
 				
 				mkvmuxer::SegmentInfo* const info = muxer_segment->GetSegmentInfo();
 				
-				info->set_writing_app("fnord WebM for Premiere");
+				
+				info->set_writing_app("fnord WebM for Premiere, build " __DATE__);
+				
+				
+				// date_utc is defined as the number of nanoseconds since the beginning of the millenium (1 Jan 2001)
+				// http://www.matroska.org/technical/specs/index.html
+				struct tm date_utc_base;
+				memset(&date_utc_base, 0, sizeof(struct tm));
+				
+				date_utc_base.tm_year = 2001 - 1900;
+				
+				time_t base = mktime(&date_utc_base);
+				
+				info->set_date_utc( (int64)difftime(time(NULL), base) * 1000000000L );
+				
 				
 				info->set_timecode_scale(timeCodeScale);
 				
@@ -1309,7 +1324,7 @@ exSDKExport(
 							if(packet_waiting && op.packet != NULL && op.bytes > 0)
 							{
 								bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																	audio_track, timeStamp, 0);
+																	audio_track, timeStamp, false);
 																		
 								if(added)
 								{
@@ -1328,7 +1343,7 @@ exSDKExport(
 											if(op.granulepos < nextBlockAudioSample)
 											{
 												bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																					audio_track, timeStamp, 0);
+																					audio_track, timeStamp, false);
 																						
 												if(!added)
 													result = exportReturn_InternalError;
@@ -1417,7 +1432,7 @@ exSDKExport(
 								while( vorbis_bitrate_flushpacket(&vd, &op) )
 								{
 									bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																		audio_track, timeStamp, 0);
+																		audio_track, timeStamp, false);
 																			
 									if(!added)
 										result = exportReturn_InternalError;
@@ -1436,7 +1451,7 @@ exSDKExport(
 												
 					bool made_frame = false;
 					
-					while((!made_frame) && result == suiteError_NoError)
+					while(!made_frame && result == suiteError_NoError)
 					{
 						const vpx_codec_cx_pkt_t *pkt = NULL;
 						
@@ -1464,7 +1479,7 @@ exSDKExport(
 							
 								bool added = muxer_segment->AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
 																	vid_track, timeStamp,
-																	(pkt->data.frame.flags & VPX_FRAME_IS_KEY));
+																	pkt->data.frame.flags & VPX_FRAME_IS_KEY);
 								made_frame = true;
 								
 								if(!added)
