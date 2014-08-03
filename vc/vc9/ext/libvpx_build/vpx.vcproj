@@ -14,29 +14,21 @@
 		/>
 	</Platforms>
 	<ToolFiles>
-		<ToolFile
-			RelativePath=".\yasm.rules"
-		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)x64\$(ConfigurationName)"
-			IntermediateDirectory="x64\$(ConfigurationName)\vpx"
+			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
+				CommandLine="call obj_int_extract.bat ..\..\..\..\ext\libvpx build\$(PlatformName)\$(ConfigurationName)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="YASM"
-				IncludePaths="&quot;.&quot;;&quot;..\..\..\..\ext\libvpx&quot;"
-				Debug="true"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -50,12 +42,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;.&quot;;&quot;..\..\..\..\ext\libvpx&quot;"
+				AdditionalIncludeDirectories=".;..\..\..\..\ext\libvpx"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="1"
 			/>
 			<Tool
@@ -89,22 +81,18 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)x64\$(ConfigurationName)"
-			IntermediateDirectory="x64\$(ConfigurationName)\vpx"
+			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
+				CommandLine="call obj_int_extract.bat ..\..\..\..\ext\libvpx build\$(PlatformName)\$(ConfigurationName)"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="YASM"
-				IncludePaths="&quot;.&quot;;&quot;..\..\..\..\ext\libvpx&quot;"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -119,12 +107,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="&quot;.&quot;;&quot;..\..\..\..\ext\libvpx&quot;"
+				AdditionalIncludeDirectories=".;..\..\..\..\ext\libvpx"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -162,460 +150,4524 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="c;cc;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="CC67CB5D-5432-70F1-D90C-FDDC823AEEFF"
+			Filter="c;cc;cpp;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="AAB8EB93-EE22-A423-25E9-88551671D906"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_alloccommon.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_alloccommon.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\bitstream.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_bitstream.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_bitstream.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\blockd.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_blockd.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_blockd.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\boolhuff.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_boolhuff.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_boolhuff.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\dboolhuff.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_dboolhuff.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_dboolhuff.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\dct.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_dct.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_dct.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\dct_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_dct_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_dct_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\dct_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_dct_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_dct_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\debugmodes.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_debugmodes.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_debugmodes.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\decoder\decodeframe.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\decodeframe.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_decodeframe.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_decodeframe.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\decodemv.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_decodemv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_decodemv.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\denoising.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_denoising.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_denoising.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\x86\denoising_sse2.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\denoising_sse2.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_denoising_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_denoising_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\dequantize.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_dequantize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_dequantize.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\dequantize_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_dequantize_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_dequantize_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_dequantize_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_dequantize_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\detokenize.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_detokenize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_detokenize.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\emms.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_ports_emms.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vpx_ports_emms.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_ports_emms.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vpx_ports_emms.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\encodeframe.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodeframe.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodeframe.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\encodeintra.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodeintra.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodeintra.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\encodemb.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodemb.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodemb.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\encodemv.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodemv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_encodemv.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\encodeopt.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_encodeopt.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_encodeopt.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_encodeopt.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_encodeopt.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\entropy.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_entropy.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_entropy.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\entropymode.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_entropymode.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_entropymode.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\entropymv.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_entropymv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_entropymv.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\ethreading.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_ethreading.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_ethreading.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\extend.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_extend.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_extend.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\filter.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_filter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_filter.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\filter_x86.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_filter_x86.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_filter_x86.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\findnearmv.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_findnearmv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_findnearmv.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\firstpass.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_firstpass.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_firstpass.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\fwalsh_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_fwalsh_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_fwalsh_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_fwalsh_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_fwalsh_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\generic\gen_scalers.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_gen_scalers.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_gen_scalers.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\idct_blk.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_idct_blk.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_idct_blk.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\idct_blk_mmx.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_idct_blk_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_idct_blk_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\idct_blk_sse2.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_idct_blk_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_idct_blk_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\idctllm.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_idctllm.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_idctllm.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\idctllm_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_idctllm_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_idctllm_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\idctllm_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_idctllm_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_idctllm_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\iwalsh_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_iwalsh_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_iwalsh_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\iwalsh_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_iwalsh_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_iwalsh_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\lookahead.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_lookahead.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_lookahead.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\loopfilter.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_loopfilter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_loopfilter.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_block_sse2_x86_64.asm"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_block_sse2_x86_64.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\loopfilter_filters.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_loopfilter_filters.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_loopfilter_filters.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_loopfilter_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_loopfilter_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_loopfilter_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_loopfilter_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\loopfilter_x86.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_loopfilter_x86.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_loopfilter_x86.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\mbpitch.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_mbpitch.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_mbpitch.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\mcomp.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_mcomp.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_mcomp.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\mfqe.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_mfqe.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_mfqe.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\mfqe_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_mfqe_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_mfqe_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_mfqe_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_mfqe_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\modecont.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_modecont.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_modecont.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\modecosts.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_modecosts.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_modecosts.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\onyx_if.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_onyx_if.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_onyx_if.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\onyxd_if.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_onyxd_if.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_onyxd_if.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\pickinter.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_pickinter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_pickinter.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\picklpf.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_picklpf.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_picklpf.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\postproc.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_postproc.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_postproc.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\postproc_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_postproc_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_postproc_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\postproc_sse2.asm"
 				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\postproc_x86.c"
-				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_postproc_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_postproc_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\quant_common.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_quant_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_quant_common.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\quantize.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_quantize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_quantize.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_quantize_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_quantize_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_quantize_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_quantize_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_sse2.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_sse2.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_quantize_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_quantize_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_sse4.asm"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_sse4.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_quantize_sse4.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_quantize_sse4.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_ssse3.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\quantize_ssse3.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_quantize_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_quantize_ssse3.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\ratectrl.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_ratectrl.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_ratectrl.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\rdopt.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_rdopt.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_rdopt.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\recon_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_recon_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_recon_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\recon_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_recon_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_recon_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\recon_wrapper_sse2.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_recon_wrapper_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_recon_wrapper_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\reconinter.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_reconinter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_reconinter.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\reconintra.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_reconintra.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_reconintra.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\reconintra4x4.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_reconintra4x4.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_reconintra4x4.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\rtcd.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_rtcd.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_rtcd.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\sad_c.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_sad_c.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_sad_c.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\sad_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\sad_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\sad_sse3.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_sse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_sse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_sse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_sse3.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\sad_sse4.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_sse4.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_sse4.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_sse4.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_sse4.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\sad_ssse3.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_sad_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_sad_ssse3.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\segmentation.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_segmentation.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_segmentation.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\setupintrarecon.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_setupintrarecon.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_setupintrarecon.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\x86\ssim_opt_x86_64.asm"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\ssim_opt_x86_64.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_ssim_opt_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_ssim_opt_x86_64.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_ssim_opt_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_ssim_opt_x86_64.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\subpixel_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_subpixel_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_subpixel_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\subpixel_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_subpixel_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_subpixel_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\subpixel_ssse3.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_subpixel_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_subpixel_ssse3.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\subtract_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_subtract_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_subtract_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_subtract_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_subtract_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\subtract_sse2.asm"
 				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vpx\src\svc_encodeframe.c"
-				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_subtract_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_subtract_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_subtract_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_subtract_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\swapyv12buffer.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_swapyv12buffer.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_swapyv12buffer.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\generic\systemdependent.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_generic_systemdependent.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_generic_systemdependent.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\temporal_filter.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_temporal_filter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_temporal_filter.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\temporal_filter_apply_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\threading.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_threading.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_decoder_threading.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\tokenize.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_tokenize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_tokenize.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\treecoder.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_treecoder.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_treecoder.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\treewriter.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_treewriter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_treewriter.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\variance_c.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_variance_c.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_variance_c.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\variance_impl_mmx.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_variance_impl_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_variance_impl_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_variance_impl_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_variance_impl_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\variance_impl_sse2.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_variance_impl_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_variance_impl_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_variance_impl_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_variance_impl_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\variance_impl_ssse3.asm"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_variance_impl_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_variance_impl_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_variance_impl_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp8_common_x86_variance_impl_ssse3.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\variance_mmx.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_variance_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_variance_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\variance_sse2.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_variance_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_variance_sse2.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\variance_ssse3.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_variance_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_variance_ssse3.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp8\encoder\vp8_asm_enc_offsets.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\vp8_asm_enc_offsets.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_vp8_asm_enc_offsets.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_vp8_asm_enc_offsets.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\vp8_asm_stubs.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_vp8_asm_stubs.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_common_x86_vp8_asm_stubs.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\vp8_cx_iface.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_vp8_cx_iface.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_vp8_cx_iface.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\vp8_dx_iface.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_vp8_dx_iface.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_vp8_dx_iface.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\vp8_enc_stubs_mmx.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_vp8_enc_stubs_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_vp8_enc_stubs_mmx.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\x86\vp8_enc_stubs_sse2.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_vp8_enc_stubs_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp8_encoder_x86_vp8_enc_stubs_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_alloccommon.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_alloccommon.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_alloccommon.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_complexity.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_complexity.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_cyclicrefresh.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_cyclicrefresh.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_variance.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_variance.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_variance.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_asm_stubs.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_asm_stubs.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_asm_stubs.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_bitstream.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_bitstream.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_bitstream.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_blockd.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_blockd.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_blockd.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_common_data.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_common_data.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_common_data.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_context_tree.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_context_tree.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_context_tree.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_convolve.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_convolve.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_convolve.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_copy_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_copy_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_copy_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_copy_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_copy_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_cost.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_cost.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_cost.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\vp9_cx_iface.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_vp9_cx_iface.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_vp9_cx_iface.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_dct.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_dct.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_dct.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct32x32_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct32x32_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct32x32_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_mmx.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_ssse3_x86_64.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_debugmodes.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_debugmodes.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_debugmodes.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_decodeframe.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_decodeframe.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodemv.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_decodemv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_decodemv.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decoder.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_decoder.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_decoder.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_detokenize.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_detokenize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_detokenize.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_dsubexp.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_dsubexp.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_dthread.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_dthread.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_dthread.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\vp9_dx_iface.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_vp9_dx_iface.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_vp9_dx_iface.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeframe.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encodeframe.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encodeframe.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemb.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encodemb.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encodemb.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemv.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encodemv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encodemv.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encoder.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encoder.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_encoder.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_entropy.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_entropy.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_entropy.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_entropymode.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_entropymode.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_entropymode.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_entropymv.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_entropymv.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_entropymv.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_error_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_error_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_error_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_error_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_error_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_extend.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_extend.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_filter.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_filter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_filter.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_firstpass.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_firstpass.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_firstpass.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_frame_buffers.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_frame_buffers.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_frame_buffers.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_idct.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_idct.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_idct.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_idct_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_idct_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_ssse3.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_idct_intrin_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_idct_intrin_ssse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_ssse3_x86_64.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_idct_ssse3_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_idct_ssse3_x86_64.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_idct_ssse3_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_idct_ssse3_x86_64.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_intrapred_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_intrapred_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_intrapred_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_intrapred_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_intrapred_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_intrapred_ssse3.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_intrapred_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_intrapred_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_intrapred_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_intrapred_ssse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_lookahead.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_lookahead.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_lookahead.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter_filters.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter_filters.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter_filters.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_loopfilter_intrin_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_loopfilter_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_loopfilter_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_loopfilter_mmx.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_loopfilter_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_loopfilter_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_loopfilter_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_loopfilter_mmx.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_mbgraph.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_mbgraph.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mcomp.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_mcomp.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_mcomp.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_mvref_common.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_mvref_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_mvref_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_picklpf.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_picklpf.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_picklpf.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_pickmode.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_pickmode.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_pickmode.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_pred_common.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_pred_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_pred_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_prob.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_prob.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_prob.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_quant_common.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_quant_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_quant_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_quantize.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_quantize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_quantize.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_quantize_ssse3_x86_64.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_ratectrl.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_ratectrl.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_ratectrl.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_rd.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_rd.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_rd.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_rdopt.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_rdopt.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_rdopt.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_read_bit_buffer.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_read_bit_buffer.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_read_bit_buffer.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_reader.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_reader.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_decoder_vp9_reader.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_reconinter.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_reconinter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_reconinter.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_reconintra.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_reconintra.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_reconintra.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_resize.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_resize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_resize.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_rtcd.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_rtcd.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_rtcd.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_sad.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_sad.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_sad.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad4d_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad4d_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad4d_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad4d_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad4d_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_mmx.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_mmx.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_sse3.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_sse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_sse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_sse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_sse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_sse4.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_sse4.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_sse4.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_sse4.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_sse4.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_ssse3.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_sad_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_sad_ssse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_scale.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_scale.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_scale.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_scan.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_scan.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_scan.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_seg_common.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_seg_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_seg_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_segmentation.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_segmentation.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_segmentation.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_speed_features.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_speed_features.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_ssim_opt_x86_64.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_ssim_opt_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_ssim_opt_x86_64.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_ssim_opt_x86_64.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_ssim_opt_x86_64.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_subexp.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_subexp.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_subexp.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subpel_variance.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_subpel_variance.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_subpel_variance.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_subpel_variance.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_subpel_variance.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_intrin_ssse3.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_subpixel_8t_intrin_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_x86_vp9_subpixel_8t_intrin_ssse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_8t_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_8t_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_8t_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_8t_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_ssse3.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_8t_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_8t_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_8t_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_8t_ssse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_bilinear_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_bilinear_ssse3.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_ssse3.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_common_x86_vp9_subpixel_bilinear_ssse3.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subtract_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_subtract_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_subtract_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_subtract_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_subtract_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_svc_layercontext.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_svc_layercontext.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_svc_layercontext.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_temporal_filter.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_temporal_filter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_temporal_filter.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_temporal_filter_apply_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_thread.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_thread.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_thread.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_tile_common.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_tile_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_tile_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_tokenize.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_tokenize.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_tokenize.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_treewriter.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_treewriter.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_treewriter.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_variance.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_variance.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_impl_mmx.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_variance_impl_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_variance_impl_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_variance_impl_mmx.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_variance_impl_mmx.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_impl_sse2.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_variance_impl_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_variance_impl_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f $(PlatformName)  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_variance_impl_sse2.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vp9_encoder_x86_vp9_variance_impl_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_mmx.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_variance_mmx.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_variance_mmx.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_variance_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_variance_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_write_bit_buffer.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_write_bit_buffer.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_write_bit_buffer.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_writer.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_writer.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_writer.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\vpx.def"
@@ -624,60 +4676,248 @@
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\src\vpx_codec.c"
 				>
-			</File>
-			<File
-				RelativePath=".\vpx_config.asm"
-				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_codec.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_codec.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\vpx_config.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_config.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_config.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\src\vpx_decoder.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_decoder.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_decoder.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\src\vpx_encoder.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_encoder.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_encoder.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\src\vpx_image.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_image.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_image.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_mem\vpx_mem.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_mem_vpx_mem.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_mem_vpx_mem.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vpx\src\vpx_psnr.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx\src\vpx_psnr.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_psnr.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_src_vpx_psnr.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vpx_scale\generic\vpx_scale.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\generic\vpx_scale.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_vpx_scale.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_vpx_scale.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\ext\libvpx\vpx_scale\vpx_scale_rtcd.c"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpx_scale_asm_offsets.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_vpx_scale_asm_offsets.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_vpx_scale_asm_offsets.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\x86_abi_support.asm"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpx_scale_rtcd.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_vpx_scale_rtcd.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_vpx_scale_rtcd.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\generic\yv12config.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_yv12config.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_yv12config.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\generic\yv12extend.c"
 				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_yv12extend.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_scale_generic_yv12extend.obj"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hm;inl;inc;xsd"
-			UniqueIdentifier="6C274047-1520-FB14-A36F-723DE6CB2707"
+			UniqueIdentifier="07C49AA6-E3F4-6282-7159-93503B1400F5"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.h"
@@ -745,6 +4985,10 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\decoder\detokenize.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\emmintrin_compat.h"
 				>
 			</File>
 			<File
@@ -820,6 +5064,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\mem_ops.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\mem_ops_aligned.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\modecont.h"
 				>
 			</File>
@@ -864,14 +5116,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\pragmas.h"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\psnr.h"
-				>
-			</File>
-			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\quant_common.h"
 				>
 			</File>
@@ -893,10 +5137,6 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\reconintra4x4.h"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\scale_mode.h"
 				>
 			</File>
 			<File
@@ -948,6 +5188,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8_rtcd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vp8cx.h"
 				>
 			</File>
@@ -956,15 +5200,303 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_alloccommon.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_variance.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_bitstream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_block.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_blockd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_common_data.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_context_tree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_convolve.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_cost.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodemv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_detokenize.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_dthread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeframe.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemb.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_encoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_entropy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_entropymode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_entropymv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_enums.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_filter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_firstpass.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_frame_buffers.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_idct.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\vp9_iface_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_lookahead.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mcomp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_mv.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_mvref_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_onyxc_int.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_picklpf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_pickmode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\x86\vp9_postproc_x86.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_ppflags.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_pred_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_prob.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_quant_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_quantize.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_ratectrl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_rd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_rdopt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_read_bit_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_reader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_reconinter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_reconintra.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_resize.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9_rtcd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_scale.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_scan.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_seg_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_segmentation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_subexp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_svc_layercontext.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_systemdependent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_temporal_filter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_textblit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_thread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_tile_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_tokenize.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_treewriter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_write_bit_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_writer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vpx_codec.h"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vpx_codec_impl_bottom.h"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vpx_codec_impl_top.h"
 				>
 			</File>
 			<File
@@ -977,6 +5509,10 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vpx_encoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vpx_frame_buffer.h"
 				>
 			</File>
 			<File
@@ -996,15 +5532,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vpx_rtcd.h"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\vpx_once.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx\internal\vpx_psnr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpx_scale.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale_rtcd.h"
 				>
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\vpx_timer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpxscale.h"
 				>
 			</File>
 			<File
@@ -1015,21 +5559,17 @@
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\yv12config.h"
 				>
 			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\generic\yv12extend_generic.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="71E89228-9717-8E8D-5868-702F3EB78610"
+			UniqueIdentifier="5889D159-813B-6778-D468-8B866BD5F7E0"
 			>
 		</Filter>
 		<Filter
 			Name="Build Files"
 			Filter="mk"
-			UniqueIdentifier="45626265-BB0F-0ECF-C4E4-C197DFAAC460"
+			UniqueIdentifier="AF1BDC3B-ED74-DC5C-8B9C-CA3E138B99C4"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\libs.mk"
@@ -1048,6 +5588,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\vp9_common.mk"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\vp9cx.mk"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\vp9dx.mk"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx\vpx_codec.mk"
 				>
 			</File>
@@ -1056,787 +5608,11 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\vpx_ports.mk"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpx_scale.mk"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="vp9"
-			>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_alloccommon.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_alloccommon.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_variance.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_variance.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_asm_stubs.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_bitstream.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_bitstream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_block.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_blockd.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_blockd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_common_data.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_context_tree.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_context_tree.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_convolve.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_convolve.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_copy_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_cost.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_cost.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\vp9_cx_iface.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_dct.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct32x32_sse2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_sse2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_ssse3_x86_64.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_debugmodes.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodemv.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodemv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decoder.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_decoder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_default_coef_probs.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_detokenize.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_detokenize.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dsubexp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dthread.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_dthread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\vp9_dx_iface.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeframe.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodeframe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemb.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemb.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemv.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encodemv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encoder.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_encoder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_entropy.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_entropy.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_entropymode.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_entropymode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_entropymv.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_entropymv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_enums.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_error_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_filter.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_filter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_firstpass.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_firstpass.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_frame_buffers.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_frame_buffers.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_idct.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_idct.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_intrin_ssse3.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_idct_ssse3_x86_64.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_intrapred_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_intrapred_ssse3.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_lookahead.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_lookahead.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter_filters.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_loopfilter_intrin_sse2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_loopfilter_mmx.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_loopfilter_x86.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_mcomp.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_mcomp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_mcomp_x86.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_mv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_mvref_common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_mvref_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_onyxc_int.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_onyxd_int.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_picklpf.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_picklpf.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_pickmode.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_pickmode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_postproc.c"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_postproc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_postproc_mmx.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_postproc_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_postproc_x86.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_ppflags.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_pragmas.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_pred_common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_pred_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_prob.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_prob.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_quant_common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_quant_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_quantize.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_quantize.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_quantize_ssse3_x86_64.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ratectrl.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ratectrl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_rdopt.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_rdopt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_read_bit_buffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_read_bit_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_reader.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_reader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_reconinter.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_reconinter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_reconintra.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_reconintra.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_resize.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_resize.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_rtcd.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sad.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad4d_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_mmx.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_sse3.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_sse4.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_sad_ssse3.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_sadmxn.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_sadmxn.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scale.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scale.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scan.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_scan.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_seg_common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_seg_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_segmentation.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_segmentation.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ssim.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_ssim.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_ssim_opt_x86_64.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_subexp.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_subexp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subpel_variance.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_subpelvar.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_intrin_ssse3.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_8t_ssse3.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_bilinear_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\x86\vp9_subpixel_bilinear_ssse3.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_subtract_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_svc_layercontext.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_svc_layercontext.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_systemdependent.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_temporal_filter.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_temporal_filter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_temporal_filter_apply_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_textblit.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_textblit.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_thread.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_thread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_tile_common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_tile_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_tokenize.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_tokenize.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\common\vp9_treecoder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\decoder\vp9_treereader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_treewriter.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_treewriter.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_variance.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_impl_mmx.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_impl_sse2.asm"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_mmx.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_variance_sse2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_write_bit_buffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_write_bit_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_writer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\ext\libvpx\vp9\encoder\vp9_writer.h"
 				>
 			</File>
 		</Filter>
