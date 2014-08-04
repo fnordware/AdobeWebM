@@ -947,6 +947,8 @@ exSDKExport(
 		
 		bool packet_waiting = false;
 		op.granulepos = 0;
+		op.packet = NULL;
+		op.bytes = 0;
 		
 		OpusMSEncoder *opus = NULL;
 		float *opus_buffer = NULL;
@@ -1325,65 +1327,78 @@ exSDKExport(
 					}
 					else
 					{
-						while(op.granulepos < nextBlockAudioSample && currentAudioSample < endAudioSample && result == malNoError)
-						{
+						while(op.granulepos < nextBlockAudioSample && op.granulepos < endAudioSample && result == malNoError)
+						{	
+							// We don't know what samples are in the packet until we get it,
+							// but by then it's too late to decide if we don't want it for this frame.
+							// So we'll hold on to that packet and use it next frame.
 							if(packet_waiting && op.packet != NULL && op.bytes > 0)
 							{
 								bool added = muxer_segment->AddFrame(op.packet, op.bytes,
 																	audio_track, timeStamp, false);
 																		
 								if(added)
-								{
 									packet_waiting = false;
-									
-									// might also be extra blocks hanging around
-									while(vorbis_analysis_blockout(&vd, &vb) == 1)
-									{
-										vorbis_analysis(&vb, NULL);
-										vorbis_bitrate_addblock(&vb);
-										
-										while( vorbis_bitrate_flushpacket(&vd, &op) )
-										{
-											assert(packet_waiting == false);
-										
-											if(op.granulepos < nextBlockAudioSample)
-											{
-												bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																					audio_track, timeStamp, false);
-																						
-												if(!added)
-													result = exportReturn_InternalError;
-											}
-											else
-												packet_waiting = true;
-										}
-										
-										if(packet_waiting)
-											break;
-									}
-								}
 								else
 									result = exportReturn_InternalError;
 							}
 							
 							
-							if(!packet_waiting)
+							// push out packets
+							while(vorbis_analysis_blockout(&vd, &vb) == 1 && result == malNoError)
 							{
-								int samples = opus_frame_size;
+								vorbis_analysis(&vb, NULL);
+								vorbis_bitrate_addblock(&vb);
+								
+								while(vorbis_bitrate_flushpacket(&vd, &op) && result == malNoError)
+								{
+									assert(!packet_waiting);
+									
+									const bool last_frame = (videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue));
+									
+									if(op.granulepos < nextBlockAudioSample || last_frame)
+									{
+										bool added = muxer_segment->AddFrame(op.packet, op.bytes,
+																			audio_track, timeStamp, false);
+																				
+										if(!added)
+											result = exportReturn_InternalError;
+									}
+									else
+										packet_waiting = true;
+								}
+								
+								if(packet_waiting)
+									break;
+							}
+							
+							
+							// make new packets
+							if(op.granulepos < nextBlockAudioSample && op.granulepos < endAudioSample && result == malNoError)
+							{
+								assert(!packet_waiting);
+								
+								int samples = opus_frame_size; // opus_frame_size is also the size of our buffer in samples
+								
+								assert(opus_frame_size == maxBlip);
+								
+								assert(currentAudioSample <= endAudioSample); // so samples won't be negative
 								
 								if(samples > (endAudioSample - currentAudioSample))
 									samples = (endAudioSample - currentAudioSample);
-								
-								float **buffer = vorbis_analysis_buffer(&vd, samples);
-								
-								
-								result = audioSuite->GetAudio(audioRenderID, samples, pr_audio_buffer, false);
-								
-								for(int c=0; c < audioChannels; c++)
+									
+								if(samples > 0)
 								{
-									for(int i=0; i < samples; i++)
+									float **buffer = vorbis_analysis_buffer(&vd, samples);
+									
+									result = audioSuite->GetAudio(audioRenderID, samples, pr_audio_buffer, false);
+									
+									for(int c=0; c < audioChannels; c++)
 									{
-										buffer[swizzle[c]][i] = pr_audio_buffer[c][i];
+										for(int i=0; i < samples; i++)
+										{
+											buffer[swizzle[c]][i] = pr_audio_buffer[c][i];
+										}
 									}
 								}
 								
@@ -1393,55 +1408,9 @@ exSDKExport(
 								if(result == malNoError)
 								{
 									vorbis_analysis_wrote(&vd, samples);
-							
-									while(vorbis_analysis_blockout(&vd, &vb) == 1)
-									{
-										vorbis_analysis(&vb, NULL);
-										vorbis_bitrate_addblock(&vb);
-
-										assert(packet_waiting == false);
-										
-										while( vorbis_bitrate_flushpacket(&vd, &op) )
-										{
-											assert(packet_waiting == false);
-										
-											if(op.granulepos < nextBlockAudioSample)
-											{
-												bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																					audio_track, timeStamp, false);
-																						
-												if(!added)
-													result = exportReturn_InternalError;
-											}
-											else
-												packet_waiting = true;
-										}
-										
-										if(packet_waiting)
-											break;
-									}
-								}
-							}
-						}
-					
-						// save the rest of the audio if this is the last frame
-						if(result == malNoError &&
-							(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)))
-						{
-							vorbis_analysis_wrote(&vd, NULL); // means there will be no more data
-					
-							while(vorbis_analysis_blockout(&vd, &vb) == 1)
-							{
-								vorbis_analysis(&vb, NULL);
-								vorbis_bitrate_addblock(&vb);
-
-								while( vorbis_bitrate_flushpacket(&vd, &op) )
-								{
-									bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																		audio_track, timeStamp, false);
-																			
-									if(!added)
-										result = exportReturn_InternalError;
+									
+									if(currentAudioSample >= endAudioSample)
+										vorbis_analysis_wrote(&vd, NULL); // we have sent everything in
 								}
 							}
 						}
@@ -1634,6 +1603,16 @@ exSDKExport(
 				
 				videoTime += frameRateP.value.timeValue;
 			}
+			
+			
+			// audio sanity check
+			if(exportInfoP->exportAudio && !vbr_pass)
+			{
+				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+					assert(currentAudioSample >= (endAudioSample + opus_pre_skip));
+				else
+					assert(op.granulepos == endAudioSample);
+			}
 		}
 		else
 			result = exportReturn_InternalError;
@@ -1662,6 +1641,8 @@ exSDKExport(
 			}
 			else
 			{
+				assert(vorbis_analysis_blockout(&vd, &vb) == 0);
+			
 				vorbis_block_clear(&vb);
 				vorbis_dsp_clear(&vd);
 				vorbis_comment_clear(&vc);
