@@ -39,13 +39,10 @@
 
 #include "WebM_Premiere_Export_Params.h"
 
-extern "C" {
 
-#include "vpx/vpx_encoder.h"
 #include "vpx/vp8cx.h"
 
-}
-
+#include <assert.h>
 
 #include <sstream>
 #include <vector>

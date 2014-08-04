@@ -1144,7 +1144,7 @@ exSDKExport(
 				mkvmuxer::SegmentInfo* const info = muxer_segment->GetSegmentInfo();
 				
 				
-				info->set_writing_app("fnord WebM for Premiere, build " __DATE__);
+				info->set_writing_app("fnord WebM for Premiere, built " __DATE__);
 				
 				
 				// date_utc is defined as the number of nanoseconds since the beginning of the millenium (1 Jan 2001)
@@ -1217,6 +1217,14 @@ exSDKExport(
 			}
 			
 			PrAudioSample currentAudioSample = 0;
+
+			// Here's a question: what do we do when the number of audio samples doesn't match evenly
+			// with the number of frames?  This could especially happen when the user changes the frame
+			// rate to something other than what Premiere is using to specify the out time.  So you could
+			// have just enough time to pop up one more frame, but not enough time to fill the audio for
+			// that frame.  What to do?  We could extend the movie duration to the whole frame, but right now
+			// we'll just encode the amount of audio originally requested.  One ramification is that you could
+			// be done encoding all your audio but still have a final frame to encode.
 			const PrAudioSample endAudioSample = (exportInfoP->endTime - exportInfoP->startTime) /
 													(ticksPerSecond / (PrAudioSample)sampleRateP.value.floatValue);
 													
@@ -1293,8 +1301,6 @@ exSDKExport(
 									
 									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
 									{
-										assert(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue)); // last frame
-										
 										const int64 discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
 										const int64 discardPadding = discardPaddingSamples * 1000000000UL / (int64)sampleRateP.value.floatValue;
 										
