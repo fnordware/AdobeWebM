@@ -802,6 +802,9 @@ exSDKPostProcessParams(
 	for(csSDK_int32 i=0; i < sizeof(frameRates) / sizeof (PrTime); i++)
 	{
 		frameRates[i] = ticksPerSecond / frameRateNumDens[i][0] * frameRateNumDens[i][1];
+		
+		// is there overflow potential here?
+		assert(frameRates[i] == ticksPerSecond * frameRateNumDens[i][1] / frameRateNumDens[i][0]);
 	}
 	
 	
@@ -1165,7 +1168,7 @@ exSDKGetParamSummary(
 	
 	stream1 << width.value.intValue << "x" << height.value.intValue;
 	
-	if(frame_rate_index >= 0 && frame_rate_index < 10) 
+	if(frame_rate_index >= 0 && frame_rate_index < 12) 
 		stream1 << ", " << frameRateStrings[frame_rate_index] << " fps";
 	
 	//stream1 << ", " << (alpha.value.intValue ? "Alpha" : "No Alpha");
