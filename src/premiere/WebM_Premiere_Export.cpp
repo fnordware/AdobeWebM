@@ -1606,7 +1606,7 @@ exSDKExport(
 			
 			
 			// audio sanity check
-			if(exportInfoP->exportAudio && !vbr_pass)
+			if(result == malNoError && exportInfoP->exportAudio && !vbr_pass)
 			{
 				if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					assert(currentAudioSample >= (endAudioSample + opus_pre_skip));

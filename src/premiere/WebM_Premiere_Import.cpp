@@ -53,6 +53,7 @@
 #include <math.h>
 
 #include <sstream>
+#include <map>
 
 #ifdef PRMAC_ENV
 	#include <mach/mach.h>
@@ -169,6 +170,8 @@ typedef enum {
 } AudioCodec;
 
 
+typedef std::map<long long, PrAudioSample> SampleMap;
+
 typedef struct
 {	
 	csSDK_int32				importerID;
@@ -195,6 +198,9 @@ typedef struct
 	vorbis_comment			vc;
 	
 	OpusMSDecoder			*opus_dec;
+	
+	SampleMap				*sample_map;
+	PrAudioSample			total_samples;
 	
 	PlugMemoryFuncsPtr		memFuncs;
 	SPBasicSuite			*BasicSuite;
@@ -396,6 +402,8 @@ SDKOpenFile8(
 		localRecP->vpx_setup = false;
 		localRecP->vorbis_setup = false;
 		localRecP->opus_dec = NULL;
+		localRecP->sample_map = NULL;
+		localRecP->total_samples = 0;
 		
 		// Acquire needed suites
 		localRecP->memFuncs = stdParms->piSuites->memFuncs;
@@ -706,6 +714,203 @@ SDKOpenFile8(
 							}
 						}
 					}
+					
+					
+					// Making the SampleMap
+					//
+					// WebM does not provide a way to get the exact sample number for a packet of audio
+					// because all time is done with timestamps, which are generally 1000 for every second.
+					// This is not really that ideal for video because of rounding errors, but it's
+					// REALLY imprecise for audio, which is something like 48000 samples per second.
+					// If we want to do sample-accurate seeking, we have to scan all the audio in the file
+					// sequentially and make a table to tell us which audio sample you'll actually get when
+					// you seek to a particular cluster.
+					assert(localRecP->sample_map == NULL);
+					
+					size_t buf_size = 1024 * 1024;
+					uint8_t *read_buf = (uint8_t *)malloc(buf_size);
+					
+					if(read_buf != NULL)
+					{
+						localRecP->sample_map = new SampleMap;
+						
+					#ifdef CHECK_VORBIS_SAMPLE_ALGORITHM		
+						vorbis_dsp_state vd;
+						vorbis_block vb;
+						
+						if(localRecP->vorbis_setup)
+						{
+							int v_err = vorbis_synthesis_init(&vd, &localRecP->vi);
+							
+							if(v_err == OV_OK)
+								v_err = vorbis_block_init(&vd, &vb);
+						}
+					#endif
+						
+						ogg_packet packet;
+	
+						packet.packet = NULL;
+						packet.bytes = 0;
+						packet.b_o_s = false;
+						packet.e_o_s = false;
+						packet.granulepos = -1;
+						packet.packetno = 2;
+						
+						long last_blockSize = 0;
+						
+						
+						long long sampleCount = 0;
+						
+						const mkvparser::Cluster *pCluster = localRecP->segment->GetFirst();
+						
+						while((pCluster != NULL) && !pCluster->EOS() && result == malNoError)
+						{
+							int cluster_packet_num = 0;
+						
+							const long long cluster_tstamp = pCluster->GetTime();
+						
+					
+							const mkvparser::BlockEntry* pBlockEntry = NULL;
+							
+							pCluster->GetFirst(pBlockEntry);
+							
+							while((pBlockEntry != NULL) && !pBlockEntry->EOS() && result == malNoError)
+							{
+								const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+								
+								if(pBlock->GetTrackNumber() == localRecP->audio_track)
+								{
+									for(int f=0; f < pBlock->GetFrameCount(); f++)
+									{
+										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(f);
+										
+										if(buf_size < blockFrame.len)
+										{
+											assert(FALSE); // this shouldn't really happen
+											
+											read_buf = (uint8_t *)realloc(read_buf, blockFrame.len);
+											
+											buf_size = blockFrame.len;
+										}
+										
+										long read_err = blockFrame.Read(localRecP->reader, read_buf);
+										
+										if(read_err == PrMkvReader::PrMkvSuccess)
+										{
+											if(localRecP->vorbis_setup)
+											{
+												// For Vorbis, the first packet you decode will not yield any samples.  You
+												// need a 1-packet run-up.  So what we'll do is record the number of samples
+												// at the second packet.  When we seek in the file, we always decode from cluster
+												// boundaries.
+												if(cluster_packet_num == 1)
+												{
+													// store the current sampleCount
+													SampleMap &sample_map = *localRecP->sample_map;
+													
+													sample_map[cluster_tstamp] = sampleCount;
+												}
+												
+												packet.packet = read_buf;
+												packet.bytes = blockFrame.len;
+												packet.packetno++;
+												
+												const long this_blockSize = vorbis_packet_blocksize(&localRecP->vi, &packet);
+												
+												const long num_samples = (last_blockSize / 4) + (this_blockSize / 4);
+												
+												last_blockSize = this_blockSize;
+												
+												
+												// Turn this on if you want to make sure the calculation above is working
+												// to count samples without actually decoding audio.  Note that the first
+												// Vorbis packet still returns 0 samples, but the calculation should
+												// work otherwise.
+											#ifdef CHECK_VORBIS_SAMPLE_ALGORITHM	
+												int actual_samples = 0;
+												
+												int synth_err = vorbis_synthesis(&vb, &packet);
+												
+												if(synth_err == OV_OK)
+												{
+													int block_err = vorbis_synthesis_blockin(&vd, &vb);
+													
+													if(block_err == OV_OK)
+													{
+														float **pcm = NULL;
+														int samples = 0;
+														
+														int synth_result = 1;
+														
+														while(synth_result != 0 && (samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0)
+														{
+															actual_samples += samples;
+															
+															synth_result = vorbis_synthesis_read(&vd, samples);
+														}
+													}
+												}
+												
+												if( !(cluster_tstamp == 0 && cluster_packet_num == 0) )
+													assert(num_samples == actual_samples);
+											#endif // !NDEBUG
+											
+												if( !(cluster_tstamp == 0 && cluster_packet_num == 0) )
+													sampleCount += num_samples;
+											}
+											else if(localRecP->opus_dec != NULL)
+											{
+												// For Opus, we'll record the number of samples on the actual cluster boundary.
+												// Opus uses SeekPreRoll to tell us we have to decode ahead of the audio we
+												// actually want.  During the pre-roll period it is still returning samples to
+												// us, they just aren't valid.
+												if(cluster_packet_num == 0)
+												{
+													// store the current sampleCount
+													SampleMap &sample_map = *localRecP->sample_map;
+													
+													sample_map[cluster_tstamp] = sampleCount;
+												}
+											
+												sampleCount += opus_packet_get_nb_samples(read_buf, blockFrame.len, 48000);
+											}
+										}
+										else
+											result = imFileReadFailed;
+									
+										cluster_packet_num++;
+									}
+									
+									
+									const long long discardPatting = pBlock->GetDiscardPadding();
+									
+									if(discardPatting > 0)
+									{
+										sampleCount -= (discardPatting * 48000UL / 1000000000UL);
+									}
+								}
+								
+								long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
+								
+								assert(status == 0);
+							}
+							
+							pCluster = localRecP->segment->GetNext(pCluster);
+						}
+						
+						localRecP->total_samples = sampleCount;
+					
+							
+					#ifdef CHECK_VORBIS_SAMPLE_ALGORITHM	
+						if(localRecP->vorbis_setup)
+						{
+							vorbis_block_clear(&vb);
+							vorbis_dsp_clear(&vd);
+						}
+					#endif
+						
+						free(read_buf);
+					}
 				}
 				
 				if(localRecP->video_track == -1 && localRecP->audio_track == -1)
@@ -755,6 +960,13 @@ SDKQuietFile(
 		stdParms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
 
 		ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
+
+		if(localRecP->sample_map != NULL)
+		{
+			delete localRecP->sample_map;
+			
+			localRecP->sample_map = NULL;
+		}
 
 		if(localRecP->vpx_setup)
 		{
@@ -1137,8 +1349,10 @@ SDKGetInfo8(
 																bitDepth == 32 ? kPrAudioSampleType_32BitFloat :
 																bitDepth == 64 ? kPrAudioSampleType_64BitFloat :
 																kPrAudioSampleType_Compressed;
-																
-						SDKFileInfo8->audDuration			= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
+						
+						const PrAudioSample calc_duration	= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
+																																				
+						SDKFileInfo8->audDuration			= (localRecP->total_samples > 0 ? localRecP->total_samples : calc_duration);
 						
 						
 						if(SDKFileInfo8->audInfo.numChannels > 2 && SDKFileInfo8->audInfo.numChannels != 6)
@@ -1614,9 +1828,6 @@ SDKImportAudio7(
 		const int *swizzle = localRecP->numChannels > 2 ? surround_swizzle : stereo_swizzle;
 
 
-		const long long tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
-		
-		
 		if(localRecP->audio_track >= 0)
 		{
 			const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
@@ -1629,6 +1840,44 @@ SDKImportAudio7(
 				
 				if(pAudioTrack)
 				{
+					const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
+					const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
+					
+					const PrAudioSample seekPreRoll_samples = seekPreRoll * localRecP->audioSampleRate / 1000000000UL;
+					const PrAudioSample codecDelay_samples = codecDelay * localRecP->audioSampleRate / 1000000000UL;
+					
+					PrAudioSample seek_sample = audioRec7->position - seekPreRoll_samples + codecDelay_samples;
+					
+					if(seek_sample < 0)
+						seek_sample = 0;
+					
+						
+					const long long calc_tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
+					
+					
+					// Use the SampleMap to figure out which cluster to seek to
+					assert(localRecP->sample_map != NULL);
+					
+					long long lookup_tstamp = -1;
+					
+					if(localRecP->sample_map != NULL)
+					{
+						const SampleMap &sample_map = *localRecP->sample_map;
+						
+						SampleMap::const_iterator i = sample_map.begin();
+						
+						while(i != sample_map.end() && i->second <= seek_sample)
+						{
+							lookup_tstamp = i->first;
+							
+							i++;
+						}
+					}
+					
+					
+					const long long tstamp = (lookup_tstamp > 0 ? lookup_tstamp : calc_tstamp);
+					
+					
 					if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup)
 					{
 						vorbis_info &vi = localRecP->vi;
@@ -1641,18 +1890,7 @@ SDKImportAudio7(
 						
 						if(v_err == OV_OK)
 							v_err = vorbis_block_init(&vd, &vb);
-						
-						// TODO: Figure out how to seek compressed audio exactly.
-						// From watching the audio encoding process, I know that you don't
-						// get to put a frame's worth of audio into each block, you have to
-						// do what the encoder lets you.  That means some of the audio you intended
-						// for this block could find its way into the next one.
-						// Movie players typically just worry about playing the audio straight
-						// through and then put up frames at the appointed times.  You sync video
-						// to audio, not the other way around.
-						// But Premiere asks for a specific sample of audio.  The only guaranteed way
-						// to provide that would be to decompress the entire audio stream from the
-						// beginning.  Uncompressed formats have it easy.
+							
 						
 						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 						
@@ -1666,6 +1904,28 @@ SDKImportAudio7(
 							csSDK_uint32 samples_left = audioRec7->size;
 							
 							const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
+							
+							PrAudioSample packet_start = 0;
+							
+							if(pCluster != NULL)
+							{
+								const long long cluster_tstamp = pCluster->GetTime();
+							
+								packet_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000UL;
+								
+								if(localRecP->sample_map != NULL)
+								{
+									// For Vorbis, this will tell us the sample number of the fist
+									// sample we'll actually get.  Because we just did a seek to here
+									// and re-started the decoder, the first packet will yield nothing.
+									// SampleMap has taken this into account.
+									SampleMap &sample_map = *localRecP->sample_map;
+									
+									assert(sample_map.find(cluster_tstamp) != sample_map.end());
+									
+									packet_start = sample_map[cluster_tstamp];
+								}
+							}
 							
 							while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
 							{
@@ -1681,11 +1941,9 @@ SDKImportAudio7(
 									{
 										assert(pBlock->GetDiscardPadding() == 0);
 
-										long long packet_tstamp = pBlock->GetTime(pCluster);
+										const long long packet_tstamp = pBlock->GetTime(pCluster);
 										
 										PrAudioSample packet_offset = 0;
-											
-										PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
 											
 										if(audioRec7->position > packet_start)
 											packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
@@ -1768,6 +2026,8 @@ SDKImportAudio7(
 																
 																
 																synth_result = vorbis_synthesis_read(&vd, samples);
+																
+																packet_start += samples;
 															}
 														}
 														else
@@ -1809,17 +2069,9 @@ SDKImportAudio7(
 						
 						assert(err == OPUS_OK);
 					
-						const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
-						const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
-						
 						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 						
-						long long seek_tstamp = (tstamp - seekPreRoll) + codecDelay;
-						
-						if(seek_tstamp < 0)
-							seek_tstamp = 0;
-						
-						pAudioTrack->Seek(seek_tstamp, pSeekBlockEntry);
+						pAudioTrack->Seek(tstamp, pSeekBlockEntry);
 						
 						if(pSeekBlockEntry != NULL)
 						{
@@ -1836,6 +2088,23 @@ SDKImportAudio7(
 								
 								while((pCluster != NULL) && !pCluster->EOS() && samples_left > 0 && result == malNoError)
 								{
+									const long long cluster_tstamp = pCluster->GetTime();
+									
+									PrAudioSample cluster_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000UL;
+									
+									// Get the actual sample number this cluster starts with from our pre-built table
+									if(localRecP->sample_map != NULL)
+									{
+										SampleMap &sample_map = *localRecP->sample_map;
+										
+										assert(sample_map.find(cluster_tstamp) != sample_map.end());
+										
+										cluster_start = sample_map[cluster_tstamp];
+									}
+										
+									PrAudioSample packet_start = cluster_start;
+									
+									
 									const mkvparser::BlockEntry* pBlockEntry = NULL;
 									
 									pCluster->GetFirst(pBlockEntry);
@@ -1846,11 +2115,7 @@ SDKImportAudio7(
 										
 										if(pBlock->GetTrackNumber() == localRecP->audio_track)
 										{
-											long long packet_tstamp = pBlock->GetTime(pCluster) - codecDelay;
-											
 											PrAudioSample packet_offset = 0;
-												
-											PrAudioSample packet_start = localRecP->audioSampleRate * packet_tstamp / 1000000000UL;
 												
 											if(audioRec7->position > packet_start)
 												packet_offset = audioRec7->position - packet_start; // in other words the audio frames in the beginning that we'll skip over
@@ -1869,7 +2134,7 @@ SDKImportAudio7(
 													
 													if(read_err == PrMkvReader::PrMkvSuccess)
 													{
-														int len = opus_multistream_decode_float(localRecP->opus_dec, data, length, interleaved_buffer, opus_frame_size, 0);
+														const int len = opus_multistream_decode_float(localRecP->opus_dec, data, length, interleaved_buffer, opus_frame_size, 0);
 														
 														int len_to_copy = len - packet_offset;
 														
@@ -1895,6 +2160,8 @@ SDKImportAudio7(
 														}
 														else
 															packet_offset -= len;
+														
+														packet_start += len;
 													}
 													else
 														result = imFileReadFailed;
