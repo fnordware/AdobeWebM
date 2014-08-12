@@ -1128,6 +1128,8 @@ exSDKExport(
 		{
 			// I'd say think about lowering this to get better precision,
 			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
+			// The WebM spec says to keep it at one million:
+			// http://www.webmproject.org/docs/container/#muxer-guidelines
 			const long long timeCodeScale = 1000000UL;
 			
 			uint64 vid_track = 0;
@@ -1201,7 +1203,7 @@ exSDKExport(
 						
 						audio->set_seek_pre_roll(80000000);
 						
-						audio->set_codec_delay((PrAudioSample)opus_pre_skip * 1000000000UL / (PrAudioSample)sampleRateP.value.floatValue);
+						audio->set_codec_delay((PrAudioSample)opus_pre_skip * 1000000000LL / (PrAudioSample)sampleRateP.value.floatValue);
 					}
 
 					if(private_data)
@@ -1235,19 +1237,14 @@ exSDKExport(
 		
 			PrTime videoTime = exportInfoP->startTime;
 			
-			while(videoTime < exportInfoP->endTime && result == malNoError)
+			while(videoTime <= exportInfoP->endTime && result == malNoError)
 			{
 				const PrTime fileTime = videoTime - exportInfoP->startTime;
-				const PrTime nextFileTime = fileTime + frameRateP.value.timeValue;
 				
-				// This is the key step, where we quantize our time based on the timeCode
-				// to match how the frames are actually stored by the muxer.  If you want more precision,
-				// lower timeCodeScale.  Time (in nanoseconds) = TimeCode * TimeCodeScale.
-				const long long timeCode = ((fileTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
-				const long long nextTimeCode = ((nextFileTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+				// Time (in nanoseconds) = TimeCode * TimeCodeScale.
+				const long long timeCode = ((fileTime * (1000000000LL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
 				
 				const uint64_t timeStamp = timeCode * timeCodeScale;
-				const uint64_t nextTimeStamp = nextTimeCode * timeCodeScale;
 			
 				
 				// When writing WebM, we want blocks of audio and video interleaved.
@@ -1266,19 +1263,15 @@ exSDKExport(
 					const int *swizzle = (audioChannels > 2 ? surround_swizzle : stereo_swizzle);
 					
 					
-					const PrAudioSample nextBlockAudioSample = nextTimeStamp * (PrAudioSample)sampleRateP.value.floatValue / 1000000000UL;
-						
+					const bool last_frame = (videoTime > (exportInfoP->endTime - frameRateP.value.timeValue));
+							
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
 						assert(opus != NULL);
 						
-						PrAudioSample opusNextBlockAudioSample = nextBlockAudioSample;
+						long long opus_timeStamp = currentAudioSample * 1000000000LL / (long long)sampleRateP.value.floatValue;
 						
-						// on last frame, add samples for pre-skip
-						if(videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue))
-							opusNextBlockAudioSample += opus_pre_skip;
-
-						while(currentAudioSample < opusNextBlockAudioSample && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
+						while(((opus_timeStamp <= timeStamp) || last_frame) && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
 						{
 							const int samples = opus_frame_size;
 							
@@ -1304,15 +1297,15 @@ exSDKExport(
 									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
 									{
 										const int64 discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
-										const int64 discardPadding = discardPaddingSamples * 1000000000UL / (int64)sampleRateP.value.floatValue;
+										const int64 discardPadding = discardPaddingSamples * 1000000000LL / (int64)sampleRateP.value.floatValue;
 										
 										added = muxer_segment->AddFrameWithDiscardPadding(opus_compressed_buffer, len,
-																		discardPadding, audio_track, timeStamp, true);
+																		discardPadding, audio_track, opus_timeStamp, true);
 									}
 									else
 									{
 										added = muxer_segment->AddFrame(opus_compressed_buffer, len,
-																			audio_track, timeStamp, true);
+																			audio_track, opus_timeStamp, true);
 									}
 																			
 									if(!added)
@@ -1321,13 +1314,18 @@ exSDKExport(
 								else if(len < 0)
 									result = exportReturn_InternalError;
 								
+								
 								currentAudioSample += samples;
+								
+								opus_timeStamp = currentAudioSample * 1000000000LL / (long long)sampleRateP.value.floatValue;
 							}
 						}
 					}
 					else
 					{
-						while(op.granulepos < nextBlockAudioSample && op.granulepos < endAudioSample && result == malNoError)
+						long long op_timeStamp = op.granulepos * 1000000000LL / (long long)sampleRateP.value.floatValue;
+					
+						while(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
 						{	
 							// We don't know what samples are in the packet until we get it,
 							// but by then it's too late to decide if we don't want it for this frame.
@@ -1335,7 +1333,7 @@ exSDKExport(
 							if(packet_waiting && op.packet != NULL && op.bytes > 0)
 							{
 								bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																	audio_track, timeStamp, true);
+																	audio_track, op_timeStamp, true);
 																		
 								if(added)
 									packet_waiting = false;
@@ -1354,12 +1352,12 @@ exSDKExport(
 								{
 									assert(!packet_waiting);
 									
-									const bool last_frame = (videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue));
+									op_timeStamp = op.granulepos * 1000000000LL / (long long)sampleRateP.value.floatValue;
 									
-									if(op.granulepos < nextBlockAudioSample || last_frame)
+									if(op_timeStamp <= timeStamp || last_frame)
 									{
 										bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																			audio_track, timeStamp, true);
+																			audio_track, op_timeStamp, true);
 																				
 										if(!added)
 											result = exportReturn_InternalError;
@@ -1373,14 +1371,16 @@ exSDKExport(
 							}
 							
 							
+							if(packet_waiting)
+								break;
+							
+							
 							// make new packets
-							if(op.granulepos < nextBlockAudioSample && op.granulepos < endAudioSample && result == malNoError)
+							if(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
 							{
-								assert(!packet_waiting);
-								
 								int samples = opus_frame_size; // opus_frame_size is also the size of our buffer in samples
 								
-								assert(opus_frame_size == maxBlip);
+								assert(samples == maxBlip);
 								
 								assert(currentAudioSample <= endAudioSample); // so samples won't be negative
 								
@@ -1418,7 +1418,7 @@ exSDKExport(
 				}
 				
 				
-				if(exportInfoP->exportVideo)
+				if(exportInfoP->exportVideo && (videoTime < exportInfoP->endTime)) // there will some audio after the last video frame
 				{
 					const unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
 												vidEncodingP.value.intValue == WEBM_ENCODING_BEST ? VPX_DL_BEST_QUALITY :
@@ -1437,29 +1437,35 @@ exSDKExport(
 								assert(vbr_pass);
 							
 								if(vbr_buffer_size == 0)
-									vbr_buffer = memorySuite->NewPtr(pkt->data.frame.sz);
+									vbr_buffer = memorySuite->NewPtr(pkt->data.twopass_stats.sz);
 								else
-									memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.frame.sz);
+									memorySuite->SetPtrSize(&vbr_buffer, vbr_buffer_size + pkt->data.twopass_stats.sz);
 								
-								memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.frame.buf, pkt->data.frame.sz);
+								memcpy(&vbr_buffer[vbr_buffer_size], pkt->data.twopass_stats.buf, pkt->data.twopass_stats.sz);
 								
-								vbr_buffer_size += pkt->data.frame.sz;
+								vbr_buffer_size += pkt->data.twopass_stats.sz;
 								
 								made_frame = true;
 							}
 							else if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
 							{
-								assert(!vbr_pass);
-								assert(muxer_segment != NULL);
+								assert( !vbr_pass );
+								assert( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) ); // libwebm not handling these now
+								assert( !(pkt->data.frame.flags & VPX_FRAME_IS_FRAGMENT) );
+								assert( pkt->data.frame.duration == 1 ); // because of how we did the timescale
 							
 								bool added = muxer_segment->AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
 																	vid_track, timeStamp,
 																	pkt->data.frame.flags & VPX_FRAME_IS_KEY);
-								made_frame = true;
+																	
+								if( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) )
+									made_frame = true;
 								
 								if(!added)
 									result = exportReturn_InternalError;
 							}
+							
+							assert(pkt->kind != VPX_CODEC_FPMB_STATS_PKT); // don't know what to do with this
 						}
 						
 						if(vbr_pass)
@@ -1590,7 +1596,16 @@ exSDKExport(
 					float progress = (double)(videoTime - exportInfoP->startTime) / (double)(exportInfoP->endTime - exportInfoP->startTime);
 					
 					if(passes == 2)
-						progress = (progress / 2.f) + (0.5f * pass);
+					{
+						const float firstpass_frac = (use_vp9 ? 0.1f : 0.3f);
+					
+						if(pass == 1)
+						{
+							progress = firstpass_frac + (progress * (1.f - firstpass_frac));
+						}
+						else
+							progress = (progress * firstpass_frac);
+					}
 
 					result = mySettings->exportProgressSuite->UpdateProgressPercent(exID, progress);
 					
