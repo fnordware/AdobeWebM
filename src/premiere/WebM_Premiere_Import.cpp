@@ -853,7 +853,7 @@ SDKOpenFile8(
 												
 												if( !(cluster_tstamp == 0 && cluster_packet_num == 0) )
 													assert(num_samples == actual_samples);
-											#endif // !NDEBUG
+											#endif
 											
 												if( !(cluster_tstamp == 0 && cluster_packet_num == 0) )
 													sampleCount += num_samples;
@@ -886,7 +886,7 @@ SDKOpenFile8(
 									
 									if(discardPatting > 0)
 									{
-										sampleCount -= (discardPatting * 48000UL / 1000000000UL);
+										sampleCount -= (discardPatting * 48000LL / 1000000000LL);
 									}
 								}
 								
@@ -1150,7 +1150,11 @@ webm_guess_framerate(mkvparser::Segment *segment,
 
 	const mkvparser::Cluster* pCluster = segment->GetFirst();
 	const mkvparser::Tracks* pTracks = segment->GetTracks();
-
+	
+	const long long start_tstamp = (pCluster ? pCluster->GetFirstTime() : 0);
+	
+	assert(start_tstamp == 0); // I think this is the Matroska spec, but I've gotten a file that wasn't so
+	
 	long status = 0;
 
 	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && frame < 100)
@@ -1174,7 +1178,7 @@ webm_guess_framerate(mkvparser::Segment *segment,
 					assert(pTrack->GetType() == mkvparser::Track::kVideo);
 					assert(pBlock->GetFrameCount() == 1);
 					
-					tstamp = pBlock->GetTime(pCluster);
+					tstamp = pBlock->GetTime(pCluster) - start_tstamp;
 					
 					frame++;
 				}
@@ -1215,10 +1219,15 @@ webm_guess_framerate(mkvparser::Segment *segment,
 		*fps_num = frameRateNumDens[match_index][0];
 		*fps_den = frameRateNumDens[match_index][1];
 	}
-	else
+	else if(fps > 0.0)
 	{
 		*fps_num = (fps * 1000.0) + 0.5;
 		*fps_den = 1000;
+	}
+	else
+	{
+		*fps_num = 24;
+		*fps_den = 1;
 	}
 }
 
@@ -1271,7 +1280,7 @@ SDKGetInfo8(
 					
 					if(pVideoTrack)
 					{
-						const double embedded_rate = pVideoTrack->GetFrameRate(); // never seems to contain anything
+						const double embedded_rate = pVideoTrack->GetFrameRate();
 						
 						unsigned int fps_num = 0;
 						unsigned int fps_den = 0;
@@ -1280,7 +1289,7 @@ SDKGetInfo8(
 
 						if(embedded_rate > 0)
 						{
-							if(duration < 1000000000UL)
+							if(duration < 1000000000LL)
 							{
 								fps_den = 1001;
 								fps_num = embedded_rate * fps_den;
@@ -1299,7 +1308,7 @@ SDKGetInfo8(
 						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talk about DefaultDecodedFieldDuration but...
 						SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 						SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-						SDKFileInfo8->vidDuration			= duration * fps_num / 1000000000UL;
+						SDKFileInfo8->vidDuration			= duration * fps_num / 1000000000LL;
 						SDKFileInfo8->vidScale				= fps_num;
 						SDKFileInfo8->vidSampleSize			= fps_den;
 
@@ -1350,7 +1359,7 @@ SDKGetInfo8(
 																bitDepth == 64 ? kPrAudioSampleType_64BitFloat :
 																kPrAudioSampleType_Compressed;
 						
-						const PrAudioSample calc_duration	= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000UL;
+						const PrAudioSample calc_duration	= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000LL;
 																																				
 						SDKFileInfo8->audDuration			= (localRecP->total_samples > 0 ? localRecP->total_samples : calc_duration);
 						
@@ -1596,6 +1605,10 @@ SDKGetSourceVideo(
 			const uint64_t fps_den = localRecP->frameRateDen;
 			
 			
+			const mkvparser::Cluster* pFirstCluster = localRecP->segment->GetFirst();
+	
+			const long long start_tstamp = (pFirstCluster ? pFirstCluster->GetFirstTime() : 0);
+
 			// convert PrTime to timeCode and then to absolute time
 			// http://matroska.org/technical/specs/notes.html#TimecodeScale
 			// Time (in nanoseconds) = TimeCode * TimeCodeScale.
@@ -1605,8 +1618,8 @@ SDKGetSourceVideo(
 			// we could be more precise, the problem presumably being that our biggest time would be
 			// reduced.
 			const long long timeCodeScale = localRecP->segment->GetInfo()->GetTimeCodeScale();
-			const long long timeCode = ((sourceVideoRec->inFrameTime * (1000000000UL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
-			const long long tstamp = timeCode * timeCodeScale;
+			const long long timeCode = ((sourceVideoRec->inFrameTime * (1000000000LL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+			const long long tstamp = (timeCode * timeCodeScale) + start_tstamp;
 			
 			
 			if(localRecP->video_track >= 0 && localRecP->vpx_setup)
@@ -1669,9 +1682,6 @@ SDKGetSourceVideo(
 										
 										long long packet_tstamp = pBlock->GetTime(pCluster);
 										
-										long long packet_tcode = pBlock->GetTimeCode(pCluster);
-										long long tcode_scale = localRecP->segment->GetInfo()->GetTimeCodeScale();
-										
 										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 										
 										unsigned int length = blockFrame.len;
@@ -1690,7 +1700,7 @@ SDKGetSourceVideo(
 
 												if(decode_err == VPX_CODEC_OK)
 												{
-													csSDK_int32 decodedFrame = ((packet_tstamp * fps_num / fps_den) + 500000000UL) / 1000000000UL;
+													csSDK_int32 decodedFrame = (((packet_tstamp - start_tstamp) * fps_num / fps_den) + 500000000LL) / 1000000000LL;
 													
 													vpx_codec_iter_t iter = NULL;
 													
@@ -1698,12 +1708,10 @@ SDKGetSourceVideo(
 													
 													if(img)
 													{
-														const unsigned int sub_x = img->x_chroma_shift + 1;
-														const unsigned int sub_y = img->y_chroma_shift + 1;
-														
 														assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
 														assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
 														assert(img->fmt == VPX_IMG_FMT_I420 || img->fmt == VPX_IMG_FMT_I422 || img->fmt == VPX_IMG_FMT_I444);
+														assert( !pBlock->IsInvisible() );
 
 														
 														// apparently pix_format doesn't have to match frameFormat->inPixelFormat
@@ -1750,7 +1758,7 @@ SDKGetSourceVideo(
 														vpx_img_free(img);
 													}
 													else
-														assert(false); // this would mean that I passed the decoder a frame, but didn't get an image
+														assert( pBlock->IsInvisible() ); // must be a VP8 alt reference frame?
 												}
 												else
 													result = imFileReadFailed;
@@ -1843,8 +1851,8 @@ SDKImportAudio7(
 					const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
 					const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
 					
-					const PrAudioSample seekPreRoll_samples = seekPreRoll * localRecP->audioSampleRate / 1000000000UL;
-					const PrAudioSample codecDelay_samples = codecDelay * localRecP->audioSampleRate / 1000000000UL;
+					const PrAudioSample seekPreRoll_samples = seekPreRoll * localRecP->audioSampleRate / 1000000000LL;
+					const PrAudioSample codecDelay_samples = codecDelay * localRecP->audioSampleRate / 1000000000LL;
 					
 					PrAudioSample seek_sample = audioRec7->position - seekPreRoll_samples + codecDelay_samples;
 					
@@ -1852,7 +1860,11 @@ SDKImportAudio7(
 						seek_sample = 0;
 					
 						
-					const long long calc_tstamp = audioRec7->position * 1000000000UL / localRecP->audioSampleRate;
+					const mkvparser::Cluster* pFirstCluster = localRecP->segment->GetFirst();
+	
+					const long long start_tstamp = (pFirstCluster ? pFirstCluster->GetFirstTime() : 0);
+					
+					const long long calc_tstamp = (audioRec7->position * 1000000000LL / localRecP->audioSampleRate) + start_tstamp;
 					
 					
 					// Use the SampleMap to figure out which cluster to seek to
@@ -1911,7 +1923,7 @@ SDKImportAudio7(
 							{
 								const long long cluster_tstamp = pCluster->GetTime();
 							
-								packet_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000UL;
+								packet_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000LL;
 								
 								if(localRecP->sample_map != NULL)
 								{
@@ -1921,9 +1933,8 @@ SDKImportAudio7(
 									// SampleMap has taken this into account.
 									SampleMap &sample_map = *localRecP->sample_map;
 									
-									assert(sample_map.find(cluster_tstamp) != sample_map.end());
-									
-									packet_start = sample_map[cluster_tstamp];
+									if(sample_map.find(cluster_tstamp) != sample_map.end());
+										packet_start = sample_map[cluster_tstamp];
 								}
 							}
 							
@@ -1941,8 +1952,6 @@ SDKImportAudio7(
 									{
 										assert(pBlock->GetDiscardPadding() == 0);
 
-										const long long packet_tstamp = pBlock->GetTime(pCluster);
-										
 										PrAudioSample packet_offset = 0;
 											
 										if(audioRec7->position > packet_start)
@@ -2090,16 +2099,15 @@ SDKImportAudio7(
 								{
 									const long long cluster_tstamp = pCluster->GetTime();
 									
-									PrAudioSample cluster_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000UL;
+									PrAudioSample cluster_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000LL;
 									
 									// Get the actual sample number this cluster starts with from our pre-built table
 									if(localRecP->sample_map != NULL)
 									{
 										SampleMap &sample_map = *localRecP->sample_map;
 										
-										assert(sample_map.find(cluster_tstamp) != sample_map.end());
-										
-										cluster_start = sample_map[cluster_tstamp];
+										if(sample_map.find(cluster_tstamp) != sample_map.end());
+											cluster_start = sample_map[cluster_tstamp];
 									}
 										
 									PrAudioSample packet_start = cluster_start;
