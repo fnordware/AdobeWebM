@@ -1477,7 +1477,10 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 			memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
 		}
 		
-		for(int y = 0; y < img->d_h / 2; y++)
+		const int chroma_width = (img->d_w / 2) + (img->d_w % 2);
+		const int chroma_height = (img->d_h / 2) + (img->d_h % 2);
+		
+		for(int y = 0; y < chroma_height; y++)
 		{
 			unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
 			unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
@@ -1485,8 +1488,8 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
 			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
 			
-			memcpy(prU, imgU, (img->d_w / 2) * sizeof(unsigned char));
-			memcpy(prV, imgV, (img->d_w / 2) * sizeof(unsigned char));
+			memcpy(prU, imgU, chroma_width * sizeof(unsigned char));
+			memcpy(prV, imgV, chroma_width * sizeof(unsigned char));
 		}
 	}
 	else
