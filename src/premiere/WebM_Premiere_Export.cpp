@@ -150,6 +150,11 @@ static const csSDK_int32 WebM_Export_Class = 'WebM';
 extern int g_num_cpus;
 
 
+// http://matroska.org/technical/specs/notes.html#TimecodeScale
+// Time (in nanoseconds) = TimeCode * TimeCodeScale
+// When we call finctions like GetTime, we're given Time in Nanoseconds.
+static const long long S2NS = 1000000000LL;
+
 
 static void
 utf16ncpy(prUTF16Char *dest, const char *src, int max_len)
@@ -1130,7 +1135,7 @@ exSDKExport(
 			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
 			// The WebM spec says to keep it at one million:
 			// http://www.webmproject.org/docs/container/#muxer-guidelines
-			const long long timeCodeScale = 1000000UL;
+			const long long timeCodeScale = 1000000LL;
 			
 			uint64 vid_track = 0;
 			uint64 audio_track = 0;
@@ -1203,7 +1208,7 @@ exSDKExport(
 						
 						audio->set_seek_pre_roll(80000000);
 						
-						audio->set_codec_delay((PrAudioSample)opus_pre_skip * 1000000000LL / (PrAudioSample)sampleRateP.value.floatValue);
+						audio->set_codec_delay((PrAudioSample)opus_pre_skip * S2NS / (PrAudioSample)sampleRateP.value.floatValue);
 					}
 
 					if(private_data)
@@ -1242,7 +1247,7 @@ exSDKExport(
 				const PrTime fileTime = videoTime - exportInfoP->startTime;
 				
 				// Time (in nanoseconds) = TimeCode * TimeCodeScale.
-				const long long timeCode = ((fileTime * (1000000000LL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+				const long long timeCode = ((fileTime * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
 				
 				const uint64_t timeStamp = timeCode * timeCodeScale;
 			
@@ -1269,7 +1274,7 @@ exSDKExport(
 					{
 						assert(opus != NULL);
 						
-						long long opus_timeStamp = currentAudioSample * 1000000000LL / (long long)sampleRateP.value.floatValue;
+						long long opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
 						
 						while(((opus_timeStamp <= timeStamp) || last_frame) && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
 						{
@@ -1297,7 +1302,7 @@ exSDKExport(
 									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
 									{
 										const int64 discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
-										const int64 discardPadding = discardPaddingSamples * 1000000000LL / (int64)sampleRateP.value.floatValue;
+										const int64 discardPadding = discardPaddingSamples * S2NS / (int64)sampleRateP.value.floatValue;
 										
 										added = muxer_segment->AddFrameWithDiscardPadding(opus_compressed_buffer, len,
 																		discardPadding, audio_track, opus_timeStamp, true);
@@ -1317,13 +1322,13 @@ exSDKExport(
 								
 								currentAudioSample += samples;
 								
-								opus_timeStamp = currentAudioSample * 1000000000LL / (long long)sampleRateP.value.floatValue;
+								opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
 							}
 						}
 					}
 					else
 					{
-						long long op_timeStamp = op.granulepos * 1000000000LL / (long long)sampleRateP.value.floatValue;
+						long long op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
 					
 						while(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
 						{	
@@ -1352,7 +1357,7 @@ exSDKExport(
 								{
 									assert(!packet_waiting);
 									
-									op_timeStamp = op.granulepos * 1000000000LL / (long long)sampleRateP.value.floatValue;
+									op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
 									
 									if(op_timeStamp <= timeStamp || last_frame)
 									{

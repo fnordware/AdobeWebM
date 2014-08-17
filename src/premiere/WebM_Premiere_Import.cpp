@@ -213,6 +213,12 @@ typedef struct
 } ImporterLocalRec8, *ImporterLocalRec8Ptr, **ImporterLocalRec8H;
 
 
+// http://matroska.org/technical/specs/notes.html#TimecodeScale
+// Time (in nanoseconds) = TimeCode * TimeCodeScale
+// When we call finctions like GetTime, we're given Time in Nanoseconds.
+static const long long S2NS = 1000000000LL;
+
+
 static prMALError 
 SDKInit(
 	imStdParms		*stdParms, 
@@ -656,7 +662,7 @@ SDKOpenFile8(
 								const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
 								const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
 								
-								assert(seekPreRoll == 80000000);
+								assert(seekPreRoll == 80000000); // 0.08 * S2NS
 
 								size_t private_size = 0;
 								const unsigned char *private_data = pAudioTrack->GetCodecPrivate(private_size);
@@ -700,7 +706,7 @@ SDKOpenFile8(
 									assert(pAudioTrack->GetSamplingRate() == 48000);
 									assert(sample_rate == 48000);
 									assert(output_gain == 0);
-									assert(codecDelay == (unsigned long long)pre_skip * 1000000000UL / sample_rate); // maybe should give myself some leeway here
+									assert(codecDelay == (unsigned long long)pre_skip * S2NS / sample_rate); // maybe should give myself some leeway here
 									
 									
 									int err = -1;
@@ -886,7 +892,9 @@ SDKOpenFile8(
 									
 									if(discardPatting > 0)
 									{
-										sampleCount -= (discardPatting * 48000LL / 1000000000LL);
+										assert(localRecP->opus_dec != NULL);
+									
+										sampleCount -= (discardPatting * 48000LL / S2NS);
 									}
 								}
 								
@@ -1148,8 +1156,11 @@ webm_guess_framerate(mkvparser::Segment *segment,
 	unsigned int frame = 0;
 	uint64_t     tstamp = 0;
 
+	const mkvparser::SegmentInfo* const pSegmentInfo = segment->GetInfo();
+	const long long timeCodeScale = pSegmentInfo->GetTimeCodeScale();
+	
+	const mkvparser::Tracks* const pTracks = segment->GetTracks();
 	const mkvparser::Cluster* pCluster = segment->GetFirst();
-	const mkvparser::Tracks* pTracks = segment->GetTracks();
 	
 	const long long start_tstamp = (pCluster ? pCluster->GetFirstTime() : 0);
 	
@@ -1157,13 +1168,13 @@ webm_guess_framerate(mkvparser::Segment *segment,
 	
 	long status = 0;
 
-	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < 1000000000 && frame < 100)
+	while( (pCluster != NULL) && !pCluster->EOS() && status >= 0 && tstamp < (1 * S2NS) && frame < 100)
 	{
 		const mkvparser::BlockEntry* pBlockEntry = NULL;
 		
 		status = pCluster->GetFirst(pBlockEntry);
 		
-		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < 1000000000 && frame < 100)
+		while( (pBlockEntry != NULL) && !pBlockEntry->EOS() && status >= 0 && tstamp < (1 * S2NS) && frame < 100)
 		{
 			const mkvparser::Block* const pBlock  = pBlockEntry->GetBlock();
 			const long long trackNum = pBlock->GetTrackNumber();
@@ -1264,6 +1275,10 @@ SDKGetInfo8(
 		
 		const long long duration = pSegmentInfo->GetDuration();
 		
+		const long long timeCodeScale = pSegmentInfo->GetTimeCodeScale();
+		
+		assert(timeCodeScale == 1000000LL);
+		
 		const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 		
 		if(localRecP->video_track >= 0)
@@ -1289,7 +1304,9 @@ SDKGetInfo8(
 
 						if(embedded_rate > 0)
 						{
-							if(duration < 1000000000LL)
+							const long long oneSecond = 1 * S2NS;
+						
+							if(duration < oneSecond)
 							{
 								fps_den = 1001;
 								fps_num = embedded_rate * fps_den;
@@ -1308,7 +1325,7 @@ SDKGetInfo8(
 						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talk about DefaultDecodedFieldDuration but...
 						SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 						SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-						SDKFileInfo8->vidDuration			= duration * fps_num / 1000000000LL;
+						SDKFileInfo8->vidDuration			= duration * fps_num / S2NS;
 						SDKFileInfo8->vidScale				= fps_num;
 						SDKFileInfo8->vidSampleSize			= fps_den;
 
@@ -1359,7 +1376,7 @@ SDKGetInfo8(
 																bitDepth == 64 ? kPrAudioSampleType_64BitFloat :
 																kPrAudioSampleType_Compressed;
 						
-						const PrAudioSample calc_duration	= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / 1000000000LL;
+						const PrAudioSample calc_duration	= (uint64_t)SDKFileInfo8->audInfo.sampleRate * duration / S2NS;
 																																				
 						SDKFileInfo8->audDuration			= (localRecP->total_samples > 0 ? localRecP->total_samples : calc_duration);
 						
@@ -1611,14 +1628,14 @@ SDKGetSourceVideo(
 
 			// convert PrTime to timeCode and then to absolute time
 			// http://matroska.org/technical/specs/notes.html#TimecodeScale
-			// Time (in nanoseconds) = TimeCode * TimeCodeScale.
+			// Time (in nanoseconds) = TimeCode * TimeCodeScale
 			// This is the source of some very imprecise timings.  If the time scale is 1 million (as it is by default),
 			// That means 1 second is time code of 1000.  For 24 frames per second, each frame would
 			// be 41.6666 of time code, but that gets rounded off to 42.  If the TimeCode scale were lower,
 			// we could be more precise, the problem presumably being that our biggest time would be
 			// reduced.
 			const long long timeCodeScale = localRecP->segment->GetInfo()->GetTimeCodeScale();
-			const long long timeCode = ((sourceVideoRec->inFrameTime * (1000000000LL / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+			const long long timeCode = ((sourceVideoRec->inFrameTime * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
 			const long long tstamp = (timeCode * timeCodeScale) + start_tstamp;
 			
 			
@@ -1700,7 +1717,7 @@ SDKGetSourceVideo(
 
 												if(decode_err == VPX_CODEC_OK)
 												{
-													csSDK_int32 decodedFrame = (((packet_tstamp - start_tstamp) * fps_num / fps_den) + 500000000LL) / 1000000000LL;
+													csSDK_int32 decodedFrame = (((packet_tstamp - start_tstamp) * fps_num / fps_den) + (S2NS / 2)) / S2NS;
 													
 													vpx_codec_iter_t iter = NULL;
 													
@@ -1851,8 +1868,8 @@ SDKImportAudio7(
 					const unsigned long long seekPreRoll = pAudioTrack->GetSeekPreRoll();
 					const unsigned long long codecDelay = pAudioTrack->GetCodecDelay();
 					
-					const PrAudioSample seekPreRoll_samples = seekPreRoll * localRecP->audioSampleRate / 1000000000LL;
-					const PrAudioSample codecDelay_samples = codecDelay * localRecP->audioSampleRate / 1000000000LL;
+					const PrAudioSample seekPreRoll_samples = seekPreRoll * localRecP->audioSampleRate / S2NS;
+					const PrAudioSample codecDelay_samples = codecDelay * localRecP->audioSampleRate / S2NS;
 					
 					PrAudioSample seek_sample = audioRec7->position - seekPreRoll_samples + codecDelay_samples;
 					
@@ -1864,7 +1881,7 @@ SDKImportAudio7(
 	
 					const long long start_tstamp = (pFirstCluster ? pFirstCluster->GetFirstTime() : 0);
 					
-					const long long calc_tstamp = (audioRec7->position * 1000000000LL / localRecP->audioSampleRate) + start_tstamp;
+					const long long calc_tstamp = (audioRec7->position * S2NS / localRecP->audioSampleRate) + start_tstamp;
 					
 					
 					// Use the SampleMap to figure out which cluster to seek to
@@ -1923,7 +1940,7 @@ SDKImportAudio7(
 							{
 								const long long cluster_tstamp = pCluster->GetTime();
 							
-								packet_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000LL;
+								packet_start = localRecP->audioSampleRate * cluster_tstamp / S2NS;
 								
 								if(localRecP->sample_map != NULL)
 								{
@@ -2099,7 +2116,7 @@ SDKImportAudio7(
 								{
 									const long long cluster_tstamp = pCluster->GetTime();
 									
-									PrAudioSample cluster_start = localRecP->audioSampleRate * cluster_tstamp / 1000000000LL;
+									PrAudioSample cluster_start = localRecP->audioSampleRate * cluster_tstamp / S2NS;
 									
 									// Get the actual sample number this cluster starts with from our pre-built table
 									if(localRecP->sample_map != NULL)

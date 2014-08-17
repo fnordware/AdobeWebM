@@ -794,7 +794,7 @@ exSDKPostProcessParams(
 												"60"};
 	
 	PrTime ticksPerSecond = 0;
-	timeSuite->GetTicksPerSecond (&ticksPerSecond);
+	timeSuite->GetTicksPerSecond(&ticksPerSecond);
 	
 	for(csSDK_int32 i=0; i < sizeof(frameRates) / sizeof (PrTime); i++)
 	{
