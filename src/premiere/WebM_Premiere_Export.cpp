@@ -548,7 +548,19 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 				unsigned short *prB = prBGRA + 0;
 				unsigned short *prG = prBGRA + 1;
 				unsigned short *prR = prBGRA + 2;
-				unsigned short *prA = prBGRA + 3;
+				
+				// These are the pixels below the current one for MPEG-2 chroma siting
+				unsigned short *prBb = prB - (rowbytes / sizeof(unsigned short));
+				unsigned short *prGb = prG - (rowbytes / sizeof(unsigned short));
+				unsigned short *prRb = prR - (rowbytes / sizeof(unsigned short));
+				
+				// unless this is the last line and there is no pixel below
+				if(y == (img->d_h - 1) || sub_y != 2)
+				{
+					prBb = prB;
+					prGb = prG;
+					prRb = prR;
+				}
 				
 				for(int x=0; x < img->d_w; x++)
 				{
@@ -556,14 +568,19 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 					
 					if( (y % sub_y == 0) && (x % sub_x == 0) )
 					{
-						*imgV++ = Convert16to8( ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) / 1000 );
-						*imgU++ = Convert16to8( (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) / 1000 );
+						*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
+												((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000 );
+						*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
+												(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000 );
 					}
 					
 					prR += 4;
 					prG += 4;
 					prB += 4;
-					prA += 4;
+					
+					prRb += 4;
+					prGb += 4;
+					prBb += 4;
 				}
 			}
 		}
@@ -585,16 +602,27 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 				unsigned char *prB = prBGRA + 0;
 				unsigned char *prG = prBGRA + 1;
 				unsigned char *prR = prBGRA + 2;
-				unsigned char *prA = prBGRA + 3;
 				
 				if(pixFormat == PrPixelFormat_ARGB_4444_8u)
 				{
 					// Media Encoder CS5 insists on handing us this format in some cases,
 					// even though we didn't list it as an option
-					prA = prBGRA + 0;
 					prR = prBGRA + 1;
 					prG = prBGRA + 2;
 					prB = prBGRA + 3;
+				}
+				
+				// These are the pixels below the current one for MPEG-2 chroma siting
+				unsigned char *prBb = prB - rowbytes;
+				unsigned char *prGb = prG - rowbytes;
+				unsigned char *prRb = prR - rowbytes;
+				
+				// unless this is the last line and there is no pixel below
+				if(y == (img->d_h - 1) || sub_y != 2)
+				{
+					prBb = prB;
+					prGb = prG;
+					prRb = prR;
 				}
 				
 				for(int x=0; x < img->d_w; x++)
@@ -604,14 +632,19 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 					
 					if( (y % sub_y == 0) && (x % sub_x == 0) )
 					{
-						*imgV++ = ((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) / 1000;
-						*imgU++ = (-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) / 1000;
+						*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
+									((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000;
+						*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
+									(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000;
 					}
 					
 					prR += 4;
 					prG += 4;
 					prB += 4;
-					prA += 4;
+					
+					prRb += 4;
+					prGb += 4;
+					prBb += 4;
 				}
 			}
 		}
