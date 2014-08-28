@@ -1450,69 +1450,70 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 		while(i < args.size())
 		{
 			const string &arg = args[i];
+			const string &val = args[i + 1];
 			
 			if(arg == "-t" || arg == "--threads")
-			{	SetValue(config.g_threads, args[i + 1]); i++;	}
+			{	SetValue(config.g_threads, val); i++;	}
 			
 			else if(arg == "--lag-in-frames")
-			{	SetValue(config.g_lag_in_frames, args[i + 1]); i++;	}
+			{	SetValue(config.g_lag_in_frames, val); i++;	}
 			
 			else if(arg == "--drop-frame")
-			{	SetValue(config.rc_dropframe_thresh, args[i + 1]); i++;	}
+			{	SetValue(config.rc_dropframe_thresh, val); i++;	}
 			
 			else if(arg == "--resize-allowed")
-			{	SetValue(config.rc_resize_allowed, args[i + 1]); i++;	}
+			{	SetValue(config.rc_resize_allowed, val); i++;	}
 			
 			else if(arg == "--resize-up")
-			{	SetValue(config.rc_resize_up_thresh, args[i + 1]); i++;	}
+			{	SetValue(config.rc_resize_up_thresh, val); i++;	}
 			
 			else if(arg == "--resize-down")
-			{	SetValue(config.rc_resize_down_thresh, args[i + 1]); i++;	}
+			{	SetValue(config.rc_resize_down_thresh, val); i++;	}
 			
 			else if(arg == "--target-bitrate")
-			{	SetValue(config.rc_target_bitrate, args[i + 1]); i++;	}
+			{	SetValue(config.rc_target_bitrate, val); i++;	}
 			
 			else if(arg == "--min-q")
-			{	SetValue(config.rc_min_quantizer, args[i + 1]); i++;	}
+			{	SetValue(config.rc_min_quantizer, val); i++;	}
 			
 			else if(arg == "--max-q")
-			{	SetValue(config.rc_max_quantizer, args[i + 1]); i++;	}
+			{	SetValue(config.rc_max_quantizer, val); i++;	}
 			
 			else if(arg == "--undershoot-pct")
-			{	SetValue(config.rc_undershoot_pct, args[i + 1]); i++;	}
+			{	SetValue(config.rc_undershoot_pct, val); i++;	}
 			
 			else if(arg == "--overshoot-pct")
-			{	SetValue(config.rc_overshoot_pct, args[i + 1]); i++;	}
+			{	SetValue(config.rc_overshoot_pct, val); i++;	}
 
 			else if(arg == "--buf-sz")
-			{	SetValue(config.rc_buf_sz, args[i + 1]); i++;	}
+			{	SetValue(config.rc_buf_sz, val); i++;	}
 
 			else if(arg == "--buf-initial-sz")
-			{	SetValue(config.rc_buf_initial_sz, args[i + 1]); i++;	}
+			{	SetValue(config.rc_buf_initial_sz, val); i++;	}
 
 			else if(arg == "--buf-optimal-sz")
-			{	SetValue(config.rc_buf_optimal_sz, args[i + 1]); i++;	}
+			{	SetValue(config.rc_buf_optimal_sz, val); i++;	}
 
 			else if(arg == "--bias-pct")
-			{	SetValue(config.rc_2pass_vbr_bias_pct, args[i + 1]); i++;	}
+			{	SetValue(config.rc_2pass_vbr_bias_pct, val); i++;	}
 
 			else if(arg == "--minsection-pct")
-			{	SetValue(config.rc_2pass_vbr_minsection_pct, args[i + 1]); i++;	}
+			{	SetValue(config.rc_2pass_vbr_minsection_pct, val); i++;	}
 
 			else if(arg == "--maxsection-pct")
-			{	SetValue(config.rc_2pass_vbr_maxsection_pct, args[i + 1]); i++;	}
+			{	SetValue(config.rc_2pass_vbr_maxsection_pct, val); i++;	}
 
 			else if(arg == "--kf-min-dist")
-			{	SetValue(config.kf_min_dist, args[i + 1]); i++;	}
+			{	SetValue(config.kf_min_dist, val); i++;	}
 
 			else if(arg == "--kf-max-dist")
-			{	SetValue(config.kf_max_dist, args[i + 1]); i++;	}
+			{	SetValue(config.kf_max_dist, val); i++;	}
 
 			else if(arg == "--disable-kf")
 			{	config.kf_mode = VPX_KF_DISABLED;	}
 
 			else if(arg == "--periodicity")
-			{	SetValue(config.ts_periodicity, args[i + 1]); i++;	}
+			{	SetValue(config.ts_periodicity, val); i++;	}
 
 			
 			i++;
@@ -1550,53 +1551,65 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 		while(i < args.size())
 		{
 			const string &arg = args[i];
+			const string &val = args[i + 1];
 		
 			if(arg == "--noise-sensitivity")
-			{	ConfigureValue(encoder, VP8E_SET_NOISE_SENSITIVITY, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_NOISE_SENSITIVITY, val); i++;	}
 
 			else if(arg == "--sharpness")
-			{	ConfigureValue(encoder, VP8E_SET_SHARPNESS, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_SHARPNESS, val); i++;	}
 
 			else if(arg == "--cpu-used")
-			{	ConfigureValue(encoder, VP8E_SET_CPUUSED, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_CPUUSED, val); i++;	}
 
 			else if(arg == "--token-parts")
-			{	ConfigureValue(encoder, VP8E_SET_TOKEN_PARTITIONS, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_TOKEN_PARTITIONS, val); i++;	}
 
 			else if(arg == "--tile-columns")
-			{	ConfigureValue(encoder, VP9E_SET_TILE_COLUMNS, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP9E_SET_TILE_COLUMNS, val); i++;	}
 
+			else if(arg == "--tile-rows")
+			{	ConfigureValue(encoder, VP9E_SET_TILE_ROWS, val); i++;	}
+			
 			else if(arg == "--auto-alt-ref")
-			{	ConfigureValue(encoder, VP8E_SET_ENABLEAUTOALTREF, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_ENABLEAUTOALTREF, val); i++;	}
 
 			else if(arg == "--arnr-maxframes")
-			{	ConfigureValue(encoder, VP8E_SET_ARNR_MAXFRAMES, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_ARNR_MAXFRAMES, val); i++;	}
 
 			else if(arg == "--arnr-strength")
-			{	ConfigureValue(encoder, VP8E_SET_ARNR_STRENGTH, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_ARNR_STRENGTH, val); i++;	}
 
 			else if(arg == "--arnr-type")
-			{	ConfigureValue(encoder, VP8E_SET_ARNR_TYPE, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_ARNR_TYPE, val); i++;	}
 
 			else if(arg == "--tune")
 			{
-				unsigned int val = args[i + 1] == "psnr" ? VP8_TUNE_PSNR :
-									args[i + 1] == "ssim" ? VP8_TUNE_SSIM :
-									0;
+				unsigned int ival = val == "psnr" ? VP8_TUNE_PSNR :
+									val == "ssim" ? VP8_TUNE_SSIM :
+									VP8_TUNE_PSNR;
 			
-				ConfigureValue(encoder, VP8E_SET_TUNING, val);
+				ConfigureValue(encoder, VP8E_SET_TUNING, ival);
 				i++;
 			}
 
 			else if(arg == "--cq-level")
-			{	ConfigureValue(encoder, VP8E_SET_CQ_LEVEL, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_CQ_LEVEL, val); i++;	}
 			
 			else if(arg == "--max-intra-rate")
-			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, args[i + 1]); i++;	}
+			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, val); i++;	}
 
 			else if(arg == "--lossless")
 			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, 1);	}
 			
+			else if(arg == "--frame-parallel")
+			{	ConfigureValue(encoder, VP9E_SET_FRAME_PARALLEL_DECODING, 1);	}
+
+			else if(arg == "--aq-mode")
+			{	ConfigureValue(encoder, VP9E_SET_AQ_MODE, 1);	}
+
+			else if(arg == "--frame_boost")
+			{	ConfigureValue(encoder, VP9E_SET_FRAME_PERIODIC_BOOST, 1);	}
 			
 			i++;	
 		}
