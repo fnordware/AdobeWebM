@@ -1498,6 +1498,7 @@ exSDKExport(
 								assert( !vbr_pass );
 								assert( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) ); // libwebm not handling these now
 								assert( !(pkt->data.frame.flags & VPX_FRAME_IS_FRAGMENT) );
+								assert( pkt->data.frame.pts == (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator) );
 								assert( pkt->data.frame.duration == 1 ); // because of how we did the timescale
 							
 								bool added = muxer_segment->AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
