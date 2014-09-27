@@ -277,16 +277,12 @@
 		2A550E141768193300BE5A72 /* vp9_variance.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BAC1768193300BE5A72 /* vp9_variance.h */; };
 		2A550E181768193300BE5A72 /* vp9_dct_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BB11768193300BE5A72 /* vp9_dct_sse2.c */; };
 		2A550E211768193300BE5A72 /* vp9_sad4d_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBA1768193300BE5A72 /* vp9_sad4d_sse2.asm */; };
-		2A550E221768193300BE5A72 /* vp9_sad_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBB1768193300BE5A72 /* vp9_sad_mmx.asm */; };
 		2A550E231768193300BE5A72 /* vp9_sad_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBC1768193300BE5A72 /* vp9_sad_sse2.asm */; };
 		2A550E241768193300BE5A72 /* vp9_sad_sse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBD1768193300BE5A72 /* vp9_sad_sse3.asm */; };
 		2A550E251768193300BE5A72 /* vp9_sad_sse4.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBE1768193300BE5A72 /* vp9_sad_sse4.asm */; };
 		2A550E261768193300BE5A72 /* vp9_sad_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BBF1768193300BE5A72 /* vp9_sad_ssse3.asm */; };
 		2A550E291768193300BE5A72 /* vp9_subtract_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BC21768193300BE5A72 /* vp9_subtract_sse2.asm */; };
 		2A550E2A1768193300BE5A72 /* vp9_temporal_filter_apply_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BC31768193300BE5A72 /* vp9_temporal_filter_apply_sse2.asm */; };
-		2A550E2B1768193300BE5A72 /* vp9_variance_impl_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BC41768193300BE5A72 /* vp9_variance_impl_mmx.asm */; };
-		2A550E2C1768193300BE5A72 /* vp9_variance_impl_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BC51768193300BE5A72 /* vp9_variance_impl_sse2.asm */; };
-		2A550E2E1768193300BE5A72 /* vp9_variance_mmx.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BC71768193300BE5A72 /* vp9_variance_mmx.c */; };
 		2A550E2F1768193300BE5A72 /* vp9_variance_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BC81768193300BE5A72 /* vp9_variance_sse2.c */; };
 		2A550E321768193300BE5A72 /* vp9_cx_iface.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BCE1768193300BE5A72 /* vp9_cx_iface.c */; };
 		2A550E331768193300BE5A72 /* vp9_dx_iface.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BCF1768193300BE5A72 /* vp9_dx_iface.c */; };
@@ -458,43 +454,6 @@
 		2A5509BB1768193200BE5A72 /* tools_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tools_common.h; sourceTree = "<group>"; };
 		2A5509BE1768193200BE5A72 /* alloccommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alloccommon.c; sourceTree = "<group>"; };
 		2A5509BF1768193200BE5A72 /* alloccommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alloccommon.h; sourceTree = "<group>"; };
-		2A5509C21768193200BE5A72 /* bilinearfilter_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = bilinearfilter_v6.asm; sourceTree = "<group>"; };
-		2A5509C31768193200BE5A72 /* copymem16x16_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = copymem16x16_v6.asm; sourceTree = "<group>"; };
-		2A5509C41768193200BE5A72 /* copymem8x4_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = copymem8x4_v6.asm; sourceTree = "<group>"; };
-		2A5509C51768193200BE5A72 /* copymem8x8_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = copymem8x8_v6.asm; sourceTree = "<group>"; };
-		2A5509C61768193200BE5A72 /* dc_only_idct_add_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = dc_only_idct_add_v6.asm; sourceTree = "<group>"; };
-		2A5509C71768193200BE5A72 /* dequant_idct_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = dequant_idct_v6.asm; sourceTree = "<group>"; };
-		2A5509C81768193200BE5A72 /* dequantize_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = dequantize_v6.asm; sourceTree = "<group>"; };
-		2A5509C91768193200BE5A72 /* filter_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = filter_v6.asm; sourceTree = "<group>"; };
-		2A5509CA1768193200BE5A72 /* idct_blk_v6.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = idct_blk_v6.c; sourceTree = "<group>"; };
-		2A5509CB1768193200BE5A72 /* idct_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = idct_v6.asm; sourceTree = "<group>"; };
-		2A5509CC1768193200BE5A72 /* intra4x4_predict_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = intra4x4_predict_v6.asm; sourceTree = "<group>"; };
-		2A5509CD1768193200BE5A72 /* iwalsh_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = iwalsh_v6.asm; sourceTree = "<group>"; };
-		2A5509CE1768193200BE5A72 /* loopfilter_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = loopfilter_v6.asm; sourceTree = "<group>"; };
-		2A5509CF1768193200BE5A72 /* simpleloopfilter_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = simpleloopfilter_v6.asm; sourceTree = "<group>"; };
-		2A5509D01768193200BE5A72 /* sixtappredict8x4_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = sixtappredict8x4_v6.asm; sourceTree = "<group>"; };
-		2A5509D11768193200BE5A72 /* vp8_sad16x16_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_sad16x16_armv6.asm; sourceTree = "<group>"; };
-		2A5509D21768193200BE5A72 /* vp8_variance16x16_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_variance16x16_armv6.asm; sourceTree = "<group>"; };
-		2A5509D31768193200BE5A72 /* vp8_variance8x8_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_variance8x8_armv6.asm; sourceTree = "<group>"; };
-		2A5509D41768193200BE5A72 /* vp8_variance_halfpixvar16x16_h_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_variance_halfpixvar16x16_h_armv6.asm; sourceTree = "<group>"; };
-		2A5509D51768193200BE5A72 /* vp8_variance_halfpixvar16x16_hv_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_variance_halfpixvar16x16_hv_armv6.asm; sourceTree = "<group>"; };
-		2A5509D61768193200BE5A72 /* vp8_variance_halfpixvar16x16_v_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_variance_halfpixvar16x16_v_armv6.asm; sourceTree = "<group>"; };
-		2A5509D71768193200BE5A72 /* bilinearfilter_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bilinearfilter_arm.c; sourceTree = "<group>"; };
-		2A5509D81768193200BE5A72 /* bilinearfilter_arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bilinearfilter_arm.h; sourceTree = "<group>"; };
-		2A5509D91768193200BE5A72 /* dequantize_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dequantize_arm.c; sourceTree = "<group>"; };
-		2A5509DA1768193200BE5A72 /* filter_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = filter_arm.c; sourceTree = "<group>"; };
-		2A5509DB1768193200BE5A72 /* loopfilter_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loopfilter_arm.c; sourceTree = "<group>"; };
-		2A5509E11768193200BE5A72 /* buildintrapredictorsmby_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = buildintrapredictorsmby_neon.asm; sourceTree = "<group>"; };
-		2A5509E81768193200BE5A72 /* idct_blk_neon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = idct_blk_neon.c; sourceTree = "<group>"; };
-		2A5509E91768193200BE5A72 /* idct_dequant_0_2x_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = idct_dequant_0_2x_neon.asm; sourceTree = "<group>"; };
-		2A5509EA1768193200BE5A72 /* idct_dequant_full_2x_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = idct_dequant_full_2x_neon.asm; sourceTree = "<group>"; };
-		2A5509EC1768193200BE5A72 /* loopfilter_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = loopfilter_neon.asm; sourceTree = "<group>"; };
-		2A5509EE1768193200BE5A72 /* loopfiltersimpleverticaledge_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = loopfiltersimpleverticaledge_neon.asm; sourceTree = "<group>"; };
-		2A5509F91768193200BE5A72 /* vp8_subpixelvariance16x16_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_subpixelvariance16x16_neon.asm; sourceTree = "<group>"; };
-		2A5509FA1768193200BE5A72 /* vp8_subpixelvariance16x16s_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_subpixelvariance16x16s_neon.asm; sourceTree = "<group>"; };
-		2A5509FB1768193200BE5A72 /* vp8_subpixelvariance8x8_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_subpixelvariance8x8_neon.asm; sourceTree = "<group>"; };
-		2A5509FC1768193200BE5A72 /* reconintra_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = reconintra_arm.c; sourceTree = "<group>"; };
-		2A5509FD1768193200BE5A72 /* variance_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = variance_arm.c; sourceTree = "<group>"; };
 		2A5509FE1768193200BE5A72 /* blockd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = blockd.c; sourceTree = "<group>"; };
 		2A5509FF1768193200BE5A72 /* blockd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blockd.h; sourceTree = "<group>"; };
 		2A550A001768193200BE5A72 /* coefupdateprobs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coefupdateprobs.h; sourceTree = "<group>"; };
@@ -620,25 +579,6 @@
 		2A550A831768193200BE5A72 /* onyxd_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = onyxd_int.h; sourceTree = "<group>"; };
 		2A550A841768193200BE5A72 /* threading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = threading.c; sourceTree = "<group>"; };
 		2A550A851768193200BE5A72 /* treereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = treereader.h; sourceTree = "<group>"; };
-		2A550A8A1768193200BE5A72 /* boolhuff_armv5te.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = boolhuff_armv5te.asm; sourceTree = "<group>"; };
-		2A550A8B1768193200BE5A72 /* vp8_packtokens_armv5.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_packtokens_armv5.asm; sourceTree = "<group>"; };
-		2A550A8C1768193200BE5A72 /* vp8_packtokens_mbrow_armv5.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_packtokens_mbrow_armv5.asm; sourceTree = "<group>"; };
-		2A550A8D1768193200BE5A72 /* vp8_packtokens_partitions_armv5.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_packtokens_partitions_armv5.asm; sourceTree = "<group>"; };
-		2A550A8F1768193200BE5A72 /* vp8_fast_quantize_b_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_fast_quantize_b_armv6.asm; sourceTree = "<group>"; };
-		2A550A901768193200BE5A72 /* vp8_mse16x16_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_mse16x16_armv6.asm; sourceTree = "<group>"; };
-		2A550A911768193200BE5A72 /* vp8_short_fdct4x4_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_short_fdct4x4_armv6.asm; sourceTree = "<group>"; };
-		2A550A921768193200BE5A72 /* vp8_subtract_armv6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_subtract_armv6.asm; sourceTree = "<group>"; };
-		2A550A931768193200BE5A72 /* walsh_v6.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = walsh_v6.asm; sourceTree = "<group>"; };
-		2A550A941768193200BE5A72 /* boolhuff_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = boolhuff_arm.c; sourceTree = "<group>"; };
-		2A550A951768193200BE5A72 /* dct_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dct_arm.c; sourceTree = "<group>"; };
-		2A550A971768193200BE5A72 /* fastquantizeb_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = fastquantizeb_neon.asm; sourceTree = "<group>"; };
-		2A550A981768193200BE5A72 /* picklpf_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = picklpf_arm.c; sourceTree = "<group>"; };
-		2A550A991768193200BE5A72 /* shortfdct_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = shortfdct_neon.asm; sourceTree = "<group>"; };
-		2A550A9A1768193200BE5A72 /* subtract_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = subtract_neon.asm; sourceTree = "<group>"; };
-		2A550A9B1768193200BE5A72 /* vp8_memcpy_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_memcpy_neon.asm; sourceTree = "<group>"; };
-		2A550A9C1768193200BE5A72 /* vp8_mse16x16_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_mse16x16_neon.asm; sourceTree = "<group>"; };
-		2A550A9D1768193200BE5A72 /* vp8_shortwalsh4x4_neon.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp8_shortwalsh4x4_neon.asm; sourceTree = "<group>"; };
-		2A550A9E1768193200BE5A72 /* quantize_arm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quantize_arm.c; sourceTree = "<group>"; };
 		2A550A9F1768193200BE5A72 /* bitstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitstream.c; sourceTree = "<group>"; };
 		2A550AA01768193200BE5A72 /* bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstream.h; sourceTree = "<group>"; };
 		2A550AA11768193200BE5A72 /* block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = block.h; sourceTree = "<group>"; };
@@ -754,9 +694,7 @@
 		2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_idct_intrin_sse2.c; sourceTree = "<group>"; };
 		2A550B511768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_loopfilter_intrin_sse2.c; sourceTree = "<group>"; };
 		2A550B521768193300BE5A72 /* vp9_loopfilter_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_loopfilter_mmx.asm; sourceTree = "<group>"; };
-		2A550B561768193300BE5A72 /* vp9_postproc_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_postproc_mmx.asm; sourceTree = "<group>"; };
 		2A550B571768193300BE5A72 /* vp9_postproc_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_postproc_sse2.asm; sourceTree = "<group>"; };
-		2A550B581768193300BE5A72 /* vp9_postproc_x86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_postproc_x86.h; sourceTree = "<group>"; };
 		2A550B5E1768193300BE5A72 /* vp9_subpixel_8t_ssse3.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_subpixel_8t_ssse3.asm; sourceTree = "<group>"; };
 		2A550B641768193300BE5A72 /* vp9_decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_decodemv.c; sourceTree = "<group>"; };
 		2A550B651768193300BE5A72 /* vp9_decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_decodemv.h; sourceTree = "<group>"; };
@@ -800,16 +738,12 @@
 		2A550BAC1768193300BE5A72 /* vp9_variance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_variance.h; sourceTree = "<group>"; };
 		2A550BB11768193300BE5A72 /* vp9_dct_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct_sse2.c; sourceTree = "<group>"; };
 		2A550BBA1768193300BE5A72 /* vp9_sad4d_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad4d_sse2.asm; sourceTree = "<group>"; };
-		2A550BBB1768193300BE5A72 /* vp9_sad_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_mmx.asm; sourceTree = "<group>"; };
 		2A550BBC1768193300BE5A72 /* vp9_sad_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_sse2.asm; sourceTree = "<group>"; };
 		2A550BBD1768193300BE5A72 /* vp9_sad_sse3.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_sse3.asm; sourceTree = "<group>"; };
 		2A550BBE1768193300BE5A72 /* vp9_sad_sse4.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_sse4.asm; sourceTree = "<group>"; };
 		2A550BBF1768193300BE5A72 /* vp9_sad_ssse3.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_sad_ssse3.asm; sourceTree = "<group>"; };
 		2A550BC21768193300BE5A72 /* vp9_subtract_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_subtract_sse2.asm; sourceTree = "<group>"; };
 		2A550BC31768193300BE5A72 /* vp9_temporal_filter_apply_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_temporal_filter_apply_sse2.asm; sourceTree = "<group>"; };
-		2A550BC41768193300BE5A72 /* vp9_variance_impl_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_variance_impl_mmx.asm; sourceTree = "<group>"; };
-		2A550BC51768193300BE5A72 /* vp9_variance_impl_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_variance_impl_sse2.asm; sourceTree = "<group>"; };
-		2A550BC71768193300BE5A72 /* vp9_variance_mmx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_variance_mmx.c; sourceTree = "<group>"; };
 		2A550BC81768193300BE5A72 /* vp9_variance_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_variance_sse2.c; sourceTree = "<group>"; };
 		2A550BCE1768193300BE5A72 /* vp9_cx_iface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_cx_iface.c; sourceTree = "<group>"; };
 		2A550BCF1768193300BE5A72 /* vp9_dx_iface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dx_iface.c; sourceTree = "<group>"; };
@@ -1090,7 +1024,6 @@
 			children = (
 				2A5509BE1768193200BE5A72 /* alloccommon.c */,
 				2A5509BF1768193200BE5A72 /* alloccommon.h */,
-				2A5509C01768193200BE5A72 /* arm */,
 				2A5509FE1768193200BE5A72 /* blockd.c */,
 				2A5509FF1768193200BE5A72 /* blockd.h */,
 				2A550A001768193200BE5A72 /* coefupdateprobs.h */,
@@ -1156,66 +1089,6 @@
 				2A550A521768193200BE5A72 /* x86 */,
 			);
 			path = common;
-			sourceTree = "<group>";
-		};
-		2A5509C01768193200BE5A72 /* arm */ = {
-			isa = PBXGroup;
-			children = (
-				2A5509C11768193200BE5A72 /* armv6 */,
-				2A5509D71768193200BE5A72 /* bilinearfilter_arm.c */,
-				2A5509D81768193200BE5A72 /* bilinearfilter_arm.h */,
-				2A5509D91768193200BE5A72 /* dequantize_arm.c */,
-				2A5509DA1768193200BE5A72 /* filter_arm.c */,
-				2A5509DB1768193200BE5A72 /* loopfilter_arm.c */,
-				2A5509DC1768193200BE5A72 /* neon */,
-				2A5509FC1768193200BE5A72 /* reconintra_arm.c */,
-				2A5509FD1768193200BE5A72 /* variance_arm.c */,
-			);
-			path = arm;
-			sourceTree = "<group>";
-		};
-		2A5509C11768193200BE5A72 /* armv6 */ = {
-			isa = PBXGroup;
-			children = (
-				2A5509C21768193200BE5A72 /* bilinearfilter_v6.asm */,
-				2A5509C31768193200BE5A72 /* copymem16x16_v6.asm */,
-				2A5509C41768193200BE5A72 /* copymem8x4_v6.asm */,
-				2A5509C51768193200BE5A72 /* copymem8x8_v6.asm */,
-				2A5509C61768193200BE5A72 /* dc_only_idct_add_v6.asm */,
-				2A5509C71768193200BE5A72 /* dequant_idct_v6.asm */,
-				2A5509C81768193200BE5A72 /* dequantize_v6.asm */,
-				2A5509C91768193200BE5A72 /* filter_v6.asm */,
-				2A5509CA1768193200BE5A72 /* idct_blk_v6.c */,
-				2A5509CB1768193200BE5A72 /* idct_v6.asm */,
-				2A5509CC1768193200BE5A72 /* intra4x4_predict_v6.asm */,
-				2A5509CD1768193200BE5A72 /* iwalsh_v6.asm */,
-				2A5509CE1768193200BE5A72 /* loopfilter_v6.asm */,
-				2A5509CF1768193200BE5A72 /* simpleloopfilter_v6.asm */,
-				2A5509D01768193200BE5A72 /* sixtappredict8x4_v6.asm */,
-				2A5509D11768193200BE5A72 /* vp8_sad16x16_armv6.asm */,
-				2A5509D21768193200BE5A72 /* vp8_variance16x16_armv6.asm */,
-				2A5509D31768193200BE5A72 /* vp8_variance8x8_armv6.asm */,
-				2A5509D41768193200BE5A72 /* vp8_variance_halfpixvar16x16_h_armv6.asm */,
-				2A5509D51768193200BE5A72 /* vp8_variance_halfpixvar16x16_hv_armv6.asm */,
-				2A5509D61768193200BE5A72 /* vp8_variance_halfpixvar16x16_v_armv6.asm */,
-			);
-			path = armv6;
-			sourceTree = "<group>";
-		};
-		2A5509DC1768193200BE5A72 /* neon */ = {
-			isa = PBXGroup;
-			children = (
-				2A5509E11768193200BE5A72 /* buildintrapredictorsmby_neon.asm */,
-				2A5509E81768193200BE5A72 /* idct_blk_neon.c */,
-				2A5509E91768193200BE5A72 /* idct_dequant_0_2x_neon.asm */,
-				2A5509EA1768193200BE5A72 /* idct_dequant_full_2x_neon.asm */,
-				2A5509EC1768193200BE5A72 /* loopfilter_neon.asm */,
-				2A5509EE1768193200BE5A72 /* loopfiltersimpleverticaledge_neon.asm */,
-				2A5509F91768193200BE5A72 /* vp8_subpixelvariance16x16_neon.asm */,
-				2A5509FA1768193200BE5A72 /* vp8_subpixelvariance16x16s_neon.asm */,
-				2A5509FB1768193200BE5A72 /* vp8_subpixelvariance8x8_neon.asm */,
-			);
-			path = neon;
 			sourceTree = "<group>";
 		};
 		2A550A121768193200BE5A72 /* generic */ = {
@@ -1332,7 +1205,6 @@
 		2A550A871768193200BE5A72 /* encoder */ = {
 			isa = PBXGroup;
 			children = (
-				2A550A881768193200BE5A72 /* arm */,
 				2A550A9F1768193200BE5A72 /* bitstream.c */,
 				2A550AA01768193200BE5A72 /* bitstream.h */,
 				2A550AA11768193200BE5A72 /* block.h */,
@@ -1387,56 +1259,6 @@
 				2A550AD81768193200BE5A72 /* x86 */,
 			);
 			path = encoder;
-			sourceTree = "<group>";
-		};
-		2A550A881768193200BE5A72 /* arm */ = {
-			isa = PBXGroup;
-			children = (
-				2A550A891768193200BE5A72 /* armv5te */,
-				2A550A8E1768193200BE5A72 /* armv6 */,
-				2A550A941768193200BE5A72 /* boolhuff_arm.c */,
-				2A550A951768193200BE5A72 /* dct_arm.c */,
-				2A550A961768193200BE5A72 /* neon */,
-				2A550A9E1768193200BE5A72 /* quantize_arm.c */,
-			);
-			path = arm;
-			sourceTree = "<group>";
-		};
-		2A550A891768193200BE5A72 /* armv5te */ = {
-			isa = PBXGroup;
-			children = (
-				2A550A8A1768193200BE5A72 /* boolhuff_armv5te.asm */,
-				2A550A8B1768193200BE5A72 /* vp8_packtokens_armv5.asm */,
-				2A550A8C1768193200BE5A72 /* vp8_packtokens_mbrow_armv5.asm */,
-				2A550A8D1768193200BE5A72 /* vp8_packtokens_partitions_armv5.asm */,
-			);
-			path = armv5te;
-			sourceTree = "<group>";
-		};
-		2A550A8E1768193200BE5A72 /* armv6 */ = {
-			isa = PBXGroup;
-			children = (
-				2A550A8F1768193200BE5A72 /* vp8_fast_quantize_b_armv6.asm */,
-				2A550A901768193200BE5A72 /* vp8_mse16x16_armv6.asm */,
-				2A550A911768193200BE5A72 /* vp8_short_fdct4x4_armv6.asm */,
-				2A550A921768193200BE5A72 /* vp8_subtract_armv6.asm */,
-				2A550A931768193200BE5A72 /* walsh_v6.asm */,
-			);
-			path = armv6;
-			sourceTree = "<group>";
-		};
-		2A550A961768193200BE5A72 /* neon */ = {
-			isa = PBXGroup;
-			children = (
-				2A550A971768193200BE5A72 /* fastquantizeb_neon.asm */,
-				2A550A981768193200BE5A72 /* picklpf_arm.c */,
-				2A550A991768193200BE5A72 /* shortfdct_neon.asm */,
-				2A550A9A1768193200BE5A72 /* subtract_neon.asm */,
-				2A550A9B1768193200BE5A72 /* vp8_memcpy_neon.asm */,
-				2A550A9C1768193200BE5A72 /* vp8_mse16x16_neon.asm */,
-				2A550A9D1768193200BE5A72 /* vp8_shortwalsh4x4_neon.asm */,
-			);
-			path = neon;
 			sourceTree = "<group>";
 		};
 		2A550AC21768193200BE5A72 /* ppc */ = {
@@ -1569,9 +1391,7 @@
 				2A550B4C1768193300BE5A72 /* vp9_idct_intrin_sse2.c */,
 				2A550B511768193300BE5A72 /* vp9_loopfilter_intrin_sse2.c */,
 				2A550B521768193300BE5A72 /* vp9_loopfilter_mmx.asm */,
-				2A550B561768193300BE5A72 /* vp9_postproc_mmx.asm */,
 				2A550B571768193300BE5A72 /* vp9_postproc_sse2.asm */,
-				2A550B581768193300BE5A72 /* vp9_postproc_x86.h */,
 				2A550B5E1768193300BE5A72 /* vp9_subpixel_8t_ssse3.asm */,
 			);
 			path = x86;
@@ -1698,16 +1518,12 @@
 				2A975B8B17A0564500FFFC04 /* vp9_subpel_variance.asm */,
 				2A550BB11768193300BE5A72 /* vp9_dct_sse2.c */,
 				2A550BBA1768193300BE5A72 /* vp9_sad4d_sse2.asm */,
-				2A550BBB1768193300BE5A72 /* vp9_sad_mmx.asm */,
 				2A550BBC1768193300BE5A72 /* vp9_sad_sse2.asm */,
 				2A550BBD1768193300BE5A72 /* vp9_sad_sse3.asm */,
 				2A550BBE1768193300BE5A72 /* vp9_sad_sse4.asm */,
 				2A550BBF1768193300BE5A72 /* vp9_sad_ssse3.asm */,
 				2A550BC21768193300BE5A72 /* vp9_subtract_sse2.asm */,
 				2A550BC31768193300BE5A72 /* vp9_temporal_filter_apply_sse2.asm */,
-				2A550BC41768193300BE5A72 /* vp9_variance_impl_mmx.asm */,
-				2A550BC51768193300BE5A72 /* vp9_variance_impl_sse2.asm */,
-				2A550BC71768193300BE5A72 /* vp9_variance_mmx.c */,
 				2A550BC81768193300BE5A72 /* vp9_variance_sse2.c */,
 			);
 			path = x86;
@@ -2238,16 +2054,12 @@
 				2A550E121768193300BE5A72 /* vp9_treewriter.c in Sources */,
 				2A550E181768193300BE5A72 /* vp9_dct_sse2.c in Sources */,
 				2A550E211768193300BE5A72 /* vp9_sad4d_sse2.asm in Sources */,
-				2A550E221768193300BE5A72 /* vp9_sad_mmx.asm in Sources */,
 				2A550E231768193300BE5A72 /* vp9_sad_sse2.asm in Sources */,
 				2A550E241768193300BE5A72 /* vp9_sad_sse3.asm in Sources */,
 				2A550E251768193300BE5A72 /* vp9_sad_sse4.asm in Sources */,
 				2A550E261768193300BE5A72 /* vp9_sad_ssse3.asm in Sources */,
 				2A550E291768193300BE5A72 /* vp9_subtract_sse2.asm in Sources */,
 				2A550E2A1768193300BE5A72 /* vp9_temporal_filter_apply_sse2.asm in Sources */,
-				2A550E2B1768193300BE5A72 /* vp9_variance_impl_mmx.asm in Sources */,
-				2A550E2C1768193300BE5A72 /* vp9_variance_impl_sse2.asm in Sources */,
-				2A550E2E1768193300BE5A72 /* vp9_variance_mmx.c in Sources */,
 				2A550E2F1768193300BE5A72 /* vp9_variance_sse2.c in Sources */,
 				2A550E321768193300BE5A72 /* vp9_cx_iface.c in Sources */,
 				2A550E331768193300BE5A72 /* vp9_dx_iface.c in Sources */,

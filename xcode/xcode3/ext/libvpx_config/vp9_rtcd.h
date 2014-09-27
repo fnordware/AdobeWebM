@@ -7,16 +7,13 @@
 #define RTCD_EXTERN extern
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * VP9
  */
 
 #include "vpx/vpx_integer.h"
 #include "vp9/common/vp9_enums.h"
+#include "vp9/common/vp9_idct.h"
 
 struct macroblockd;
 
@@ -28,17 +25,12 @@ struct mv;
 union int_mv;
 struct yv12_buffer_config;
 
-void vp9_blend_b_c(uint8_t *y, uint8_t *u, uint8_t *v, int y1, int u1, int v1, int alpha, int stride);
-#define vp9_blend_b vp9_blend_b_c
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void vp9_blend_mb_inner_c(uint8_t *y, uint8_t *u, uint8_t *v, int y1, int u1, int v1, int alpha, int stride);
-#define vp9_blend_mb_inner vp9_blend_mb_inner_c
-
-void vp9_blend_mb_outer_c(uint8_t *y, uint8_t *u, uint8_t *v, int y1, int u1, int v1, int alpha, int stride);
-#define vp9_blend_mb_outer vp9_blend_mb_outer_c
-
-int64_t vp9_block_error_c(const int16_t *coeff, const int16_t *dqcoeff, intptr_t block_size, int64_t *ssz);
-int64_t vp9_block_error_sse2(const int16_t *coeff, const int16_t *dqcoeff, intptr_t block_size, int64_t *ssz);
+int64_t vp9_block_error_c(const tran_low_t *coeff, const tran_low_t *dqcoeff, intptr_t block_size, int64_t *ssz);
+int64_t vp9_block_error_sse2(const tran_low_t *coeff, const tran_low_t *dqcoeff, intptr_t block_size, int64_t *ssz);
 #define vp9_block_error vp9_block_error_sse2
 
 void vp9_convolve8_c(const uint8_t *src, ptrdiff_t src_stride, uint8_t *dst, ptrdiff_t dst_stride, const int16_t *filter_x, int x_step_q4, const int16_t *filter_y, int y_step_q4, int w, int h);
@@ -221,53 +213,53 @@ void vp9_dc_top_predictor_8x8_c(uint8_t *dst, ptrdiff_t y_stride, const uint8_t 
 int vp9_diamond_search_sad_c(const struct macroblock *x, const struct search_site_config *cfg,  struct mv *ref_mv, struct mv *best_mv, int search_param, int sad_per_bit, int *num00, const struct vp9_variance_vtable *fn_ptr, const struct mv *center_mv);
 #define vp9_diamond_search_sad vp9_diamond_search_sad_c
 
-void vp9_fdct16x16_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct16x16_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct16x16_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct16x16_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct16x16 vp9_fdct16x16_sse2
 
-void vp9_fdct16x16_1_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct16x16_1_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct16x16_1_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct16x16_1_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct16x16_1 vp9_fdct16x16_1_sse2
 
-void vp9_fdct32x32_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct32x32_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct32x32_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct32x32_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct32x32 vp9_fdct32x32_sse2
 
-void vp9_fdct32x32_1_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct32x32_1_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct32x32_1_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct32x32_1_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct32x32_1 vp9_fdct32x32_1_sse2
 
-void vp9_fdct32x32_rd_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct32x32_rd_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct32x32_rd_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct32x32_rd_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct32x32_rd vp9_fdct32x32_rd_sse2
 
-void vp9_fdct4x4_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct4x4_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct4x4_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct4x4_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct4x4 vp9_fdct4x4_sse2
 
-void vp9_fdct4x4_1_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct4x4_1_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct4x4_1_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct4x4_1_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct4x4_1 vp9_fdct4x4_1_sse2
 
-void vp9_fdct8x8_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct8x8_sse2(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct8x8_ssse3(const int16_t *input, int16_t *output, int stride);
-RTCD_EXTERN void (*vp9_fdct8x8)(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct8x8_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct8x8_sse2(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct8x8_ssse3(const int16_t *input, tran_low_t *output, int stride);
+RTCD_EXTERN void (*vp9_fdct8x8)(const int16_t *input, tran_low_t *output, int stride);
 
-void vp9_fdct8x8_1_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fdct8x8_1_sse2(const int16_t *input, int16_t *output, int stride);
+void vp9_fdct8x8_1_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fdct8x8_1_sse2(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fdct8x8_1 vp9_fdct8x8_1_sse2
 
-void vp9_fht16x16_c(const int16_t *input, int16_t *output, int stride, int tx_type);
-void vp9_fht16x16_sse2(const int16_t *input, int16_t *output, int stride, int tx_type);
+void vp9_fht16x16_c(const int16_t *input, tran_low_t *output, int stride, int tx_type);
+void vp9_fht16x16_sse2(const int16_t *input, tran_low_t *output, int stride, int tx_type);
 #define vp9_fht16x16 vp9_fht16x16_sse2
 
-void vp9_fht4x4_c(const int16_t *input, int16_t *output, int stride, int tx_type);
-void vp9_fht4x4_sse2(const int16_t *input, int16_t *output, int stride, int tx_type);
+void vp9_fht4x4_c(const int16_t *input, tran_low_t *output, int stride, int tx_type);
+void vp9_fht4x4_sse2(const int16_t *input, tran_low_t *output, int stride, int tx_type);
 #define vp9_fht4x4 vp9_fht4x4_sse2
 
-void vp9_fht8x8_c(const int16_t *input, int16_t *output, int stride, int tx_type);
-void vp9_fht8x8_sse2(const int16_t *input, int16_t *output, int stride, int tx_type);
+void vp9_fht8x8_c(const int16_t *input, tran_low_t *output, int stride, int tx_type);
+void vp9_fht8x8_sse2(const int16_t *input, tran_low_t *output, int stride, int tx_type);
 #define vp9_fht8x8 vp9_fht8x8_sse2
 
 int vp9_full_range_search_c(const struct macroblock *x, const struct search_site_config *cfg, struct mv *ref_mv, struct mv *best_mv, int search_param, int sad_per_bit, int *num00, const struct vp9_variance_vtable *fn_ptr, const struct mv *center_mv);
@@ -278,8 +270,8 @@ int vp9_full_search_sadx3(const struct macroblock *x, const struct mv *ref_mv, i
 int vp9_full_search_sadx8(const struct macroblock *x, const struct mv *ref_mv, int sad_per_bit, int distance, const struct vp9_variance_vtable *fn_ptr, const struct mv *center_mv, struct mv *best_mv);
 RTCD_EXTERN int (*vp9_full_search_sad)(const struct macroblock *x, const struct mv *ref_mv, int sad_per_bit, int distance, const struct vp9_variance_vtable *fn_ptr, const struct mv *center_mv, struct mv *best_mv);
 
-void vp9_fwht4x4_c(const int16_t *input, int16_t *output, int stride);
-void vp9_fwht4x4_mmx(const int16_t *input, int16_t *output, int stride);
+void vp9_fwht4x4_c(const int16_t *input, tran_low_t *output, int stride);
+void vp9_fwht4x4_mmx(const int16_t *input, tran_low_t *output, int stride);
 #define vp9_fwht4x4 vp9_fwht4x4_mmx
 
 void vp9_get16x16var_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse, int *sum);
@@ -287,12 +279,10 @@ void vp9_get16x16var_sse2(const uint8_t *src_ptr, int source_stride, const uint8
 #define vp9_get16x16var vp9_get16x16var_sse2
 
 void vp9_get8x8var_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse, int *sum);
-void vp9_get8x8var_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse, int *sum);
 void vp9_get8x8var_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse, int *sum);
 #define vp9_get8x8var vp9_get8x8var_sse2
 
 unsigned int vp9_get_mb_ss_c(const int16_t *);
-unsigned int vp9_get_mb_ss_mmx(const int16_t *);
 unsigned int vp9_get_mb_ss_sse2(const int16_t *);
 #define vp9_get_mb_ss vp9_get_mb_ss_sse2
 
@@ -312,70 +302,70 @@ void vp9_h_predictor_8x8_c(uint8_t *dst, ptrdiff_t y_stride, const uint8_t *abov
 void vp9_h_predictor_8x8_ssse3(uint8_t *dst, ptrdiff_t y_stride, const uint8_t *above, const uint8_t *left);
 RTCD_EXTERN void (*vp9_h_predictor_8x8)(uint8_t *dst, ptrdiff_t y_stride, const uint8_t *above, const uint8_t *left);
 
-void vp9_idct16x16_10_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct16x16_10_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct16x16_10_add_ssse3(const int16_t *input, uint8_t *dest, int dest_stride);
-RTCD_EXTERN void (*vp9_idct16x16_10_add)(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_10_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_10_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_10_add_ssse3(const tran_low_t *input, uint8_t *dest, int dest_stride);
+RTCD_EXTERN void (*vp9_idct16x16_10_add)(const tran_low_t *input, uint8_t *dest, int dest_stride);
 
-void vp9_idct16x16_1_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct16x16_1_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_1_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_1_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct16x16_1_add vp9_idct16x16_1_add_sse2
 
-void vp9_idct16x16_256_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct16x16_256_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct16x16_256_add_ssse3(const int16_t *input, uint8_t *dest, int dest_stride);
-RTCD_EXTERN void (*vp9_idct16x16_256_add)(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_256_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_256_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct16x16_256_add_ssse3(const tran_low_t *input, uint8_t *dest, int dest_stride);
+RTCD_EXTERN void (*vp9_idct16x16_256_add)(const tran_low_t *input, uint8_t *dest, int dest_stride);
 
-void vp9_idct32x32_1024_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct32x32_1024_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct32x32_1024_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct32x32_1024_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct32x32_1024_add vp9_idct32x32_1024_add_sse2
 
-void vp9_idct32x32_1_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct32x32_1_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct32x32_1_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct32x32_1_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct32x32_1_add vp9_idct32x32_1_add_sse2
 
-void vp9_idct32x32_34_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct32x32_34_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct32x32_34_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct32x32_34_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct32x32_34_add vp9_idct32x32_34_add_sse2
 
-void vp9_idct4x4_16_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct4x4_16_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct4x4_16_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct4x4_16_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct4x4_16_add vp9_idct4x4_16_add_sse2
 
-void vp9_idct4x4_1_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct4x4_1_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct4x4_1_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct4x4_1_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct4x4_1_add vp9_idct4x4_1_add_sse2
 
-void vp9_idct8x8_12_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct8x8_12_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct8x8_12_add_ssse3(const int16_t *input, uint8_t *dest, int dest_stride);
-RTCD_EXTERN void (*vp9_idct8x8_12_add)(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_12_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_12_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_12_add_ssse3(const tran_low_t *input, uint8_t *dest, int dest_stride);
+RTCD_EXTERN void (*vp9_idct8x8_12_add)(const tran_low_t *input, uint8_t *dest, int dest_stride);
 
-void vp9_idct8x8_1_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct8x8_1_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_1_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_1_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_idct8x8_1_add vp9_idct8x8_1_add_sse2
 
-void vp9_idct8x8_64_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct8x8_64_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride);
-void vp9_idct8x8_64_add_ssse3(const int16_t *input, uint8_t *dest, int dest_stride);
-RTCD_EXTERN void (*vp9_idct8x8_64_add)(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_64_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_64_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride);
+void vp9_idct8x8_64_add_ssse3(const tran_low_t *input, uint8_t *dest, int dest_stride);
+RTCD_EXTERN void (*vp9_idct8x8_64_add)(const tran_low_t *input, uint8_t *dest, int dest_stride);
 
-void vp9_iht16x16_256_add_c(const int16_t *input, uint8_t *output, int pitch, int tx_type);
-void vp9_iht16x16_256_add_sse2(const int16_t *input, uint8_t *output, int pitch, int tx_type);
+void vp9_iht16x16_256_add_c(const tran_low_t *input, uint8_t *output, int pitch, int tx_type);
+void vp9_iht16x16_256_add_sse2(const tran_low_t *input, uint8_t *output, int pitch, int tx_type);
 #define vp9_iht16x16_256_add vp9_iht16x16_256_add_sse2
 
-void vp9_iht4x4_16_add_c(const int16_t *input, uint8_t *dest, int dest_stride, int tx_type);
-void vp9_iht4x4_16_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride, int tx_type);
+void vp9_iht4x4_16_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride, int tx_type);
+void vp9_iht4x4_16_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride, int tx_type);
 #define vp9_iht4x4_16_add vp9_iht4x4_16_add_sse2
 
-void vp9_iht8x8_64_add_c(const int16_t *input, uint8_t *dest, int dest_stride, int tx_type);
-void vp9_iht8x8_64_add_sse2(const int16_t *input, uint8_t *dest, int dest_stride, int tx_type);
+void vp9_iht8x8_64_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride, int tx_type);
+void vp9_iht8x8_64_add_sse2(const tran_low_t *input, uint8_t *dest, int dest_stride, int tx_type);
 #define vp9_iht8x8_64_add vp9_iht8x8_64_add_sse2
 
-void vp9_iwht4x4_16_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_iwht4x4_16_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_iwht4x4_16_add vp9_iwht4x4_16_add_c
 
-void vp9_iwht4x4_1_add_c(const int16_t *input, uint8_t *dest, int dest_stride);
+void vp9_iwht4x4_1_add_c(const tran_low_t *input, uint8_t *dest, int dest_stride);
 #define vp9_iwht4x4_1_add vp9_iwht4x4_1_add_c
 
 void vp9_lpf_horizontal_16_c(uint8_t *s, int pitch, const uint8_t *blimit, const uint8_t *limit, const uint8_t *thresh, int count);
@@ -423,40 +413,41 @@ void vp9_lpf_vertical_8_dual_sse2(uint8_t *s, int pitch, const uint8_t *blimit0,
 #define vp9_lpf_vertical_8_dual vp9_lpf_vertical_8_dual_sse2
 
 unsigned int vp9_mse16x16_c(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
-unsigned int vp9_mse16x16_mmx(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
 unsigned int vp9_mse16x16_sse2(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
 #define vp9_mse16x16 vp9_mse16x16_sse2
 
 unsigned int vp9_mse16x8_c(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
-#define vp9_mse16x8 vp9_mse16x8_c
+unsigned int vp9_mse16x8_sse2(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
+#define vp9_mse16x8 vp9_mse16x8_sse2
 
 unsigned int vp9_mse8x16_c(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
-#define vp9_mse8x16 vp9_mse8x16_c
+unsigned int vp9_mse8x16_sse2(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
+#define vp9_mse8x16 vp9_mse8x16_sse2
 
 unsigned int vp9_mse8x8_c(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
-#define vp9_mse8x8 vp9_mse8x8_c
+unsigned int vp9_mse8x8_sse2(const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse);
+#define vp9_mse8x8 vp9_mse8x8_sse2
 
-void vp9_quantize_b_c(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-void vp9_quantize_b_ssse3(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-RTCD_EXTERN void (*vp9_quantize_b)(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_b_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_b_ssse3(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+RTCD_EXTERN void (*vp9_quantize_b)(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
 
-void vp9_quantize_b_32x32_c(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-void vp9_quantize_b_32x32_ssse3(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-RTCD_EXTERN void (*vp9_quantize_b_32x32)(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_b_32x32_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_b_32x32_ssse3(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+RTCD_EXTERN void (*vp9_quantize_b_32x32)(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
 
-void vp9_quantize_fp_c(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-void vp9_quantize_fp_ssse3(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-RTCD_EXTERN void (*vp9_quantize_fp)(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_fp_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_fp_ssse3(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+RTCD_EXTERN void (*vp9_quantize_fp)(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
 
-void vp9_quantize_fp_32x32_c(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-void vp9_quantize_fp_32x32_ssse3(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
-RTCD_EXTERN void (*vp9_quantize_fp_32x32)(const int16_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, int16_t *qcoeff_ptr, int16_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_fp_32x32_c(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+void vp9_quantize_fp_32x32_ssse3(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
+RTCD_EXTERN void (*vp9_quantize_fp_32x32)(const tran_low_t *coeff_ptr, intptr_t n_coeffs, int skip_block, const int16_t *zbin_ptr, const int16_t *round_ptr, const int16_t *quant_ptr, const int16_t *quant_shift_ptr, tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr, int zbin_oq_value, uint16_t *eob_ptr, const int16_t *scan, const int16_t *iscan);
 
 int vp9_refining_search_sad_c(const struct macroblock *x, struct mv *ref_mv, int sad_per_bit, int distance, const struct vp9_variance_vtable *fn_ptr, const struct mv *center_mv);
 #define vp9_refining_search_sad vp9_refining_search_sad_c
 
 unsigned int vp9_sad16x16_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
-unsigned int vp9_sad16x16_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 unsigned int vp9_sad16x16_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 #define vp9_sad16x16 vp9_sad16x16_sse2
 
@@ -489,7 +480,6 @@ void vp9_sad16x32x4d_sse2(const uint8_t *src_ptr, int  src_stride, const uint8_t
 #define vp9_sad16x32x4d vp9_sad16x32x4d_sse2
 
 unsigned int vp9_sad16x8_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
-unsigned int vp9_sad16x8_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 unsigned int vp9_sad16x8_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 #define vp9_sad16x8 vp9_sad16x8_sse2
 
@@ -552,7 +542,6 @@ void vp9_sad32x64x4d_sse2(const uint8_t *src_ptr, int  src_stride, const uint8_t
 #define vp9_sad32x64x4d vp9_sad32x64x4d_sse2
 
 unsigned int vp9_sad4x4_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
-unsigned int vp9_sad4x4_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 unsigned int vp9_sad4x4_sse(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 #define vp9_sad4x4 vp9_sad4x4_sse
 
@@ -617,7 +606,6 @@ void vp9_sad64x64x8_c(const uint8_t *src_ptr, int  src_stride, const uint8_t *re
 #define vp9_sad64x64x8 vp9_sad64x64x8_c
 
 unsigned int vp9_sad8x16_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
-unsigned int vp9_sad8x16_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 unsigned int vp9_sad8x16_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 #define vp9_sad8x16 vp9_sad8x16_sse2
 
@@ -652,7 +640,6 @@ void vp9_sad8x4x8_c(const uint8_t *src_ptr, int src_stride, const uint8_t *ref_p
 #define vp9_sad8x4x8 vp9_sad8x4x8_c
 
 unsigned int vp9_sad8x8_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
-unsigned int vp9_sad8x8_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 unsigned int vp9_sad8x8_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int  ref_stride);
 #define vp9_sad8x8 vp9_sad8x8_sse2
 
@@ -842,7 +829,6 @@ void vp9_v_predictor_8x8_sse(uint8_t *dst, ptrdiff_t y_stride, const uint8_t *ab
 #define vp9_v_predictor_8x8 vp9_v_predictor_8x8_sse
 
 unsigned int vp9_variance16x16_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
-unsigned int vp9_variance16x16_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 unsigned int vp9_variance16x16_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 #define vp9_variance16x16 vp9_variance16x16_sse2
 
@@ -851,7 +837,6 @@ unsigned int vp9_variance16x32_sse2(const uint8_t *src_ptr, int source_stride, c
 #define vp9_variance16x32 vp9_variance16x32_sse2
 
 unsigned int vp9_variance16x8_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
-unsigned int vp9_variance16x8_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 unsigned int vp9_variance16x8_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 #define vp9_variance16x8 vp9_variance16x8_sse2
 
@@ -868,7 +853,6 @@ unsigned int vp9_variance32x64_sse2(const uint8_t *src_ptr, int source_stride, c
 #define vp9_variance32x64 vp9_variance32x64_sse2
 
 unsigned int vp9_variance4x4_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
-unsigned int vp9_variance4x4_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 unsigned int vp9_variance4x4_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 #define vp9_variance4x4 vp9_variance4x4_sse2
 
@@ -885,7 +869,6 @@ unsigned int vp9_variance64x64_sse2(const uint8_t *src_ptr, int source_stride, c
 #define vp9_variance64x64 vp9_variance64x64_sse2
 
 unsigned int vp9_variance8x16_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
-unsigned int vp9_variance8x16_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 unsigned int vp9_variance8x16_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 #define vp9_variance8x16 vp9_variance8x16_sse2
 
@@ -894,7 +877,6 @@ unsigned int vp9_variance8x4_sse2(const uint8_t *src_ptr, int source_stride, con
 #define vp9_variance8x4 vp9_variance8x4_sse2
 
 unsigned int vp9_variance8x8_c(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
-unsigned int vp9_variance8x8_mmx(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 unsigned int vp9_variance8x8_sse2(const uint8_t *src_ptr, int source_stride, const uint8_t *ref_ptr, int ref_stride, unsigned int *sse);
 #define vp9_variance8x8 vp9_variance8x8_sse2
 
