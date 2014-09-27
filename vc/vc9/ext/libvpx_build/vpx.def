@@ -34,20 +34,10 @@ EXPORTS
   vpx_codec_set_cx_data_buf
   vpx_svc_dump_statistics
   vpx_svc_encode
-  vpx_svc_get_buffer
-  vpx_svc_get_encode_frame_count
-  vpx_svc_get_frame_size
   vpx_svc_get_message
   vpx_svc_init
-  vpx_svc_is_keyframe
   vpx_svc_release
-  vpx_svc_set_keyframe
   vpx_svc_set_options
-  vpx_svc_set_quantizers
-  vpx_svc_set_scale_factors
-  vpx_svc_get_layer_resolution
-  vpx_svc_get_rc_stats_buffer_size
-  vpx_svc_get_rc_stats_buffer
   vpx_codec_dec_init_ver
   vpx_codec_decode
   vpx_codec_get_frame
