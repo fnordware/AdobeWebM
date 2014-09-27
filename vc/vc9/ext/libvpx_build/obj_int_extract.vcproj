@@ -23,7 +23,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                AdditionalIncludeDirectories="&quot;.&quot;;&quot;C:\cygwin64\tmp\libvpx&quot;"
+                AdditionalIncludeDirectories="&quot;.&quot;;&quot;..\..\..\..\ext\libvpx&quot;"
                 PreprocessorDefinitions="WIN32;DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
                 RuntimeLibrary="1"
                 WarningLevel="3"
@@ -47,7 +47,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 FavorSizeorSpeed="1"
-                AdditionalIncludeDirectories="&quot;.&quot;;&quot;C:\cygwin64\tmp\libvpx&quot;"
+                AdditionalIncludeDirectories="&quot;.&quot;;&quot;..\..\..\..\ext\libvpx&quot;"
                 PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
                 RuntimeLibrary="0"
                 UsePrecompiledHeader="0"
@@ -68,7 +68,7 @@
             UniqueIdentifier="4778CEBA-FB0E-E69F-9992-7E2492C650E5"
             >
             <File
-                RelativePath="C:\cygwin64\tmp\libvpx\build\make\obj_int_extract.c"
+                RelativePath=".\..\..\..\..\ext\libvpx\build\make\obj_int_extract.c"
                 >
                 <FileConfiguration
                     Name="Debug|x64"
