@@ -81,6 +81,7 @@ typedef enum {
 #define WebMVideoQuality	"WebMVideoQuality"
 #define WebMVideoBitrate	"WebMVideoBitrate"
 #define WebMVideoEncoding	"WebMVideoEncoding"
+#define WebMVideoSampling	"WebMVideoSampling"
 
 #define WebMCustomGroup		"WebMCustomGroup"
 #define WebMCustomArgs		"WebMCustomArgs"

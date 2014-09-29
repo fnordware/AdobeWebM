@@ -499,7 +499,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
 				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
 			
-				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
 				
 				for(int x=0; x < img->d_w; x++)
 				{
@@ -782,17 +782,18 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, customArgsP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, samplingP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
 	
 	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
 	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
-	const WebM_Chroma_Sampling chroma = (use_vp9 ? WEBM_420 : WEBM_420);
+	const WebM_Chroma_Sampling chroma = (use_vp9 ? (WebM_Chroma_Sampling)samplingP.value.intValue : WEBM_420);
 	
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
@@ -810,9 +811,9 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	
 	
-	PrPixelFormat yuv_format = chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
-								chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
-								PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+	const PrPixelFormat yuv_format = (chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
+										chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
+										PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
 	
 	SequenceRender_ParamsRec renderParms;
 	PrPixelFormat pixelFormats[] = { yuv_format,

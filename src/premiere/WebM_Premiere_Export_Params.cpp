@@ -444,6 +444,25 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &vidEncodingParam);
 	
 	
+	// Sampling
+	exParamValues samplingValues;
+	samplingValues.structVersion = 1;
+	samplingValues.rangeMin.intValue = WEBM_420;
+	samplingValues.rangeMax.intValue = WEBM_444;
+	samplingValues.value.intValue = WEBM_420;
+	samplingValues.disabled = kPrTrue;
+	samplingValues.hidden = kPrFalse;
+	
+	exNewParamInfo samplingParam;
+	samplingParam.structVersion = 1;
+	strncpy(samplingParam.identifier, WebMVideoSampling, 255);
+	samplingParam.paramType = exParamType_int;
+	samplingParam.flags = exParamFlag_none;
+	samplingParam.paramValues = samplingValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &samplingParam);
+	
+	
 	// Version
 	exParamValues versionValues;
 	versionValues.structVersion = 1;
@@ -923,6 +942,30 @@ exSDKPostProcessParams(
 	}
 	
 	
+	// Sampling
+	utf16ncpy(paramString, "Sampling", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMVideoSampling, paramString);
+	
+	
+	int vidSampling[] = {	WEBM_420,
+							WEBM_422,
+							WEBM_444 };
+	
+	const char *vidSamplingStrings[]	= {	"4:2:0",
+											"4:2:2",
+											"4:4:4" };
+
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoSampling);
+	
+	exOneParamValueRec tempSamplingMethod;
+	for(int i=0; i < 3; i++)
+	{
+		tempSamplingMethod.intValue = vidSampling[i];
+		utf16ncpy(paramString, vidSamplingStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoSampling, &tempSamplingMethod, paramString);
+	}
+	
+	
 	// Custom settings
 	utf16ncpy(paramString, "Custom settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, WebMCustomGroup, paramString);
@@ -1104,9 +1147,10 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, videoQualityP, videoBitrateP, vidEncodingP;
+	exParamValues codecP, methodP, samplingP, videoQualityP, videoBitrateP, vidEncodingP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
@@ -1232,6 +1276,16 @@ exSDKGetParamSummary(
 	
 	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");	
 
+	if(codecP.value.intValue == WEBM_CODEC_VP9)
+	{
+		if(samplingP.value.intValue == WEBM_444)
+			stream3 << " 4:4:4";
+		else if(samplingP.value.intValue == WEBM_422)
+			stream3 << " 4:2:2";
+		else
+			stream3 << " 4:2:0";
+	}
+	
 	if(vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME)
 		stream3 << ", Realtime";
 	else if(vidEncodingP.value.intValue == WEBM_ENCODING_BEST)
@@ -1282,6 +1336,17 @@ exSDKValidateParamChanged (
 		paramSuite->ChangeParam(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
 		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
 		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFPS, &frameRateP);
+	}
+	else if(param == WebMVideoCodec)
+	{
+		exParamValues codecValue, samplingValue;
+		
+		paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecValue);
+		paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingValue);
+		
+		samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
+		
+		paramSuite->ChangeParam(exID, gIdx, WebMVideoSampling, &samplingValue);
 	}
 	else if(param == WebMVideoMethod)
 	{

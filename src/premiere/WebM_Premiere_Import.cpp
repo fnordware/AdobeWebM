@@ -1511,7 +1511,7 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
 				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
 				
-				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
 				
 				for(int x=0; x < img->d_w; x++)
 				{
