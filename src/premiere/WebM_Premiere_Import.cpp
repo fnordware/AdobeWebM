@@ -551,6 +551,21 @@ SDKOpenFile8(
 				}
 				
 				
+				// Load Cue Points
+				// For some reason the segment constuctor doesn't do this on its own
+				const mkvparser::Cues* const cues = localRecP->segment->GetCues();
+				
+				if(cues != NULL)
+				{
+					assert(cues->GetFirst() == NULL);
+					
+					while( !cues->DoneParsing() )
+						cues->LoadCuePoint();
+					
+					assert(cues->GetFirst() != NULL);
+				}
+				
+				
 				if(localRecP->video_track >= 0 && localRecP->vpx_setup == false)
 				{
 					const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
@@ -1661,17 +1676,39 @@ SDKGetSourceVideo(
 						
 						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
 						
-						pVideoTrack->Seek(tstamp, pSeekBlockEntry);
 						
-						// TODO: Any way I can seek with cues instead of a binary search through clusters?
-						//const mkvparser::Cues* cues = localRecP->segment->GetCues();
-
+						// If the file has Cues, we'll use them to seek.
+						// Expect to have one cue for each keyframe, and each keyframe
+						// should begin a new cluster.  This will not always be the case, though.
+						const mkvparser::Cues* const cues = localRecP->segment->GetCues();
+						
+						if(cues != NULL)
+						{
+							assert(cues->GetFirst() != NULL);
+						
+							const mkvparser::CuePoint* cue = NULL;
+							const mkvparser::CuePoint::TrackPosition *pTrackPos = NULL;
+							
+							const bool seek_success = cues->Find(tstamp, pVideoTrack, cue, pTrackPos);
+							
+							if(seek_success && cue != NULL && pTrackPos != NULL)
+							{
+								pSeekBlockEntry = cues->GetBlock(cue, pTrackPos);
+							}
+						}
+						
+						
+						// A more brute foce seek method that doesn't use cues
+						if(pSeekBlockEntry == NULL)
+							pVideoTrack->Seek(tstamp, pSeekBlockEntry);
+						
+						
 						if(pSeekBlockEntry != NULL)
 						{
 							const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
 
 							// The seek took us to this Cluster for a reason.
-							// It stars with a keyframe, although not necessarily the last keyframe before
+							// It should start with a keyframe, although not necessarily the last keyframe before
 							// the requested frame. I have to decode each frame starting with the keyframe,
 							// and then I continue afterwards until I decode the entire cluster.
 							// TODO: Maybe we should seek for keyframes within the cluster.
