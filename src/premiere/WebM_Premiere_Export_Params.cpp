@@ -1512,7 +1512,7 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 		
 		int i = 0;
 		
-		while(i < args.size())
+		while(i < (args.size() - 1))
 		{
 			const string &arg = args[i];
 			const string &val = args[i + 1];
@@ -1609,11 +1609,13 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 	
 	if(quotedTokenize(txt, args, " =\t\r\n") && args.size() > 0)
 	{
+		const int num_args = args.size();
+
 		args.push_back(""); // so there's always an i+1
 		
 		int i = 0;
 		
-		while(i < args.size())
+		while(i < num_args)
 		{
 			const string &arg = args[i];
 			const string &val = args[i + 1];
