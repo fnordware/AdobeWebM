@@ -463,6 +463,25 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &samplingParam);
 	
 	
+	// Bit Depth
+	exParamValues bitDepthValues;
+	bitDepthValues.structVersion = 1;
+	bitDepthValues.rangeMin.intValue = 8;
+	bitDepthValues.rangeMax.intValue = 12;
+	bitDepthValues.value.intValue = 8;
+	bitDepthValues.disabled = kPrTrue;
+	bitDepthValues.hidden = kPrFalse;
+	
+	exNewParamInfo bitDepthParam;
+	bitDepthParam.structVersion = 1;
+	strncpy(bitDepthParam.identifier, WebMVideoBitDepth, 255);
+	bitDepthParam.paramType = exParamType_int;
+	bitDepthParam.flags = exParamFlag_none;
+	bitDepthParam.paramValues = bitDepthValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &bitDepthParam);
+	
+	
 	// Version
 	exParamValues versionValues;
 	versionValues.structVersion = 1;
@@ -965,7 +984,31 @@ exSDKPostProcessParams(
 		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoSampling, &tempSamplingMethod, paramString);
 	}
 	
+
+	// Bit depth
+	utf16ncpy(paramString, "Bit depth", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMVideoBitDepth, paramString);
 	
+	
+	int vidBitDepth[] = {	VPX_BITS_8,
+							VPX_BITS_10,
+							VPX_BITS_12 };
+	
+	const char *vidBitDepthStrings[]	= {	"8-bit",
+											"10-bit",
+											"12-bit" };
+
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoBitDepth);
+	
+	exOneParamValueRec tempBitDepthMethod;
+	for(int i=0; i < 3; i++)
+	{
+		tempBitDepthMethod.intValue = vidBitDepth[i];
+		utf16ncpy(paramString, vidBitDepthStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoBitDepth, &tempBitDepthMethod, paramString);
+	}
+	
+
 	// Custom settings
 	utf16ncpy(paramString, "Custom settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, WebMCustomGroup, paramString);
@@ -1147,10 +1190,11 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, samplingP, videoQualityP, videoBitrateP, vidEncodingP;
+	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, vidEncodingP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
@@ -1284,6 +1328,13 @@ exSDKGetParamSummary(
 			stream3 << " 4:2:2";
 		else
 			stream3 << " 4:2:0";
+		
+		if(bitDepthP.value.intValue == VPX_BITS_10)
+			stream3 << " 10-bit";
+		else if(bitDepthP.value.intValue == VPX_BITS_12)
+			stream3 << " 12-bit";
+		else
+			stream3 << " 8-bit";
 	}
 	
 	if(vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME)
@@ -1339,14 +1390,16 @@ exSDKValidateParamChanged (
 	}
 	else if(param == WebMVideoCodec)
 	{
-		exParamValues codecValue, samplingValue;
+		exParamValues codecValue, samplingValue, bitDepthValue;
 		
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecValue);
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingValue);
+		paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
 		
-		samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
+		bitDepthValue.disabled = samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
 		
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoSampling, &samplingValue);
+		paramSuite->ChangeParam(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
 	}
 	else if(param == WebMVideoMethod)
 	{

@@ -429,6 +429,35 @@ Convert16to8(const unsigned short &v)
 	return ( (((long)(v) * 255) + 16384) / 32768);
 }
 
+// convert 8-bit to real 16-bit
+static inline unsigned short
+Convert8to16(const unsigned short &v)
+{
+	return ((v << 8) & v);
+}
+
+static inline unsigned short
+Convert8toN(const unsigned short &v, const int &depth)
+{
+	return (v << (depth - 8)) & (v >> (16 - depth));
+}
+
+// converting from Adobe 16-bit to regular 16-bit
+#define PF_HALF_CHAN16			16384
+
+static inline unsigned short
+Promote(const unsigned short &val)
+{
+	return (val > PF_HALF_CHAN16 ? ( (val - 1) << 1 ) + 1 : val << 1);
+}
+
+// assume we're starting from Adobe 16-bit
+static inline unsigned short
+Convert16toN(const unsigned short &val, const int &depth)
+{
+	return (Promote(val) >> (16 - depth));
+}
+
 
 static void
 CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuite, PrSDKPPix2Suite *pix2Suite)
@@ -447,6 +476,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 	if(pixFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 	{
 		assert(sub_x == 2 && sub_y == 2);
+		assert(img->bit_depth == 8);
 		
 		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
@@ -492,6 +522,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 		if(pixFormat == PrPixelFormat_UYVY_422_8u_601)
 		{
 			assert(sub_x == 2 && sub_y == 1);
+			assert(img->bit_depth == 8);
 			
 			for(int y = 0; y < img->d_h; y++)
 			{
@@ -515,6 +546,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 		else if(pixFormat == PrPixelFormat_VUYX_4444_8u)
 		{
 			assert(sub_x == 1 && sub_y == 1);
+			assert(img->bit_depth == 8);
 			
 			for(int y = 0; y < img->d_h; y++)
 			{
@@ -541,118 +573,262 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 				}
 			}
 		}
-		else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
+		else if(pixFormat == PrPixelFormat_VUYA_4444_16u)
 		{
-			// since we're doing an RGB to YUV conversion, it wouldn't hurt to have some extra bits
+			assert(img->bit_depth > 8);
 			
 			for(int y = 0; y < img->d_h; y++)
 			{
-				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+				unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+				unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+				unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
+			
+				unsigned short *prVUYA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
 				
-				unsigned short *prBGRA = (unsigned short *)((unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-				
-				unsigned short *prB = prBGRA + 0;
-				unsigned short *prG = prBGRA + 1;
-				unsigned short *prR = prBGRA + 2;
-				
-				// These are the pixels below the current one for MPEG-2 chroma siting
-				unsigned short *prBb = prB - (rowbytes / sizeof(unsigned short));
-				unsigned short *prGb = prG - (rowbytes / sizeof(unsigned short));
-				unsigned short *prRb = prR - (rowbytes / sizeof(unsigned short));
-				
-				// unless this is the last line and there is no pixel below
-				if(y == (img->d_h - 1) || sub_y != 2)
-				{
-					prBb = prB;
-					prGb = prG;
-					prRb = prR;
-				}
+				unsigned short *prV = prVUYA + 0;
+				unsigned short *prU = prVUYA + 1;
+				unsigned short *prY = prVUYA + 2;
+				unsigned short *prA = prVUYA + 3;
 				
 				for(int x=0; x < img->d_w; x++)
 				{
-					*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
+					*imgY++ = Convert16toN(*prY, img->bit_depth);
 					
-					if( (y % sub_y == 0) && (x % sub_x == 0) )
+					if(x % sub_x == 0)
 					{
-						*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
-												((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000 );
-						*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
-												(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000 );
+						*imgU++ = Convert16toN(*prU, img->bit_depth);
+						*imgV++ = Convert16toN(*prV, img->bit_depth);
 					}
 					
-					prR += 4;
-					prG += 4;
-					prB += 4;
+					prY += 4;
+					prU += 4;
+					prV += 4;
+				}
+			}
+		}
+		else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
+		{
+			if(img->bit_depth > 8)
+			{
+				for(int y = 0; y < img->d_h; y++)
+				{
+					unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+					unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+					unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
 					
-					prRb += 4;
-					prGb += 4;
-					prBb += 4;
+					unsigned short *prBGRA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+					
+					unsigned short *prB = prBGRA + 0;
+					unsigned short *prG = prBGRA + 1;
+					unsigned short *prR = prBGRA + 2;
+					
+					// These are the pixels below the current one for MPEG-2 chroma siting
+					unsigned short *prBb = prB - (rowbytes / sizeof(unsigned short));
+					unsigned short *prGb = prG - (rowbytes / sizeof(unsigned short));
+					unsigned short *prRb = prR - (rowbytes / sizeof(unsigned short));
+					
+					// unless this is the last line and there is no pixel below
+					if(y == (img->d_h - 1) || sub_y != 2)
+					{
+						prBb = prB;
+						prGb = prG;
+						prRb = prR;
+					}
+					
+					for(int x=0; x < img->d_w; x++)
+					{
+						*imgY++ = Convert16toN( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000, img->bit_depth);
+						
+						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						{
+							*imgV++ = Convert16toN( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
+												((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
+							*imgU++ = Convert16toN( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
+												(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
+						}
+						
+						prR += 4;
+						prG += 4;
+						prB += 4;
+						
+						prRb += 4;
+						prGb += 4;
+						prBb += 4;
+					}
+				}
+			}
+			else
+			{
+				for(int y = 0; y < img->d_h; y++)
+				{
+					unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+					unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+					unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+					
+					unsigned short *prBGRA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+					
+					unsigned short *prB = prBGRA + 0;
+					unsigned short *prG = prBGRA + 1;
+					unsigned short *prR = prBGRA + 2;
+					
+					// These are the pixels below the current one for MPEG-2 chroma siting
+					unsigned short *prBb = prB - (rowbytes / sizeof(unsigned short));
+					unsigned short *prGb = prG - (rowbytes / sizeof(unsigned short));
+					unsigned short *prRb = prR - (rowbytes / sizeof(unsigned short));
+					
+					// unless this is the last line and there is no pixel below
+					if(y == (img->d_h - 1) || sub_y != 2)
+					{
+						prBb = prB;
+						prGb = prG;
+						prRb = prR;
+					}
+					
+					for(int x=0; x < img->d_w; x++)
+					{
+						*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
+						
+						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						{
+							*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
+													((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000 );
+							*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
+													(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000 );
+						}
+						
+						prR += 4;
+						prG += 4;
+						prB += 4;
+						
+						prRb += 4;
+						prGb += 4;
+						prBb += 4;
+					}
 				}
 			}
 		}
 		else if(pixFormat == PrPixelFormat_BGRA_4444_8u || pixFormat == PrPixelFormat_ARGB_4444_8u)
 		{
-			// so here's our dumb RGB to YUV conversion
-
-			for(int y = 0; y < img->d_h; y++)
+			// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
+			
+			if(img->bit_depth > 8)
 			{
-				// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
-				
-				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-				
-				// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
-				unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-				
-				unsigned char *prB = prBGRA + 0;
-				unsigned char *prG = prBGRA + 1;
-				unsigned char *prR = prBGRA + 2;
-				
-				if(pixFormat == PrPixelFormat_ARGB_4444_8u)
+				for(int y = 0; y < img->d_h; y++)
 				{
-					// Media Encoder CS5 insists on handing us this format in some cases,
-					// even though we didn't list it as an option
-					prR = prBGRA + 1;
-					prG = prBGRA + 2;
-					prB = prBGRA + 3;
-				}
-				
-				// These are the pixels below the current one for MPEG-2 chroma siting
-				unsigned char *prBb = prB - rowbytes;
-				unsigned char *prGb = prG - rowbytes;
-				unsigned char *prRb = prR - rowbytes;
-				
-				// unless this is the last line and there is no pixel below
-				if(y == (img->d_h - 1) || sub_y != 2)
-				{
-					prBb = prB;
-					prGb = prG;
-					prRb = prR;
-				}
-				
-				for(int x=0; x < img->d_w; x++)
-				{
-					// like the clever integer (fixed point) math?
-					*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
+					unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+					unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+					unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
 					
-					if( (y % sub_y == 0) && (x % sub_x == 0) )
+					// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
+					unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+					
+					unsigned char *prB = prBGRA + 0;
+					unsigned char *prG = prBGRA + 1;
+					unsigned char *prR = prBGRA + 2;
+					
+					if(pixFormat == PrPixelFormat_ARGB_4444_8u)
 					{
-						*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
-									((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000;
-						*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
-									(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000;
+						// Media Encoder CS5 insists on handing us this format in some cases,
+						// even though we didn't list it as an option
+						prR = prBGRA + 1;
+						prG = prBGRA + 2;
+						prB = prBGRA + 3;
 					}
 					
-					prR += 4;
-					prG += 4;
-					prB += 4;
+					// These are the pixels below the current one for MPEG-2 chroma siting
+					unsigned char *prBb = prB - rowbytes;
+					unsigned char *prGb = prG - rowbytes;
+					unsigned char *prRb = prR - rowbytes;
 					
-					prRb += 4;
-					prGb += 4;
-					prBb += 4;
+					// unless this is the last line and there is no pixel below
+					if(y == (img->d_h - 1) || sub_y != 2)
+					{
+						prBb = prB;
+						prGb = prG;
+						prRb = prR;
+					}
+					
+					for(int x=0; x < img->d_w; x++)
+					{
+						// like the clever integer (fixed point) math?
+						*imgY++ = Convert8toN(((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000, img->bit_depth);
+						
+						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						{
+							*imgV++ = Convert8toN((((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
+										((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
+							*imgU++ = Convert8toN(((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
+										(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
+						}
+						
+						prR += 4;
+						prG += 4;
+						prB += 4;
+						
+						prRb += 4;
+						prGb += 4;
+						prBb += 4;
+					}
+				}
+			}
+			else
+			{
+				for(int y = 0; y < img->d_h; y++)
+				{
+					unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+					unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+					unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
+					
+					// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
+					unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
+					
+					unsigned char *prB = prBGRA + 0;
+					unsigned char *prG = prBGRA + 1;
+					unsigned char *prR = prBGRA + 2;
+					
+					if(pixFormat == PrPixelFormat_ARGB_4444_8u)
+					{
+						// Media Encoder CS5 insists on handing us this format in some cases,
+						// even though we didn't list it as an option
+						prR = prBGRA + 1;
+						prG = prBGRA + 2;
+						prB = prBGRA + 3;
+					}
+					
+					// These are the pixels below the current one for MPEG-2 chroma siting
+					unsigned char *prBb = prB - rowbytes;
+					unsigned char *prGb = prG - rowbytes;
+					unsigned char *prRb = prR - rowbytes;
+					
+					// unless this is the last line and there is no pixel below
+					if(y == (img->d_h - 1) || sub_y != 2)
+					{
+						prBb = prB;
+						prGb = prG;
+						prRb = prR;
+					}
+					
+					for(int x=0; x < img->d_w; x++)
+					{
+						// like the clever integer (fixed point) math?
+						*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
+						
+						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						{
+							*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
+										((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000;
+							*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
+										(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000;
+						}
+						
+						prR += 4;
+						prG += 4;
+						prB += 4;
+						
+						prRb += 4;
+						prGb += 4;
+						prBb += 4;
+					}
 				}
 			}
 		}
@@ -782,18 +958,20 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, samplingP, customArgsP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, samplingP, bitDepthP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
 	
 	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
 	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 	const WebM_Chroma_Sampling chroma = (use_vp9 ? (WebM_Chroma_Sampling)samplingP.value.intValue : WEBM_420);
+	const int bit_depth = (use_vp9 ? bitDepthP.value.intValue : 8);
 	
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
@@ -811,9 +989,13 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	
 	
-	const PrPixelFormat yuv_format = (chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
+	const PrPixelFormat yuv_format8 = (chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
 										chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
 										PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
+
+	const PrPixelFormat yuv_format16 = PrPixelFormat_VUYA_4444_16u; // only 16-bit YUV format
+	
+	const PrPixelFormat yuv_format = (bit_depth > 8 ? yuv_format16 : yuv_format8);
 	
 	SequenceRender_ParamsRec renderParms;
 	PrPixelFormat pixelFormats[] = { yuv_format,
@@ -909,9 +1091,18 @@ exSDKExport(
 			
 			// (only applies to VP9)
 			// Profile 0 is 4:2:0 only
-			// Profile 1 can do 4:4:4 and 4:2:2 and alpha
-			// Profile 2 can do 10- and 12-bit
-			config.g_profile = (chroma > WEBM_420 ? 1 : 0);
+			// Profile 1 can do 4:4:4 and 4:2:2
+			// Profile 2 can do 10- and 12-bit, 4:2:0 only
+			// Profile 3 can do 10- and 12-bit, 4:4:4 and 4:2:2
+			config.g_profile = (chroma > WEBM_420 ?
+									(bit_depth > 8 ? 3 : 2) :
+									(bit_depth > 8 ? 2 : 0) );
+			
+			config.g_bit_depth = (bit_depth == 12 ? VPX_BITS_12 :
+									bit_depth == 10 ? VPX_BITS_10 :
+									VPX_BITS_8);
+			
+			config.g_input_bit_depth = config.g_bit_depth;
 			
 			
 			if(method == WEBM_METHOD_QUALITY)
@@ -1578,24 +1769,28 @@ exSDKExport(
 									
 									
 									// see validate_img() and validate_config() in vp8_cx_iface.c and vp9_cx_iface.c
-									// TODO: use alpha and higher dit depth when libvpx supports it
-									// Right now (12 June 1014) libvpx is not accepting alpha or >8-bit worlds
-									// and vpx_img_alloc() in vpx_image.c isn't creating them properly.
-									const vpx_img_fmt_t imgfmt = chroma == WEBM_444 ? VPX_IMG_FMT_I444 :
+									const vpx_img_fmt_t imgfmt8 = chroma == WEBM_444 ? VPX_IMG_FMT_I444 :
 																	chroma == WEBM_422 ? VPX_IMG_FMT_I422 :
 																	VPX_IMG_FMT_I420;
+																	
+									const vpx_img_fmt_t imgfmt16 = chroma == WEBM_444 ? VPX_IMG_FMT_I44416 :
+																	chroma == WEBM_422 ? VPX_IMG_FMT_I42216 :
+																	VPX_IMG_FMT_I42016;
+																	
+									const vpx_img_fmt_t imgfmt = (bit_depth > 8 ? imgfmt16 : imgfmt8);
+									
 											
 									vpx_image_t img_data;
 									vpx_image_t *img = vpx_img_alloc(&img_data, imgfmt, width, height, 32);
 									
 									if(img)
 									{
-										const unsigned int sub_x = img->x_chroma_shift + 1;
-										const unsigned int sub_y = img->y_chroma_shift + 1;
-										
-										assert((sub_x == 2 && sub_y == 2) || (use_vp9 && chroma != WEBM_420 && encoder.config.enc->g_profile > 0));
-										
-										
+										if(bit_depth > 8)
+										{
+											img->bit_depth = bit_depth;
+											img->bps = img->bps * bit_depth / 16;
+										}
+									
 										CopyPixToImg(img, renderResult.outFrame, pixSuite, pix2Suite);
 										
 										

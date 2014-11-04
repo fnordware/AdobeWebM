@@ -1462,6 +1462,21 @@ SDKPreferredFrameSize(
 }
 
 
+// Convert regular 16-bit to Adobe 16-bit, max val 0x8000
+#define PF_MAX_CHAN16			32768
+
+static inline unsigned short
+Demote(const unsigned short &val)
+{
+	return (val > PF_MAX_CHAN16 ? ( (val - 1) >> 1 ) + 1 : val >> 1);
+}
+
+static inline unsigned short
+ConvertNto16(const unsigned short &val, int depth)
+{
+	return Demote((val << (16 - depth)) & (val >> ((depth * 2) - 16)));
+}
+
 static void
 CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPixSuite, PrSDKPPix2Suite *PPix2Suite)
 {
@@ -1474,6 +1489,7 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 	if(pix_format == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 	{
 		assert(sub_x == 2 && sub_y == 2);
+		assert(img->bit_depth == 8);
 
 		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
@@ -1519,6 +1535,7 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 		if(pix_format == PrPixelFormat_UYVY_422_8u_601)
 		{
 			assert(sub_x == 2 && sub_y == 1);
+			assert(img->bit_depth == 8);
 			
 			for(int y = 0; y < img->d_h; y++)
 			{
@@ -1542,6 +1559,7 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 		else if(pix_format == PrPixelFormat_VUYX_4444_8u)
 		{
 			assert(sub_x == 1 && sub_y == 1);
+			assert(img->bit_depth == 8);
 			
 			for(int y = 0; y < img->d_h; y++)
 			{
@@ -1560,6 +1578,41 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 					*prY = *imgY++;
 					*prU = *imgU++;
 					*prV = *imgV++;
+					
+					prY += 4;
+					prU += 4;
+					prV += 4;
+				}
+			}
+		}
+		else if(pix_format == PrPixelFormat_VUYA_4444_16u)
+		{
+			assert(img->bit_depth > 8);
+		
+			for(int y = 0; y < img->d_h; y++)
+			{
+				unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+				unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+				unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
+				
+				unsigned short *prVUYX = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+				
+				unsigned short *prV = prVUYX + 0;
+				unsigned short *prU = prVUYX + 1;
+				unsigned short *prY = prVUYX + 2;
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					*prY = ConvertNto16(*imgY++, img->bit_depth);
+					
+					if(x != 0 && (x % sub_x == 0))
+					{
+						imgU++;
+						imgV++;
+					}
+					
+					*prU = ConvertNto16(*imgU, img->bit_depth);
+					*prV = ConvertNto16(*imgV, img->bit_depth);
 					
 					prY += 4;
 					prU += 4;
@@ -1767,13 +1820,17 @@ SDKGetSourceVideo(
 													{
 														assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
 														assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
-														assert(img->fmt == VPX_IMG_FMT_I420 || img->fmt == VPX_IMG_FMT_I422 || img->fmt == VPX_IMG_FMT_I444);
 														assert( !pBlock->IsInvisible() );
 
 														
 														// apparently pix_format doesn't have to match frameFormat->inPixelFormat
 														const PrPixelFormat pix_format = img->fmt == VPX_IMG_FMT_I422 ? PrPixelFormat_UYVY_422_8u_601 :
+																							img->fmt == VPX_IMG_FMT_I440 ? PrPixelFormat_VUYX_4444_8u :
 																							img->fmt == VPX_IMG_FMT_I444 ? PrPixelFormat_VUYX_4444_8u :
+																							img->fmt == VPX_IMG_FMT_I42016 ? PrPixelFormat_VUYA_4444_16u :
+																							img->fmt == VPX_IMG_FMT_I42216 ? PrPixelFormat_VUYA_4444_16u :
+																							img->fmt == VPX_IMG_FMT_I44016 ? PrPixelFormat_VUYA_4444_16u :
+																							img->fmt == VPX_IMG_FMT_I44416 ? PrPixelFormat_VUYA_4444_16u :
 																							PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
 																							
 														PPixHand ppix;
