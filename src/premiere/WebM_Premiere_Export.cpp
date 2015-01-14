@@ -439,7 +439,7 @@ Convert8to16(const unsigned short &v)
 static inline unsigned short
 Convert8toN(const unsigned short &v, const int &depth)
 {
-	return (v << (depth - 8)) & (v >> (16 - depth));
+	return (v << (depth - 8)) | (v >> (16 - depth));
 }
 
 // converting from Adobe 16-bit to regular 16-bit
