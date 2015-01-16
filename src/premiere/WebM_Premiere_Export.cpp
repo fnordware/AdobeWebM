@@ -1095,7 +1095,7 @@ exSDKExport(
 			// Profile 2 can do 10- and 12-bit, 4:2:0 only
 			// Profile 3 can do 10- and 12-bit, 4:4:4 and 4:2:2
 			config.g_profile = (chroma > WEBM_420 ?
-									(bit_depth > 8 ? 3 : 2) :
+									(bit_depth > 8 ? 3 : 1) :
 									(bit_depth > 8 ? 2 : 0) );
 			
 			config.g_bit_depth = (bit_depth == 12 ? VPX_BITS_12 :
@@ -1722,8 +1722,6 @@ exSDKExport(
 						
 						if(!made_frame && result == suiteError_NoError)
 						{
-							assert(videoEncoderTime != LONG_LONG_MAX);
-							
 							// this is for the encoder, which does its own math based on config.g_timebase
 							// let's do the math
 							// time = timestamp * timebase :: time = videoTime / ticksPerSecond : timebase = 1 / fps
@@ -1742,8 +1740,12 @@ exSDKExport(
 							const vpx_codec_pts_t encoder_FrameNumber = encoder_fileTime / frameRateP.value.timeValue;
 							const unsigned long encoder_FrameDuration = 1;
 							
-							assert(encoder_FrameNumber == encoder_timeStamp); // will not be true for big time values (int64_t overflow)
-							assert(encoder_FrameDuration == encoder_duration);
+							// these asserts will not be true for big time values (int64_t overflow)
+							if(videoEncoderTime < LONG_MAX)
+							{
+								assert(encoder_FrameNumber == encoder_timeStamp);
+								assert(encoder_FrameDuration == encoder_duration);
+							}
 							
 				
 							if(videoEncoderTime < exportInfoP->endTime)
