@@ -971,8 +971,8 @@ exSDKExport(
 	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
 	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 	const WebM_Chroma_Sampling chroma = (use_vp9 ? (WebM_Chroma_Sampling)samplingP.value.intValue : WEBM_420);
-	const int bit_depth = (use_vp9 ? bitDepthP.value.intValue : 8);
-	
+	const int bit_depth = 8; //(use_vp9 ? bitDepthP.value.intValue : 8); // re-enable this when --enable-vp9-highbitdepth works
+
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
 	customArgs[255] = '\0';

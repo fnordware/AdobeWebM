@@ -1397,6 +1397,7 @@ exSDKValidateParamChanged (
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
 		
 		bitDepthValue.disabled = samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
+		bitDepthValue.disabled = kPrTrue; // get rid of this when --enable-vp9-highbitdepth works
 		
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoSampling, &samplingValue);
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
