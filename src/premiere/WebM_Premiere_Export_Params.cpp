@@ -1583,6 +1583,12 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 			else if(arg == "--resize-allowed")
 			{	SetValue(config.rc_resize_allowed, val); i++;	}
 			
+			else if(arg == "--resize-width")
+			{	SetValue(config.rc_scaled_width, val); i++;	}
+			
+			else if(arg == "--resize-height")
+			{	SetValue(config.rc_scaled_height, val); i++;	}
+			
 			else if(arg == "--resize-up")
 			{	SetValue(config.rc_resize_up_thresh, val); i++;	}
 			
@@ -1678,6 +1684,9 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			else if(arg == "--sharpness")
 			{	ConfigureValue(encoder, VP8E_SET_SHARPNESS, val); i++;	}
 
+			else if(arg == "--static-thresh")
+			{	ConfigureValue(encoder, VP8E_SET_STATIC_THRESHOLD, val); i++;	}
+
 			else if(arg == "--cpu-used")
 			{	ConfigureValue(encoder, VP8E_SET_CPUUSED, val); i++;	}
 
@@ -1718,6 +1727,12 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			else if(arg == "--max-intra-rate")
 			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, val); i++;	}
 
+			else if(arg == "--gf-cbr-boost")
+			{	ConfigureValue(encoder, VP8E_SET_GF_CBR_BOOST_PCT, val); i++;	}
+
+			else if(arg == "--screen-content-mode")
+			{	ConfigureValue(encoder, VP8E_SET_SCREEN_CONTENT_MODE, 1);	}
+			
 			else if(arg == "--lossless")
 			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, 1);	}
 			
