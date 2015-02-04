@@ -178,6 +178,19 @@ ncpyUTF16(char *dest, const prUTF16Char *src, int max_len)
 	}while(*c++ != '\0' && --max_len);
 }
 
+static int
+mylog2(int val)
+{
+	int ret = 0;
+	
+	while( pow(2, ret) < val )
+	{
+		ret++;
+	}
+	
+	return ret;
+}
+
 static prMALError
 exSDKStartup(
 	exportStdParms		*stdParmsP, 
@@ -1167,6 +1180,8 @@ exSDKExport(
 				
 					vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, cq_level);
 				}
+				
+				vpx_codec_control(&encoder, VP9E_SET_TILE_COLUMNS, mylog2(g_num_cpus)); // this gives us some multithreading
 			
 				ConfigureEncoderPost(&encoder, customArgs);
 			}
@@ -1398,7 +1413,7 @@ exSDKExport(
 				
 				time_t base = mktime(&date_utc_base);
 				
-				info->set_date_utc( (int64)difftime(time(NULL), base) * 1000000000L );
+				info->set_date_utc( (int64)difftime(time(NULL), base) * S2NS );
 				
 				
 				info->set_timecode_scale(timeCodeScale);
