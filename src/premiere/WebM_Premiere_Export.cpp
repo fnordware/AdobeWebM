@@ -48,6 +48,7 @@
 #else
 	#include <assert.h>
 	#include <time.h>
+	#include <math.h>
 
 	#define LONG_LONG_MAX LLONG_MAX
 #endif
@@ -183,7 +184,7 @@ mylog2(int val)
 {
 	int ret = 0;
 	
-	while( pow(2, ret) < val )
+	while( pow(2.0, ret) < val )
 	{
 		ret++;
 	}

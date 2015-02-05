@@ -25,7 +25,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -42,9 +41,9 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\..\..\..\ext\libvpx"
+				AdditionalIncludeDirectories="&quot;.&quot;;&quot;.\..\..\..\..\ext\libvpx&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -81,15 +80,14 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)x64\$(ConfigurationName)"
+			IntermediateDirectory="x64\$(ConfigurationName)\vpx"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -107,9 +105,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".;..\..\..\..\ext\libvpx"
+				AdditionalIncludeDirectories="&quot;.&quot;;&quot;.\..\..\..\..\ext\libvpx&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -151,7 +149,7 @@
 		<Filter
 			Name="Source Files"
 			Filter="c;cc;cpp;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="382060E6-B2C5-9252-8611-41F8E7994895"
+			UniqueIdentifier="70045505-942D-DD51-FF7B-06E2C8677218"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.c"
@@ -2390,26 +2388,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8\encoder\vp8_asm_enc_offsets.c"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp8_encoder_vp8_asm_enc_offsets.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp8_encoder_vp8_asm_enc_offsets.obj"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\x86\vp8_asm_stubs.c"
 				>
 				<FileConfiguration
@@ -2606,6 +2584,46 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)\vp9_common_x86_vp9_asm_stubs.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_avg.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_avg.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_avg.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_avg_intrin_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_avg_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_avg_intrin_sse2.obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2814,6 +2832,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_impl_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_impl_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_impl_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_mmx.asm"
 				>
 				<FileConfiguration
@@ -2854,6 +2892,26 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_ssse3.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3.obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3206,6 +3264,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_ethread.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_ethread.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_ethread.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.c"
 				>
 				<FileConfiguration
@@ -3522,6 +3600,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter_thread.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter_thread.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter_thread.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.c"
 				>
 				<FileConfiguration
@@ -3698,6 +3796,26 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)\vp9_encoder_vp9_quantize.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_quantize_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_quantize_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_quantize_sse2.obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -4578,7 +4696,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx.def"
+				RelativePath="vpx.def"
 				>
 			</File>
 			<File
@@ -4602,7 +4720,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\vpx_config.c"
+				RelativePath="vpx_config.c"
 				>
 				<FileConfiguration
 					Name="Debug|x64"
@@ -4742,26 +4860,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpx_scale_asm_offsets.c"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vpx_scale_vpx_scale_asm_offsets.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vpx_scale_vpx_scale_asm_offsets.obj"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale\vpx_scale_rtcd.c"
 				>
 				<FileConfiguration
@@ -4825,7 +4923,7 @@
 		<Filter
 			Name="Header Files"
 			Filter="h;hm;inl;inc;xsd"
-			UniqueIdentifier="1C7ABAD2-5F86-0287-7A9B-74BB35E289FB"
+			UniqueIdentifier="9CDCEEC9-D418-BBE6-1613-ECE4BEB5724A"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.h"
@@ -5096,7 +5194,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp8_rtcd.h"
+				RelativePath="vp8_rtcd.h"
 				>
 			</File>
 			<File
@@ -5156,6 +5254,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_dct.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_sse2.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\decoder\vp9_decodeframe.h"
 				>
 			</File>
@@ -5212,6 +5318,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_ethread.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_extend.h"
 				>
 			</File>
@@ -5245,6 +5355,10 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter_thread.h"
 				>
 			</File>
 			<File
@@ -5328,7 +5442,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp9_rtcd.h"
+				RelativePath="vp9_rtcd.h"
 				>
 			</File>
 			<File
@@ -5448,7 +5562,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale_rtcd.h"
+				RelativePath="vpx_scale_rtcd.h"
 				>
 			</File>
 			<File
@@ -5467,13 +5581,13 @@
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="CBE7738C-366C-67C3-AC53-F1F386DA0F81"
+			UniqueIdentifier="816B916E-102F-FB32-2B78-1315510D5220"
 			>
 		</Filter>
 		<Filter
 			Name="Build Files"
 			Filter="mk"
-			UniqueIdentifier="576B9DB3-1D0C-586E-21FB-A89B9DC815E1"
+			UniqueIdentifier="A69C55D7-3B85-44BD-7B0D-726ADF4447A2"
 			>
 			<File
 				RelativePath="libs.mk"
