@@ -131,9 +131,6 @@ void vp8_fast_quantize_b_sse2(struct block *, struct blockd *);
 void vp8_fast_quantize_b_ssse3(struct block *, struct blockd *);
 RTCD_EXTERN void (*vp8_fast_quantize_b)(struct block *, struct blockd *);
 
-void vp8_fast_quantize_b_pair_c(struct block *b1, struct block *b2, struct blockd *d1, struct blockd *d2);
-#define vp8_fast_quantize_b_pair vp8_fast_quantize_b_pair_c
-
 void vp8_filter_by_weight16x16_c(unsigned char *src, int src_stride, unsigned char *dst, int dst_stride, int src_weight);
 void vp8_filter_by_weight16x16_sse2(unsigned char *src, int src_stride, unsigned char *dst, int dst_stride, int src_weight);
 #define vp8_filter_by_weight16x16 vp8_filter_by_weight16x16_sse2
@@ -235,15 +232,6 @@ void vp8_post_proc_down_and_across_mb_row_c(unsigned char *src, unsigned char *d
 void vp8_post_proc_down_and_across_mb_row_sse2(unsigned char *src, unsigned char *dst, int src_pitch, int dst_pitch, int cols, unsigned char *flimits, int size);
 #define vp8_post_proc_down_and_across_mb_row vp8_post_proc_down_and_across_mb_row_sse2
 
-void vp8_quantize_mb_c(struct macroblock *);
-#define vp8_quantize_mb vp8_quantize_mb_c
-
-void vp8_quantize_mbuv_c(struct macroblock *);
-#define vp8_quantize_mbuv vp8_quantize_mbuv_c
-
-void vp8_quantize_mby_c(struct macroblock *);
-#define vp8_quantize_mby vp8_quantize_mby_c
-
 int vp8_refining_search_sad_c(struct macroblock *x, struct block *b, struct blockd *d, union int_mv *ref_mv, int sad_per_bit, int distance, struct variance_vtable *fn_ptr, int *mvcost[2], union int_mv *center_mv);
 int vp8_refining_search_sadx4(struct macroblock *x, struct block *b, struct blockd *d, union int_mv *ref_mv, int sad_per_bit, int distance, struct variance_vtable *fn_ptr, int *mvcost[2], union int_mv *center_mv);
 RTCD_EXTERN int (*vp8_refining_search_sad)(struct macroblock *x, struct block *b, struct blockd *d, union int_mv *ref_mv, int sad_per_bit, int distance, struct variance_vtable *fn_ptr, int *mvcost[2], union int_mv *center_mv);
@@ -252,9 +240,6 @@ void vp8_regular_quantize_b_c(struct block *, struct blockd *);
 void vp8_regular_quantize_b_sse2(struct block *, struct blockd *);
 void vp8_regular_quantize_b_sse4_1(struct block *, struct blockd *);
 RTCD_EXTERN void (*vp8_regular_quantize_b)(struct block *, struct blockd *);
-
-void vp8_regular_quantize_b_pair_c(struct block *b1, struct block *b2, struct blockd *d1, struct blockd *d2);
-#define vp8_regular_quantize_b_pair vp8_regular_quantize_b_pair_c
 
 unsigned int vp8_sad16x16_c(const unsigned char *src_ptr, int src_stride, const unsigned char *ref_ptr, int ref_stride, unsigned int max_sad);
 unsigned int vp8_sad16x16_mmx(const unsigned char *src_ptr, int src_stride, const unsigned char *ref_ptr, int ref_stride, unsigned int max_sad);

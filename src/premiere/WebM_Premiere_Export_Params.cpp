@@ -463,6 +463,25 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &samplingParam);
 	
 	
+	// Bit Depth
+	exParamValues bitDepthValues;
+	bitDepthValues.structVersion = 1;
+	bitDepthValues.rangeMin.intValue = 8;
+	bitDepthValues.rangeMax.intValue = 12;
+	bitDepthValues.value.intValue = 8;
+	bitDepthValues.disabled = kPrTrue;
+	bitDepthValues.hidden = kPrFalse;
+	
+	exNewParamInfo bitDepthParam;
+	bitDepthParam.structVersion = 1;
+	strncpy(bitDepthParam.identifier, WebMVideoBitDepth, 255);
+	bitDepthParam.paramType = exParamType_int;
+	bitDepthParam.flags = exParamFlag_none;
+	bitDepthParam.paramValues = bitDepthValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &bitDepthParam);
+	
+	
 	// Version
 	exParamValues versionValues;
 	versionValues.structVersion = 1;
@@ -965,7 +984,31 @@ exSDKPostProcessParams(
 		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoSampling, &tempSamplingMethod, paramString);
 	}
 	
+
+	// Bit depth
+	utf16ncpy(paramString, "Bit depth", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMVideoBitDepth, paramString);
 	
+	
+	int vidBitDepth[] = {	VPX_BITS_8,
+							VPX_BITS_10,
+							VPX_BITS_12 };
+	
+	const char *vidBitDepthStrings[]	= {	"8-bit",
+											"10-bit",
+											"12-bit" };
+
+	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoBitDepth);
+	
+	exOneParamValueRec tempBitDepthMethod;
+	for(int i=0; i < 3; i++)
+	{
+		tempBitDepthMethod.intValue = vidBitDepth[i];
+		utf16ncpy(paramString, vidBitDepthStrings[i], 255);
+		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoBitDepth, &tempBitDepthMethod, paramString);
+	}
+	
+
 	// Custom settings
 	utf16ncpy(paramString, "Custom settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, WebMCustomGroup, paramString);
@@ -1147,10 +1190,11 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, samplingP, videoQualityP, videoBitrateP, vidEncodingP;
+	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, vidEncodingP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
@@ -1284,6 +1328,13 @@ exSDKGetParamSummary(
 			stream3 << " 4:2:2";
 		else
 			stream3 << " 4:2:0";
+		
+		if(bitDepthP.value.intValue == VPX_BITS_10)
+			stream3 << " 10-bit";
+		else if(bitDepthP.value.intValue == VPX_BITS_12)
+			stream3 << " 12-bit";
+		else
+			stream3 << " 8-bit";
 	}
 	
 	if(vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME)
@@ -1339,14 +1390,17 @@ exSDKValidateParamChanged (
 	}
 	else if(param == WebMVideoCodec)
 	{
-		exParamValues codecValue, samplingValue;
+		exParamValues codecValue, samplingValue, bitDepthValue;
 		
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecValue);
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingValue);
+		paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
 		
-		samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
+		bitDepthValue.disabled = samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
+		bitDepthValue.disabled = kPrTrue; // get rid of this when --enable-vp9-highbitdepth works
 		
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoSampling, &samplingValue);
+		paramSuite->ChangeParam(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
 	}
 	else if(param == WebMVideoMethod)
 	{
@@ -1531,6 +1585,12 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 			else if(arg == "--resize-allowed")
 			{	SetValue(config.rc_resize_allowed, val); i++;	}
 			
+			else if(arg == "--resize-width")
+			{	SetValue(config.rc_scaled_width, val); i++;	}
+			
+			else if(arg == "--resize-height")
+			{	SetValue(config.rc_scaled_height, val); i++;	}
+			
 			else if(arg == "--resize-up")
 			{	SetValue(config.rc_resize_up_thresh, val); i++;	}
 			
@@ -1628,6 +1688,9 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			else if(arg == "--sharpness")
 			{	ConfigureValue(encoder, VP8E_SET_SHARPNESS, val); i++;	}
 
+			else if(arg == "--static-thresh")
+			{	ConfigureValue(encoder, VP8E_SET_STATIC_THRESHOLD, val); i++;	}
+
 			else if(arg == "--cpu-used")
 			{	ConfigureValue(encoder, VP8E_SET_CPUUSED, val); i++;	}
 
@@ -1668,6 +1731,12 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			else if(arg == "--max-intra-rate")
 			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, val); i++;	}
 
+			else if(arg == "--gf-cbr-boost")
+			{	ConfigureValue(encoder, VP8E_SET_GF_CBR_BOOST_PCT, val); i++;	}
+
+			else if(arg == "--screen-content-mode")
+			{	ConfigureValue(encoder, VP8E_SET_SCREEN_CONTENT_MODE, 1);	}
+			
 			else if(arg == "--lossless")
 			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, 1);	}
 			

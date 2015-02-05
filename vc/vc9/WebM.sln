@@ -11,11 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebM", "WebM_Premiere.vcpro
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vpx", "ext\libvpx_build\vpx.vcproj", "{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E1360C65-D375-4335-8057-7ED99CC3F9B2} = {E1360C65-D375-4335-8057-7ED99CC3F9B2}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "obj_int_extract", "ext\libvpx_build\obj_int_extract.vcproj", "{E1360C65-D375-4335-8057-7ED99CC3F9B2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "..\..\ext\libogg\win32\VS2008\libogg_static.vcproj", "{15CBFEFF-7965-41F5-B4E2-21E8795C9159}"
 EndProject
@@ -39,10 +34,6 @@ Global
 		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Debug|x64.Build.0 = Debug|x64
 		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Release|x64.ActiveCfg = Release|x64
 		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Release|x64.Build.0 = Release|x64
-		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Debug|x64.ActiveCfg = Debug|x64
-		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Debug|x64.Build.0 = Debug|x64
-		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Release|x64.ActiveCfg = Release|x64
-		{E1360C65-D375-4335-8057-7ED99CC3F9B2}.Release|x64.Build.0 = Release|x64
 		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.ActiveCfg = Debug|x64
 		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.Build.0 = Debug|x64
 		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.ActiveCfg = Release|x64
