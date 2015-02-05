@@ -1007,7 +1007,7 @@ exSDKExport(
 										chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
 										PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
 
-	const PrPixelFormat yuv_format16 = PrPixelFormat_VUYA_4444_16u; // only 16-bit YUV format
+	const PrPixelFormat yuv_format16 = PrPixelFormat_BGRA_4444_16u; // can't trust PrPixelFormat_VUYA_4444_16u, only 16-bit YUV format
 	
 	const PrPixelFormat yuv_format = (bit_depth > 8 ? yuv_format16 : yuv_format8);
 	
