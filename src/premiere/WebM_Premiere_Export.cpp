@@ -1410,7 +1410,7 @@ exSDKExport(
 								{
 									for(int c=0; c < audioChannels; c++)
 									{
-										opus_buffer[(i * audioChannels) + swizzle[c]] = pr_audio_buffer[c][i];
+										opus_buffer[(i * audioChannels) + c] = pr_audio_buffer[swizzle[c]][i];
 									}
 								}
 								
@@ -1524,7 +1524,7 @@ exSDKExport(
 									{
 										for(int i=0; i < samples; i++)
 										{
-											buffer[swizzle[c]][i] = pr_audio_buffer[c][i];
+											buffer[c][i] = pr_audio_buffer[swizzle[c]][i];
 										}
 									}
 								}

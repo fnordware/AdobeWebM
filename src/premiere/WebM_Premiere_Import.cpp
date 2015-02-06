@@ -2198,7 +2198,7 @@ SDKImportAudio7(
 																// how nice, audio samples are float, just like Premiere wants 'em
 																for(int c=0; c < localRecP->numChannels && samples_to_copy > 0; c++)
 																{
-																	memcpy(audioRec7->buffer[swizzle[c]] + samples_copied, pcm[c] + packet_offset, samples_to_copy * sizeof(float));
+																	memcpy(audioRec7->buffer[c] + samples_copied, pcm[swizzle[c]] + packet_offset, samples_to_copy * sizeof(float));
 																}
 																
 																// now samples_to_copy is more like samples_I_just_copied
@@ -2339,7 +2339,7 @@ SDKImportAudio7(
 														{
 															for(int c=0; c < localRecP->numChannels; c++)
 															{
-																audioRec7->buffer[swizzle[c]][samples_copied + i] = interleaved_buffer[((i + packet_offset) * localRecP->numChannels) + c];
+																audioRec7->buffer[c][samples_copied + i] = interleaved_buffer[((i + packet_offset) * localRecP->numChannels) + swizzle[c]];
 															}
 														}
 														
