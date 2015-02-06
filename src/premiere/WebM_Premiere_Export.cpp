@@ -1027,7 +1027,12 @@ exSDKExport(
 					vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, cq_level);
 				}
 				
-				vpx_codec_control(&encoder, VP9E_SET_TILE_COLUMNS, mylog2(g_num_cpus)); // this gives us some multithreading
+				if(use_vp9)
+				{
+					vpx_codec_control(&encoder, VP8E_SET_CPUUSED, 2); // much faster if we do this
+					
+					vpx_codec_control(&encoder, VP9E_SET_TILE_COLUMNS, mylog2(g_num_cpus)); // this gives us some multithreading
+				}
 			
 				ConfigureEncoderPost(&encoder, customArgs);
 			}
