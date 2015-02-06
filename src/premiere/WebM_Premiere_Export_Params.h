@@ -69,12 +69,7 @@ typedef enum {
 } WebM_Chroma_Sampling;
 
 
-#define ADBEVideoAlpha		"ADBEVideoAlpha"
-
-
 #define WebMPluginVersion	"WebMPluginVersion"
-
-#define ADBEVideoMatchSource "ADBEVideoMatchSource"
 
 #define WebMVideoCodec		"WebMVideoCodec"
 #define WebMVideoMethod		"WebMVideoMethod"

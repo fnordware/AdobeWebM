@@ -76,7 +76,6 @@ exSDKQueryOutputSettings(
 								frameRate,
 								pixelAspectRatio,
 								fieldType,
-								//alpha,
 								methodP,
 								videoQualityP,
 								videoBitrateP,
@@ -125,8 +124,6 @@ exSDKQueryOutputSettings(
 		}
 		else
 			videoBitrate += videoBitrateP.value.intValue;
-		
-		//paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoAlpha, &alpha);
 	}
 	
 	if(outputSettingsP->inExportAudio)
@@ -212,23 +209,6 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParamGroup(exID, gIdx,
 									ADBEVideoTabGroup, ADBEBasicVideoGroup, groupString,
 									kPrFalse, kPrFalse, kPrFalse);
-	
-	// Match source
-	exParamValues matchSourceValues;
-	matchSourceValues.structVersion = 1;
-	matchSourceValues.value.intValue = kPrFalse;
-	matchSourceValues.disabled = kPrFalse;
-	matchSourceValues.hidden = kPrFalse;
-	
-	exNewParamInfo matchSourceParam;
-	matchSourceParam.structVersion = 1;
-	strncpy(matchSourceParam.identifier, ADBEVideoMatchSource, 255);
-	matchSourceParam.paramType = exParamType_bool;
-	matchSourceParam.flags = exParamFlag_none;
-	matchSourceParam.paramValues = matchSourceValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &matchSourceParam);
-	
 	
 	// width
 	exParamValues widthValues;
@@ -326,23 +306,6 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &fpsParam);
 
 
-	// Alpha channel
-	exParamValues alphaValues;
-	alphaValues.structVersion = 1;
-	alphaValues.value.intValue = kPrFalse;
-	alphaValues.disabled = kPrFalse;
-	alphaValues.hidden = kPrFalse;
-	
-	exNewParamInfo alphaParam;
-	alphaParam.structVersion = 1;
-	strncpy(alphaParam.identifier, ADBEVideoAlpha, 255);
-	alphaParam.paramType = exParamType_bool;
-	alphaParam.flags = exParamFlag_none;
-	alphaParam.paramValues = alphaValues;
-	
-	//exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &alphaParam);
-
-	
 	// Video Codec Settings Group
 	utf16ncpy(groupString, "Codec settings", 255);
 	exportParamSuite->AddParamGroup(exID, gIdx,
@@ -720,11 +683,6 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicVideoGroup, paramString);
 	
 									
-	// Match source
-	utf16ncpy(paramString, "Match source", 255);
-	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoMatchSource, paramString);
-	
-	
 	// width
 	utf16ncpy(paramString, "Width", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoWidth, paramString);
@@ -853,11 +811,6 @@ exSDKPostProcessParams(
 		utf16ncpy(paramString, frameRateStrings[i], 255);
 		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEVideoFPS, &tempFrameRate, paramString);
 	}
-	
-	
-	// Alpha channel
-	utf16ncpy(paramString, "Include Alpha Channel", 255);
-	//exportParamSuite->SetParamName(exID, gIdx, ADBEVideoAlpha, paramString);
 	
 	
 	// Video codec settings
@@ -1179,12 +1132,11 @@ exSDKGetParamSummary(
 	csSDK_int32		gIdx	= 0;
 	
 	// Standard settings
-	exParamValues width, height, frameRate, alpha;
+	exParamValues width, height, frameRate;
 	
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &width);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &height);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRate);
-	//paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoAlpha, &alpha);
 	
 	exParamValues sampleRateP, channelTypeP;
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
@@ -1255,8 +1207,6 @@ exSDKGetParamSummary(
 	
 	if(frame_rate_index >= 0 && frame_rate_index < 12) 
 		stream1 << ", " << frameRateStrings[frame_rate_index] << " fps";
-	
-	//stream1 << ", " << (alpha.value.intValue ? "Alpha" : "No Alpha");
 	
 	summary1 = stream1.str();
 	
@@ -1367,28 +1317,7 @@ exSDKValidateParamChanged (
 	
 	std::string param = validateParamChangedRecP->changedParamIdentifier;
 	
-	if(param == ADBEVideoMatchSource)
-	{
-		exParamValues matchSourceP, widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
-		
-		paramSuite->GetParamValue(exID, gIdx, ADBEVideoMatchSource, &matchSourceP);
-		paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
-		paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
-		paramSuite->GetParamValue(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
-		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
-		paramSuite->GetParamValue(exID, gIdx, ADBEVideoFPS, &frameRateP);
-		
-		bool disabled = (matchSourceP.value.intValue != 0);
-		
-		widthP.disabled = heightP.disabled = pixelAspectRatioP.disabled = fieldTypeP.disabled = frameRateP.disabled = disabled;
-		
-		paramSuite->ChangeParam(exID, gIdx, ADBEVideoWidth, &widthP);
-		paramSuite->ChangeParam(exID, gIdx, ADBEVideoHeight, &heightP);
-		paramSuite->ChangeParam(exID, gIdx, ADBEVideoAspect, &pixelAspectRatioP);
-		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFieldType, &fieldTypeP);
-		paramSuite->ChangeParam(exID, gIdx, ADBEVideoFPS, &frameRateP);
-	}
-	else if(param == WebMVideoCodec)
+	if(param == WebMVideoCodec)
 	{
 		exParamValues codecValue, samplingValue, bitDepthValue;
 		
