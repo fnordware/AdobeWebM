@@ -494,11 +494,11 @@ CopyVUYAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowb
 		IMG_PIX *imgU = (IMG_PIX *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
 		IMG_PIX *imgV = (IMG_PIX *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
 	
-		VUYA_PIX *prVUYA = (VUYA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+		const VUYA_PIX *prVUYA = (VUYA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
 		
-		VUYA_PIX *prV = prVUYA + 0;
-		VUYA_PIX *prU = prVUYA + 1;
-		VUYA_PIX *prY = prVUYA + 2;
+		const VUYA_PIX *prV = prVUYA + 0;
+		const VUYA_PIX *prU = prVUYA + 1;
+		const VUYA_PIX *prY = prVUYA + 2;
 		
 		for(int x=0; x < img->d_w; x++)
 		{
@@ -632,7 +632,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 		{
 			unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
 			
-			unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+			const unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
 			
 			memcpy(imgY, prY, img->d_w * sizeof(unsigned char));
 		}
@@ -645,8 +645,8 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 			unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
 			unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
 			
-			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+			const unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+			const unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
 			
 			memcpy(imgU, prU, chroma_width * sizeof(unsigned char));
 			memcpy(imgV, prV, chroma_width * sizeof(unsigned char));
@@ -672,7 +672,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
 				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
 			
-				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
+				const unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
 				
 				for(int x=0; x < img->d_w; x++)
 				{
