@@ -1474,8 +1474,8 @@ Clamp16(const int &val)
 }
 
 
-template <typename IMG_PIX, typename VUVA_PIX>
-static inline VUVA_PIX
+template <typename IMG_PIX, typename VUYA_PIX>
+static inline VUYA_PIX
 ConvertDepth(const IMG_PIX &val, const int &depth);
 
 template<>
@@ -1501,7 +1501,7 @@ ConvertDepth<unsigned char, unsigned char>(const unsigned char &val, const int &
 }
 
 
-template <typename IMG_PIX, typename VUVA_PIX>
+template <typename IMG_PIX, typename VUYA_PIX>
 static void
 CopyImgToVUYA(const vpx_image_t * const img, char *frameBufferP, csSDK_int32 rowbytes)
 {
@@ -1516,16 +1516,16 @@ CopyImgToVUYA(const vpx_image_t * const img, char *frameBufferP, csSDK_int32 row
 		IMG_PIX *imgU = (IMG_PIX *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
 		IMG_PIX *imgV = (IMG_PIX *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
 		
-		VUVA_PIX *prVUYX = (VUVA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+		VUYA_PIX *prVUYX = (VUYA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
 		
-		VUVA_PIX *prV = prVUYX + 0;
-		VUVA_PIX *prU = prVUYX + 1;
-		VUVA_PIX *prY = prVUYX + 2;
-		VUVA_PIX *prA = prVUYX + 3;
+		VUYA_PIX *prV = prVUYX + 0;
+		VUYA_PIX *prU = prVUYX + 1;
+		VUYA_PIX *prY = prVUYX + 2;
+		VUYA_PIX *prA = prVUYX + 3;
 		
 		for(int x=0; x < img->d_w; x++)
 		{
-			*prY = ConvertDepth<IMG_PIX, VUVA_PIX>(*imgY++, img->bit_depth);
+			*prY = ConvertDepth<IMG_PIX, VUYA_PIX>(*imgY++, img->bit_depth);
 			
 			if(x != 0 && (x % sub_x == 0))
 			{
@@ -1533,9 +1533,9 @@ CopyImgToVUYA(const vpx_image_t * const img, char *frameBufferP, csSDK_int32 row
 				imgV++;
 			}
 			
-			*prU = ConvertDepth<IMG_PIX, VUVA_PIX>(*imgU, img->bit_depth);
-			*prV = ConvertDepth<IMG_PIX, VUVA_PIX>(*imgV, img->bit_depth);
-			*prA = ConvertDepth<unsigned short, VUVA_PIX>(255, 8);
+			*prU = ConvertDepth<IMG_PIX, VUYA_PIX>(*imgU, img->bit_depth);
+			*prV = ConvertDepth<IMG_PIX, VUYA_PIX>(*imgV, img->bit_depth);
+			*prA = ConvertDepth<unsigned short, VUYA_PIX>(255, 8);
 			
 			prY += 4;
 			prU += 4;
