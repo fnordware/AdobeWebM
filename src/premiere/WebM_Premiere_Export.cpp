@@ -436,26 +436,6 @@ static void get_framerate(PrTime ticksPerSecond, PrTime ticks_per_frame, exRatio
 }
 
 
-// converting from the Adobe 16-bit, i.e. max_val is 0x8000
-static inline unsigned char
-Convert16to8(const unsigned short &v)
-{
-	return ( (((long)(v) * 255) + 16384) / 32768);
-}
-
-// convert 8-bit to real 16-bit
-static inline unsigned short
-Convert8to16(const unsigned short &v)
-{
-	return ((v << 8) & v);
-}
-
-static inline unsigned short
-Convert8toN(const unsigned short &v, const int &depth)
-{
-	return (v << (depth - 8)) | (v >> (16 - depth));
-}
-
 // converting from Adobe 16-bit to regular 16-bit
 #define PF_HALF_CHAN16			16384
 
@@ -465,11 +445,159 @@ Promote(const unsigned short &val)
 	return (val > PF_HALF_CHAN16 ? ( (val - 1) << 1 ) + 1 : val << 1);
 }
 
-// assume we're starting from Adobe 16-bit
+
+template <typename BGRA_PIX, typename IMG_PIX>
+static inline IMG_PIX
+DepthConvert(const BGRA_PIX &val, const int &depth);
+
+template<>
 static inline unsigned short
-Convert16toN(const unsigned short &val, const int &depth)
+DepthConvert<unsigned short, unsigned short>(const unsigned short &val, const int &depth)
 {
 	return (Promote(val) >> (16 - depth));
+}
+
+template<>
+static inline unsigned short
+DepthConvert<unsigned char, unsigned short>(const unsigned char &val, const int &depth)
+{
+	return (val << (depth - 8)) | (val >> (16 - depth));
+}
+
+template<>
+static inline unsigned char
+DepthConvert<unsigned short, unsigned char>(const unsigned short &val, const int &depth)
+{
+	assert(depth == 8);
+	return ( (((long)(val) * 255) + 16384) / 32768);
+}
+
+template<>
+static inline unsigned char
+DepthConvert<unsigned char, unsigned char>(const unsigned char &val, const int &depth)
+{
+	assert(depth == 8);
+	return val;
+}
+
+
+template <typename VUYA_PIX, typename IMG_PIX>
+static void
+CopyVUYAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowbytes)
+{
+	const unsigned int sub_x = img->x_chroma_shift + 1;
+	const unsigned int sub_y = img->y_chroma_shift + 1;
+	
+	for(int y = 0; y < img->d_h; y++)
+	{
+		IMG_PIX *imgY = (IMG_PIX *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+		IMG_PIX *imgU = (IMG_PIX *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+		IMG_PIX *imgV = (IMG_PIX *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
+	
+		VUYA_PIX *prVUYA = (VUYA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+		
+		VUYA_PIX *prV = prVUYA + 0;
+		VUYA_PIX *prU = prVUYA + 1;
+		VUYA_PIX *prY = prVUYA + 2;
+		
+		for(int x=0; x < img->d_w; x++)
+		{
+			*imgY++ = DepthConvert<VUYA_PIX, IMG_PIX>(*prY, img->bit_depth);
+			
+			if( (y % sub_y == 0) && (x % sub_x == 0) )
+			{
+				*imgU++ = DepthConvert<VUYA_PIX, IMG_PIX>(*prU, img->bit_depth);
+				*imgV++ = DepthConvert<VUYA_PIX, IMG_PIX>(*prV, img->bit_depth);
+			}
+			
+			prY += 4;
+			prU += 4;
+			prV += 4;
+		}
+	}
+}
+
+
+template <typename BGRA_PIX, typename IMG_PIX, bool isARGB>
+static void
+CopyBGRAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowbytes)
+{
+	const unsigned int sub_x = img->x_chroma_shift + 1;
+	const unsigned int sub_y = img->y_chroma_shift + 1;
+
+	for(int y = 0; y < img->d_h; y++)
+	{
+		IMG_PIX *imgY = (IMG_PIX *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+		IMG_PIX *imgU = (IMG_PIX *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+		IMG_PIX *imgV = (IMG_PIX *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
+		
+		const BGRA_PIX *prBGRA = (BGRA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+		
+		const BGRA_PIX *prB = prBGRA + 0;
+		const BGRA_PIX *prG = prBGRA + 1;
+		const BGRA_PIX *prR = prBGRA + 2;
+		
+		if(isARGB)
+		{
+			// Media Encoder CS5 insists on handing us this format in some cases,
+			// even though we didn't list it as an option
+			prR = prBGRA + 1;
+			prG = prBGRA + 2;
+			prB = prBGRA + 3;
+		}
+		
+		// These are the pixels below the current one for MPEG-2 chroma siting
+		const BGRA_PIX *prBb = prB - (rowbytes / sizeof(BGRA_PIX));
+		const BGRA_PIX *prGb = prG - (rowbytes / sizeof(BGRA_PIX));
+		const BGRA_PIX *prRb = prR - (rowbytes / sizeof(BGRA_PIX));
+		
+		// unless this is the last line and there is no pixel below
+		if(y == (img->d_h - 1) || sub_y != 2)
+		{
+			prBb = prB;
+			prGb = prG;
+			prRb = prR;
+		}
+		
+		
+		// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
+		
+		// these are part of the RGBtoYUV math (uses Adobe 16-bit)
+		const int Yadd = (sizeof(BGRA_PIX) > 1 ? 2056500 : 16500);    // to be divided by 1000
+		const int UVadd = (sizeof(BGRA_PIX) > 1 ? 16449500 : 128500); // includes extra 500 for rounding
+		
+		for(int x=0; x < img->d_w; x++)
+		{
+			*imgY++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + Yadd) / 1000, img->bit_depth);
+			
+			if(sub_y > 1)
+			{
+				if( (y % sub_y == 0) && (x % sub_x == 0) )
+				{
+					*imgV++ = DepthConvert<BGRA_PIX, IMG_PIX>( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + UVadd) +
+										((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + UVadd)) / 2000, img->bit_depth);
+					*imgU++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + UVadd) +
+										(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + UVadd)) / 2000, img->bit_depth);
+				}
+				
+				prRb += 4;
+				prGb += 4;
+				prBb += 4;
+			}
+			else
+			{
+				if(x % sub_x == 0)
+				{
+					*imgV++ = DepthConvert<BGRA_PIX, IMG_PIX>( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + UVadd)) / 1000, img->bit_depth);
+					*imgU++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + UVadd) ) / 1000, img->bit_depth);
+				}
+			}
+			
+			prR += 4;
+			prG += 4;
+			prB += 4;
+		}
+	}
 }
 
 
@@ -562,333 +690,34 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 			assert(sub_x == 1 && sub_y == 1);
 			assert(img->bit_depth == 8);
 			
-			for(int y = 0; y < img->d_h; y++)
-			{
-				unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-				unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-				unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-			
-				unsigned char *prVUYA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-				
-				unsigned char *prV = prVUYA + 0;
-				unsigned char *prU = prVUYA + 1;
-				unsigned char *prY = prVUYA + 2;
-				unsigned char *prA = prVUYA + 3;
-				
-				for(int x=0; x < img->d_w; x++)
-				{
-					*imgY++ = *prY;
-					*imgU++ = *prU;
-					*imgV++ = *prV;
-					
-					prY += 4;
-					prU += 4;
-					prV += 4;
-				}
-			}
+			CopyVUYAToImg<unsigned char, unsigned char>(img, frameBufferP, rowbytes);
 		}
 		else if(pixFormat == PrPixelFormat_VUYA_4444_16u)
 		{
 			assert(img->bit_depth > 8);
 			
-			for(int y = 0; y < img->d_h; y++)
-			{
-				unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
-				unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
-				unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
-			
-				unsigned short *prVUYA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-				
-				unsigned short *prV = prVUYA + 0;
-				unsigned short *prU = prVUYA + 1;
-				unsigned short *prY = prVUYA + 2;
-				unsigned short *prA = prVUYA + 3;
-				
-				for(int x=0; x < img->d_w; x++)
-				{
-					*imgY++ = Convert16toN(*prY, img->bit_depth);
-					
-					if(x % sub_x == 0)
-					{
-						*imgU++ = Convert16toN(*prU, img->bit_depth);
-						*imgV++ = Convert16toN(*prV, img->bit_depth);
-					}
-					
-					prY += 4;
-					prU += 4;
-					prV += 4;
-				}
-			}
+			CopyVUYAToImg<unsigned short, unsigned short>(img, frameBufferP, rowbytes);
 		}
 		else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
 		{
 			if(img->bit_depth > 8)
-			{
-				for(int y = 0; y < img->d_h; y++)
-				{
-					unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
-					unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
-					unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
-					
-					unsigned short *prBGRA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-					
-					unsigned short *prB = prBGRA + 0;
-					unsigned short *prG = prBGRA + 1;
-					unsigned short *prR = prBGRA + 2;
-					
-					// These are the pixels below the current one for MPEG-2 chroma siting
-					unsigned short *prBb = prB - (rowbytes / sizeof(unsigned short));
-					unsigned short *prGb = prG - (rowbytes / sizeof(unsigned short));
-					unsigned short *prRb = prR - (rowbytes / sizeof(unsigned short));
-					
-					// unless this is the last line and there is no pixel below
-					if(y == (img->d_h - 1) || sub_y != 2)
-					{
-						prBb = prB;
-						prGb = prG;
-						prRb = prR;
-					}
-					
-					for(int x=0; x < img->d_w; x++)
-					{
-						*imgY++ = Convert16toN( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000, img->bit_depth);
-						
-						if(sub_y > 1)
-						{
-							if( (y % sub_y == 0) && (x % sub_x == 0) )
-							{
-								*imgV++ = Convert16toN( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
-													((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
-								*imgU++ = Convert16toN( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
-													(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
-							}
-							
-							prRb += 4;
-							prGb += 4;
-							prBb += 4;
-						}
-						else
-						{
-							if(x % sub_x == 0)
-							{
-								*imgV++ = Convert16toN( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500)) / 1000, img->bit_depth);
-								*imgU++ = Convert16toN( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) ) / 1000, img->bit_depth);
-							}
-						}
-						
-						prR += 4;
-						prG += 4;
-						prB += 4;
-					}
-				}
-			}
+				CopyBGRAToImg<unsigned short, unsigned short, false>(img, frameBufferP, rowbytes);
 			else
-			{
-				for(int y = 0; y < img->d_h; y++)
-				{
-					unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-					unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-					unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-					
-					unsigned short *prBGRA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-					
-					unsigned short *prB = prBGRA + 0;
-					unsigned short *prG = prBGRA + 1;
-					unsigned short *prR = prBGRA + 2;
-					
-					// These are the pixels below the current one for MPEG-2 chroma siting
-					unsigned short *prBb = prB - (rowbytes / sizeof(unsigned short));
-					unsigned short *prGb = prG - (rowbytes / sizeof(unsigned short));
-					unsigned short *prRb = prR - (rowbytes / sizeof(unsigned short));
-					
-					// unless this is the last line and there is no pixel below
-					if(y == (img->d_h - 1) || sub_y != 2)
-					{
-						prBb = prB;
-						prGb = prG;
-						prRb = prR;
-					}
-					
-					for(int x=0; x < img->d_w; x++)
-					{
-						*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
-						
-						if(sub_y > 1)
-						{
-							if( (y % sub_y == 0) && (x % sub_x == 0) )
-							{
-								*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
-														((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000 );
-								*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
-														(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000 );
-							}
-							
-							prRb += 4;
-							prGb += 4;
-							prBb += 4;
-						}
-						else
-						{
-							if(x % sub_x == 0)
-							{
-								*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500)) / 1000 );
-								*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500)) / 1000 );
-							}
-						}
-						
-						prR += 4;
-						prG += 4;
-						prB += 4;
-					}
-				}
-			}
+				CopyBGRAToImg<unsigned short, unsigned char, false>(img, frameBufferP, rowbytes);
 		}
-		else if(pixFormat == PrPixelFormat_BGRA_4444_8u || pixFormat == PrPixelFormat_ARGB_4444_8u)
+		else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
 		{
-			// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
-			
 			if(img->bit_depth > 8)
-			{
-				for(int y = 0; y < img->d_h; y++)
-				{
-					unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
-					unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
-					unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
-					
-					// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
-					unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-					
-					unsigned char *prB = prBGRA + 0;
-					unsigned char *prG = prBGRA + 1;
-					unsigned char *prR = prBGRA + 2;
-					
-					if(pixFormat == PrPixelFormat_ARGB_4444_8u)
-					{
-						// Media Encoder CS5 insists on handing us this format in some cases,
-						// even though we didn't list it as an option
-						prR = prBGRA + 1;
-						prG = prBGRA + 2;
-						prB = prBGRA + 3;
-					}
-					
-					// These are the pixels below the current one for MPEG-2 chroma siting
-					unsigned char *prBb = prB - rowbytes;
-					unsigned char *prGb = prG - rowbytes;
-					unsigned char *prRb = prR - rowbytes;
-					
-					// unless this is the last line and there is no pixel below
-					if(y == (img->d_h - 1) || sub_y != 2)
-					{
-						prBb = prB;
-						prGb = prG;
-						prRb = prR;
-					}
-					
-					for(int x=0; x < img->d_w; x++)
-					{
-						// like the clever integer (fixed point) math?
-						*imgY++ = Convert8toN(((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000, img->bit_depth);
-						
-						if(sub_y > 1)
-						{
-							if( (y % sub_y == 0) && (x % sub_x == 0) )
-							{
-								*imgV++ = Convert8toN((((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
-											((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
-								*imgU++ = Convert8toN(((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
-											(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
-							}
-							
-							prRb += 4;
-							prGb += 4;
-							prBb += 4;
-						}
-						else
-						{
-							if(x % sub_x == 0)
-							{
-								*imgV++ = Convert8toN((((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500)) / 1000, img->bit_depth);
-								*imgU++ = Convert8toN(((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500)) / 1000, img->bit_depth);
-							}
-						}
-						
-						prR += 4;
-						prG += 4;
-						prB += 4;
-					}
-				}
-			}
+				CopyBGRAToImg<unsigned char, unsigned short, false>(img, frameBufferP, rowbytes);
 			else
-			{
-				for(int y = 0; y < img->d_h; y++)
-				{
-					unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-					unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-					unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-					
-					// the rows in this kind of Premiere buffer are flipped, FYI (or is it flopped?)
-					unsigned char *prBGRA = (unsigned char *)frameBufferP + (rowbytes * (img->d_h - 1 - y));
-					
-					unsigned char *prB = prBGRA + 0;
-					unsigned char *prG = prBGRA + 1;
-					unsigned char *prR = prBGRA + 2;
-					
-					if(pixFormat == PrPixelFormat_ARGB_4444_8u)
-					{
-						// Media Encoder CS5 insists on handing us this format in some cases,
-						// even though we didn't list it as an option
-						prR = prBGRA + 1;
-						prG = prBGRA + 2;
-						prB = prBGRA + 3;
-					}
-					
-					// These are the pixels below the current one for MPEG-2 chroma siting
-					unsigned char *prBb = prB - rowbytes;
-					unsigned char *prGb = prG - rowbytes;
-					unsigned char *prRb = prR - rowbytes;
-					
-					// unless this is the last line and there is no pixel below
-					if(y == (img->d_h - 1) || sub_y != 2)
-					{
-						prBb = prB;
-						prGb = prG;
-						prRb = prR;
-					}
-					
-					for(int x=0; x < img->d_w; x++)
-					{
-						// like the clever integer (fixed point) math?
-						*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
-						
-						if(sub_y > 1)
-						{
-							if( (y % sub_y == 0) && (x % sub_x == 0) )
-							{
-								*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
-											((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000;
-								*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
-											(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000;
-							}
-							
-							prRb += 4;
-							prGb += 4;
-							prBb += 4;
-						}
-						else
-						{
-							if(x % sub_x == 0)
-							{
-								*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500)) / 1000;
-								*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500)) / 1000;
-							}
-						}
-						
-						prR += 4;
-						prG += 4;
-						prB += 4;
-					}
-				}
-			}
+				CopyBGRAToImg<unsigned char, unsigned char, false>(img, frameBufferP, rowbytes);
+		}
+		else if(pixFormat == PrPixelFormat_ARGB_4444_8u)
+		{
+			if(img->bit_depth > 8)
+				CopyBGRAToImg<unsigned char, unsigned short, true>(img, frameBufferP, rowbytes);
+			else
+				CopyBGRAToImg<unsigned char, unsigned char, true>(img, frameBufferP, rowbytes);
 		}
 		else
 			assert(false);

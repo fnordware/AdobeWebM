@@ -1468,23 +1468,82 @@ Demote(const unsigned short &val)
 }
 
 static inline unsigned short
-ConvertNto16(const unsigned short &val, int depth)
-{
-	return Demote((val << (16 - depth)) | (val >> ((depth * 2) - 16)));
-}
-
-static inline unsigned char
-ConvertNto8(const unsigned short &val, int depth)
-{
-	return (val << (depth - 8));
-}
-
-static inline unsigned short
 Clamp16(const int &val)
 {
 	return (val < 0 ? 0 : val > PF_MAX_CHAN16 ? PF_MAX_CHAN16 : val);
 }
 
+
+template <typename IMG_PIX, typename VUVA_PIX>
+static inline VUVA_PIX
+ConvertDepth(const IMG_PIX &val, const int &depth);
+
+template<>
+static inline unsigned short
+ConvertDepth<unsigned short, unsigned short>(const unsigned short &val, const int &depth)
+{
+	return Demote((val << (16 - depth)) | (val >> ((depth * 2) - 16)));
+}
+
+template<>
+static inline unsigned char
+ConvertDepth<unsigned short, unsigned char>(const unsigned short &val, const int &depth)
+{
+	return (val << (depth - 8)); 
+}
+
+template<>
+static inline unsigned char
+ConvertDepth<unsigned char, unsigned char>(const unsigned char &val, const int &depth)
+{
+	assert(depth == 8);
+	return val; 
+}
+
+
+template <typename IMG_PIX, typename VUVA_PIX>
+static void
+CopyImgToVUYA(const vpx_image_t * const img, char *frameBufferP, csSDK_int32 rowbytes)
+{
+	const unsigned int sub_x = img->x_chroma_shift + 1;
+	const unsigned int sub_y = img->y_chroma_shift + 1;
+	
+	assert(sub_y == 1);
+	
+	for(int y = 0; y < img->d_h; y++)
+	{
+		IMG_PIX *imgY = (IMG_PIX *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+		IMG_PIX *imgU = (IMG_PIX *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+		IMG_PIX *imgV = (IMG_PIX *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
+		
+		VUVA_PIX *prVUYX = (VUVA_PIX *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
+		
+		VUVA_PIX *prV = prVUYX + 0;
+		VUVA_PIX *prU = prVUYX + 1;
+		VUVA_PIX *prY = prVUYX + 2;
+		VUVA_PIX *prA = prVUYX + 3;
+		
+		for(int x=0; x < img->d_w; x++)
+		{
+			*prY = ConvertDepth<IMG_PIX, VUVA_PIX>(*imgY++, img->bit_depth);
+			
+			if(x != 0 && (x % sub_x == 0))
+			{
+				imgU++;
+				imgV++;
+			}
+			
+			*prU = ConvertDepth<IMG_PIX, VUVA_PIX>(*imgU, img->bit_depth);
+			*prV = ConvertDepth<IMG_PIX, VUVA_PIX>(*imgV, img->bit_depth);
+			*prA = ConvertDepth<unsigned short, VUVA_PIX>(255, 8);
+			
+			prY += 4;
+			prU += 4;
+			prV += 4;
+			prA += 4;
+		}
+	}
+}
 
 static void
 CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPixSuite, PrSDKPPix2Suite *PPix2Suite)
@@ -1570,110 +1629,20 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 			if(img->bit_depth > 8)
 			{
 				// This is only necessary because of a bug with VUYA_4444_16u
-				for(int y = 0; y < img->d_h; y++)
-				{
-					unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
-					unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
-					unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
-					
-					unsigned char *prVUYX = (unsigned char *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-					
-					unsigned char *prV = prVUYX + 0;
-					unsigned char *prU = prVUYX + 1;
-					unsigned char *prY = prVUYX + 2;
-					
-					for(int x=0; x < img->d_w; x++)
-					{
-						*prY = ConvertNto8(*imgY++, img->bit_depth);
-						
-						if(x != 0 && (x % sub_x == 0))
-						{
-							imgU++;
-							imgV++;
-						}
-						
-						*prU = ConvertNto8(*imgU, img->bit_depth);
-						*prV = ConvertNto8(*imgV, img->bit_depth);
-						
-						prY += 4;
-						prU += 4;
-						prV += 4;
-					}
-				}
+				CopyImgToVUYA<unsigned short, unsigned char>(img, frameBufferP, rowbytes);
 			}
 			else
 			{
 				assert(img->bit_depth == 8);
 				
-				for(int y = 0; y < img->d_h; y++)
-				{
-					unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-					unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-					unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-					
-					unsigned char *prVUYX = (unsigned char *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-					
-					unsigned char *prV = prVUYX + 0;
-					unsigned char *prU = prVUYX + 1;
-					unsigned char *prY = prVUYX + 2;
-					
-					for(int x=0; x < img->d_w; x++)
-					{
-						*prY = *imgY++;
-						
-						if(x != 0 && (x % sub_x == 0))
-						{
-							imgU++;
-							imgV++;
-						}
-						
-						*prU = *imgU;
-						*prV = *imgV;
-						
-						prY += 4;
-						prU += 4;
-						prV += 4;
-					}
-				}
+				CopyImgToVUYA<unsigned char, unsigned char>(img, frameBufferP, rowbytes);
 			}
 		}
 		else if(pix_format == PrPixelFormat_VUYA_4444_16u)
 		{
 			assert(img->bit_depth > 8);
-		
-			for(int y = 0; y < img->d_h; y++)
-			{
-				unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
-				unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
-				unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
-				
-				unsigned short *prVUYA = (unsigned short *)(frameBufferP + (rowbytes * (img->d_h - 1 - y)));
-				
-				unsigned short *prV = prVUYA + 0;
-				unsigned short *prU = prVUYA + 1;
-				unsigned short *prY = prVUYA + 2;
-				unsigned short *prA = prVUYA + 3;
-				
-				for(int x=0; x < img->d_w; x++)
-				{
-					*prY = ConvertNto16(*imgY++, img->bit_depth);
-					
-					if(x != 0 && (x % sub_x == 0))
-					{
-						imgU++;
-						imgV++;
-					}
-					
-					*prU = ConvertNto16(*imgU, img->bit_depth);
-					*prV = ConvertNto16(*imgV, img->bit_depth);
-					*prA = PF_MAX_CHAN16;
-					
-					prY += 4;
-					prU += 4;
-					prV += 4;
-					prA += 4;
-				}
-			}
+			
+			CopyImgToVUYA<unsigned short, unsigned short>(img, frameBufferP, rowbytes);
 		}
 		else if(pix_format == PrPixelFormat_BGRA_4444_16u)
 		{
@@ -1695,7 +1664,7 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 				
 				for(int x=0; x < img->d_w; x++)
 				{
-					const int prY = ConvertNto16(*imgY++, img->bit_depth);
+					const int prY = ConvertDepth<unsigned short, unsigned short>(*imgY++, img->bit_depth);
 					
 					if(x != 0 && (x % sub_x == 0))
 					{
@@ -1703,11 +1672,11 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 						imgV++;
 					}
 					
-					const int prU = ConvertNto16(*imgU, img->bit_depth);
-					const int prV = ConvertNto16(*imgV, img->bit_depth);
+					const int prU = ConvertDepth<unsigned short, unsigned short>(*imgU, img->bit_depth);
+					const int prV = ConvertDepth<unsigned short, unsigned short>(*imgV, img->bit_depth);
 					
-					const int subY = ConvertNto16(16, 8);
-					const int subUV = ConvertNto16(128, 8);
+					const int subY = ConvertDepth<unsigned short, unsigned short>(16, 8);
+					const int subUV = ConvertDepth<unsigned short, unsigned short>(128, 8);
 					
 					*prB = Clamp16( ((1164 * (prY - subY)) + (2018 * (prU - subUV)) + 500) / 1000 );
 					*prG = Clamp16( ((1164 * (prY - subY)) - (813 * (prV - subUV)) - (391 * (prU - subUV)) + 500) / 1000 );
