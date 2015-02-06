@@ -1037,9 +1037,11 @@ exSDKExport(
 			config.g_timebase.den = fps.numerator;
 			
 			ConfigureEncoderPre(config, customArgs);
-		
-		
-			codec_err = vpx_codec_enc_init(&encoder, iface, &config, (bit_depth > 8 ? VPX_CODEC_USE_HIGHBITDEPTH : 0));
+			
+			
+			const vpx_codec_flags_t flags = (config.g_bit_depth == VPX_BITS_8 ? 0 : VPX_CODEC_USE_HIGHBITDEPTH);
+			
+			codec_err = vpx_codec_enc_init(&encoder, iface, &config, flags);
 			
 			
 			if(codec_err == VPX_CODEC_OK)
