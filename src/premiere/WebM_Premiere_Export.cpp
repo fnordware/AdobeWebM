@@ -653,21 +653,32 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 					{
 						*imgY++ = Convert16toN( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000, img->bit_depth);
 						
-						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						if(sub_y > 1)
 						{
-							*imgV++ = Convert16toN( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
-												((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
-							*imgU++ = Convert16toN( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
-												(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
+							if( (y % sub_y == 0) && (x % sub_x == 0) )
+							{
+								*imgV++ = Convert16toN( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
+													((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
+								*imgU++ = Convert16toN( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
+													(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000, img->bit_depth);
+							}
+							
+							prRb += 4;
+							prGb += 4;
+							prBb += 4;
+						}
+						else
+						{
+							if(x % sub_x == 0)
+							{
+								*imgV++ = Convert16toN( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500)) / 1000, img->bit_depth);
+								*imgU++ = Convert16toN( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) ) / 1000, img->bit_depth);
+							}
 						}
 						
 						prR += 4;
 						prG += 4;
 						prB += 4;
-						
-						prRb += 4;
-						prGb += 4;
-						prBb += 4;
 					}
 				}
 			}
@@ -702,21 +713,32 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 					{
 						*imgY++ = Convert16to8( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 2056500) / 1000 );
 						
-						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						if(sub_y > 1)
 						{
-							*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
-													((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000 );
-							*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
-													(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000 );
+							if( (y % sub_y == 0) && (x % sub_x == 0) )
+							{
+								*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500) +
+														((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 16449500)) / 2000 );
+								*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500) +
+														(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 16449500)) / 2000 );
+							}
+							
+							prRb += 4;
+							prGb += 4;
+							prBb += 4;
+						}
+						else
+						{
+							if(x % sub_x == 0)
+							{
+								*imgV++ = Convert16to8( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 16449500)) / 1000 );
+								*imgU++ = Convert16to8( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 16449500)) / 1000 );
+							}
 						}
 						
 						prR += 4;
 						prG += 4;
 						prB += 4;
-						
-						prRb += 4;
-						prGb += 4;
-						prBb += 4;
 					}
 				}
 			}
@@ -767,21 +789,32 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 						// like the clever integer (fixed point) math?
 						*imgY++ = Convert8toN(((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000, img->bit_depth);
 						
-						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						if(sub_y > 1)
 						{
-							*imgV++ = Convert8toN((((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
-										((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
-							*imgU++ = Convert8toN(((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
-										(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
+							if( (y % sub_y == 0) && (x % sub_x == 0) )
+							{
+								*imgV++ = Convert8toN((((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
+											((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
+								*imgU++ = Convert8toN(((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
+											(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000, img->bit_depth);
+							}
+							
+							prRb += 4;
+							prGb += 4;
+							prBb += 4;
+						}
+						else
+						{
+							if(x % sub_x == 0)
+							{
+								*imgV++ = Convert8toN((((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500)) / 1000, img->bit_depth);
+								*imgU++ = Convert8toN(((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500)) / 1000, img->bit_depth);
+							}
 						}
 						
 						prR += 4;
 						prG += 4;
 						prB += 4;
-						
-						prRb += 4;
-						prGb += 4;
-						prBb += 4;
 					}
 				}
 			}
@@ -827,21 +860,32 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 						// like the clever integer (fixed point) math?
 						*imgY++ = ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + 16500) / 1000;
 						
-						if( (y % sub_y == 0) && (x % sub_x == 0) )
+						if(sub_y > 1)
 						{
-							*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
-										((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000;
-							*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
-										(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000;
+							if( (y % sub_y == 0) && (x % sub_x == 0) )
+							{
+								*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500) +
+											((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + 128500)) / 2000;
+								*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500) +
+											(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + 128500)) / 2000;
+							}
+							
+							prRb += 4;
+							prGb += 4;
+							prBb += 4;
+						}
+						else
+						{
+							if(x % sub_x == 0)
+							{
+								*imgV++ = (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + 128500)) / 1000;
+								*imgU++ = ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + 128500)) / 1000;
+							}
 						}
 						
 						prR += 4;
 						prG += 4;
 						prB += 4;
-						
-						prRb += 4;
-						prGb += 4;
-						prBb += 4;
 					}
 				}
 			}
@@ -1897,7 +1941,8 @@ exSDKExport(
 
 		if(exportInfoP->exportVideo)
 		{
-			assert(NULL == vpx_codec_get_cx_data(&encoder, &encoder_iter));
+			if(result == malNoError)
+				assert(NULL == vpx_codec_get_cx_data(&encoder, &encoder_iter));
 		
 			vpx_codec_err_t destroy_err = vpx_codec_destroy(&encoder);
 			assert(destroy_err == VPX_CODEC_OK);
@@ -1917,7 +1962,8 @@ exSDKExport(
 			}
 			else
 			{
-				assert(vorbis_analysis_blockout(&vd, &vb) == 0);
+				if(result == malNoError)
+					assert(vorbis_analysis_blockout(&vd, &vb) == 0);
 			
 				vorbis_block_clear(&vb);
 				vorbis_dsp_clear(&vd);
