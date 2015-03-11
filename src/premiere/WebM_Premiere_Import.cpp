@@ -1489,7 +1489,7 @@ template<>
 static inline unsigned char
 ConvertDepth<unsigned short, unsigned char>(const unsigned short &val, const int &depth)
 {
-	return (val << (depth - 8)); 
+	return (val >> (depth - 8)); 
 }
 
 template<>
