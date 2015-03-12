@@ -898,13 +898,13 @@ static void DoWriteStart(GPtr globals)
 	assert(gStuff->planes >= 3);
 	
 	
-	bool have_transparency = (gStuff->planes >= 4);
-	bool have_alpha_channel = (gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels);
+	const bool have_transparency = (gStuff->planes >= 4);
+	const bool have_alpha_channel = (gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels);
 
-	bool use_transparency = (have_transparency && gOptions.alpha == WEBP_ALPHA_TRANSPARENCY);
-	bool use_alpha_channel = (have_alpha_channel && gOptions.alpha == WEBP_ALPHA_CHANNEL);
+	const bool use_transparency = (have_transparency && gOptions.alpha == WEBP_ALPHA_TRANSPARENCY);
+	const bool use_alpha_channel = (have_alpha_channel && gOptions.alpha == WEBP_ALPHA_CHANNEL);
 	
-	bool use_alpha = (use_transparency || use_alpha_channel);
+	const bool use_alpha = (use_transparency || use_alpha_channel);
 	
 	
 	const int width = (gStuff->PluginUsing32BitCoordinates ? gStuff->imageSize32.h : gStuff->imageSize.h);
@@ -927,8 +927,7 @@ static void DoWriteStart(GPtr globals)
 	ReadChannelDesc *alpha_channel = NULL;
 	
 	// ReadProc being non-null means we're going to get the channel from the channels palette
-	if(use_alpha && gOptions.alpha == WEBP_ALPHA_CHANNEL &&
-		gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels)
+	if(use_alpha && gOptions.alpha == WEBP_ALPHA_CHANNEL && have_alpha_channel)
 	{
 		ReadProc = gStuff->channelPortProcs->readPixelsProc;
 		
@@ -994,6 +993,7 @@ static void DoWriteStart(GPtr globals)
 					config.lossless = gOptions.lossless;
 					config.quality = gOptions.quality;
 					config.method = 6;
+					config.preprocessing = 4; // https://groups.google.com/a/webmproject.org/forum/#!topic/webp-discuss/7dV1qXrdQ2Y
 					
 					if(use_alpha && !gOptions.lossless && gOptions.lossy_alpha)
 						config.alpha_quality = gOptions.quality;
