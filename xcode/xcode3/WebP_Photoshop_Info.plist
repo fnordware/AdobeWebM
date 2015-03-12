@@ -13,7 +13,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PLUGIN_TYPE)</string>
 	<key>CFBundleGetInfoString</key>
-	<string>©2013 fnord</string>
+	<string>©2013-2015 fnord</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 </dict>
