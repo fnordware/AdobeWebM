@@ -43,6 +43,7 @@
 #include "vpx/vp8cx.h"
 
 #include <assert.h>
+#include <math.h>
 
 #include <sstream>
 #include <vector>
@@ -68,57 +69,56 @@ exSDKQueryOutputSettings(
 {
 	prMALError result = malNoError;
 	
-	ExportSettings *privateData	= reinterpret_cast<ExportSettings*>(outputSettingsP->privateData);
+	ExportSettings *privateData	= reinterpret_cast<ExportSettings *>(outputSettingsP->privateData);
 	
-	csSDK_uint32				exID			= outputSettingsP->exporterPluginID;
-	exParamValues				width,
-								height,
-								frameRate,
-								pixelAspectRatio,
-								fieldType,
-								methodP,
-								videoQualityP,
-								videoBitrateP,
-								sampleRate,
-								channelType,
-								audioQualityP;
-	PrSDKExportParamSuite		*paramSuite		= privateData->exportParamSuite;
-	csSDK_int32					mgroupIndex		= 0;
-	float						fps				= 0.0f;
-	PrTime						ticksPerSecond	= 0;
-	csSDK_uint32				videoBitrate	= 0;
+	PrSDKExportParamSuite *paramSuite = privateData->exportParamSuite;
 	
-	privateData->timeSuite->GetTicksPerSecond(&ticksPerSecond);
+	const csSDK_uint32 exID = outputSettingsP->exporterPluginID;
+	const csSDK_int32 mgroupIndex = 0;
 	
-	fps = (float)ticksPerSecond / (float)frameRate.value.timeValue;
+	
+	csSDK_uint32 videoBitrate = 0;
+	
 	
 	if(outputSettingsP->inExportVideo)
 	{
+		exParamValues width, height, frameRate, pixelAspectRatio, fieldType;
+	
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoWidth, &width);
-		outputSettingsP->outVideoWidth = width.value.intValue;
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoHeight, &height);
-		outputSettingsP->outVideoHeight = height.value.intValue;
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoFPS, &frameRate);
-		outputSettingsP->outVideoFrameRate = frameRate.value.timeValue;
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoAspect, &pixelAspectRatio);
+		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoFieldType, &fieldType);
+		
+		outputSettingsP->outVideoWidth = width.value.intValue;
+		outputSettingsP->outVideoHeight = height.value.intValue;
+		outputSettingsP->outVideoFrameRate = frameRate.value.timeValue;
 		outputSettingsP->outVideoAspectNum = pixelAspectRatio.value.ratioValue.numerator;
 		outputSettingsP->outVideoAspectDen = pixelAspectRatio.value.ratioValue.denominator;
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoFieldType, &fieldType);
 		outputSettingsP->outVideoFieldType = fieldType.value.intValue;
 		
+		
+		exParamValues methodP, videoQualityP, videoBitrateP;
+								
 		paramSuite->GetParamValue(exID, mgroupIndex, WebMVideoMethod, &methodP);
 		paramSuite->GetParamValue(exID, mgroupIndex, WebMVideoQuality, &videoQualityP);
 		paramSuite->GetParamValue(exID, mgroupIndex, WebMVideoBitrate, &videoBitrateP);
-		paramSuite->GetParamValue(exID, mgroupIndex, WebMAudioQuality, &audioQualityP);
+		
 		
 		if(methodP.value.intValue == WEBM_METHOD_QUALITY)
 		{
-			int bitsPerFrameUncompressed = (width.value.intValue * height.value.intValue) * 3 * 8;
-			int qual = videoQualityP.value.intValue;
-			float qualityMaxMult = 0.5;
-			float qualityMinMult = 0.01;
-			float qualityMult = (((float)qual / 100.0) * (qualityMaxMult - qualityMinMult)) + qualityMinMult;
-			int bitsPerFrame = bitsPerFrameUncompressed * qualityMult;
+			PrTime ticksPerSecond = 0;
+			privateData->timeSuite->GetTicksPerSecond(&ticksPerSecond);
+			
+			const float fps = (double)ticksPerSecond / (double)frameRate.value.timeValue;
+			
+			const int bitsPerFrameUncompressed = (width.value.intValue * height.value.intValue) * 3 * 8;
+			const float qual = (float)videoQualityP.value.intValue / 100.0;
+			const float quality_gamma = 2.0;  // these numbers arrived at from some experimentation
+			const float qualityMaxMult = 0.02;
+			const float qualityMinMult = 0.001;
+			const float qualityMult = ( powf(qual, quality_gamma) * (qualityMaxMult - qualityMinMult)) + qualityMinMult;
+			const int bitsPerFrame = bitsPerFrameUncompressed * qualityMult;
 		
 			videoBitrate += (bitsPerFrame * fps) / 1024;
 		}
@@ -126,26 +126,71 @@ exSDKQueryOutputSettings(
 			videoBitrate += videoBitrateP.value.intValue;
 	}
 	
+	
 	if(outputSettingsP->inExportAudio)
 	{
+		exParamValues sampleRate, channelType;
+	
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioRatePerSecond, &sampleRate);
-		outputSettingsP->outAudioSampleRate = sampleRate.value.floatValue;
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioNumChannels, &channelType);
-		outputSettingsP->outAudioChannelType = (PrAudioChannelType)channelType.value.intValue;
-		outputSettingsP->outAudioSampleType = kPrAudioSampleType_Compressed;
 		
-		const PrAudioChannelType audioFormat = (PrAudioChannelType)channelType.value.intValue;
+		PrAudioChannelType audioFormat = (PrAudioChannelType)channelType.value.intValue;
+		
+		if(audioFormat < kPrAudioChannelType_Mono || audioFormat > kPrAudioChannelType_51)
+			audioFormat = kPrAudioChannelType_Stereo;
+			
 		const int audioChannels = (audioFormat == kPrAudioChannelType_51 ? 6 :
+									audioFormat == kPrAudioChannelType_Stereo ? 2 :
 									audioFormat == kPrAudioChannelType_Mono ? 1 :
 									2);
-
-		float qualityMult = (audioQualityP.value.floatValue + 0.1) / 1.1;
-		float ogg_mult = (qualityMult * 0.4) + 0.1;
+									
+		outputSettingsP->outAudioSampleRate = sampleRate.value.floatValue;
+		outputSettingsP->outAudioChannelType = audioFormat;
+		outputSettingsP->outAudioSampleType = kPrAudioSampleType_Compressed;
 		
-		videoBitrate += (sampleRate.value.floatValue * audioChannels * 8 * 4 * ogg_mult) / 1024; // IDK
+									
+		exParamValues audioCodecP;
+		paramSuite->GetParamValue(exID, mgroupIndex, WebMAudioCodec, &audioCodecP);
+
+		const int samples_per_sec = sampleRate.value.floatValue * audioChannels;
+
+		if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
+		{
+			exParamValues autoBitrateP, opusBitrateP;
+			paramSuite->GetParamValue(exID, mgroupIndex, WebMOpusAutoBitrate, &autoBitrateP);
+			paramSuite->GetParamValue(exID, mgroupIndex, WebMOpusBitrate, &opusBitrateP);
+									
+			assert(sampleRate.value.floatValue == 48000);
+			
+			if(autoBitrateP.value.intValue == kPrTrue)
+			{
+				videoBitrate += samples_per_sec * 0.001; // number I came up with through experimentation
+			}
+			else
+				videoBitrate += opusBitrateP.value.intValue;
+		}
+		else
+		{
+			exParamValues audioMethodP, audioQualityP, audioBitrateP;
+			paramSuite->GetParamValue(exID, mgroupIndex, WebMAudioMethod, &audioMethodP);
+			paramSuite->GetParamValue(exID, mgroupIndex, WebMAudioQuality, &audioQualityP);
+			paramSuite->GetParamValue(exID, mgroupIndex, WebMAudioBitrate, &audioBitrateP);
+			
+			if(audioMethodP.value.intValue == OGG_QUALITY)
+			{
+				const float qual = (audioQualityP.value.floatValue + 0.1) / 1.1;
+				const float qualityMaxMult = 0.0025; // experimental numbers
+				const float qualityMinMult = 0.00005;
+				const float qualityMult = (qual * (qualityMaxMult - qualityMinMult)) + qualityMinMult;
+			
+				videoBitrate += samples_per_sec * qualityMult;
+			}
+			else
+				videoBitrate += audioBitrateP.value.intValue;
+		}
 	}
 	
-	// return outBitratePerSecond in kbps
+	// outBitratePerSecond in kbps
 	outputSettingsP->outBitratePerSecond = videoBitrate;
 
 
