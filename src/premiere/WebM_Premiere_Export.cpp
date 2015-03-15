@@ -811,10 +811,10 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 	
 	PrAudioChannelType audioFormat = (PrAudioChannelType)channelTypeP.value.intValue;
-    
-    if(audioFormat < kPrAudioChannelType_Mono || audioFormat > kPrAudioChannelType_51)
-        audioFormat = kPrAudioChannelType_Stereo;
-    
+	
+	if(audioFormat < kPrAudioChannelType_Mono || audioFormat > kPrAudioChannelType_51)
+		audioFormat = kPrAudioChannelType_Stereo;
+	
 	const int audioChannels = (audioFormat == kPrAudioChannelType_51 ? 6 :
 								audioFormat == kPrAudioChannelType_Stereo ? 2 :
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
