@@ -46,6 +46,7 @@
 #include	"PrSDKExportFileSuite.h"
 #include	"PrSDKExportInfoSuite.h"
 #include	"PrSDKExportParamSuite.h"
+#include	"PrSDKExportStdParamSuite.h"
 #include	"PrSDKSequenceRenderSuite.h"
 #include	"PrSDKSequenceAudioSuite.h"
 #include	"PrSDKExportProgressSuite.h"
@@ -61,6 +62,7 @@ typedef struct ExportSettings
 {
 	SPBasicSuite				*spBasic;
 	PrSDKExportParamSuite		*exportParamSuite;
+	PrSDKExportStdParamSuite	*exportStdParamSuite;
 	PrSDKExportInfoSuite		*exportInfoSuite;
 	PrSDKExportFileSuite		*exportFileSuite;
 	PrSDKExportProgressSuite	*exportProgressSuite;

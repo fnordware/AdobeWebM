@@ -269,6 +269,10 @@ exSDKBeginInstance(
 				kPrSDKExportParamSuiteVersion,
 				const_cast<const void**>(reinterpret_cast<void**>(&(mySettings->exportParamSuite))));
 			spError = spBasic->AcquireSuite(
+				kPrExportStdParamSuite,
+				kPrExportStdParamSuiteVersion,
+				const_cast<const void**>(reinterpret_cast<void**>(&(mySettings->exportStdParamSuite))));
+			spError = spBasic->AcquireSuite(
 				kPrSDKExportFileSuite,
 				kPrSDKExportFileSuiteVersion,
 				const_cast<const void**>(reinterpret_cast<void**>(&(mySettings->exportFileSuite))));
@@ -336,6 +340,10 @@ exSDKEndInstance(
 		if (lRec->exportParamSuite)
 		{
 			result = spBasic->ReleaseSuite(kPrSDKExportParamSuite, kPrSDKExportParamSuiteVersion);
+		}
+		if (lRec->exportStdParamSuite)
+		{
+			result = spBasic->ReleaseSuite(kPrExportStdParamSuite, kPrExportStdParamSuiteVersion);
 		}
 		if (lRec->exportFileSuite)
 		{
@@ -782,6 +790,7 @@ exSDKExport(
 	prMALError					result					= malNoError;
 	ExportSettings				*mySettings				= reinterpret_cast<ExportSettings*>(exportInfoP->privateData);
 	PrSDKExportParamSuite		*paramSuite				= mySettings->exportParamSuite;
+	PrSDKExportStdParamSuite	*stdParamSuite			= mySettings->exportStdParamSuite;
 	PrSDKExportInfoSuite		*exportInfoSuite		= mySettings->exportInfoSuite;
 	PrSDKSequenceRenderSuite	*renderSuite			= mySettings->sequenceRenderSuite;
 	PrSDKSequenceAudioSuite		*audioSuite				= mySettings->sequenceAudioSuite;
@@ -795,10 +804,10 @@ exSDKExport(
 	mySettings->timeSuite->GetTicksPerSecond(&ticksPerSecond);
 	
 	
-	csSDK_uint32 exID = exportInfoP->exporterPluginID;
-	csSDK_int32 gIdx = 0;
+	const csSDK_uint32 exID = exportInfoP->exporterPluginID;
+	const csSDK_int32 gIdx = 0;
 	
-	exParamValues widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
+/*	exParamValues widthP, heightP, pixelAspectRatioP, fieldTypeP, frameRateP;
 	
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightP);
@@ -808,9 +817,17 @@ exSDKExport(
 	
 	exParamValues sampleRateP, channelTypeP;
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);*/
 	
-	PrAudioChannelType audioFormat = (PrAudioChannelType)channelTypeP.value.intValue;
+	exQueryOutputSettingsRec stdParams;
+	stdParams.exporterPluginID = exID;
+	stdParams.inMultiGroupIndex = gIdx;
+	stdParams.inExportVideo = exportInfoP->exportVideo;
+	stdParams.inExportAudio = exportInfoP->exportAudio;
+	
+	stdParamSuite->QueryOutputSettings(exID, &stdParams);
+	
+	PrAudioChannelType audioFormat = stdParams.outAudioChannelType;
 	
 	if(audioFormat < kPrAudioChannelType_Mono || audioFormat > kPrAudioChannelType_51)
 		audioFormat = kPrAudioChannelType_Stereo;
@@ -866,12 +883,12 @@ exSDKExport(
 									
 	renderParms.inRequestedPixelFormatArray = pixelFormats;
 	renderParms.inRequestedPixelFormatArrayCount = 3;
-	renderParms.inWidth = widthP.value.intValue;
-	renderParms.inHeight = heightP.value.intValue;
-	renderParms.inPixelAspectRatioNumerator = pixelAspectRatioP.value.ratioValue.numerator;
-	renderParms.inPixelAspectRatioDenominator = pixelAspectRatioP.value.ratioValue.denominator;
+	renderParms.inWidth = stdParams.outVideoWidth;
+	renderParms.inHeight = stdParams.outVideoHeight;
+	renderParms.inPixelAspectRatioNumerator = stdParams.outVideoAspectNum;
+	renderParms.inPixelAspectRatioDenominator = stdParams.outVideoAspectDen;
 	renderParms.inRenderQuality = kPrRenderQuality_High;
-	renderParms.inFieldType = fieldTypeP.value.intValue;
+	renderParms.inFieldType = stdParams.outVideoFieldType;
 	renderParms.inDeinterlace = kPrFalse;
 	renderParms.inDeinterlaceQuality = kPrRenderQuality_High;
 	renderParms.inCompositeOnBlack = kPrTrue;
@@ -881,7 +898,7 @@ exSDKExport(
 	
 	if(exportInfoP->exportVideo)
 	{
-		result = renderSuite->MakeVideoRenderer(exID, &videoRenderID, frameRateP.value.timeValue);
+		result = renderSuite->MakeVideoRenderer(exID, &videoRenderID, stdParams.outVideoFrameRate);
 	}
 	
 	csSDK_uint32 audioRenderID = 0;
@@ -892,7 +909,7 @@ exSDKExport(
 												exportInfoP->startTime,
 												audioFormat,
 												kPrAudioSampleType_32BitFloat,
-												sampleRateP.value.floatValue, 
+												stdParams.outAudioSampleRate, 
 												&audioRenderID);
 	}
 
@@ -931,7 +948,7 @@ exSDKExport(
 		
 	
 		exRatioValue fps;
-		get_framerate(ticksPerSecond, frameRateP.value.timeValue, &fps);
+		get_framerate(ticksPerSecond, stdParams.outVideoFrameRate, &fps);
 		
 		
 		vpx_codec_err_t codec_err = VPX_CODEC_OK;
@@ -1075,7 +1092,7 @@ exSDKExport(
 		
 		if(exportInfoP->exportAudio && !vbr_pass)
 		{
-			mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, frameRateP.value.timeValue, &maxBlip);
+			mySettings->sequenceAudioSuite->GetMaxBlip(audioRenderID, stdParams.outVideoFrameRate, &maxBlip);
 			
 			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 			{
@@ -1192,7 +1209,7 @@ exSDKExport(
 				{
 					v_err = vorbis_encode_init(&vi,
 												audioChannels,
-												sampleRateP.value.floatValue,
+												stdParams.outAudioSampleRate,
 												-1,
 												audioBitrateP.value.intValue * 1000,
 												-1);
@@ -1201,7 +1218,7 @@ exSDKExport(
 				{
 					v_err = vorbis_encode_init_vbr(&vi,
 													audioChannels,
-													sampleRateP.value.floatValue,
+													stdParams.outAudioSampleRate,
 													audioQualityP.value.floatValue);
 				}
 				
@@ -1294,12 +1311,12 @@ exSDKExport(
 				{
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
-						assert(sampleRateP.value.floatValue == 48000.f);
+						assert(stdParams.outAudioSampleRate == 48000.f);
 						
-						sampleRateP.value.floatValue = 48000.f; // we'll just go ahead and enforce that
+						stdParams.outAudioSampleRate = 48000.f; // we'll just go ahead and enforce that
 					}
 				
-					audio_track = muxer_segment->AddAudioTrack(sampleRateP.value.floatValue, audioChannels, 2);
+					audio_track = muxer_segment->AddAudioTrack(stdParams.outAudioSampleRate, audioChannels, 2);
 					
 					mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment->GetTrackByNumber(audio_track));
 					
@@ -1312,7 +1329,7 @@ exSDKExport(
 						
 						audio->set_seek_pre_roll(80000000);
 						
-						audio->set_codec_delay((PrAudioSample)opus_pre_skip * S2NS / (PrAudioSample)sampleRateP.value.floatValue);
+						audio->set_codec_delay((PrAudioSample)opus_pre_skip * S2NS / (PrAudioSample)stdParams.outAudioSampleRate);
 					}
 
 					if(private_data)
@@ -1339,9 +1356,9 @@ exSDKExport(
 			// we'll just encode the amount of audio originally requested.  One ramification is that you could
 			// be done encoding all your audio but still have a final frame to encode.
 			const PrAudioSample endAudioSample = (exportInfoP->endTime - exportInfoP->startTime) /
-													(ticksPerSecond / (PrAudioSample)sampleRateP.value.floatValue);
+													(ticksPerSecond / (PrAudioSample)stdParams.outAudioSampleRate);
 													
-			assert(ticksPerSecond % (PrAudioSample)sampleRateP.value.floatValue == 0);
+			assert(ticksPerSecond % (PrAudioSample)stdParams.outAudioSampleRate == 0);
 			
 		
 			PrTime videoTime = exportInfoP->startTime;
@@ -1372,13 +1389,13 @@ exSDKExport(
 					const int *swizzle = (audioChannels > 2 ? surround_swizzle : stereo_swizzle);
 					
 					
-					const bool last_frame = (videoTime > (exportInfoP->endTime - frameRateP.value.timeValue));
+					const bool last_frame = (videoTime > (exportInfoP->endTime - stdParams.outVideoFrameRate));
 							
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
 						assert(opus != NULL);
 						
-						long long opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
+						long long opus_timeStamp = currentAudioSample * S2NS / (long long)stdParams.outAudioSampleRate;
 						
 						while(((opus_timeStamp <= timeStamp) || last_frame) && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
 						{
@@ -1406,7 +1423,7 @@ exSDKExport(
 									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
 									{
 										const int64 discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
-										const int64 discardPadding = discardPaddingSamples * S2NS / (int64)sampleRateP.value.floatValue;
+										const int64 discardPadding = discardPaddingSamples * S2NS / (int64)stdParams.outAudioSampleRate;
 										
 										added = muxer_segment->AddFrameWithDiscardPadding(opus_compressed_buffer, len,
 																		discardPadding, audio_track, opus_timeStamp, true);
@@ -1426,13 +1443,13 @@ exSDKExport(
 								
 								currentAudioSample += samples;
 								
-								opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
+								opus_timeStamp = currentAudioSample * S2NS / (long long)stdParams.outAudioSampleRate;
 							}
 						}
 					}
 					else
 					{
-						long long op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
+						long long op_timeStamp = op.granulepos * S2NS / (long long)stdParams.outAudioSampleRate;
 					
 						while(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
 						{	
@@ -1461,7 +1478,7 @@ exSDKExport(
 								{
 									assert(!packet_waiting);
 									
-									op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
+									op_timeStamp = op.granulepos * S2NS / (long long)stdParams.outAudioSampleRate;
 									
 									if(op_timeStamp <= timeStamp || last_frame)
 									{
@@ -1599,7 +1616,7 @@ exSDKExport(
 							// timestamp = time / timebase
 							// timestamp = (videoTime / ticksPerSecond) * (fps.num / fps.den)
 							const PrTime encoder_fileTime = videoEncoderTime - exportInfoP->startTime;
-							const PrTime encoder_nextFileTime = encoder_fileTime + frameRateP.value.timeValue;
+							const PrTime encoder_nextFileTime = encoder_fileTime + stdParams.outVideoFrameRate;
 							
 							const vpx_codec_pts_t encoder_timeStamp = encoder_fileTime * fps.numerator / (ticksPerSecond * fps.denominator);
 							const vpx_codec_pts_t encoder_nextTimeStamp = encoder_nextFileTime * fps.numerator / (ticksPerSecond * fps.denominator);
@@ -1608,7 +1625,7 @@ exSDKExport(
 							// BUT, if we're setting timebase to 1/fps, then timestamp is just frame number.
 							// And since frame number isn't going to overflow at big times the way encoder_timeStamp is,
 							// let's just use that.
-							const vpx_codec_pts_t encoder_FrameNumber = encoder_fileTime / frameRateP.value.timeValue;
+							const vpx_codec_pts_t encoder_FrameNumber = encoder_fileTime / stdParams.outVideoFrameRate;
 							const unsigned long encoder_FrameDuration = 1;
 							
 							// these asserts will not be true for big time values (int64_t overflow)
@@ -1671,7 +1688,7 @@ exSDKExport(
 										
 										if(encode_err == VPX_CODEC_OK)
 										{
-											videoEncoderTime += frameRateP.value.timeValue;
+											videoEncoderTime += stdParams.outVideoFrameRate;
 
 											encoder_iter = NULL;
 										}
@@ -1732,7 +1749,7 @@ exSDKExport(
 				}
 				
 				
-				videoTime += frameRateP.value.timeValue;
+				videoTime += stdParams.outVideoFrameRate;
 			}
 			
 			

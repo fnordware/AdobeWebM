@@ -72,6 +72,7 @@ exSDKQueryOutputSettings(
 	ExportSettings *privateData	= reinterpret_cast<ExportSettings *>(outputSettingsP->privateData);
 	
 	PrSDKExportParamSuite *paramSuite = privateData->exportParamSuite;
+	PrSDKExportStdParamSuite *stdParamSuite = privateData->exportStdParamSuite;
 	
 	const csSDK_uint32 exID = outputSettingsP->exporterPluginID;
 	const csSDK_int32 mgroupIndex = 0;
@@ -80,9 +81,18 @@ exSDKQueryOutputSettings(
 	csSDK_uint32 videoBitrate = 0;
 	
 	
+	exQueryOutputSettingsRec stdParams;
+	stdParams.exporterPluginID = exID;
+	stdParams.inMultiGroupIndex = mgroupIndex;
+	stdParams.inExportVideo = outputSettingsP->inExportVideo;
+	stdParams.inExportAudio = outputSettingsP->inExportAudio;
+	
+	stdParamSuite->QueryOutputSettings(exID, &stdParams);
+	
+	
 	if(outputSettingsP->inExportVideo)
 	{
-		exParamValues width, height, frameRate, pixelAspectRatio, fieldType;
+		/*exParamValues width, height, frameRate, pixelAspectRatio, fieldType;
 	
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoWidth, &width);
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEVideoHeight, &height);
@@ -95,7 +105,8 @@ exSDKQueryOutputSettings(
 		outputSettingsP->outVideoFrameRate = frameRate.value.timeValue;
 		outputSettingsP->outVideoAspectNum = pixelAspectRatio.value.ratioValue.numerator;
 		outputSettingsP->outVideoAspectDen = pixelAspectRatio.value.ratioValue.denominator;
-		outputSettingsP->outVideoFieldType = fieldType.value.intValue;
+		outputSettingsP->outVideoFieldType = fieldType.value.intValue;*/
+		
 		
 		
 		exParamValues methodP, videoQualityP, videoBitrateP;
@@ -110,9 +121,9 @@ exSDKQueryOutputSettings(
 			PrTime ticksPerSecond = 0;
 			privateData->timeSuite->GetTicksPerSecond(&ticksPerSecond);
 			
-			const float fps = (double)ticksPerSecond / (double)frameRate.value.timeValue;
+			const float fps = (double)ticksPerSecond / (double)stdParams.outVideoFrameRate;
 			
-			const int bitsPerFrameUncompressed = (width.value.intValue * height.value.intValue) * 3 * 8;
+			const int bitsPerFrameUncompressed = (stdParams.outVideoWidth * stdParams.outVideoHeight) * 3 * 8;
 			const float qual = (float)videoQualityP.value.intValue / 100.0;
 			const float quality_gamma = 2.0;  // these numbers arrived at from some experimentation
 			const float qualityMaxMult = 0.02;
@@ -129,12 +140,12 @@ exSDKQueryOutputSettings(
 	
 	if(outputSettingsP->inExportAudio)
 	{
-		exParamValues sampleRate, channelType;
+		/*exParamValues sampleRate, channelType;
 	
 		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioRatePerSecond, &sampleRate);
-		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioNumChannels, &channelType);
+		paramSuite->GetParamValue(exID, mgroupIndex, ADBEAudioNumChannels, &channelType);*/
 		
-		PrAudioChannelType audioFormat = (PrAudioChannelType)channelType.value.intValue;
+		PrAudioChannelType audioFormat = stdParams.outAudioChannelType;
 		
 		if(audioFormat < kPrAudioChannelType_Mono || audioFormat > kPrAudioChannelType_51)
 			audioFormat = kPrAudioChannelType_Stereo;
@@ -144,7 +155,7 @@ exSDKQueryOutputSettings(
 									audioFormat == kPrAudioChannelType_Mono ? 1 :
 									2);
 									
-		outputSettingsP->outAudioSampleRate = sampleRate.value.floatValue;
+		outputSettingsP->outAudioSampleRate = stdParams.outAudioSampleRate;
 		outputSettingsP->outAudioChannelType = audioFormat;
 		outputSettingsP->outAudioSampleType = kPrAudioSampleType_Compressed;
 		
@@ -152,7 +163,7 @@ exSDKQueryOutputSettings(
 		exParamValues audioCodecP;
 		paramSuite->GetParamValue(exID, mgroupIndex, WebMAudioCodec, &audioCodecP);
 
-		const int samples_per_sec = sampleRate.value.floatValue * audioChannels;
+		const int samples_per_sec = stdParams.outAudioSampleRate * audioChannels;
 
 		if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 		{
@@ -160,7 +171,7 @@ exSDKQueryOutputSettings(
 			paramSuite->GetParamValue(exID, mgroupIndex, WebMOpusAutoBitrate, &autoBitrateP);
 			paramSuite->GetParamValue(exID, mgroupIndex, WebMOpusBitrate, &opusBitrateP);
 									
-			assert(sampleRate.value.floatValue == 48000);
+			assert(stdParams.outAudioSampleRate == 48000);
 			
 			if(autoBitrateP.value.intValue == kPrTrue)
 			{
@@ -205,10 +216,11 @@ exSDKGenerateDefaultParams(
 {
 	prMALError				result				= malNoError;
 
-	ExportSettings			*lRec				= reinterpret_cast<ExportSettings *>(generateDefaultParamRec->privateData);
-	PrSDKExportParamSuite	*exportParamSuite	= lRec->exportParamSuite;
-	PrSDKExportInfoSuite	*exportInfoSuite	= lRec->exportInfoSuite;
-	PrSDKTimeSuite			*timeSuite			= lRec->timeSuite;
+	ExportSettings				*lRec					= reinterpret_cast<ExportSettings *>(generateDefaultParamRec->privateData);
+	PrSDKExportParamSuite		*exportParamSuite		= lRec->exportParamSuite;
+	PrSDKExportStdParamSuite	*exportStdParamSuite	= lRec->exportStdParamSuite;
+	PrSDKExportInfoSuite		*exportInfoSuite		= lRec->exportInfoSuite;
+	PrSDKTimeSuite				*timeSuite				= lRec->timeSuite;
 
 	csSDK_int32 exID = generateDefaultParamRec->exporterPluginID;
 	csSDK_int32 gIdx = 0;
@@ -239,7 +251,7 @@ exSDKGenerateDefaultParams(
 
 
 	prUTF16Char groupString[256];
-	
+/*	
 	// Video Tab
 	exportParamSuite->AddMultiGroup(exID, &gIdx);
 	
@@ -349,6 +361,8 @@ exSDKGenerateDefaultParams(
 	fpsParam.paramValues = fpsValues;
 	
 	exportParamSuite->AddParam(exID, gIdx, ADBEBasicVideoGroup, &fpsParam);
+*/
+	exportStdParamSuite->AddStandardParams(exID, SDKStdParams_Video);
 
 
 	// Video Codec Settings Group
@@ -533,7 +547,7 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, WebMCustomGroup, &customArgParam);
 
 
-
+/*
 	// Audio Tab
 	utf16ncpy(groupString, "Audio Tab", 255);
 	exportParamSuite->AddParamGroup(exID, gIdx,
@@ -577,7 +591,7 @@ exSDKGenerateDefaultParams(
 	channelTypeParam.paramValues = channelTypeValues;
 	
 	exportParamSuite->AddParam(exID, gIdx, ADBEBasicAudioGroup, &channelTypeParam);
-	
+*/	
 	
 	
 	// Audio Codec Settings Group
@@ -712,17 +726,18 @@ exSDKPostProcessParams(
 {
 	prMALError		result	= malNoError;
 
-	ExportSettings			*lRec				= reinterpret_cast<ExportSettings *>(postProcessParamsRecP->privateData);
-	PrSDKExportParamSuite	*exportParamSuite	= lRec->exportParamSuite;
-	//PrSDKExportInfoSuite	*exportInfoSuite	= lRec->exportInfoSuite;
-	PrSDKTimeSuite			*timeSuite			= lRec->timeSuite;
+	ExportSettings				*lRec					= reinterpret_cast<ExportSettings *>(postProcessParamsRecP->privateData);
+	PrSDKExportParamSuite		*exportParamSuite		= lRec->exportParamSuite;
+	PrSDKExportStdParamSuite	*exportStdParamSuite	= lRec->exportStdParamSuite;
+	PrSDKExportInfoSuite		*exportInfoSuite		= lRec->exportInfoSuite;
+	PrSDKTimeSuite				*timeSuite				= lRec->timeSuite;
 
 	csSDK_int32 exID = postProcessParamsRecP->exporterPluginID;
 	csSDK_int32 gIdx = 0;
 	
 	prUTF16Char paramString[256];
 	
-	
+/*	
 	// Image Settings group
 	utf16ncpy(paramString, "Image Settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicVideoGroup, paramString);
@@ -856,6 +871,12 @@ exSDKPostProcessParams(
 		utf16ncpy(paramString, frameRateStrings[i], 255);
 		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEVideoFPS, &tempFrameRate, paramString);
 	}
+	*/
+	
+	PrParam channelsTypeP;
+	exportInfoSuite->GetExportSourceInfo(exID, kExportInfo_AudioChannelsType, &channelsTypeP);
+	
+	exportStdParamSuite->PostProcessParamNames(exID, static_cast<PrAudioChannelType>(channelsTypeP.mInt32));
 	
 	
 	// Video codec settings
@@ -1016,7 +1037,7 @@ exSDKPostProcessParams(
 	
 	
 	
-	
+/*	
 	// Audio Settings group
 	utf16ncpy(paramString, "Audio Settings", 255);
 	exportParamSuite->SetParamName(exID, gIdx, ADBEBasicAudioGroup, paramString);
@@ -1064,7 +1085,7 @@ exSDKPostProcessParams(
 		utf16ncpy(paramString, channelTypeStrings[i], 255);
 		exportParamSuite->AddConstrainedValuePair(exID, gIdx, ADBEAudioNumChannels, &tempChannelType, paramString);
 	}
-	
+*/	
 	
 	// Audio codec settings
 	utf16ncpy(paramString, "Codec settings", 255);
@@ -1168,14 +1189,15 @@ exSDKGetParamSummary(
 	exportStdParms			*stdParmsP, 
 	exParamSummaryRec		*summaryRecP)
 {
-	ExportSettings			*privateData	= reinterpret_cast<ExportSettings*>(summaryRecP->privateData);
-	PrSDKExportParamSuite	*paramSuite		= privateData->exportParamSuite;
+	ExportSettings				*privateData	= reinterpret_cast<ExportSettings*>(summaryRecP->privateData);
+	PrSDKExportParamSuite		*paramSuite		= privateData->exportParamSuite;
+	PrSDKExportStdParamSuite	*stdParamSuite	= privateData->exportStdParamSuite;
 	
 	csSDK_uint32	exID	= summaryRecP->exporterPluginID;
 	csSDK_int32		gIdx	= 0;
 	
 	// Standard settings
-	exParamValues width, height, frameRate;
+	/*exParamValues width, height, frameRate;
 	
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &width);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &height);
@@ -1183,7 +1205,10 @@ exSDKGetParamSummary(
 	
 	exParamValues sampleRateP, channelTypeP;
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
-	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);*/
+
+	stdParamSuite->MakeParamSummary(exID, summaryRecP->exportVideo, summaryRecP->exportAudio,
+										summaryRecP->videoSummary, summaryRecP->audioSummary);
 
 	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, vidEncodingP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
@@ -1207,7 +1232,7 @@ exSDKGetParamSummary(
 	
 	
 	// oh boy, figure out frame rate
-	PrTime frameRates[] = {	10, 15, 23,
+/*	PrTime frameRates[] = {	10, 15, 23,
 							24, 25, 29,
 							30, 48, 48,
 							50, 59, 60};
@@ -1260,6 +1285,9 @@ exSDKGetParamSummary(
 						"Stereo");
 
 	audioStream << ", ";
+	*/
+	
+	std::stringstream audioStream;
 	
 	if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 	{
@@ -1332,8 +1360,8 @@ exSDKGetParamSummary(
 		bitrateStream << ", Best";
 	
 
-	utf16ncpy(summaryRecP->videoSummary, videoStream.str().c_str(), 255);
-	utf16ncpy(summaryRecP->audioSummary, audioStream.str().c_str(), 255);
+	//utf16ncpy(summaryRecP->videoSummary, videoStream.str().c_str(), 255);
+	//utf16ncpy(summaryRecP->audioSummary, audioStream.str().c_str(), 255);
 	utf16ncpy(summaryRecP->bitrateSummary, bitrateStream.str().c_str(), 255);
 	
 	return malNoError;
