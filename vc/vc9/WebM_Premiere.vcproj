@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
+				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;&quot;..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Utils&quot;"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC"
 				RuntimeLibrary="3"
 				StructMemberAlignment="0"
@@ -79,7 +79,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="vfw32.lib msacm32.lib winmm.lib comctl32.lib"
-				OutputFile="$(OutDir)\WebM.prm"
+				OutputFile="C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\WebM.prm"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils&quot;"
+				AdditionalIncludeDirectories="..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;&quot;..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers&quot;;&quot;..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Utils&quot;"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC"
 				RuntimeLibrary="2"
 			/>
@@ -195,91 +195,91 @@
 			Filter=".h"
 			>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAlphaTypes.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKAlphaTypes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAsyncImporter.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKAsyncImporter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAudioSuite.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKAudioSuite.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKClassData.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKClassData.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKEntry.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKEntry.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKImport.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKImport.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKImporterShared.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKImporterShared.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKMALErrors.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKMALErrors.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPixelFormat.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPixelFormat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugMemory.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPlugMemory.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugPPix.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPlugPPix.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugSuites.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPlugSuites.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugUtilities.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPlugUtilities.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugWindow.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPlugWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPPixCacheSuite.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPPixCacheSuite.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPPixCreatorSuite.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKPPixCreatorSuite.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKTimeSuite.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKTimeSuite.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKTypes.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\PrSDKTypes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPBasic.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\SPBasic.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPConfig.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\SPConfig.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPErrorCodes.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\SPErrorCodes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPTypes.h"
+				RelativePath="..\..\ext\Premiere Pro CS6 r2 Win SDK\Examples\Headers\SPTypes.h"
 				>
 			</File>
 		</Filter>
