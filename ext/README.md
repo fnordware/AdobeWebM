@@ -5,7 +5,7 @@ This directory holds git submodules that point to libraries needed by the WebM a
 
 You will need to manually add the following to this directory because the owners don't have a git repository I can embed:
 
-* [Premiere CS5 SDK](http://www.adobe.com/devnet/premiere/sdk/cs5.html)
+* [Premiere CS6 r2 SDK](http://www.adobe.com/devnet/premiere/sdk/cs6.html)
 * [Photoshop CS5 SDK](http://www.adobe.com/devnet/photoshop/sdk.html)
 
 

@@ -108,16 +108,17 @@
 /* Begin PBXFileReference section */
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		08EA7FFBFE8413EDC02AAC07 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
-		112C3FBA0A8828B9001FFCCB /* PrSDKImport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKImport.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKImport.h"; sourceTree = SOURCE_ROOT; };
-		112C3FBB0A8828B9001FFCCB /* SPBasic.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SPBasic.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/SPBasic.h"; sourceTree = SOURCE_ROOT; };
-		112C3FC20A8828F9001FFCCB /* PrSDKStructs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKStructs.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKStructs.h"; sourceTree = SOURCE_ROOT; };
-		112C3FC60A88292D001FFCCB /* PrSDKPPixCreatorSuite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKPPixCreatorSuite.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKPPixCreatorSuite.h"; sourceTree = SOURCE_ROOT; };
-		112C3FCA0A882955001FFCCB /* PrSDKPPixCacheSuite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKPPixCacheSuite.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKPPixCacheSuite.h"; sourceTree = SOURCE_ROOT; };
+		112C3FBA0A8828B9001FFCCB /* PrSDKImport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKImport.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/PrSDKImport.h"; sourceTree = SOURCE_ROOT; };
+		112C3FBB0A8828B9001FFCCB /* SPBasic.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SPBasic.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/SPBasic.h"; sourceTree = SOURCE_ROOT; };
+		112C3FC20A8828F9001FFCCB /* PrSDKStructs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKStructs.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/PrSDKStructs.h"; sourceTree = SOURCE_ROOT; };
+		112C3FC60A88292D001FFCCB /* PrSDKPPixCreatorSuite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKPPixCreatorSuite.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/PrSDKPPixCreatorSuite.h"; sourceTree = SOURCE_ROOT; };
+		112C3FCA0A882955001FFCCB /* PrSDKPPixCacheSuite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKPPixCacheSuite.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/PrSDKPPixCacheSuite.h"; sourceTree = SOURCE_ROOT; };
 		1157612B0AD5C4A200B6DA40 /* WebM Premiere.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WebM Premiere.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		11C3E51F0A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = WebM_Premiere_Import_PiPL.r; path = ../../src/premiere/WebM_Premiere_Import_PiPL.r; sourceTree = SOURCE_ROOT; };
-		11D512BB0B1E7F490085D80B /* PrSDKTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKTypes.h; path = "../../ext/Premiere Pro CS5 Mac SDK/Examples/Headers/PrSDKTypes.h"; sourceTree = SOURCE_ROOT; };
+		11D512BB0B1E7F490085D80B /* PrSDKTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrSDKTypes.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/PrSDKTypes.h"; sourceTree = SOURCE_ROOT; };
 		2A06EF71177D75F100233616 /* WebM_Premiere_Export_Params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebM_Premiere_Export_Params.h; sourceTree = "<group>"; };
 		2A06EF72177D75F100233616 /* WebM_Premiere_Export_Params.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebM_Premiere_Export_Params.cpp; sourceTree = "<group>"; };
+		2A27ED9E1AB8B182003D25AB /* PrSDKExport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrSDKExport.h; path = "../../ext/Premiere Pro CS6 r2 Mac SDK/Examples/Headers/PrSDKExport.h"; sourceTree = SOURCE_ROOT; };
 		2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libvpx.xcodeproj; path = ext/libvpx.xcodeproj; sourceTree = "<group>"; };
 		2A55321D176AA87700BE5A72 /* libogg.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libogg.xcodeproj; path = ext/libogg.xcodeproj; sourceTree = "<group>"; };
 		2A553220176AA87700BE5A72 /* libvorbis.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libvorbis.xcodeproj; path = ext/libvorbis.xcodeproj; sourceTree = "<group>"; };
@@ -167,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				112C3FBA0A8828B9001FFCCB /* PrSDKImport.h */,
+				2A27ED9E1AB8B182003D25AB /* PrSDKExport.h */,
 				112C3FCA0A882955001FFCCB /* PrSDKPPixCacheSuite.h */,
 				112C3FC60A88292D001FFCCB /* PrSDKPPixCreatorSuite.h */,
 				112C3FC20A8828F9001FFCCB /* PrSDKStructs.h */,
@@ -488,7 +490,7 @@
 					../../ext/opus/include,
 				);
 				PREBINDING = NO;
-				PREMIERE_SDK = "\"../../ext/Premiere Pro CS5 Mac SDK\"";
+				PREMIERE_SDK = "\"../../ext/Premiere Pro CS6 r2 Mac SDK\"";
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Debug;
@@ -514,7 +516,7 @@
 					../../ext/opus/include,
 				);
 				PREBINDING = NO;
-				PREMIERE_SDK = "\"../../ext/Premiere Pro CS5 Mac SDK\"";
+				PREMIERE_SDK = "\"../../ext/Premiere Pro CS6 r2 Mac SDK\"";
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Release;

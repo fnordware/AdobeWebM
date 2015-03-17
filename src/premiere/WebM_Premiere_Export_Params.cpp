@@ -1171,8 +1171,6 @@ exSDKGetParamSummary(
 	ExportSettings			*privateData	= reinterpret_cast<ExportSettings*>(summaryRecP->privateData);
 	PrSDKExportParamSuite	*paramSuite		= privateData->exportParamSuite;
 	
-	std::string summary1, summary2, summary3;
-
 	csSDK_uint32	exID	= summaryRecP->exporterPluginID;
 	csSDK_int32		gIdx	= 0;
 	
@@ -1246,104 +1244,97 @@ exSDKGetParamSummary(
 	}
 
 
-	std::stringstream stream1;
+	std::stringstream videoStream;
 	
-	stream1 << width.value.intValue << "x" << height.value.intValue;
+	videoStream << width.value.intValue << "x" << height.value.intValue;
 	
 	if(frame_rate_index >= 0 && frame_rate_index < 12) 
-		stream1 << ", " << frameRateStrings[frame_rate_index] << " fps";
-	
-	summary1 = stream1.str();
+		videoStream << ", " << frameRateStrings[frame_rate_index] << " fps";
 	
 	
-	std::stringstream stream2;
+	std::stringstream audioStream;
 	
-	stream2 << (int)sampleRateP.value.floatValue << " Hz";
-	stream2 << ", " << (channelTypeP.value.intValue == kPrAudioChannelType_51 ? "Dolby 5.1" :
+	audioStream << (int)sampleRateP.value.floatValue << " Hz";
+	audioStream << ", " << (channelTypeP.value.intValue == kPrAudioChannelType_51 ? "Dolby 5.1" :
 						channelTypeP.value.intValue == kPrAudioChannelType_Mono ? "Mono" :
 						"Stereo");
 
-	stream2 << ", ";
+	audioStream << ", ";
 	
 	if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 	{
-		stream2 << "Opus ";
+		audioStream << "Opus ";
 		
 		if(autoBitrateP.value.intValue)
 		{
-			stream2 << "auto bitrate";
+			audioStream << "auto bitrate";
 		}
 		else
 		{
-			stream2 << opusBitrateP.value.intValue << " kbps";
+			audioStream << opusBitrateP.value.intValue << " kbps";
 		}
 	}
 	else
 	{
-		stream2 << "Vorbis ";
+		audioStream << "Vorbis ";
 		
 		if(audioMethodP.value.intValue == OGG_BITRATE)
 		{
-			stream2 << audioBitrateP.value.intValue << " kbps";
+			audioStream << audioBitrateP.value.intValue << " kbps";
 		}
 		else
 		{
-			stream2 << "Quality " << audioQualityP.value.floatValue;
+			audioStream << "Quality " << audioQualityP.value.floatValue;
 		}
 	}
 	
 
-	
-	summary2 = stream2.str();
 	
 	
 	WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 	
-	std::stringstream stream3;
+	std::stringstream bitrateStream;
 	
 	if(method == WEBM_METHOD_QUALITY)
 	{
-		stream3 << "Quality " << videoQualityP.value.intValue;
+		bitrateStream << "Quality " << videoQualityP.value.intValue;
 	}
 	else
 	{
-		stream3 << videoBitrateP.value.intValue << " kb/s";
+		bitrateStream << videoBitrateP.value.intValue << " kb/s";
 		
 		if(method == WEBM_METHOD_VBR)
-			stream3 << " VBR";
+			bitrateStream << " VBR";
 	}
 	
-	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");	
+	bitrateStream << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");	
 
 	if(codecP.value.intValue == WEBM_CODEC_VP9)
 	{
 		if(samplingP.value.intValue == WEBM_444)
-			stream3 << " 4:4:4";
+			bitrateStream << " 4:4:4";
 		else if(samplingP.value.intValue == WEBM_422)
-			stream3 << " 4:2:2";
+			bitrateStream << " 4:2:2";
 		else
-			stream3 << " 4:2:0";
+			bitrateStream << " 4:2:0";
 		
 		if(bitDepthP.value.intValue == VPX_BITS_10)
-			stream3 << " 10-bit";
+			bitrateStream << " 10-bit";
 		else if(bitDepthP.value.intValue == VPX_BITS_12)
-			stream3 << " 12-bit";
+			bitrateStream << " 12-bit";
 		else
-			stream3 << " 8-bit";
+			bitrateStream << " 8-bit";
 	}
 	
 	if(vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME)
-		stream3 << ", Realtime";
+		bitrateStream << ", Realtime";
 	else if(vidEncodingP.value.intValue == WEBM_ENCODING_BEST)
-		stream3 << ", Best";
-	
-	summary3 = stream3.str();
-	
+		bitrateStream << ", Best";
 	
 
-	utf16ncpy(summaryRecP->Summary1, summary1.c_str(), 255);
-	utf16ncpy(summaryRecP->Summary2, summary2.c_str(), 255);
-	utf16ncpy(summaryRecP->Summary3, summary3.c_str(), 255);
+	utf16ncpy(summaryRecP->videoSummary, videoStream.str().c_str(), 255);
+	utf16ncpy(summaryRecP->audioSummary, audioStream.str().c_str(), 255);
+	utf16ncpy(summaryRecP->bitrateSummary, bitrateStream.str().c_str(), 255);
 	
 	return malNoError;
 }
