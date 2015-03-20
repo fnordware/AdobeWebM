@@ -418,7 +418,7 @@ exSDKGenerateDefaultParams(
 	exParamValues videoBitrateValues;
 	videoBitrateValues.structVersion = 1;
 	videoBitrateValues.rangeMin.intValue = 1;
-	videoBitrateValues.rangeMax.intValue = 50000;
+	videoBitrateValues.rangeMax.intValue = 10000;
 	videoBitrateValues.value.intValue = 1000;
 	videoBitrateValues.disabled = kPrFalse;
 	videoBitrateValues.hidden = kPrTrue;
@@ -930,7 +930,7 @@ exSDKPostProcessParams(
 	exportParamSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateValues);
 
 	bitrateValues.rangeMin.intValue = 1;
-	bitrateValues.rangeMax.intValue = 50000;
+	bitrateValues.rangeMax.intValue = 10000;
 	
 	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &bitrateValues);
 	
@@ -1529,7 +1529,10 @@ static void SetValue(T &v, string s)
 
 
 bool
-ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
+ConfigureEncoderPre(vpx_codec_enc_cfg_t &config,
+						 unsigned int &target_bitrate,
+						 unsigned long &deadline,
+						 const char *txt)
 {
 	std::vector<string> args;
 	
@@ -1546,7 +1549,13 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt)
 			const string &arg = args[i];
 			const string &val = args[i + 1];
 			
-			if(arg == "-t" || arg == "--threads")
+			if(arg == "--target-bitrate")
+			{	SetValue(target_bitrate, val); i++;	}
+
+			else if(arg == "-d" || arg == "--deadline")
+			{	SetValue(deadline, val); i++;	}
+
+			else if(arg == "-t" || arg == "--threads")
 			{	SetValue(config.g_threads, val); i++;	}
 			
 			else if(arg == "--lag-in-frames")

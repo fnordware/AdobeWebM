@@ -130,7 +130,10 @@ exSDKValidateParamChanged (
 	exParamChangedRec	*validateParamChangedRecP);
 	
 
-bool ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, const char *txt);
+bool ConfigureEncoderPre(vpx_codec_enc_cfg_t &config,
+						 unsigned int &target_bitrate,
+						 unsigned long &deadline,
+						 const char *txt);
 
 bool ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt);
 

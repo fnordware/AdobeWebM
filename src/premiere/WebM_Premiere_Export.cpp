@@ -949,6 +949,11 @@ exSDKExport(
 		vpx_codec_ctx_t encoder;
 		vpx_codec_iter_t encoder_iter = NULL;
 		
+		unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
+									vidEncodingP.value.intValue == WEBM_ENCODING_BEST ? VPX_DL_BEST_QUALITY :
+									VPX_DL_GOOD_QUALITY;
+
+												
 		PrTime videoEncoderTime = exportInfoP->startTime;
 		
 		if(exportInfoP->exportVideo)
@@ -1021,7 +1026,7 @@ exSDKExport(
 			config.g_timebase.num = fps.denominator;
 			config.g_timebase.den = fps.numerator;
 			
-			ConfigureEncoderPre(config, customArgs);
+			ConfigureEncoderPre(config, config.rc_target_bitrate, deadline, customArgs);
 			
 			
 			const vpx_codec_flags_t flags = (config.g_bit_depth == VPX_BITS_8 ? 0 : VPX_CODEC_USE_HIGHBITDEPTH);
@@ -1539,10 +1544,6 @@ exSDKExport(
 				
 				if(exportInfoP->exportVideo && (videoTime < exportInfoP->endTime)) // there will some audio after the last video frame
 				{
-					const unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
-												vidEncodingP.value.intValue == WEBM_ENCODING_BEST ? VPX_DL_BEST_QUALITY :
-												VPX_DL_GOOD_QUALITY;
-												
 					bool made_frame = false;
 					
 					while(!made_frame && result == suiteError_NoError)
