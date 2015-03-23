@@ -830,12 +830,11 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, vidEncodingP, samplingP, bitDepthP, customArgsP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, samplingP, bitDepthP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
-	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
@@ -949,9 +948,7 @@ exSDKExport(
 		vpx_codec_ctx_t encoder;
 		vpx_codec_iter_t encoder_iter = NULL;
 		
-		unsigned long deadline = vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME ? VPX_DL_REALTIME :
-									vidEncodingP.value.intValue == WEBM_ENCODING_BEST ? VPX_DL_BEST_QUALITY :
-									VPX_DL_GOOD_QUALITY;
+		unsigned long deadline = VPX_DL_GOOD_QUALITY;
 
 												
 		PrTime videoEncoderTime = exportInfoP->startTime;
@@ -1026,7 +1023,7 @@ exSDKExport(
 			config.g_timebase.num = fps.denominator;
 			config.g_timebase.den = fps.numerator;
 			
-			ConfigureEncoderPre(config, config.rc_target_bitrate, deadline, customArgs);
+			ConfigureEncoderPre(config, deadline, customArgs);
 			
 			
 			const vpx_codec_flags_t flags = (config.g_bit_depth == VPX_BITS_8 ? 0 : VPX_CODEC_USE_HIGHBITDEPTH);

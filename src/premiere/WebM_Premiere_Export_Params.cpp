@@ -362,7 +362,7 @@ exSDKGenerateDefaultParams(
 	codecValues.structVersion = 1;
 	codecValues.rangeMin.intValue = WEBM_CODEC_VP8;
 	codecValues.rangeMax.intValue = WEBM_CODEC_VP9;
-	codecValues.value.intValue = WEBM_CODEC_VP8;
+	codecValues.value.intValue = WEBM_CODEC_VP9;
 	codecValues.disabled = kPrFalse;
 	codecValues.hidden = kPrFalse;
 	
@@ -433,32 +433,13 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &videoBitrateParam);
 	
 	
-	// Encoding
-	exParamValues vidEncodingValues;
-	vidEncodingValues.structVersion = 1;
-	vidEncodingValues.rangeMin.intValue = WEBM_ENCODING_REALTIME;
-	vidEncodingValues.rangeMax.intValue = WEBM_ENCODING_BEST;
-	vidEncodingValues.value.intValue = WEBM_ENCODING_GOOD;
-	vidEncodingValues.disabled = kPrFalse;
-	vidEncodingValues.hidden = kPrFalse;
-	
-	exNewParamInfo vidEncodingParam;
-	vidEncodingParam.structVersion = 1;
-	strncpy(vidEncodingParam.identifier, WebMVideoEncoding, 255);
-	vidEncodingParam.paramType = exParamType_int;
-	vidEncodingParam.flags = exParamFlag_none;
-	vidEncodingParam.paramValues = vidEncodingValues;
-	
-	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &vidEncodingParam);
-	
-	
 	// Sampling
 	exParamValues samplingValues;
 	samplingValues.structVersion = 1;
 	samplingValues.rangeMin.intValue = WEBM_420;
 	samplingValues.rangeMax.intValue = WEBM_444;
 	samplingValues.value.intValue = WEBM_420;
-	samplingValues.disabled = kPrTrue;
+	samplingValues.disabled = kPrFalse;
 	samplingValues.hidden = kPrFalse;
 	
 	exNewParamInfo samplingParam;
@@ -477,7 +458,7 @@ exSDKGenerateDefaultParams(
 	bitDepthValues.rangeMin.intValue = 8;
 	bitDepthValues.rangeMax.intValue = 12;
 	bitDepthValues.value.intValue = 8;
-	bitDepthValues.disabled = kPrTrue;
+	bitDepthValues.disabled = kPrFalse;
 	bitDepthValues.hidden = kPrFalse;
 	
 	exNewParamInfo bitDepthParam;
@@ -591,7 +572,7 @@ exSDKGenerateDefaultParams(
 	audioCodecValues.structVersion = 1;
 	audioCodecValues.rangeMin.intValue = WEBM_CODEC_VORBIS;
 	audioCodecValues.rangeMax.intValue = WEBM_CODEC_OPUS;
-	audioCodecValues.value.intValue = WEBM_CODEC_VORBIS;
+	audioCodecValues.value.intValue = WEBM_CODEC_OPUS;
 	audioCodecValues.disabled = kPrFalse;
 	audioCodecValues.hidden = kPrFalse;
 	
@@ -612,7 +593,7 @@ exSDKGenerateDefaultParams(
 	audioMethodValues.rangeMax.intValue = OGG_BITRATE;
 	audioMethodValues.value.intValue = OGG_QUALITY;
 	audioMethodValues.disabled = kPrFalse;
-	audioMethodValues.hidden = kPrFalse;
+	audioMethodValues.hidden = kPrTrue;
 	
 	exNewParamInfo audioMethodParam;
 	audioMethodParam.structVersion = 1;
@@ -631,7 +612,7 @@ exSDKGenerateDefaultParams(
 	audioQualityValues.rangeMax.floatValue = 1.f;
 	audioQualityValues.value.floatValue = 0.5f;
 	audioQualityValues.disabled = kPrFalse;
-	audioQualityValues.hidden = kPrFalse;
+	audioQualityValues.hidden = kPrTrue;
 	
 	exNewParamInfo audioQualityParam;
 	audioQualityParam.structVersion = 1;
@@ -667,7 +648,7 @@ exSDKGenerateDefaultParams(
 	autoBitrateValues.structVersion = 1;
 	autoBitrateValues.value.intValue = kPrTrue;
 	autoBitrateValues.disabled = kPrFalse;
-	autoBitrateValues.hidden = kPrTrue;
+	autoBitrateValues.hidden = kPrFalse;
 	
 	exNewParamInfo autoBitrateParam;
 	autoBitrateParam.structVersion = 1;
@@ -686,7 +667,7 @@ exSDKGenerateDefaultParams(
 	opusBitrateValues.rangeMax.intValue = 512;
 	opusBitrateValues.value.intValue = 128;
 	opusBitrateValues.disabled = kPrTrue;
-	opusBitrateValues.hidden = kPrTrue;
+	opusBitrateValues.hidden = kPrFalse;
 	
 	exNewParamInfo opusBitrateParam;
 	opusBitrateParam.structVersion = 1;
@@ -935,28 +916,12 @@ exSDKPostProcessParams(
 	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &bitrateValues);
 	
 	
-	// Encoding
-	utf16ncpy(paramString, "Encoding", 255);
-	exportParamSuite->SetParamName(exID, gIdx, WebMVideoEncoding, paramString);
-	
-	
-	int vidQualities[] = {	WEBM_ENCODING_REALTIME,
-							WEBM_ENCODING_GOOD,
-							WEBM_ENCODING_BEST };
-	
-	const char *vidQualityStrings[]	= {	"Realtime",
-										"Good",
-										"Best" };
-
-	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoEncoding);
-	
-	exOneParamValueRec tempEncodingQuality;
-	for(int i=0; i < 3; i++)
-	{
-		tempEncodingQuality.intValue = vidQualities[i];
-		utf16ncpy(paramString, vidQualityStrings[i], 255);
-		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoEncoding, &tempEncodingQuality, paramString);
-	}
+	// hide old Encoding quality parameter
+#define WebMVideoEncoding "WebMVideoEncoding"
+	exParamValues encodingValues;
+	exportParamSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &encodingValues);
+	encodingValues.hidden = kPrTrue;
+	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoEncoding, &encodingValues);
 	
 	
 	// Sampling
@@ -1187,14 +1152,13 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, vidEncodingP;
+	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
-	paramSuite->GetParamValue(exID, gIdx, WebMVideoEncoding, &vidEncodingP);
 	
 
 	exParamValues audioCodecP, audioMethodP, audioQualityP, audioBitrateP;
@@ -1331,11 +1295,6 @@ exSDKGetParamSummary(
 		else
 			stream3 << " 8-bit";
 	}
-	
-	if(vidEncodingP.value.intValue == WEBM_ENCODING_REALTIME)
-		stream3 << ", Realtime";
-	else if(vidEncodingP.value.intValue == WEBM_ENCODING_BEST)
-		stream3 << ", Best";
 	
 	summary3 = stream3.str();
 	
@@ -1529,10 +1488,7 @@ static void SetValue(T &v, string s)
 
 
 bool
-ConfigureEncoderPre(vpx_codec_enc_cfg_t &config,
-						 unsigned int &target_bitrate,
-						 unsigned long &deadline,
-						 const char *txt)
+ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, unsigned long &deadline, const char *txt)
 {
 	std::vector<string> args;
 	
@@ -1549,9 +1505,15 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config,
 			const string &arg = args[i];
 			const string &val = args[i + 1];
 			
-			if(arg == "--target-bitrate")
-			{	SetValue(target_bitrate, val); i++;	}
-
+			if(arg == "--best")
+			{	deadline = VPX_DL_BEST_QUALITY;	}
+			
+			else if(arg == "--good")
+			{	deadline = VPX_DL_GOOD_QUALITY;	}
+			
+			else if(arg == "--rt")
+			{	deadline = VPX_DL_REALTIME;	}
+			
 			else if(arg == "-d" || arg == "--deadline")
 			{	SetValue(deadline, val); i++;	}
 

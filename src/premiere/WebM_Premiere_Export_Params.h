@@ -57,12 +57,6 @@ typedef enum {
 } WebM_Video_Method;
 
 typedef enum {
-	WEBM_ENCODING_REALTIME = 0,
-	WEBM_ENCODING_GOOD,
-	WEBM_ENCODING_BEST
-} WebM_Video_Encoding;
-
-typedef enum {
 	WEBM_420 = 0,
 	WEBM_422,
 	WEBM_444
@@ -75,7 +69,6 @@ typedef enum {
 #define WebMVideoMethod		"WebMVideoMethod"
 #define WebMVideoQuality	"WebMVideoQuality"
 #define WebMVideoBitrate	"WebMVideoBitrate"
-#define WebMVideoEncoding	"WebMVideoEncoding"
 #define WebMVideoSampling	"WebMVideoSampling"
 #define WebMVideoBitDepth	"WebMVideoBitDepth"
 
@@ -94,9 +87,9 @@ typedef enum {
 } Ogg_Method;
 
 
-#define WebMAudioCodec	"WebMAudioCodec"
+#define WebMAudioCodec		"WebMAudioCodec"
 
-#define WebMAudioMethod	"WebMAudioMethod"
+#define WebMAudioMethod		"WebMAudioMethod"
 #define WebMAudioQuality	"WebMAudioQuality"
 #define WebMAudioBitrate	"WebMAudioBitrate"
 
@@ -130,10 +123,7 @@ exSDKValidateParamChanged (
 	exParamChangedRec	*validateParamChangedRecP);
 	
 
-bool ConfigureEncoderPre(vpx_codec_enc_cfg_t &config,
-						 unsigned int &target_bitrate,
-						 unsigned long &deadline,
-						 const char *txt);
+bool ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, unsigned long &deadline, const char *txt);
 
 bool ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt);
 
