@@ -105,7 +105,7 @@ exSDKQueryOutputSettings(
 		paramSuite->GetParamValue(exID, mgroupIndex, WebMVideoBitrate, &videoBitrateP);
 		
 		
-		if(methodP.value.intValue == WEBM_METHOD_QUALITY)
+		if(methodP.value.intValue == WEBM_METHOD_CONSTANT_QUALITY || methodP.value.intValue == WEBM_METHOD_CONSTRAINED_QUALITY)
 		{
 			PrTime ticksPerSecond = 0;
 			privateData->timeSuite->GetTicksPerSecond(&ticksPerSecond);
@@ -119,8 +119,13 @@ exSDKQueryOutputSettings(
 			const float qualityMinMult = 0.001;
 			const float qualityMult = ( powf(qual, quality_gamma) * (qualityMaxMult - qualityMinMult)) + qualityMinMult;
 			const int bitsPerFrame = bitsPerFrameUncompressed * qualityMult;
-		
-			videoBitrate += (bitsPerFrame * fps) / 1024;
+			
+			csSDK_uint32 quality_bitrate = (bitsPerFrame * fps) / 1024;
+			
+			if(methodP.value.intValue == WEBM_METHOD_CONSTRAINED_QUALITY && quality_bitrate > videoBitrateP.value.intValue)
+				quality_bitrate = videoBitrateP.value.intValue;
+			
+			videoBitrate += quality_bitrate;
 		}
 		else
 			videoBitrate += videoBitrateP.value.intValue;
@@ -379,9 +384,9 @@ exSDKGenerateDefaultParams(
 	// Method
 	exParamValues methodValues;
 	methodValues.structVersion = 1;
-	methodValues.rangeMin.intValue = WEBM_METHOD_QUALITY;
-	methodValues.rangeMax.intValue = WEBM_METHOD_VBR;
-	methodValues.value.intValue = WEBM_METHOD_QUALITY;
+	methodValues.rangeMin.intValue = WEBM_METHOD_CONSTANT_QUALITY;
+	methodValues.rangeMax.intValue = WEBM_METHOD_CONSTRAINED_QUALITY;
+	methodValues.value.intValue = WEBM_METHOD_CONSTANT_QUALITY;
 	methodValues.disabled = kPrFalse;
 	methodValues.hidden = kPrFalse;
 	
@@ -871,18 +876,20 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, WebMVideoMethod, paramString);
 	
 	
-	int vidMethods[] = {	WEBM_METHOD_QUALITY,
+	int vidMethods[] = {	WEBM_METHOD_CONSTANT_QUALITY,
+							WEBM_METHOD_CONSTRAINED_QUALITY,
 							WEBM_METHOD_BITRATE,
 							WEBM_METHOD_VBR };
 	
 	const char *vidMethodStrings[]	= {	"Constant Quality",
+										"Constrained Quality",
 										"Constant Bitrate",
 										"Variable Bitrate (2-pass)" };
 
 	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoMethod);
 	
 	exOneParamValueRec tempEncodingMethod;
-	for(int i=0; i < 3; i++)
+	for(int i=0; i < 4; i++)
 	{
 		tempEncodingMethod.intValue = vidMethods[i];
 		utf16ncpy(paramString, vidMethodStrings[i], 255);
@@ -1265,9 +1272,12 @@ exSDKGetParamSummary(
 	
 	std::stringstream stream3;
 	
-	if(method == WEBM_METHOD_QUALITY)
+	if(method == WEBM_METHOD_CONSTANT_QUALITY || method == WEBM_METHOD_CONSTRAINED_QUALITY)
 	{
 		stream3 << "Quality " << videoQualityP.value.intValue;
+		
+		if(method == WEBM_METHOD_CONSTRAINED_QUALITY)
+			stream3 << ", Limit " << videoBitrateP.value.intValue << " kb/s";
 	}
 	else
 	{
@@ -1342,8 +1352,8 @@ exSDKValidateParamChanged (
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityValue);
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateValue);
 		
-		videoQualityValue.hidden = !(methodValue.value.intValue == WEBM_METHOD_QUALITY);
-		videoBitrateValue.hidden = (methodValue.value.intValue == WEBM_METHOD_QUALITY);
+		videoQualityValue.hidden = (methodValue.value.intValue == WEBM_METHOD_BITRATE || methodValue.value.intValue == WEBM_METHOD_VBR);
+		videoBitrateValue.hidden = (methodValue.value.intValue == WEBM_METHOD_CONSTANT_QUALITY);
 		
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoQuality, &videoQualityValue);
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &videoBitrateValue);
@@ -1679,19 +1689,19 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			{	ConfigureValue(encoder, VP8E_SET_GF_CBR_BOOST_PCT, val); i++;	}
 
 			else if(arg == "--screen-content-mode")
-			{	ConfigureValue(encoder, VP8E_SET_SCREEN_CONTENT_MODE, 1);	}
+			{	ConfigureValue(encoder, VP8E_SET_SCREEN_CONTENT_MODE, val);	i++;	}
 			
 			else if(arg == "--lossless")
 			{	ConfigureValue(encoder, VP9E_SET_LOSSLESS, 1);	}
 			
 			else if(arg == "--frame-parallel")
-			{	ConfigureValue(encoder, VP9E_SET_FRAME_PARALLEL_DECODING, 1);	}
+			{	ConfigureValue(encoder, VP9E_SET_FRAME_PARALLEL_DECODING, val);	i++;	}
 
 			else if(arg == "--aq-mode")
-			{	ConfigureValue(encoder, VP9E_SET_AQ_MODE, 1);	}
+			{	ConfigureValue(encoder, VP9E_SET_AQ_MODE, val);	i++;	}
 
 			else if(arg == "--frame_boost")
-			{	ConfigureValue(encoder, VP9E_SET_FRAME_PERIODIC_BOOST, 1);	}
+			{	ConfigureValue(encoder, VP9E_SET_FRAME_PERIODIC_BOOST, val); i++;	}
 			
 			i++;	
 		}

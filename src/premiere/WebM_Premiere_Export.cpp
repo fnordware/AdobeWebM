@@ -917,7 +917,7 @@ exSDKExport(
 			
 	try{
 	
-	const int passes = ( (exportInfoP->exportVideo && method == WEBM_METHOD_VBR) ? 2 : 1);
+	const int passes = ( (exportInfoP->exportVideo && (method == WEBM_METHOD_VBR || method == WEBM_METHOD_CONSTRAINED_QUALITY)) ? 2 : 1);
 	
 	for(int pass = 0; pass < passes && result == malNoError; pass++)
 	{
@@ -979,9 +979,9 @@ exSDKExport(
 			config.g_input_bit_depth = config.g_bit_depth;
 			
 			
-			if(method == WEBM_METHOD_QUALITY)
+			if(method == WEBM_METHOD_CONSTANT_QUALITY || method == WEBM_METHOD_CONSTRAINED_QUALITY)
 			{
-				config.rc_end_usage = VPX_CQ;
+				config.rc_end_usage = (method == WEBM_METHOD_CONSTANT_QUALITY ? VPX_Q : VPX_CQ);
 				config.g_pass = VPX_RC_ONE_PASS;
 				
 				const int min_q = config.rc_min_quantizer + 1;
@@ -995,27 +995,35 @@ exSDKExport(
 				if(method == WEBM_METHOD_VBR)
 				{
 					config.rc_end_usage = VPX_VBR;
-					
-					if(vbr_pass)
-					{
-						config.g_pass = VPX_RC_FIRST_PASS;
-					}
-					else
-					{
-						config.g_pass = VPX_RC_LAST_PASS;
-						
-						config.rc_twopass_stats_in.buf = vbr_buffer;
-						config.rc_twopass_stats_in.sz = vbr_buffer_size;
-					}
 				}
-				else
+				else if(method == WEBM_METHOD_BITRATE)
 				{
 					config.rc_end_usage = VPX_CBR;
 					config.g_pass = VPX_RC_ONE_PASS;
 				}
-				
-				config.rc_target_bitrate = bitrateP.value.intValue;
+				else
+					assert(false);
 			}
+			
+			if(passes == 2)
+			{
+				if(vbr_pass)
+				{
+					config.g_pass = VPX_RC_FIRST_PASS;
+				}
+				else
+				{
+					config.g_pass = VPX_RC_LAST_PASS;
+					
+					config.rc_twopass_stats_in.buf = vbr_buffer;
+					config.rc_twopass_stats_in.sz = vbr_buffer_size;
+				}
+			}
+			else
+				config.g_pass = VPX_RC_ONE_PASS;
+				
+			
+			config.rc_target_bitrate = bitrateP.value.intValue;
 			
 			
 			config.g_threads = g_num_cpus;
@@ -1033,7 +1041,7 @@ exSDKExport(
 			
 			if(codec_err == VPX_CODEC_OK)
 			{
-				if(method == WEBM_METHOD_QUALITY)
+				if(method == WEBM_METHOD_CONSTANT_QUALITY || method == WEBM_METHOD_CONSTRAINED_QUALITY)
 				{
 					const int min_q = config.rc_min_quantizer;
 					const int max_q = config.rc_max_quantizer;
@@ -1049,6 +1057,7 @@ exSDKExport(
 					vpx_codec_control(&encoder, VP8E_SET_CPUUSED, 2); // much faster if we do this
 					
 					vpx_codec_control(&encoder, VP9E_SET_TILE_COLUMNS, mylog2(g_num_cpus)); // this gives us some multithreading
+					vpx_codec_control(&encoder, VP9E_SET_FRAME_PARALLEL_DECODING, 1);
 				}
 			
 				ConfigureEncoderPost(&encoder, customArgs);

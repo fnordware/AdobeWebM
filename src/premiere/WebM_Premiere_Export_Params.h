@@ -51,9 +51,10 @@ typedef enum {
 } WebM_Video_Codec;
 
 typedef enum {
-	WEBM_METHOD_QUALITY = 0,
+	WEBM_METHOD_CONSTANT_QUALITY = 0,
 	WEBM_METHOD_BITRATE,
-	WEBM_METHOD_VBR
+	WEBM_METHOD_VBR,
+	WEBM_METHOD_CONSTRAINED_QUALITY
 } WebM_Video_Method;
 
 typedef enum {
