@@ -830,11 +830,12 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, samplingP, bitDepthP, customArgsP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, twoPassP, samplingP, bitDepthP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoTwoPass, &twoPassP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
@@ -917,7 +918,7 @@ exSDKExport(
 			
 	try{
 	
-	const int passes = ( (exportInfoP->exportVideo && (method == WEBM_METHOD_VBR || method == WEBM_METHOD_CONSTRAINED_QUALITY)) ? 2 : 1);
+	const int passes = ( (exportInfoP->exportVideo && twoPassP.value.intValue) ? 2 : 1);
 	
 	for(int pass = 0; pass < passes && result == malNoError; pass++)
 	{

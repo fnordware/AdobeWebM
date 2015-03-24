@@ -70,6 +70,7 @@ typedef enum {
 #define WebMVideoMethod		"WebMVideoMethod"
 #define WebMVideoQuality	"WebMVideoQuality"
 #define WebMVideoBitrate	"WebMVideoBitrate"
+#define WebMVideoTwoPass	"WebMVideoTwoPass"
 #define WebMVideoSampling	"WebMVideoSampling"
 #define WebMVideoBitDepth	"WebMVideoBitDepth"
 

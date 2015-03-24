@@ -438,6 +438,23 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &videoBitrateParam);
 	
 	
+	// 2-pass
+	exParamValues twoPassValues;
+	twoPassValues.structVersion = 1;
+	twoPassValues.value.intValue = kPrTrue;
+	twoPassValues.disabled = kPrFalse;
+	twoPassValues.hidden = kPrFalse;
+	
+	exNewParamInfo twoPassParam;
+	twoPassParam.structVersion = 1;
+	strncpy(twoPassParam.identifier, WebMVideoTwoPass, 255);
+	twoPassParam.paramType = exParamType_bool;
+	twoPassParam.flags = exParamFlag_none;
+	twoPassParam.paramValues = twoPassValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &twoPassParam);
+	
+	
 	// Sampling
 	exParamValues samplingValues;
 	samplingValues.structVersion = 1;
@@ -884,7 +901,7 @@ exSDKPostProcessParams(
 	const char *vidMethodStrings[]	= {	"Constant Quality",
 										"Constrained Quality",
 										"Constant Bitrate",
-										"Variable Bitrate (2-pass)" };
+										"Variable Bitrate" };
 
 	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoMethod);
 	
@@ -921,6 +938,11 @@ exSDKPostProcessParams(
 	bitrateValues.rangeMax.intValue = 10000;
 	
 	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoBitrate, &bitrateValues);
+	
+	
+	// 2-pass
+	utf16ncpy(paramString, "2-Pass Encoding", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMVideoTwoPass, paramString);
 	
 	
 	// hide old Encoding quality parameter
@@ -1159,13 +1181,14 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP;
+	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, twoPassP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoTwoPass, &twoPassP);
 	
 
 	exParamValues audioCodecP, audioMethodP, audioQualityP, audioBitrateP;
@@ -1287,7 +1310,10 @@ exSDKGetParamSummary(
 			stream3 << " VBR";
 	}
 	
-	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");	
+	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");
+	
+	if(twoPassP.value.intValue)
+		stream3 << " 2-pass";
 
 	if(codecP.value.intValue == WEBM_CODEC_VP9)
 	{
