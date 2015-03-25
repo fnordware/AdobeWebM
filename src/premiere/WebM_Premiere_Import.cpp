@@ -54,6 +54,7 @@
 
 #include <sstream>
 #include <map>
+#include <queue>
 
 #ifdef PRMAC_ENV
 	#include <mach/mach.h>
@@ -599,7 +600,9 @@ SDKOpenFile8(
 								// VPX_CODEC_USE_POSTPROC here.  Things like VP8_DEMACROBLOCK and
 								// VP8_MFQE (Multiframe Quality Enhancement) could be cool.
 								
-								codec_err = vpx_codec_dec_init(&decoder, iface, &config, 0);
+								const vpx_codec_flags_t flags = VPX_CODEC_USE_FRAME_THREADING;
+								
+								codec_err = vpx_codec_dec_init(&decoder, iface, &config, flags);
 								
 								if(codec_err == VPX_CODEC_OK)
 									localRecP->vpx_setup = true;
@@ -1212,9 +1215,6 @@ webm_guess_framerate(mkvparser::Segment *segment,
 
 	unsigned int frame = 0;
 	uint64_t     tstamp = 0;
-
-	const mkvparser::SegmentInfo* const pSegmentInfo = segment->GetInfo();
-	const long long timeCodeScale = pSegmentInfo->GetTimeCodeScale();
 	
 	const mkvparser::Tracks* const pTracks = segment->GetTracks();
 	const mkvparser::Cluster* pCluster = segment->GetFirst();
@@ -1409,6 +1409,8 @@ SDKGetInfo8(
 												
 												if(decode_err == VPX_CODEC_OK)
 												{
+													vpx_codec_decode(&decoder, NULL, 0, NULL, 0); // flush the decoder
+													
 													vpx_codec_iter_t iter = NULL;
 													
 													vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
@@ -1422,6 +1424,8 @@ SDKGetInfo8(
 														
 														vpx_img_free(img);
 													}
+													else
+														assert(false);
 												}
 												else
 													result = imFileReadFailed;
@@ -1876,6 +1880,103 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 	}
 }
 
+static bool
+store_vpx_img(
+	const vpx_image_t *img,
+	ImporterLocalRec8Ptr localRecP,
+	imSourceVideoRec *sourceVideoRec,
+	const long long decoded_tstamp,
+	const long long start_tstamp)
+{
+	PrTime ticksPerSecond = 0;
+	localRecP->TimeSuite->GetTicksPerSecond(&ticksPerSecond);
+	
+	csSDK_int32 theFrame = 0;
+	
+	if(localRecP->frameRateDen == 0) // i.e. still frame
+	{
+		theFrame = 0;
+	}
+	else
+	{
+		PrTime ticksPerFrame = (ticksPerSecond * (PrTime)localRecP->frameRateDen) / (PrTime)localRecP->frameRateNum;
+		theFrame = sourceVideoRec->inFrameTime / ticksPerFrame;
+	}
+	
+	imFrameFormat *frameFormat = &sourceVideoRec->inFrameFormats[0];
+	
+	prRect theRect;
+	if(frameFormat->inFrameWidth == 0 && frameFormat->inFrameHeight == 0)
+	{
+		frameFormat->inFrameWidth = localRecP->width;
+		frameFormat->inFrameHeight = localRecP->height;
+	}
+	
+	// Windows and MacOS have different definitions of Rects, so use the cross-platform prSetRect
+	prSetRect(&theRect, 0, 0, frameFormat->inFrameWidth, frameFormat->inFrameHeight);
+	
+	assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
+	
+	vpx_img_fmt img_fmt = img->fmt;
+	
+	// maybe Premiere doesn't want 16-bit right now
+	if(img_fmt & VPX_IMG_FMT_HIGHBITDEPTH)
+	{
+		if(frameFormat->inPixelFormat != PrPixelFormat_BGRA_4444_16u) // the only 16-bit format we currently support
+		{
+			img_fmt = (img_fmt == VPX_IMG_FMT_I42216 ? VPX_IMG_FMT_I422 :
+						img_fmt == VPX_IMG_FMT_I44016 ? VPX_IMG_FMT_I440 :
+						img_fmt == VPX_IMG_FMT_I44416 ? VPX_IMG_FMT_I444 :
+						VPX_IMG_FMT_I420);
+		}
+	}
+
+	
+	// apparently pix_format doesn't have to match frameFormat->inPixelFormat
+	const PrPixelFormat pix_format = vpx_to_premiere_pix_format(img_fmt);
+										
+	PPixHand ppix;
+	
+	localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, pix_format, &theRect);
+	
+	
+	CopyImgToPix(img, ppix, localRecP->PPixSuite, localRecP->PPix2Suite);
+	
+
+	
+	const uint64_t fps_num = localRecP->frameRateNum;
+	const uint64_t fps_den = localRecP->frameRateDen;
+	
+	const csSDK_int32 decodedFrame = (((decoded_tstamp - start_tstamp) * fps_num / fps_den) + (S2NS / 2)) / S2NS;
+	
+	const bool requested_frame = (decodedFrame == theFrame);
+	
+	// This is a nice Premiere feature.  We often have to decode many frames
+	// in a GOP (group of pictures) before we decode the one Premiere asked for.
+	// This suite lets us cache those frames for later.  We keep going past the
+	// requested frame to end of the cluster to save us the trouble in the future.
+	localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
+												0,
+												ppix,
+												decodedFrame,
+												NULL,
+												NULL);
+	
+	if(requested_frame)
+	{
+		*sourceVideoRec->outFrame = ppix;
+	}
+	else
+	{
+		// Premiere copied the frame to its cache, so we dispose ours.
+		// Very obvious memory leak if we don't.
+		localRecP->PPixSuite->Dispose(ppix);
+	}
+	
+	
+	return requested_frame;
+}
+
 static prMALError 
 SDKGetSourceVideo(
 	imStdParms			*stdParms, 
@@ -1940,10 +2041,6 @@ SDKGetSourceVideo(
 		
 		if(localRecP->segment)
 		{
-			const uint64_t fps_num = localRecP->frameRateNum;
-			const uint64_t fps_den = localRecP->frameRateDen;
-			
-			
 			const mkvparser::Cluster* pFirstCluster = localRecP->segment->GetFirst();
 	
 			const long long start_tstamp = (pFirstCluster ? pFirstCluster->GetFirstTime() : 0);
@@ -2027,6 +2124,8 @@ SDKGetSourceVideo(
 								assert(pCluster->GetTime() >= 0);
 								assert(pCluster->GetTime() == pCluster->GetFirstTime());
 								assert(got_frame || tstamp >= pCluster->GetTime());
+								
+								std::queue<long long> tstamp_queue;
 
 								const mkvparser::BlockEntry* pBlockEntry = NULL;
 								
@@ -2061,75 +2160,24 @@ SDKGetSourceVideo(
 
 												if(decode_err == VPX_CODEC_OK)
 												{
-													csSDK_int32 decodedFrame = (((packet_tstamp - start_tstamp) * fps_num / fps_den) + (S2NS / 2)) / S2NS;
+													tstamp_queue.push(packet_tstamp);
 													
 													vpx_codec_iter_t iter = NULL;
 													
-													vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
-													
-													if(img)
+													while(vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter))
 													{
-														assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
-														assert( !pBlock->IsInvisible() );
+														const bool requested_frame = store_vpx_img(img,
+																									localRecP,
+																									sourceVideoRec,
+																									tstamp_queue.front(),
+																									start_tstamp);
+														tstamp_queue.pop();
 														
-														vpx_img_fmt img_fmt = img->fmt;
-														
-														// maybe Premiere doesn't want 16-bit right now
-														if(img_fmt & VPX_IMG_FMT_HIGHBITDEPTH)
-														{
-															if(frameFormat->inPixelFormat != PrPixelFormat_BGRA_4444_16u) // the only 16-bit format we currently support
-															{
-																img_fmt = (img_fmt == VPX_IMG_FMT_I42216 ? VPX_IMG_FMT_I422 :
-																			img_fmt == VPX_IMG_FMT_I44016 ? VPX_IMG_FMT_I440 :
-																			img_fmt == VPX_IMG_FMT_I44416 ? VPX_IMG_FMT_I444 :
-																			VPX_IMG_FMT_I420);
-															}
-														}
-
-														
-														// apparently pix_format doesn't have to match frameFormat->inPixelFormat
-														const PrPixelFormat pix_format = vpx_to_premiere_pix_format(img_fmt);
-																							
-														PPixHand ppix;
-														
-														localRecP->PPixCreatorSuite->CreatePPix(&ppix, PrPPixBufferAccess_ReadWrite, pix_format, &theRect);
-														
-														
-														CopyImgToPix(img, ppix, localRecP->PPixSuite, localRecP->PPix2Suite);
-														
-
-														// Should never have another image waiting in the queue
-														assert( NULL == (img = vpx_codec_get_frame(&decoder, &iter) ) );
-														
-														
-														// This is a nice Premiere feature.  We often have to decode many frames
-														// in a GOP (group of pictures) before we decode the one Premiere asked for.
-														// This suite lets us cache those frames for later.  We keep going past the
-														// requested frame to end of the cluster to save us the trouble in the future.
-														localRecP->PPixCacheSuite->AddFrameToCache(	localRecP->importerID,
-																									0,
-																									ppix,
-																									decodedFrame,
-																									NULL,
-																									NULL);
-														
-														if(decodedFrame == theFrame)
-														{
-															*sourceVideoRec->outFrame = ppix;
-															
+														if(requested_frame)
 															got_frame = true;
-														}
-														else
-														{
-															// Premiere copied the frame to its cache, so we dispose ours.
-															// Very obvious memory leak if we don't.
-															localRecP->PPixSuite->Dispose(ppix);
-														}
 														
 														vpx_img_free(img);
 													}
-													else
-														assert( pBlock->IsInvisible() ); // must be a VP8 alt reference frame?
 												}
 												else
 													result = imFileReadFailed;
@@ -2146,6 +2194,31 @@ SDKGetSourceVideo(
 									long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
 									
 									assert(status == 0);
+								}
+								
+								// clear out any more frames left over from the multithreaded decode
+								while(tstamp_queue.size() > 0 && result == malNoError)
+								{
+									const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, NULL, 0, NULL, 0);
+									
+									assert(decode_err == VPX_CODEC_OK);
+									
+									vpx_codec_iter_t iter = NULL;
+									
+									while(vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter))
+									{
+										const bool requested_frame = store_vpx_img(img,
+																					localRecP,
+																					sourceVideoRec,
+																					tstamp_queue.front(),
+																					start_tstamp);
+										tstamp_queue.pop();
+										
+										if(requested_frame)
+											got_frame = true;
+										
+										vpx_img_free(img);
+									}
 								}
 								
 								//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
