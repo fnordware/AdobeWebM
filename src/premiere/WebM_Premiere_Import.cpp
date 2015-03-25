@@ -180,6 +180,7 @@ typedef struct
 	csSDK_int32				height;
 	csSDK_int32				frameRateNum;
 	csSDK_int32				frameRateDen;
+	csSDK_uint8				bit_depth;
 	float					audioSampleRate;
 	int						numChannels;
 	
@@ -187,6 +188,7 @@ typedef struct
 	mkvparser::Segment		*segment;
 	int						video_track;
 	VideoCodec				video_codec;
+	vpx_img_fmt_t			img_fmt;
 	int						audio_track;
 	AudioCodec				audio_codec;
 	
@@ -576,7 +578,7 @@ SDKOpenFile8(
 						
 						if(pVideoTrack)
 						{
-							const char* codec_id = pTrack->GetCodecId();
+							const char* codec_id = pVideoTrack->GetCodecId();
 						
 							const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() :
 																codec_id == std::string("V_VP9") ? vpx_codec_vp9_dx() :
@@ -618,7 +620,7 @@ SDKOpenFile8(
 						
 						if(pAudioTrack)
 						{
-							if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup == false)
+							if(pAudioTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup == false)
 							{
 								assert(pAudioTrack->GetSeekPreRoll() == 0);
 								assert(pAudioTrack->GetCodecDelay() == 0);
@@ -1078,6 +1080,19 @@ SDKCloseFile(
 }
 
 
+static inline PrPixelFormat
+vpx_to_premiere_pix_format(const vpx_img_fmt &fmt)
+{
+	return fmt == VPX_IMG_FMT_I422 ? PrPixelFormat_UYVY_422_8u_601 :
+			fmt == VPX_IMG_FMT_I440 ? PrPixelFormat_VUYX_4444_8u :
+			fmt == VPX_IMG_FMT_I444 ? PrPixelFormat_VUYX_4444_8u :
+			fmt == VPX_IMG_FMT_I42016 ? PrPixelFormat_BGRA_4444_16u : // These are set to RGB
+			fmt == VPX_IMG_FMT_I42216 ? PrPixelFormat_BGRA_4444_16u : // because Premiere seems
+			fmt == VPX_IMG_FMT_I44016 ? PrPixelFormat_BGRA_4444_16u : // to have a bug with
+			fmt == VPX_IMG_FMT_I44416 ? PrPixelFormat_BGRA_4444_16u : // VUYA_4444_16u
+			PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+}
+
 static prMALError 
 SDKGetIndPixelFormat(
 	imStdParms			*stdParms,
@@ -1085,18 +1100,30 @@ SDKGetIndPixelFormat(
 	imIndPixelFormatRec	*SDKIndPixelFormatRec) 
 {
 	prMALError	result	= malNoError;
-	//ImporterLocalRec8H	ldataH	= reinterpret_cast<ImporterLocalRec8H>(SDKIndPixelFormatRec->privatedata);
-
-	switch(idx)
-	{
-		case 0:
-			SDKIndPixelFormatRec->outPixelFormat = PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
-			break;
 	
-		default:
-			result = imBadFormatIndex;
-			break;
+	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(SDKIndPixelFormatRec->privatedata);
+	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
+
+
+	if(idx == 0)
+	{
+		SDKIndPixelFormatRec->outPixelFormat = vpx_to_premiere_pix_format(localRecP->img_fmt);
 	}
+	else if(idx == 1 && localRecP->bit_depth > 8)
+	{
+		// if main format is 16-bit, offer 8-bit alternative
+		assert(localRecP->img_fmt & VPX_IMG_FMT_HIGHBITDEPTH);
+	
+		const PrPixelFormat pix_format8 = localRecP->img_fmt == VPX_IMG_FMT_I42216 ? PrPixelFormat_UYVY_422_8u_601 :
+											localRecP->img_fmt == VPX_IMG_FMT_I44016 ? PrPixelFormat_VUYX_4444_8u :
+											localRecP->img_fmt == VPX_IMG_FMT_I44416 ? PrPixelFormat_VUYX_4444_8u :
+											PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+											
+		SDKIndPixelFormatRec->outPixelFormat = pix_format8;
+	}
+	else
+		result = imBadFormatIndex;
+	
 
 	return result;	
 }
@@ -1122,13 +1149,32 @@ SDKAnalysis(
 	if(localRecP->video_track >= 0)
 	{
 		if(localRecP->video_codec == CODEC_VP8)
+		{
+			assert(localRecP->img_fmt == VPX_IMG_FMT_I420);
+			assert(localRecP->bit_depth == 8);
+		
 			stream << "VP8";
+		}
 		else if(localRecP->video_codec == CODEC_VP9)
-			stream << "VP9";
+		{
+			const std::string sampling = localRecP->img_fmt == VPX_IMG_FMT_I422 ? "4:2:2" :
+											localRecP->img_fmt == VPX_IMG_FMT_I444 ? "4:4:4" :
+											localRecP->img_fmt == VPX_IMG_FMT_I440 ? "4:4:0" :
+											localRecP->img_fmt == VPX_IMG_FMT_I42216 ? "4:2:2" :
+											localRecP->img_fmt == VPX_IMG_FMT_I44416 ? "4:4:4" :
+											localRecP->img_fmt == VPX_IMG_FMT_I44016 ? "4:4:0" :
+											"4:2:0";
+									
+			stream << "VP9 " << sampling << " " << (int)localRecP->bit_depth << "-bit";
+			
+		}
 		else
 			stream << "unknown";
 		
-		stream << " video, ";
+		stream << " video";
+		
+		if(localRecP->audio_track >= 0)
+			stream << ", ";
 	}
 	
 	if(localRecP->audio_track >= 0)
@@ -1219,7 +1265,7 @@ webm_guess_framerate(mkvparser::Segment *segment,
 												{30, 1}, {48000, 1001}, {48, 1},
 												{50, 1}, {60000, 1001}, {60, 1}};
 
-	double fps = (double)(frame - 1) * 1000000000.0 / (double)tstamp;
+	double fps = (double)(frame - 1) * (double)S2NS / (double)tstamp;
 
 	int match_index = -1;
 	double match_episilon = 999;
@@ -1327,12 +1373,87 @@ SDKGetInfo8(
 						}
 						
 						
+						if(localRecP->video_codec == CODEC_VP9)
+						{
+							// decode the first frame to get bit depth and sampling information
+							vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
+							
+							const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
+							
+							bool got_frame = false;
+							
+							while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
+							{
+								const mkvparser::BlockEntry* pBlockEntry = NULL;
+								
+								pCluster->GetFirst(pBlockEntry);
+								
+								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && !got_frame && result == malNoError)
+								{
+									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+									
+									if(pBlock->GetTrackNumber() == localRecP->video_track)
+									{
+										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
+										
+										const unsigned int length = blockFrame.len;
+										uint8_t *data = (uint8_t *)malloc(length);
+										
+										if(data != NULL)
+										{
+											const long read_err = blockFrame.Read(localRecP->reader, data);
+											
+											if(read_err == PrMkvReader::PrMkvSuccess)
+											{
+												const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
+												
+												if(decode_err == VPX_CODEC_OK)
+												{
+													vpx_codec_iter_t iter = NULL;
+													
+													vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
+													
+													if(img)
+													{
+														localRecP->bit_depth = img->bit_depth;
+														localRecP->img_fmt = img->fmt;
+													
+														got_frame = true;
+														
+														vpx_img_free(img);
+													}
+												}
+												else
+													result = imFileReadFailed;
+											}
+											else
+												result = imFileReadFailed;
+											
+											free(data);
+										}
+										else
+											result = imMemErr;
+									}
+									
+									pCluster->GetNext(pBlockEntry, pBlockEntry);
+								}
+								
+								pCluster = localRecP->segment->GetNext(pCluster);
+							}
+						}
+						else
+						{
+							localRecP->bit_depth = 8;
+							localRecP->img_fmt = VPX_IMG_FMT_I420;
+						}
+						
+
 						// Video information
 						SDKFileInfo8->hasVideo				= kPrTrue;
-						SDKFileInfo8->vidInfo.subType		= PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+						SDKFileInfo8->vidInfo.subType		= vpx_to_premiere_pix_format(localRecP->img_fmt);
 						SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
 						SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
-						SDKFileInfo8->vidInfo.depth			= 24;	// for RGB, no A
+						SDKFileInfo8->vidInfo.depth			= localRecP->bit_depth * 3;	// for RGB, no A
 						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talk about DefaultDecodedFieldDuration but...
 						SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 						SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
@@ -1557,7 +1678,6 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 	if(pix_format == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601)
 	{
 		assert(sub_x == 2 && sub_y == 2);
-		assert(img->bit_depth == 8);
 
 		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
@@ -1567,28 +1687,65 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 														&U_PixelAddress, &U_RowBytes,
 														&V_PixelAddress, &V_RowBytes);
 													
-		for(int y = 0; y < img->d_h; y++)
+		if(img->bit_depth == 8)
 		{
-			const unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-			
-			unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
-			
-			memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+			for(int y = 0; y < img->d_h; y++)
+			{
+				const unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+				
+				unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+				
+				memcpy(prY, imgY, img->d_w * sizeof(unsigned char));
+			}
+		}
+		else
+		{
+			for(int y = 0; y < img->d_h; y++)
+			{
+				const unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+				
+				unsigned char *prY = (unsigned char *)Y_PixelAddress + (Y_RowBytes * y);
+				
+				for(int x=0; x < img->d_w; x++)
+				{
+					*prY++ = ConvertDepth<unsigned short, unsigned char>(*imgY++, img->bit_depth);
+				}
+			}
 		}
 		
 		const int chroma_width = (img->d_w / 2) + (img->d_w % 2);
 		const int chroma_height = (img->d_h / 2) + (img->d_h % 2);
 		
-		for(int y = 0; y < chroma_height; y++)
+		if(img->bit_depth == 8)
 		{
-			const unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
-			const unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
-			
-			unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
-			unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
-			
-			memcpy(prU, imgU, chroma_width * sizeof(unsigned char));
-			memcpy(prV, imgV, chroma_width * sizeof(unsigned char));
+			for(int y = 0; y < chroma_height; y++)
+			{
+				const unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y);
+				const unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y);
+				
+				unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+				unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+				
+				memcpy(prU, imgU, chroma_width * sizeof(unsigned char));
+				memcpy(prV, imgV, chroma_width * sizeof(unsigned char));
+			}
+		}
+		else
+		{
+			for(int y = 0; y < chroma_height; y++)
+			{
+				const unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * y));
+				const unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * y));
+				
+				unsigned char *prU = (unsigned char *)U_PixelAddress + (U_RowBytes * y);
+				unsigned char *prV = (unsigned char *)V_PixelAddress + (V_RowBytes * y);
+				
+				for(int x=0; x < chroma_width; x++)
+				{
+					*prU++ = ConvertDepth<unsigned short, unsigned char>(*imgU++, img->bit_depth);
+					*prV++ = ConvertDepth<unsigned short, unsigned char>(*imgV++, img->bit_depth);
+				}
+			}
 		}
 	}
 	else
@@ -1603,32 +1760,56 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 		if(pix_format == PrPixelFormat_UYVY_422_8u_601)
 		{
 			assert(sub_x == 2 && sub_y == 1);
-			assert(img->bit_depth == 8);
 			
-			for(int y = 0; y < img->d_h; y++)
+			if(img->bit_depth == 8)
 			{
-				const unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
-				const unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
-				const unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
-				
-				unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
-				
-				for(int x=0; x < img->d_w; x++)
+				for(int y = 0; y < img->d_h; y++)
 				{
-					if(x % 2 == 0)
-						*prUYVY++ = *imgU++;
-					else
-						*prUYVY++ = *imgV++;
+					const unsigned char *imgY = img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y);
+					const unsigned char *imgU = img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y));
+					const unsigned char *imgV = img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y));
 					
-					*prUYVY++ = *imgY++;
+					unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
+					
+					for(int x=0; x < img->d_w; x++)
+					{
+						if(x % 2 == 0)
+							*prUYVY++ = *imgU++;
+						else
+							*prUYVY++ = *imgV++;
+						
+						*prUYVY++ = *imgY++;
+					}
+				}
+			}
+			else
+			{
+				for(int y = 0; y < img->d_h; y++)
+				{
+					const unsigned short *imgY = (unsigned short *)(img->planes[VPX_PLANE_Y] + (img->stride[VPX_PLANE_Y] * y));
+					const unsigned short *imgU = (unsigned short *)(img->planes[VPX_PLANE_U] + (img->stride[VPX_PLANE_U] * (y / sub_y)));
+					const unsigned short *imgV = (unsigned short *)(img->planes[VPX_PLANE_V] + (img->stride[VPX_PLANE_V] * (y / sub_y)));
+					
+					unsigned char *prUYVY = (unsigned char *)frameBufferP + (rowbytes * y);
+					
+					for(int x=0; x < img->d_w; x++)
+					{
+						if(x % 2 == 0)
+							*prUYVY++ = ConvertDepth<unsigned short, unsigned char>(*imgU++, img->bit_depth);
+						else
+							*prUYVY++ = ConvertDepth<unsigned short, unsigned char>(*imgV++, img->bit_depth);
+						
+						*prUYVY++ = *imgY++;
+					}
 				}
 			}
 		}
 		else if(pix_format == PrPixelFormat_VUYX_4444_8u)
 		{
+			assert(sub_x == 1 && sub_y == 1);
+			
 			if(img->bit_depth > 8)
 			{
-				// This is only necessary because of a bug with VUYA_4444_16u
 				CopyImgToVUYA<unsigned short, unsigned char>(img, frameBufferP, rowbytes);
 			}
 			else
@@ -1864,17 +2045,17 @@ SDKGetSourceVideo(
 										
 										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
 										
-										unsigned int length = blockFrame.len;
+										const unsigned int length = blockFrame.len;
 										uint8_t *data = (uint8_t *)malloc(length);
 										
 										if(data != NULL)
 										{
 											//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
-											long read_err = blockFrame.Read(localRecP->reader, data);
+											const long read_err = blockFrame.Read(localRecP->reader, data);
 											
 											if(read_err == PrMkvReader::PrMkvSuccess)
 											{
-												vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
+												const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
 												
 												assert(decode_err == VPX_CODEC_OK);
 
@@ -1888,20 +2069,26 @@ SDKGetSourceVideo(
 													
 													if(img)
 													{
-														assert(frameFormat->inPixelFormat == PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
 														assert(frameFormat->inFrameHeight == img->d_h && frameFormat->inFrameWidth == img->d_w);
 														assert( !pBlock->IsInvisible() );
+														
+														vpx_img_fmt img_fmt = img->fmt;
+														
+														// maybe Premiere doesn't want 16-bit right now
+														if(img_fmt & VPX_IMG_FMT_HIGHBITDEPTH)
+														{
+															if(frameFormat->inPixelFormat != PrPixelFormat_BGRA_4444_16u) // the only 16-bit format we currently support
+															{
+																img_fmt = (img_fmt == VPX_IMG_FMT_I42216 ? VPX_IMG_FMT_I422 :
+																			img_fmt == VPX_IMG_FMT_I44016 ? VPX_IMG_FMT_I440 :
+																			img_fmt == VPX_IMG_FMT_I44416 ? VPX_IMG_FMT_I444 :
+																			VPX_IMG_FMT_I420);
+															}
+														}
 
 														
 														// apparently pix_format doesn't have to match frameFormat->inPixelFormat
-														const PrPixelFormat pix_format = img->fmt == VPX_IMG_FMT_I422 ? PrPixelFormat_UYVY_422_8u_601 :
-																							img->fmt == VPX_IMG_FMT_I440 ? PrPixelFormat_VUYX_4444_8u :
-																							img->fmt == VPX_IMG_FMT_I444 ? PrPixelFormat_VUYX_4444_8u :
-																							img->fmt == VPX_IMG_FMT_I42016 ? PrPixelFormat_BGRA_4444_16u : // These are set to RGB
-																							img->fmt == VPX_IMG_FMT_I42216 ? PrPixelFormat_BGRA_4444_16u : // because Premiere seems
-																							img->fmt == VPX_IMG_FMT_I44016 ? PrPixelFormat_BGRA_4444_16u : // to have a bug with
-																							img->fmt == VPX_IMG_FMT_I44416 ? PrPixelFormat_BGRA_4444_16u : // VUYA_4444_16u
-																							PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601;
+														const PrPixelFormat pix_format = vpx_to_premiere_pix_format(img_fmt);
 																							
 														PPixHand ppix;
 														
