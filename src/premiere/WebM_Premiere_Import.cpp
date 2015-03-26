@@ -1265,15 +1265,15 @@ webm_guess_framerate(mkvparser::Segment *segment,
 												{30, 1}, {48000, 1001}, {48, 1},
 												{50, 1}, {60000, 1001}, {60, 1}};
 
-	double fps = (double)(frame - 1) * (double)S2NS / (double)tstamp;
+	const double fps = (double)(frame - 1) * (double)S2NS / (double)tstamp;
 
 	int match_index = -1;
 	double match_episilon = 999;
 
 	for(int i=0; i < 12; i++)
 	{
-		double rate = (double)frameRateNumDens[i][0] / (double)frameRateNumDens[i][1];
-		double episilon = fabs(fps - rate);
+		const double rate = (double)frameRateNumDens[i][0] / (double)frameRateNumDens[i][1];
+		const double episilon = fabs(fps - rate);
 
 		if(episilon < match_episilon)
 		{
@@ -1282,7 +1282,7 @@ webm_guess_framerate(mkvparser::Segment *segment,
 		}
 	}
 
-	if(match_index >=0 && match_episilon < 0.01)
+	if(match_index >=0 && match_episilon < 0.1)
 	{
 		*fps_num = frameRateNumDens[match_index][0];
 		*fps_den = frameRateNumDens[match_index][1];
