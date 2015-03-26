@@ -1358,7 +1358,7 @@ SDKGetInfo8(
 					
 					if(pVideoTrack)
 					{
-						// all this because FFmpeg was shifting video timestamps over by 3
+						// all this because FFmpeg was shifting video timestamps over
 						if(localRecP->video_start_tstamp < 0)
 						{
 							assert(localRecP->video_start_tstamp == -1);
@@ -1378,6 +1378,59 @@ SDKGetInfo8(
 									if(pBlock->GetTrackNumber() == localRecP->video_track)
 									{
 										localRecP->video_start_tstamp = pBlock->GetTime(pCluster);
+										
+										if(localRecP->video_codec == CODEC_VP9)
+										{
+											vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
+											
+											// decode the first frame to get bit depth and sampling information
+											const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
+											
+											const unsigned int length = blockFrame.len;
+											uint8_t *data = (uint8_t *)malloc(length);
+											
+											if(data != NULL)
+											{
+												const long read_err = blockFrame.Read(localRecP->reader, data);
+												
+												if(read_err == PrMkvReader::PrMkvSuccess)
+												{
+													const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
+													
+													if(decode_err == VPX_CODEC_OK)
+													{
+														vpx_codec_decode(&decoder, NULL, 0, NULL, 0); // flush the decoder
+														
+														vpx_codec_iter_t iter = NULL;
+														
+														vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
+														
+														if(img)
+														{
+															localRecP->bit_depth = img->bit_depth;
+															localRecP->img_fmt = img->fmt;
+														
+															vpx_img_free(img);
+														}
+														else
+															assert(false);
+													}
+													else
+														result = imFileReadFailed;
+												}
+												else
+													result = imFileReadFailed;
+												
+												free(data);
+											}
+											else
+												result = imMemErr;
+										}
+										else
+										{
+											localRecP->bit_depth = 8;
+											localRecP->img_fmt = VPX_IMG_FMT_I420;
+										}
 									}
 									
 									pCluster->GetNext(pBlockEntry, pBlockEntry);
@@ -1411,92 +1464,14 @@ SDKGetInfo8(
 						}
 						
 						
-						if(localRecP->video_codec == CODEC_VP9)
-						{
-							// decode the first frame to get bit depth and sampling information
-							vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
-							
-							const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
-							
-							bool got_frame = false;
-							
-							while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
-							{
-								const mkvparser::BlockEntry* pBlockEntry = NULL;
-								
-								pCluster->GetFirst(pBlockEntry);
-								
-								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && !got_frame && result == malNoError)
-								{
-									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
-									
-									if(pBlock->GetTrackNumber() == localRecP->video_track)
-									{
-										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
-										
-										const unsigned int length = blockFrame.len;
-										uint8_t *data = (uint8_t *)malloc(length);
-										
-										if(data != NULL)
-										{
-											const long read_err = blockFrame.Read(localRecP->reader, data);
-											
-											if(read_err == PrMkvReader::PrMkvSuccess)
-											{
-												const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
-												
-												if(decode_err == VPX_CODEC_OK)
-												{
-													vpx_codec_decode(&decoder, NULL, 0, NULL, 0); // flush the decoder
-													
-													vpx_codec_iter_t iter = NULL;
-													
-													vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter);
-													
-													if(img)
-													{
-														localRecP->bit_depth = img->bit_depth;
-														localRecP->img_fmt = img->fmt;
-													
-														got_frame = true;
-														
-														vpx_img_free(img);
-													}
-													else
-														assert(false);
-												}
-												else
-													result = imFileReadFailed;
-											}
-											else
-												result = imFileReadFailed;
-											
-											free(data);
-										}
-										else
-											result = imMemErr;
-									}
-									
-									pCluster->GetNext(pBlockEntry, pBlockEntry);
-								}
-								
-								pCluster = localRecP->segment->GetNext(pCluster);
-							}
-						}
-						else
-						{
-							localRecP->bit_depth = 8;
-							localRecP->img_fmt = VPX_IMG_FMT_I420;
-						}
 						
-
 						// Video information
 						SDKFileInfo8->hasVideo				= kPrTrue;
 						SDKFileInfo8->vidInfo.subType		= vpx_to_premiere_pix_format(localRecP->img_fmt);
 						SDKFileInfo8->vidInfo.imageWidth	= pVideoTrack->GetWidth();
 						SDKFileInfo8->vidInfo.imageHeight	= pVideoTrack->GetHeight();
 						SDKFileInfo8->vidInfo.depth			= localRecP->bit_depth * 3;	// for RGB, no A
-						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talk about DefaultDecodedFieldDuration but...
+						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talks about DefaultDecodedFieldDuration but...
 						SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 						SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
 						SDKFileInfo8->vidDuration			= duration * fps_num / S2NS;
