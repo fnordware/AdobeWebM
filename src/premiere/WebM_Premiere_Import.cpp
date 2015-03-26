@@ -1954,8 +1954,7 @@ store_vpx_img(
 	const vpx_image_t *img,
 	ImporterLocalRec8Ptr localRecP,
 	imSourceVideoRec *sourceVideoRec,
-	const long long decoded_tstamp,
-	const long long start_tstamp)
+	const long long decoded_tstamp)
 {
 	PrTime ticksPerSecond = 0;
 	localRecP->TimeSuite->GetTicksPerSecond(&ticksPerSecond);
@@ -2016,7 +2015,7 @@ store_vpx_img(
 	const uint64_t fps_num = localRecP->frameRateNum;
 	const uint64_t fps_den = localRecP->frameRateDen;
 	
-	const csSDK_int32 decodedFrame = (((decoded_tstamp - start_tstamp) * fps_num / fps_den) + (S2NS / 2)) / S2NS;
+	const csSDK_int32 decodedFrame = (((decoded_tstamp - localRecP->video_start_tstamp) * fps_num / fps_den) + (S2NS / 2)) / S2NS;
 	
 	const bool requested_frame = (decodedFrame == theFrame);
 	
@@ -2218,8 +2217,7 @@ SDKGetSourceVideo(
 													const bool requested_frame = store_vpx_img(img,
 																								localRecP,
 																								sourceVideoRec,
-																								tstamp_queue.front(),
-																								localRecP->video_start_tstamp);
+																								tstamp_queue.front());
 													tstamp_queue.pop();
 													
 													if(requested_frame)
@@ -2259,8 +2257,7 @@ SDKGetSourceVideo(
 									const bool requested_frame = store_vpx_img(img,
 																				localRecP,
 																				sourceVideoRec,
-																				tstamp_queue.front(),
-																				localRecP->video_start_tstamp);
+																				tstamp_queue.front());
 									tstamp_queue.pop();
 									
 									if(requested_frame)
