@@ -1984,8 +1984,6 @@ SDKGetSourceVideo(
 	imSourceVideoRec	*sourceVideoRec)
 {
 	prMALError		result		= malNoError;
-	csSDK_int32		theFrame	= 0;
-	imFrameFormat	*frameFormat;
 
 	// privateData
 	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(sourceVideoRec->inPrivateData);
@@ -1995,8 +1993,9 @@ SDKGetSourceVideo(
 
 	PrTime ticksPerSecond = 0;
 	localRecP->TimeSuite->GetTicksPerSecond(&ticksPerSecond);
-	
 
+	csSDK_int32		theFrame	= 0;
+	
 	if(localRecP->frameRateDen == 0) // i.e. still frame
 	{
 		theFrame = 0;
@@ -2023,19 +2022,6 @@ SDKGetSourceVideo(
 		// ok, we'll read the file - clear error
 		result = malNoError;
 		
-		// get the Premiere buffer
-		frameFormat = &sourceVideoRec->inFrameFormats[0];
-		prRect theRect;
-		if(frameFormat->inFrameWidth == 0 && frameFormat->inFrameHeight == 0)
-		{
-			frameFormat->inFrameWidth = localRecP->width;
-			frameFormat->inFrameHeight = localRecP->height;
-		}
-		
-		// Windows and MacOS have different definitions of Rects, so use the cross-platform prSetRect
-		prSetRect(&theRect, 0, 0, frameFormat->inFrameWidth, frameFormat->inFrameHeight);
-		
-
 		assert(localRecP->reader != NULL && localRecP->reader->FileRef() == fileRef);
 		assert(localRecP->segment != NULL);
 		
@@ -2197,7 +2183,7 @@ SDKGetSourceVideo(
 								}
 								
 								// clear out any more frames left over from the multithreaded decode
-								while(tstamp_queue.size() > 0 && result == malNoError)
+								if(result == malNoError)
 								{
 									const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, NULL, 0, NULL, 0);
 									
@@ -2219,6 +2205,8 @@ SDKGetSourceVideo(
 										
 										vpx_img_free(img);
 									}
+									
+									assert(tstamp_queue.size() == 0);
 								}
 								
 								//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
