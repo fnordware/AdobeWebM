@@ -187,6 +187,7 @@ typedef struct
 	
 	PrMkvReader				*reader;
 	mkvparser::Segment		*segment;
+	long long				start_tstamp;
 	int						video_track;
 	VideoCodec				video_codec;
 	vpx_img_fmt_t			img_fmt;
@@ -404,6 +405,7 @@ SDKOpenFile8(
 		
 		localRecP->reader = NULL;
 		localRecP->segment = NULL;
+		localRecP->start_tstamp = -1;
 		localRecP->video_track = -1;
 		localRecP->video_codec = CODEC_NONE;
 		localRecP->audio_track = -1;
@@ -1144,7 +1146,9 @@ SDKAnalysis(
 {
 	// Is this all I'm supposed to do here?
 	// The string shows up in the properties dialog.
+	assert(SDKAnalysisRec->privatedata);
 	ImporterLocalRec8H ldataH = reinterpret_cast<ImporterLocalRec8H>(SDKAnalysisRec->privatedata);
+	stdParms->piSuites->memFuncs->lockHandle(reinterpret_cast<char**>(ldataH));
 	ImporterLocalRec8Ptr localRecP = reinterpret_cast<ImporterLocalRec8Ptr>( *ldataH );
 
 	std::stringstream stream;
@@ -1195,6 +1199,9 @@ SDKAnalysis(
 	
 	if(SDKAnalysisRec->buffersize > stream.str().size())
 		strcpy(SDKAnalysisRec->buffer, stream.str().c_str());
+	
+	
+	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
 
 	return malNoError;
 }
@@ -1203,6 +1210,7 @@ SDKAnalysis(
 static void
 webm_guess_framerate(mkvparser::Segment *segment,
 						int				video_track,
+						long long		start_tstamp,
 						unsigned int	*fps_den,
 						unsigned int	*fps_num)
 {
@@ -1218,10 +1226,6 @@ webm_guess_framerate(mkvparser::Segment *segment,
 	
 	const mkvparser::Tracks* const pTracks = segment->GetTracks();
 	const mkvparser::Cluster* pCluster = segment->GetFirst();
-	
-	const long long start_tstamp = (pCluster ? pCluster->GetFirstTime() : 0);
-	
-	assert(start_tstamp == 0); // I think this is the Matroska spec, but I've gotten a file that wasn't so
 	
 	long status = 0;
 
@@ -1352,12 +1356,42 @@ SDKGetInfo8(
 					
 					if(pVideoTrack)
 					{
+						// all this because FFmpeg was shifting video timestamps over by 3
+						if(localRecP->start_tstamp < 0)
+						{
+							assert(localRecP->start_tstamp == -1);
+						
+							const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
+							
+							while((pCluster != NULL) && !pCluster->EOS() && localRecP->start_tstamp < 0)
+							{
+								const mkvparser::BlockEntry* pBlockEntry = NULL;
+								
+								pCluster->GetFirst(pBlockEntry);
+								
+								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->start_tstamp < 0)
+								{
+									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+									
+									if(pBlock->GetTrackNumber() == localRecP->video_track)
+									{
+										localRecP->start_tstamp = pBlock->GetTime(pCluster);
+									}
+									
+									pCluster->GetNext(pBlockEntry, pBlockEntry);
+								}
+								
+								pCluster = localRecP->segment->GetNext(pCluster);
+							}
+						}
+						
+					
 						const double embedded_rate = pVideoTrack->GetFrameRate();
 						
 						unsigned int fps_num = 0;
 						unsigned int fps_den = 0;
 						
-						webm_guess_framerate(localRecP->segment, localRecP->video_track, &fps_den, &fps_num);
+						webm_guess_framerate(localRecP->segment, localRecP->video_track, localRecP->start_tstamp, &fps_den, &fps_num);
 
 						if(embedded_rate > 0)
 						{
@@ -1486,6 +1520,37 @@ SDKGetInfo8(
 		
 		if(localRecP->audio_track >= 0)
 		{
+			if(localRecP->start_tstamp < 0)
+			{
+				assert(localRecP->start_tstamp == -1);
+				assert( !(localRecP->video_track >= 0) );
+				
+				const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
+				
+				while((pCluster != NULL) && !pCluster->EOS() && localRecP->start_tstamp < 0)
+				{
+					const mkvparser::BlockEntry* pBlockEntry = NULL;
+					
+					pCluster->GetFirst(pBlockEntry);
+					
+					while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->start_tstamp < 0)
+					{
+						const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+						
+						if(pBlock->GetTrackNumber() == localRecP->audio_track)
+						{
+							localRecP->start_tstamp = pBlock->GetTime(pCluster);
+						}
+						
+						pCluster->GetNext(pBlockEntry, pBlockEntry);
+					}
+					
+					assert(localRecP->start_tstamp == pCluster->GetFirstTime());
+					
+					pCluster = localRecP->segment->GetNext(pCluster);
+				}
+			}
+		
 			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
 			
 			if(pTrack != NULL)
@@ -1530,6 +1595,8 @@ SDKGetInfo8(
 				}
 			}
 		}
+		
+		assert(localRecP->start_tstamp == 0);
 	}
 		
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
@@ -2025,12 +2092,8 @@ SDKGetSourceVideo(
 		assert(localRecP->reader != NULL && localRecP->reader->FileRef() == fileRef);
 		assert(localRecP->segment != NULL);
 		
-		if(localRecP->segment)
+		if(localRecP->segment && localRecP->video_track >= 0 && localRecP->vpx_setup)
 		{
-			const mkvparser::Cluster* pFirstCluster = localRecP->segment->GetFirst();
-	
-			const long long start_tstamp = (pFirstCluster ? pFirstCluster->GetFirstTime() : 0);
-
 			// convert PrTime to timeCode and then to absolute time
 			// http://matroska.org/technical/specs/notes.html#TimecodeScale
 			// Time (in nanoseconds) = TimeCode * TimeCodeScale
@@ -2041,185 +2104,184 @@ SDKGetSourceVideo(
 			// reduced.
 			const long long timeCodeScale = localRecP->segment->GetInfo()->GetTimeCodeScale();
 			const long long timeCode = ((sourceVideoRec->inFrameTime * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
-			const long long tstamp = (timeCode * timeCodeScale) + start_tstamp;
+			const long long tstamp = (timeCode * timeCodeScale) + localRecP->start_tstamp;
 			
 			
-			if(localRecP->video_track >= 0 && localRecP->vpx_setup)
+			vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
+		
+			const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
+		
+			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
+			
+			if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kVideo)
 			{
-				vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
-			
-				const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
-			
-				const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->video_track);
+				const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
 				
-				if(pTrack != NULL && pTrack->GetType() == mkvparser::Track::kVideo)
+				if(pVideoTrack)
 				{
-					const mkvparser::VideoTrack* const pVideoTrack = static_cast<const mkvparser::VideoTrack*>(pTrack);
+					assert(pVideoTrack->GetSeekPreRoll() == 0);
+					assert(pVideoTrack->GetCodecDelay() == 0);
 					
-					if(pVideoTrack)
+					const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+					
+					
+					// If the file has Cues, we'll use them to seek.
+					// Expect to have one cue for each keyframe, and each keyframe
+					// should begin a new cluster.  This will not always be the case, though.
+					const mkvparser::Cues* const cues = localRecP->segment->GetCues();
+					
+					if(cues != NULL)
 					{
-						assert(pVideoTrack->GetSeekPreRoll() == 0);
-						assert(pVideoTrack->GetCodecDelay() == 0);
+						assert(cues->GetFirst() != NULL);
+					
+						const mkvparser::CuePoint* cue = NULL;
+						const mkvparser::CuePoint::TrackPosition *pTrackPos = NULL;
 						
-						const mkvparser::BlockEntry* pSeekBlockEntry = NULL;
+						const bool seek_success = cues->Find(tstamp, pVideoTrack, cue, pTrackPos);
 						
-						
-						// If the file has Cues, we'll use them to seek.
-						// Expect to have one cue for each keyframe, and each keyframe
-						// should begin a new cluster.  This will not always be the case, though.
-						const mkvparser::Cues* const cues = localRecP->segment->GetCues();
-						
-						if(cues != NULL)
+						if(seek_success && cue != NULL && pTrackPos != NULL)
 						{
-							assert(cues->GetFirst() != NULL);
-						
-							const mkvparser::CuePoint* cue = NULL;
-							const mkvparser::CuePoint::TrackPosition *pTrackPos = NULL;
-							
-							const bool seek_success = cues->Find(tstamp, pVideoTrack, cue, pTrackPos);
-							
-							if(seek_success && cue != NULL && pTrackPos != NULL)
-							{
-								pSeekBlockEntry = cues->GetBlock(cue, pTrackPos);
-							}
+							pSeekBlockEntry = cues->GetBlock(cue, pTrackPos);
 						}
+					}
+					
+					
+					// A more brute foce seek method that doesn't use cues
+					if(pSeekBlockEntry == NULL)
+						pVideoTrack->Seek(tstamp, pSeekBlockEntry);
+					
+					
+					if(pSeekBlockEntry != NULL)
+					{
+						const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
+
+						// The seek took us to this Cluster for a reason.
+						// It should start with a keyframe, although not necessarily the last keyframe before
+						// the requested frame. I have to decode each frame starting with the keyframe,
+						// and then I continue afterwards until I decode the entire cluster.
+						// TODO: Maybe we should seek for keyframes within the cluster.
+
+						assert(tstamp >= pSeekBlockEntry->GetBlock()->GetTime(pCluster));
+						assert(tstamp >= pCluster->GetTime());
+
+						bool got_frame = false;
 						
-						
-						// A more brute foce seek method that doesn't use cues
-						if(pSeekBlockEntry == NULL)
-							pVideoTrack->Seek(tstamp, pSeekBlockEntry);
-						
-						
-						if(pSeekBlockEntry != NULL)
+						while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
 						{
-							const mkvparser::Cluster *pCluster = pSeekBlockEntry->GetCluster();
-
-							// The seek took us to this Cluster for a reason.
-							// It should start with a keyframe, although not necessarily the last keyframe before
-							// the requested frame. I have to decode each frame starting with the keyframe,
-							// and then I continue afterwards until I decode the entire cluster.
-							// TODO: Maybe we should seek for keyframes within the cluster.
-
-							assert(tstamp >= pSeekBlockEntry->GetBlock()->GetTime(pCluster));
-							assert(tstamp >= pCluster->GetTime());
-
-							bool got_frame = false;
+							assert(pCluster->GetTime() >= 0);
+							assert(pCluster->GetTime() == pCluster->GetFirstTime());
+							assert(got_frame || tstamp >= pCluster->GetTime());
 							
-							while((pCluster != NULL) && !pCluster->EOS() && !got_frame && result == malNoError)
+							std::queue<long long> tstamp_queue;
+
+							const mkvparser::BlockEntry* pBlockEntry = NULL;
+							
+							pCluster->GetFirst(pBlockEntry);
+
+							while((pBlockEntry != NULL) && !pBlockEntry->EOS() && result == malNoError)
 							{
-								assert(pCluster->GetTime() >= 0);
-								assert(pCluster->GetTime() == pCluster->GetFirstTime());
-								assert(got_frame || tstamp >= pCluster->GetTime());
-								
-								std::queue<long long> tstamp_queue;
-
-								const mkvparser::BlockEntry* pBlockEntry = NULL;
-								
-								pCluster->GetFirst(pBlockEntry);
-
-								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && result == malNoError)
+								const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
+							
+								if(pBlock->GetTrackNumber() == localRecP->video_track)
 								{
-									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
-								
-									if(pBlock->GetTrackNumber() == localRecP->video_track)
+									assert(pBlock->GetFrameCount() == 1);
+									assert(pBlock->GetDiscardPadding() == 0);
+									
+									long long packet_tstamp = pBlock->GetTime(pCluster);
+									
+									const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
+									
+									const unsigned int length = blockFrame.len;
+									uint8_t *data = (uint8_t *)malloc(length);
+									
+									if(data != NULL)
 									{
-										assert(pBlock->GetFrameCount() == 1);
-										assert(pBlock->GetDiscardPadding() == 0);
+										//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
+										const long read_err = blockFrame.Read(localRecP->reader, data);
 										
-										long long packet_tstamp = pBlock->GetTime(pCluster);
-										
-										const mkvparser::Block::Frame& blockFrame = pBlock->GetFrame(0);
-										
-										const unsigned int length = blockFrame.len;
-										uint8_t *data = (uint8_t *)malloc(length);
-										
-										if(data != NULL)
+										if(read_err == PrMkvReader::PrMkvSuccess)
 										{
-											//int read_err = localRecP->reader->Read(blockFrame.pos, blockFrame.len, data);
-											const long read_err = blockFrame.Read(localRecP->reader, data);
+											const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
 											
-											if(read_err == PrMkvReader::PrMkvSuccess)
-											{
-												const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, data, length, NULL, 0);
-												
-												assert(decode_err == VPX_CODEC_OK);
+											assert(decode_err == VPX_CODEC_OK);
 
-												if(decode_err == VPX_CODEC_OK)
+											if(decode_err == VPX_CODEC_OK)
+											{
+												tstamp_queue.push(packet_tstamp);
+												
+												vpx_codec_iter_t iter = NULL;
+												
+												while(vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter))
 												{
-													tstamp_queue.push(packet_tstamp);
+													const bool requested_frame = store_vpx_img(img,
+																								localRecP,
+																								sourceVideoRec,
+																								tstamp_queue.front(),
+																								localRecP->start_tstamp);
+													tstamp_queue.pop();
 													
-													vpx_codec_iter_t iter = NULL;
+													if(requested_frame)
+														got_frame = true;
 													
-													while(vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter))
-													{
-														const bool requested_frame = store_vpx_img(img,
-																									localRecP,
-																									sourceVideoRec,
-																									tstamp_queue.front(),
-																									start_tstamp);
-														tstamp_queue.pop();
-														
-														if(requested_frame)
-															got_frame = true;
-														
-														vpx_img_free(img);
-													}
+													vpx_img_free(img);
 												}
-												else
-													result = imFileReadFailed;
 											}
 											else
 												result = imFileReadFailed;
-											
-											free(data);
 										}
 										else
-											result = imMemErr;
+											result = imFileReadFailed;
+										
+										free(data);
 									}
-									
-									long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
-									
-									assert(status == 0);
+									else
+										result = imMemErr;
 								}
 								
-								// clear out any more frames left over from the multithreaded decode
-								if(result == malNoError)
-								{
-									const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, NULL, 0, NULL, 0);
-									
-									assert(decode_err == VPX_CODEC_OK);
-									
-									vpx_codec_iter_t iter = NULL;
-									
-									while(vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter))
-									{
-										const bool requested_frame = store_vpx_img(img,
-																					localRecP,
-																					sourceVideoRec,
-																					tstamp_queue.front(),
-																					start_tstamp);
-										tstamp_queue.pop();
-										
-										if(requested_frame)
-											got_frame = true;
-										
-										vpx_img_free(img);
-									}
-									
-									assert(tstamp_queue.size() == 0);
-								}
+								long status = pCluster->GetNext(pBlockEntry, pBlockEntry);
 								
-								//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
-								
-								pCluster = localRecP->segment->GetNext(pCluster);
+								assert(status == 0);
 							}
-
-							assert(got_frame);
+							
+							// clear out any more frames left over from the multithreaded decode
+							if(result == malNoError)
+							{
+								const vpx_codec_err_t decode_err = vpx_codec_decode(&decoder, NULL, 0, NULL, 0);
+								
+								assert(decode_err == VPX_CODEC_OK);
+								
+								vpx_codec_iter_t iter = NULL;
+								
+								while(vpx_image_t *img = vpx_codec_get_frame(&decoder, &iter))
+								{
+									const bool requested_frame = store_vpx_img(img,
+																				localRecP,
+																				sourceVideoRec,
+																				tstamp_queue.front(),
+																				localRecP->start_tstamp);
+									tstamp_queue.pop();
+									
+									if(requested_frame)
+										got_frame = true;
+									
+									vpx_img_free(img);
+								}
+								
+								assert(tstamp_queue.size() == 0);
+							}
+							
+							//assert(got_frame); // otherwise our cluster seek function has failed us (turns out it will)
+							
+							pCluster = localRecP->segment->GetNext(pCluster);
 						}
+
+						assert(got_frame);
 					}
 				}
 			}
 		}
+		else
+			result = malUnknownError;
 	}
 
 
