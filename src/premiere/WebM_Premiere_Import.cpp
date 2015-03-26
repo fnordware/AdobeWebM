@@ -187,12 +187,13 @@ typedef struct
 	
 	PrMkvReader				*reader;
 	mkvparser::Segment		*segment;
-	long long				start_tstamp;
 	int						video_track;
 	VideoCodec				video_codec;
+	long long				video_start_tstamp;
 	vpx_img_fmt_t			img_fmt;
 	int						audio_track;
 	AudioCodec				audio_codec;
+	long long				audio_start_tstamp;
 	
 	bool					vpx_setup;
 	vpx_codec_ctx_t			vpx_decoder;
@@ -405,11 +406,12 @@ SDKOpenFile8(
 		
 		localRecP->reader = NULL;
 		localRecP->segment = NULL;
-		localRecP->start_tstamp = -1;
 		localRecP->video_track = -1;
 		localRecP->video_codec = CODEC_NONE;
+		localRecP->video_start_tstamp = -1;
 		localRecP->audio_track = -1;
 		localRecP->audio_codec = CODEC_ANONE;
+		localRecP->audio_start_tstamp = -1;
 		localRecP->vpx_setup = false;
 		localRecP->vorbis_setup = false;
 		localRecP->opus_dec = NULL;
@@ -1357,25 +1359,25 @@ SDKGetInfo8(
 					if(pVideoTrack)
 					{
 						// all this because FFmpeg was shifting video timestamps over by 3
-						if(localRecP->start_tstamp < 0)
+						if(localRecP->video_start_tstamp < 0)
 						{
-							assert(localRecP->start_tstamp == -1);
+							assert(localRecP->video_start_tstamp == -1);
 						
 							const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
 							
-							while((pCluster != NULL) && !pCluster->EOS() && localRecP->start_tstamp < 0)
+							while((pCluster != NULL) && !pCluster->EOS() && localRecP->video_start_tstamp < 0)
 							{
 								const mkvparser::BlockEntry* pBlockEntry = NULL;
 								
 								pCluster->GetFirst(pBlockEntry);
 								
-								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->start_tstamp < 0)
+								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->video_start_tstamp < 0)
 								{
 									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 									
 									if(pBlock->GetTrackNumber() == localRecP->video_track)
 									{
-										localRecP->start_tstamp = pBlock->GetTime(pCluster);
+										localRecP->video_start_tstamp = pBlock->GetTime(pCluster);
 									}
 									
 									pCluster->GetNext(pBlockEntry, pBlockEntry);
@@ -1385,13 +1387,15 @@ SDKGetInfo8(
 							}
 						}
 						
+						assert(localRecP->video_start_tstamp == 0); // unfortunately, it sometimes isn't
+						
 					
 						const double embedded_rate = pVideoTrack->GetFrameRate();
 						
 						unsigned int fps_num = 0;
 						unsigned int fps_den = 0;
 						
-						webm_guess_framerate(localRecP->segment, localRecP->video_track, localRecP->start_tstamp, &fps_den, &fps_num);
+						webm_guess_framerate(localRecP->segment, localRecP->video_track, localRecP->video_start_tstamp, &fps_den, &fps_num);
 
 						if(embedded_rate > 0)
 						{
@@ -1520,36 +1524,36 @@ SDKGetInfo8(
 		
 		if(localRecP->audio_track >= 0)
 		{
-			if(localRecP->start_tstamp < 0)
+			if(localRecP->audio_start_tstamp < 0)
 			{
-				assert(localRecP->start_tstamp == -1);
-				assert( !(localRecP->video_track >= 0) );
+				assert(localRecP->audio_start_tstamp == -1);
 				
 				const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
 				
-				while((pCluster != NULL) && !pCluster->EOS() && localRecP->start_tstamp < 0)
+				while((pCluster != NULL) && !pCluster->EOS() && localRecP->audio_start_tstamp < 0)
 				{
 					const mkvparser::BlockEntry* pBlockEntry = NULL;
 					
 					pCluster->GetFirst(pBlockEntry);
 					
-					while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->start_tstamp < 0)
+					while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->audio_start_tstamp < 0)
 					{
 						const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 						
 						if(pBlock->GetTrackNumber() == localRecP->audio_track)
 						{
-							localRecP->start_tstamp = pBlock->GetTime(pCluster);
+							localRecP->audio_start_tstamp = pBlock->GetTime(pCluster);
 						}
 						
 						pCluster->GetNext(pBlockEntry, pBlockEntry);
 					}
 					
-					assert(localRecP->start_tstamp == pCluster->GetFirstTime());
-					
 					pCluster = localRecP->segment->GetNext(pCluster);
 				}
 			}
+			
+			assert(localRecP->audio_start_tstamp == 0); // unfortunately, it sometimes isn't
+			
 		
 			const mkvparser::Track* const pTrack = pTracks->GetTrackByNumber(localRecP->audio_track);
 			
@@ -1595,8 +1599,6 @@ SDKGetInfo8(
 				}
 			}
 		}
-		
-		assert(localRecP->start_tstamp == 0);
 	}
 		
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
@@ -2104,7 +2106,7 @@ SDKGetSourceVideo(
 			// reduced.
 			const long long timeCodeScale = localRecP->segment->GetInfo()->GetTimeCodeScale();
 			const long long timeCode = ((sourceVideoRec->inFrameTime * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
-			const long long tstamp = (timeCode * timeCodeScale) + localRecP->start_tstamp;
+			const long long tstamp = (timeCode * timeCodeScale) + localRecP->video_start_tstamp;
 			
 			
 			vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
@@ -2217,7 +2219,7 @@ SDKGetSourceVideo(
 																								localRecP,
 																								sourceVideoRec,
 																								tstamp_queue.front(),
-																								localRecP->start_tstamp);
+																								localRecP->video_start_tstamp);
 													tstamp_queue.pop();
 													
 													if(requested_frame)
@@ -2258,7 +2260,7 @@ SDKGetSourceVideo(
 																				localRecP,
 																				sourceVideoRec,
 																				tstamp_queue.front(),
-																				localRecP->start_tstamp);
+																				localRecP->video_start_tstamp);
 									tstamp_queue.pop();
 									
 									if(requested_frame)
@@ -2354,11 +2356,7 @@ SDKImportAudio7(
 						seek_sample = 0;
 					
 						
-					const mkvparser::Cluster* pFirstCluster = localRecP->segment->GetFirst();
-	
-					const long long start_tstamp = (pFirstCluster ? pFirstCluster->GetFirstTime() : 0);
-					
-					const long long calc_tstamp = (audioRec7->position * S2NS / localRecP->audioSampleRate) + start_tstamp;
+					const long long calc_tstamp = (audioRec7->position * S2NS / localRecP->audioSampleRate) + localRecP->audio_start_tstamp;
 					
 					
 					// Use the SampleMap to figure out which cluster to seek to
@@ -2379,6 +2377,8 @@ SDKImportAudio7(
 							i++;
 						}
 					}
+					else
+						assert(false);
 					
 					
 					const long long tstamp = (lookup_tstamp > 0 ? lookup_tstamp : calc_tstamp);
