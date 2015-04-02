@@ -604,7 +604,7 @@ SDKOpenFile8(
 								// VPX_CODEC_USE_POSTPROC here.  Things like VP8_DEMACROBLOCK and
 								// VP8_MFQE (Multiframe Quality Enhancement) could be cool.
 								
-								const vpx_codec_flags_t flags = VPX_CODEC_USE_FRAME_THREADING;
+								const vpx_codec_flags_t flags = 0; //VPX_CODEC_USE_FRAME_THREADING;
 								
 								codec_err = vpx_codec_dec_init(&decoder, iface, &config, flags);
 								
