@@ -321,6 +321,9 @@ exSDKGenerateDefaultParams(
 	
 	
 	// field order
+	if(fieldTypeP.mInt32 == prFieldsUnknown)
+		fieldTypeP.mInt32 = prFieldsNone;
+	
 	exParamValues fieldOrderValues;
 	fieldOrderValues.structVersion = 1;
 	fieldOrderValues.value.intValue = fieldTypeP.mInt32;
@@ -553,7 +556,7 @@ exSDKGenerateDefaultParams(
 	// Sample rate
 	exParamValues sampleRateValues;
 	sampleRateValues.value.floatValue = sampleRateP.mFloat64;
-	sampleRateValues.disabled = kPrFalse;
+	sampleRateValues.disabled = kPrTrue;
 	sampleRateValues.hidden = kPrFalse;
 	
 	exNewParamInfo sampleRateParam;
