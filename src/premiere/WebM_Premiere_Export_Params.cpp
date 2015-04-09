@@ -1715,7 +1715,7 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			{	ConfigureValue(encoder, VP8E_SET_MAX_INTRA_BITRATE_PCT, val); i++;	}
 
 			else if(arg == "--gf-cbr-boost")
-			{	ConfigureValue(encoder, VP8E_SET_GF_CBR_BOOST_PCT, val); i++;	}
+			{	ConfigureValue(encoder, VP9E_SET_GF_CBR_BOOST_PCT, val); i++;	}
 
 			else if(arg == "--screen-content-mode")
 			{	ConfigureValue(encoder, VP8E_SET_SCREEN_CONTENT_MODE, val);	i++;	}

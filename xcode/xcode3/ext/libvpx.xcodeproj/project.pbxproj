@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A4796341AD6ECE9005C8F0E /* vp9_thread_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A4796321AD6ECE9005C8F0E /* vp9_thread_common.c */; };
+		2A4796351AD6ECE9005C8F0E /* vp9_thread_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A4796331AD6ECE9005C8F0E /* vp9_thread_common.h */; };
 		2A550C281768193300BE5A72 /* args.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A55098E1768193200BE5A72 /* args.c */; };
 		2A550C291768193300BE5A72 /* args.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A55098F1768193200BE5A72 /* args.h */; };
 		2A550C331768193300BE5A72 /* md5_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A55099A1768193200BE5A72 /* md5_utils.c */; };
@@ -176,7 +178,6 @@
 		2A550D4D1768193300BE5A72 /* tokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550AD41768193200BE5A72 /* tokenize.h */; };
 		2A550D4E1768193300BE5A72 /* treewriter.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550AD51768193200BE5A72 /* treewriter.c */; };
 		2A550D4F1768193300BE5A72 /* treewriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550AD61768193200BE5A72 /* treewriter.h */; };
-		2A550D501768193300BE5A72 /* vp8_asm_enc_offsets.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550AD71768193200BE5A72 /* vp8_asm_enc_offsets.c */; };
 		2A550D511768193300BE5A72 /* dct_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550AD91768193200BE5A72 /* dct_mmx.asm */; };
 		2A550D521768193300BE5A72 /* dct_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550ADA1768193200BE5A72 /* dct_sse2.asm */; };
 		2A550D531768193300BE5A72 /* denoising_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550ADB1768193200BE5A72 /* denoising_sse2.c */; };
@@ -319,7 +320,6 @@
 		2A550E541768193300BE5A72 /* vpx_mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550BFD1768193300BE5A72 /* vpx_mem.h */; };
 		2A550E551768193300BE5A72 /* vpx_mem_tracker.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550BFF1768193300BE5A72 /* vpx_mem_tracker.c */; };
 		2A550E561768193300BE5A72 /* arm.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C011768193300BE5A72 /* arm.h */; };
-		2A550E581768193300BE5A72 /* asm_offsets.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C031768193300BE5A72 /* asm_offsets.h */; };
 		2A550E591768193300BE5A72 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C041768193300BE5A72 /* config.h */; };
 		2A550E5A1768193300BE5A72 /* emmintrin_compat.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C051768193300BE5A72 /* emmintrin_compat.h */; };
 		2A550E5B1768193300BE5A72 /* emms.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C061768193300BE5A72 /* emms.asm */; };
@@ -335,7 +335,6 @@
 		2A550E6B1768193300BE5A72 /* yv12config.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C1A1768193300BE5A72 /* yv12config.c */; };
 		2A550E6C1768193300BE5A72 /* yv12extend.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C1B1768193300BE5A72 /* yv12extend.c */; };
 		2A550E6D1768193300BE5A72 /* vpx_scale.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C1C1768193300BE5A72 /* vpx_scale.h */; };
-		2A550E6E1768193300BE5A72 /* vpx_scale_asm_offsets.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C1E1768193300BE5A72 /* vpx_scale_asm_offsets.c */; };
 		2A550E6F1768193300BE5A72 /* vpx_scale_rtcd.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C1F1768193300BE5A72 /* vpx_scale_rtcd.c */; };
 		2A550E711768193300BE5A72 /* yv12config.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A550C231768193300BE5A72 /* yv12config.h */; };
 		2A550E741768193300BE5A72 /* y4minput.c in Sources */ = {isa = PBXBuildFile; fileRef = 2A550C261768193300BE5A72 /* y4minput.c */; };
@@ -426,8 +425,6 @@
 		2AC416A1185B0E24000EFF77 /* vp9_extend.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AC4169E185B0E24000EFF77 /* vp9_extend.c */; };
 		2AC416A2185B0E24000EFF77 /* vp9_extend.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AC4169F185B0E24000EFF77 /* vp9_extend.h */; };
 		2AC416A7185B0E4A000EFF77 /* decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AC416A6185B0E4A000EFF77 /* decodeframe.c */; };
-		2AEB1D001A82BDBF0050C571 /* vp9_loopfilter_thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AEB1CFC1A82BDBF0050C571 /* vp9_loopfilter_thread.c */; };
-		2AEB1D011A82BDBF0050C571 /* vp9_loopfilter_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AEB1CFD1A82BDBF0050C571 /* vp9_loopfilter_thread.h */; };
 		2AEB1D031A82BDBF0050C571 /* vp9_mfqe.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AEB1CFF1A82BDBF0050C571 /* vp9_mfqe.h */; };
 		2AEB1D071A82BDCE0050C571 /* vp9_mfqe_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2AEB1D061A82BDCE0050C571 /* vp9_mfqe_sse2.asm */; };
 		2AEB1D0B1A82BDE80050C571 /* vp9_dct.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AEB1D081A82BDE80050C571 /* vp9_dct.h */; };
@@ -467,6 +464,8 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXFileReference section */
+		2A4796321AD6ECE9005C8F0E /* vp9_thread_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_thread_common.c; sourceTree = "<group>"; };
+		2A4796331AD6ECE9005C8F0E /* vp9_thread_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_thread_common.h; sourceTree = "<group>"; };
 		2A55098E1768193200BE5A72 /* args.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = args.c; sourceTree = "<group>"; };
 		2A55098F1768193200BE5A72 /* args.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = args.h; sourceTree = "<group>"; };
 		2A55099A1768193200BE5A72 /* md5_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5_utils.c; sourceTree = "<group>"; };
@@ -523,18 +522,6 @@
 		2A550A2A1768193200BE5A72 /* onyxd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = onyxd.h; sourceTree = "<group>"; };
 		2A550A2B1768193200BE5A72 /* postproc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = postproc.c; sourceTree = "<group>"; };
 		2A550A2C1768193200BE5A72 /* postproc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = postproc.h; sourceTree = "<group>"; };
-		2A550A2E1768193200BE5A72 /* copy_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = copy_altivec.asm; sourceTree = "<group>"; };
-		2A550A2F1768193200BE5A72 /* filter_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = filter_altivec.asm; sourceTree = "<group>"; };
-		2A550A301768193200BE5A72 /* filter_bilinear_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = filter_bilinear_altivec.asm; sourceTree = "<group>"; };
-		2A550A311768193200BE5A72 /* idctllm_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = idctllm_altivec.asm; sourceTree = "<group>"; };
-		2A550A321768193200BE5A72 /* loopfilter_altivec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loopfilter_altivec.c; sourceTree = "<group>"; };
-		2A550A331768193200BE5A72 /* loopfilter_filters_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = loopfilter_filters_altivec.asm; sourceTree = "<group>"; };
-		2A550A341768193200BE5A72 /* platform_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = platform_altivec.asm; sourceTree = "<group>"; };
-		2A550A351768193200BE5A72 /* recon_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = recon_altivec.asm; sourceTree = "<group>"; };
-		2A550A361768193200BE5A72 /* sad_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = sad_altivec.asm; sourceTree = "<group>"; };
-		2A550A371768193200BE5A72 /* systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemdependent.c; sourceTree = "<group>"; };
-		2A550A381768193200BE5A72 /* variance_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = variance_altivec.asm; sourceTree = "<group>"; };
-		2A550A391768193200BE5A72 /* variance_subpixel_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = variance_subpixel_altivec.asm; sourceTree = "<group>"; };
 		2A550A3A1768193200BE5A72 /* ppflags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ppflags.h; sourceTree = "<group>"; };
 		2A550A3C1768193200BE5A72 /* quant_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quant_common.c; sourceTree = "<group>"; };
 		2A550A3D1768193200BE5A72 /* quant_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quant_common.h; sourceTree = "<group>"; };
@@ -639,10 +626,6 @@
 		2A550ABF1768193200BE5A72 /* pickinter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pickinter.c; sourceTree = "<group>"; };
 		2A550AC01768193200BE5A72 /* pickinter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pickinter.h; sourceTree = "<group>"; };
 		2A550AC11768193200BE5A72 /* picklpf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = picklpf.c; sourceTree = "<group>"; };
-		2A550AC31768193200BE5A72 /* csystemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = csystemdependent.c; sourceTree = "<group>"; };
-		2A550AC41768193200BE5A72 /* encodemb_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = encodemb_altivec.asm; sourceTree = "<group>"; };
-		2A550AC51768193200BE5A72 /* fdct_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = fdct_altivec.asm; sourceTree = "<group>"; };
-		2A550AC61768193200BE5A72 /* rdopt_altivec.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = rdopt_altivec.asm; sourceTree = "<group>"; };
 		2A550AC91768193200BE5A72 /* quantize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quantize.c; sourceTree = "<group>"; };
 		2A550ACA1768193200BE5A72 /* quantize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quantize.h; sourceTree = "<group>"; };
 		2A550ACB1768193200BE5A72 /* ratectrl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ratectrl.c; sourceTree = "<group>"; };
@@ -657,7 +640,6 @@
 		2A550AD41768193200BE5A72 /* tokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tokenize.h; sourceTree = "<group>"; };
 		2A550AD51768193200BE5A72 /* treewriter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = treewriter.c; sourceTree = "<group>"; };
 		2A550AD61768193200BE5A72 /* treewriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = treewriter.h; sourceTree = "<group>"; };
-		2A550AD71768193200BE5A72 /* vp8_asm_enc_offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp8_asm_enc_offsets.c; sourceTree = "<group>"; };
 		2A550AD91768193200BE5A72 /* dct_mmx.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = dct_mmx.asm; sourceTree = "<group>"; };
 		2A550ADA1768193200BE5A72 /* dct_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = dct_sse2.asm; sourceTree = "<group>"; };
 		2A550ADB1768193200BE5A72 /* denoising_sse2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = denoising_sse2.c; sourceTree = "<group>"; };
@@ -806,7 +788,6 @@
 		2A550BFF1768193300BE5A72 /* vpx_mem_tracker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_mem_tracker.c; sourceTree = "<group>"; };
 		2A550C011768193300BE5A72 /* arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arm.h; sourceTree = "<group>"; };
 		2A550C021768193300BE5A72 /* arm_cpudetect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = arm_cpudetect.c; sourceTree = "<group>"; };
-		2A550C031768193300BE5A72 /* asm_offsets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asm_offsets.h; sourceTree = "<group>"; };
 		2A550C041768193300BE5A72 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		2A550C051768193300BE5A72 /* emmintrin_compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emmintrin_compat.h; sourceTree = "<group>"; };
 		2A550C061768193300BE5A72 /* emms.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = emms.asm; sourceTree = "<group>"; };
@@ -822,7 +803,6 @@
 		2A550C1A1768193300BE5A72 /* yv12config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = yv12config.c; sourceTree = "<group>"; };
 		2A550C1B1768193300BE5A72 /* yv12extend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = yv12extend.c; sourceTree = "<group>"; };
 		2A550C1C1768193300BE5A72 /* vpx_scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vpx_scale.h; sourceTree = "<group>"; };
-		2A550C1E1768193300BE5A72 /* vpx_scale_asm_offsets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_scale_asm_offsets.c; sourceTree = "<group>"; };
 		2A550C1F1768193300BE5A72 /* vpx_scale_rtcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpx_scale_rtcd.c; sourceTree = "<group>"; };
 		2A550C231768193300BE5A72 /* yv12config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yv12config.h; sourceTree = "<group>"; };
 		2A550C241768193300BE5A72 /* vpxdec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vpxdec.c; sourceTree = "<group>"; };
@@ -925,8 +905,6 @@
 		2AC416A6185B0E4A000EFF77 /* decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decodeframe.c; sourceTree = "<group>"; };
 		2AC416B8185B1049000EFF77 /* vp9_dct_avx2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct_avx2.c; sourceTree = "<group>"; };
 		2AC416B9185B1049000EFF77 /* vp9_dct32x32_avx2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_dct32x32_avx2.c; sourceTree = "<group>"; };
-		2AEB1CFC1A82BDBF0050C571 /* vp9_loopfilter_thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_loopfilter_thread.c; sourceTree = "<group>"; };
-		2AEB1CFD1A82BDBF0050C571 /* vp9_loopfilter_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_loopfilter_thread.h; sourceTree = "<group>"; };
 		2AEB1CFE1A82BDBF0050C571 /* vp9_mfqe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vp9_mfqe.c; sourceTree = "<group>"; };
 		2AEB1CFF1A82BDBF0050C571 /* vp9_mfqe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vp9_mfqe.h; sourceTree = "<group>"; };
 		2AEB1D061A82BDCE0050C571 /* vp9_mfqe_sse2.asm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm.asm; path = vp9_mfqe_sse2.asm; sourceTree = "<group>"; };
@@ -1175,18 +1153,6 @@
 		2A550A2D1768193200BE5A72 /* ppc */ = {
 			isa = PBXGroup;
 			children = (
-				2A550A2E1768193200BE5A72 /* copy_altivec.asm */,
-				2A550A2F1768193200BE5A72 /* filter_altivec.asm */,
-				2A550A301768193200BE5A72 /* filter_bilinear_altivec.asm */,
-				2A550A311768193200BE5A72 /* idctllm_altivec.asm */,
-				2A550A321768193200BE5A72 /* loopfilter_altivec.c */,
-				2A550A331768193200BE5A72 /* loopfilter_filters_altivec.asm */,
-				2A550A341768193200BE5A72 /* platform_altivec.asm */,
-				2A550A351768193200BE5A72 /* recon_altivec.asm */,
-				2A550A361768193200BE5A72 /* sad_altivec.asm */,
-				2A550A371768193200BE5A72 /* systemdependent.c */,
-				2A550A381768193200BE5A72 /* variance_altivec.asm */,
-				2A550A391768193200BE5A72 /* variance_subpixel_altivec.asm */,
 			);
 			path = ppc;
 			sourceTree = "<group>";
@@ -1307,7 +1273,6 @@
 				2A550AD41768193200BE5A72 /* tokenize.h */,
 				2A550AD51768193200BE5A72 /* treewriter.c */,
 				2A550AD61768193200BE5A72 /* treewriter.h */,
-				2A550AD71768193200BE5A72 /* vp8_asm_enc_offsets.c */,
 				2A550AD81768193200BE5A72 /* x86 */,
 			);
 			path = encoder;
@@ -1316,10 +1281,6 @@
 		2A550AC21768193200BE5A72 /* ppc */ = {
 			isa = PBXGroup;
 			children = (
-				2A550AC31768193200BE5A72 /* csystemdependent.c */,
-				2A550AC41768193200BE5A72 /* encodemb_altivec.asm */,
-				2A550AC51768193200BE5A72 /* fdct_altivec.asm */,
-				2A550AC61768193200BE5A72 /* rdopt_altivec.asm */,
 			);
 			path = ppc;
 			sourceTree = "<group>";
@@ -1362,8 +1323,8 @@
 		2A550AF31768193200BE5A72 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				2AEB1CFC1A82BDBF0050C571 /* vp9_loopfilter_thread.c */,
-				2AEB1CFD1A82BDBF0050C571 /* vp9_loopfilter_thread.h */,
+				2A4796321AD6ECE9005C8F0E /* vp9_thread_common.c */,
+				2A4796331AD6ECE9005C8F0E /* vp9_thread_common.h */,
 				2AEB1CFE1A82BDBF0050C571 /* vp9_mfqe.c */,
 				2AEB1CFF1A82BDBF0050C571 /* vp9_mfqe.h */,
 				2A78BD9E198E0E0F00BFACCF /* vp9_thread.c */,
@@ -1702,7 +1663,6 @@
 			children = (
 				2A550C011768193300BE5A72 /* arm.h */,
 				2A550C021768193300BE5A72 /* arm_cpudetect.c */,
-				2A550C031768193300BE5A72 /* asm_offsets.h */,
 				2A550C041768193300BE5A72 /* config.h */,
 				2A550C051768193300BE5A72 /* emmintrin_compat.h */,
 				2A550C061768193300BE5A72 /* emms.asm */,
@@ -1722,7 +1682,6 @@
 			children = (
 				2A550C171768193300BE5A72 /* generic */,
 				2A550C1C1768193300BE5A72 /* vpx_scale.h */,
-				2A550C1E1768193300BE5A72 /* vpx_scale_asm_offsets.c */,
 				2A550C1F1768193300BE5A72 /* vpx_scale_rtcd.c */,
 				2A550C231768193300BE5A72 /* yv12config.h */,
 			);
@@ -1874,7 +1833,6 @@
 				2A550E521768193300BE5A72 /* hmm_intrnl.h in Headers */,
 				2A550E541768193300BE5A72 /* vpx_mem.h in Headers */,
 				2A550E561768193300BE5A72 /* arm.h in Headers */,
-				2A550E581768193300BE5A72 /* asm_offsets.h in Headers */,
 				2A550E591768193300BE5A72 /* config.h in Headers */,
 				2A550E5A1768193300BE5A72 /* emmintrin_compat.h in Headers */,
 				2A550E5C1768193300BE5A72 /* mem.h in Headers */,
@@ -1918,11 +1876,11 @@
 				2AA14EF7193D34EA002E5E84 /* vpx_frame_buffer.h in Headers */,
 				2A78BDA1198E0E0F00BFACCF /* vp9_thread.h in Headers */,
 				2A78BDAB198E0EE500BFACCF /* vp9_rd.h in Headers */,
-				2AEB1D011A82BDBF0050C571 /* vp9_loopfilter_thread.h in Headers */,
 				2AEB1D031A82BDBF0050C571 /* vp9_mfqe.h in Headers */,
 				2AEB1D0B1A82BDE80050C571 /* vp9_dct.h in Headers */,
 				2AEB1D0D1A82BDE80050C571 /* vp9_ethread.h in Headers */,
 				2AEB1D191A82BDFF0050C571 /* vp9_dct_sse2.h in Headers */,
+				2A4796351AD6ECE9005C8F0E /* vp9_thread_common.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2078,7 +2036,6 @@
 				2A550D4B1768193300BE5A72 /* temporal_filter.c in Sources */,
 				2A550D4C1768193300BE5A72 /* tokenize.c in Sources */,
 				2A550D4E1768193300BE5A72 /* treewriter.c in Sources */,
-				2A550D501768193300BE5A72 /* vp8_asm_enc_offsets.c in Sources */,
 				2A550D511768193300BE5A72 /* dct_mmx.asm in Sources */,
 				2A550D521768193300BE5A72 /* dct_sse2.asm in Sources */,
 				2A550D531768193300BE5A72 /* denoising_sse2.c in Sources */,
@@ -2167,7 +2124,6 @@
 				2A550E6A1768193300BE5A72 /* vpx_scale.c in Sources */,
 				2A550E6B1768193300BE5A72 /* yv12config.c in Sources */,
 				2A550E6C1768193300BE5A72 /* yv12extend.c in Sources */,
-				2A550E6E1768193300BE5A72 /* vpx_scale_asm_offsets.c in Sources */,
 				2A550E6F1768193300BE5A72 /* vpx_scale_rtcd.c in Sources */,
 				2A550E741768193300BE5A72 /* y4minput.c in Sources */,
 				2A975B8417A0562500FFFC04 /* vp9_dsubexp.c in Sources */,
@@ -2232,7 +2188,6 @@
 				2AEC95C11A02A3E700DA31A1 /* vp9_avg_intrin_sse2.c in Sources */,
 				2AEC95C21A02A3E700DA31A1 /* vp9_denoiser_sse2.c in Sources */,
 				2AEC95C31A02A3E700DA31A1 /* vp9_quantize_sse2.c in Sources */,
-				2AEB1D001A82BDBF0050C571 /* vp9_loopfilter_thread.c in Sources */,
 				2AEB1D071A82BDCE0050C571 /* vp9_mfqe_sse2.asm in Sources */,
 				2AEB1D0C1A82BDE80050C571 /* vp9_ethread.c in Sources */,
 				2AEB1D181A82BDFF0050C571 /* vp9_dct_impl_sse2.c in Sources */,
@@ -2244,6 +2199,7 @@
 				2AEB1D1F1A82BDFF0050C571 /* vp9_highbd_subpel_variance.asm in Sources */,
 				2AEB1D201A82BDFF0050C571 /* vp9_highbd_variance_impl_sse2.asm in Sources */,
 				2AEB1D211A82BDFF0050C571 /* vp9_highbd_variance_sse2.c in Sources */,
+				2A4796341AD6ECE9005C8F0E /* vp9_thread_common.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
