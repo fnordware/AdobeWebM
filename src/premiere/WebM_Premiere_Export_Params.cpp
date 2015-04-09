@@ -555,7 +555,7 @@ exSDKGenerateDefaultParams(
 	
 	// Sample rate
 	exParamValues sampleRateValues;
-	sampleRateValues.value.floatValue = sampleRateP.mFloat64;
+	sampleRateValues.value.floatValue = 48000.f; //sampleRateP.mFloat64;
 	sampleRateValues.disabled = kPrTrue;
 	sampleRateValues.hidden = kPrFalse;
 	
