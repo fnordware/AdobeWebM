@@ -80,8 +80,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)x64\$(ConfigurationName)"
-			IntermediateDirectory="x64\$(ConfigurationName)\vpx"
+			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
@@ -149,7 +149,7 @@
 		<Filter
 			Name="Source Files"
 			Filter="c;cc;cpp;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="1797A566-F3B2-6BA5-C2F6-F12D21CA02F0"
+			UniqueIdentifier="619BE9C7-2138-9734-D702-BEC8E4771FCF"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.c"
@@ -3848,26 +3848,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter_thread.c"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter_thread.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp9_common_vp9_loopfilter_thread.obj"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.c"
 				>
 				<FileConfiguration
@@ -4492,6 +4472,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_skin_detection.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_skin_detection.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_skin_detection.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_speed_features.c"
 				>
 				<FileConfiguration
@@ -4804,6 +4804,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_thread_common.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_thread_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_common_vp9_thread_common.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_tile_common.c"
 				>
 				<FileConfiguration
@@ -4944,7 +4964,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="vpx.def"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx.def"
 				>
 			</File>
 			<File
@@ -5171,14 +5191,10 @@
 		<Filter
 			Name="Header Files"
 			Filter="h;hm;inl;inc;xsd"
-			UniqueIdentifier="9A52E3B9-D42B-E0F1-154E-392BF3C996EF"
+			UniqueIdentifier="B1006D7E-08ED-F789-D4DD-65E46B6B142A"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx_ports\asm_offsets.h"
 				>
 			</File>
 			<File
@@ -5442,7 +5458,7 @@
 				>
 			</File>
 			<File
-				RelativePath="vp8_rtcd.h"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp8_rtcd.h"
 				>
 			</File>
 			<File
@@ -5606,10 +5622,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_loopfilter_thread.h"
-				>
-			</File>
-			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_mbgraph.h"
 				>
 			</File>
@@ -5690,7 +5702,7 @@
 				>
 			</File>
 			<File
-				RelativePath="vp9_rtcd.h"
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9_rtcd.h"
 				>
 			</File>
 			<File
@@ -5707,6 +5719,10 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_segmentation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_skin_detection.h"
 				>
 			</File>
 			<File
@@ -5735,6 +5751,10 @@
 			</File>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_thread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\common\vp9_thread_common.h"
 				>
 			</File>
 			<File
@@ -5810,7 +5830,7 @@
 				>
 			</File>
 			<File
-				RelativePath="vpx_scale_rtcd.h"
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_scale_rtcd.h"
 				>
 			</File>
 			<File
@@ -5829,13 +5849,13 @@
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="96EA8950-C7C9-1772-4AF1-B8C32F072CAB"
+			UniqueIdentifier="14C91951-CE56-A261-87DD-970C65DB390B"
 			>
 		</Filter>
 		<Filter
 			Name="Build Files"
 			Filter="mk"
-			UniqueIdentifier="EA2F4A0A-6306-759D-496A-6DBE20C125A1"
+			UniqueIdentifier="3C6E898E-A786-A334-94B2-FB42ADFE3DAE"
 			>
 			<File
 				RelativePath="libs.mk"
