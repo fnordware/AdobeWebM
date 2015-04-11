@@ -197,14 +197,17 @@ exSDKStartup(
 	exportStdParms		*stdParmsP, 
 	exExporterInfoRec	*infoRecP)
 {
+	int fourCC = 0;
+	VersionInfo version = {0, 0, 0};
+
 	PrSDKAppInfoSuite *appInfoSuite = NULL;
 	stdParmsP->getSPBasicSuite()->AcquireSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion, (const void**)&appInfoSuite);
 	
 	if(appInfoSuite)
 	{
-		int fourCC = 0;
-	
 		appInfoSuite->GetAppInfo(PrSDKAppInfoSuite::kAppInfo_AppFourCC, (void *)&fourCC);
+
+		appInfoSuite->GetAppInfo(PrSDKAppInfoSuite::kAppInfo_Version, (void *)&version);
 	
 		stdParmsP->getSPBasicSuite()->ReleaseSuite(kPrSDKAppInfoSuite, kPrSDKAppInfoSuiteVersion);
 		
@@ -233,7 +236,9 @@ exSDKStartup(
 	
 	infoRecP->isCacheable		= kPrFalse;
 	
-	if(stdParmsP->interfaceVer >= 6)
+	if(stdParmsP->interfaceVer >= 6 &&
+		((fourCC == kAppPremierePro && version.major >= 9) ||
+		 (fourCC == kAppMediaEncoder && version.major >= 9)))
 	{
 	#if EXPORTMOD_VERSION >= 6
 		infoRecP->canConformToMatchParams = kPrTrue;
