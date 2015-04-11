@@ -2940,7 +2940,14 @@
 						<array>
 							<dict>
 								<key>DESCRIPTION</key>
-								<array/>
+								<array>
+									<dict>
+										<key>LANGUAGE</key>
+										<string>English</string>
+										<key>VALUE</key>
+										<string>WebM plug-in for Adobe Premiere Pro and Adobe Media Encoder in Adobe Creative Cloud or Adobe Creative Cloud 2014 and later.</string>
+									</dict>
+								</array>
 								<key>OPTIONS</key>
 								<dict>
 									<key>HIDDEN</key>
@@ -2989,7 +2996,14 @@
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
-								<array/>
+								<array>
+									<dict>
+										<key>LANGUAGE</key>
+										<string>English</string>
+										<key>VALUE</key>
+										<string>WebM plug-in for Adobe Premiere Pro CS6 and Adobe Media Encoder CS6.</string>
+									</dict>
+								</array>
 								<key>OPTIONS</key>
 								<dict>
 									<key>HIDDEN</key>
@@ -3038,7 +3052,14 @@
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
-								<array/>
+								<array>
+									<dict>
+										<key>LANGUAGE</key>
+										<string>English</string>
+										<key>VALUE</key>
+										<string>Presets for Adobe Premiere Pro CC 2014 and Adobe Media Encoder CC 2014.</string>
+									</dict>
+								</array>
 								<key>OPTIONS</key>
 								<dict>
 									<key>HIDDEN</key>
@@ -3087,7 +3108,14 @@
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
-								<array/>
+								<array>
+									<dict>
+										<key>LANGUAGE</key>
+										<string>English</string>
+										<key>VALUE</key>
+										<string>Presets for Adobe Premiere Pro CC and Adobe Media Encoder CC.</string>
+									</dict>
+								</array>
 								<key>OPTIONS</key>
 								<dict>
 									<key>HIDDEN</key>
@@ -3136,7 +3164,14 @@
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
-								<array/>
+								<array>
+									<dict>
+										<key>LANGUAGE</key>
+										<string>English</string>
+										<key>VALUE</key>
+										<string>Presets for Adobe Premiere Pro CS6 and Adobe Media Encoder CS6.</string>
+									</dict>
+								</array>
 								<key>OPTIONS</key>
 								<dict>
 									<key>HIDDEN</key>
