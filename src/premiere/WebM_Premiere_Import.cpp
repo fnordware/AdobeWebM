@@ -1336,11 +1336,13 @@ SDKGetInfo8(
 	{
 		const mkvparser::SegmentInfo* const pSegmentInfo = localRecP->segment->GetInfo();
 		
-		const long long duration = pSegmentInfo->GetDuration();
+		long long duration = pSegmentInfo->GetDuration();
 		
 		const long long timeCodeScale = pSegmentInfo->GetTimeCodeScale();
 		
 		assert(timeCodeScale == 1000000LL);
+		
+		bool duration_unknown = (duration <= (1 * timeCodeScale)); // the file was not properly "finalized"
 		
 		const mkvparser::Tracks* pTracks = localRecP->segment->GetTracks();
 		
@@ -1362,20 +1364,26 @@ SDKGetInfo8(
 						if(localRecP->video_start_tstamp < 0)
 						{
 							assert(localRecP->video_start_tstamp == -1);
+							
+							long long last_tstamp = 0;
+							long long second_last_tstamp = 0;
 						
 							const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
 							
-							while((pCluster != NULL) && !pCluster->EOS() && localRecP->video_start_tstamp < 0)
+							while((pCluster != NULL) && !pCluster->EOS() && (localRecP->video_start_tstamp < 0 || duration_unknown))
 							{
 								const mkvparser::BlockEntry* pBlockEntry = NULL;
 								
 								pCluster->GetFirst(pBlockEntry);
 								
-								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->video_start_tstamp < 0)
+								while((pBlockEntry != NULL) && !pBlockEntry->EOS() && (localRecP->video_start_tstamp < 0 || duration_unknown))
 								{
 									const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 									
-									if(pBlock->GetTrackNumber() == localRecP->video_track)
+									second_last_tstamp = last_tstamp;
+									last_tstamp = pBlock->GetTime(pCluster);
+									
+									if(pBlock->GetTrackNumber() == localRecP->video_track && localRecP->video_start_tstamp < 0)
 									{
 										localRecP->video_start_tstamp = pBlock->GetTime(pCluster);
 										
@@ -1437,6 +1445,18 @@ SDKGetInfo8(
 								}
 								
 								pCluster = localRecP->segment->GetNext(pCluster);
+							}
+							
+							if(duration_unknown)
+							{
+								duration = last_tstamp + (last_tstamp - second_last_tstamp);
+								
+								if(duration > 0)
+								{
+									duration_unknown = false;
+								}
+								else
+									duration = 1 * timeCodeScale;
 							}
 						}
 						
@@ -1503,19 +1523,25 @@ SDKGetInfo8(
 			{
 				assert(localRecP->audio_start_tstamp == -1);
 				
+				long long last_tstamp = 0;
+				long long second_last_tstamp = 0;
+				
 				const mkvparser::Cluster* pCluster = localRecP->segment->GetFirst();
 				
-				while((pCluster != NULL) && !pCluster->EOS() && localRecP->audio_start_tstamp < 0)
+				while((pCluster != NULL) && !pCluster->EOS() && (localRecP->audio_start_tstamp < 0 || duration_unknown))
 				{
 					const mkvparser::BlockEntry* pBlockEntry = NULL;
 					
 					pCluster->GetFirst(pBlockEntry);
 					
-					while((pBlockEntry != NULL) && !pBlockEntry->EOS() && localRecP->audio_start_tstamp < 0)
+					while((pBlockEntry != NULL) && !pBlockEntry->EOS() && (localRecP->audio_start_tstamp < 0 || duration_unknown))
 					{
 						const mkvparser::Block *pBlock = pBlockEntry->GetBlock();
 						
-						if(pBlock->GetTrackNumber() == localRecP->audio_track)
+						second_last_tstamp = last_tstamp;
+						last_tstamp = pBlock->GetTime(pCluster);
+						
+						if(pBlock->GetTrackNumber() == localRecP->audio_track && localRecP->audio_start_tstamp < 0)
 						{
 							localRecP->audio_start_tstamp = pBlock->GetTime(pCluster);
 						}
@@ -1524,6 +1550,18 @@ SDKGetInfo8(
 					}
 					
 					pCluster = localRecP->segment->GetNext(pCluster);
+				}
+				
+				if(duration_unknown)
+				{
+					duration = last_tstamp + (last_tstamp - second_last_tstamp);
+					
+					if(duration > 0)
+					{
+						duration_unknown = false;
+					}
+					else
+						duration = 1 * timeCodeScale;
 				}
 			}
 			
@@ -1574,6 +1612,8 @@ SDKGetInfo8(
 				}
 			}
 		}
+		
+		assert(!duration_unknown);
 	}
 		
 	stdParms->piSuites->memFuncs->unlockHandle(reinterpret_cast<char**>(ldataH));
