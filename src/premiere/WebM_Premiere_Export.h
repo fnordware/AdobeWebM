@@ -75,8 +75,8 @@ typedef struct ExportSettings
 } ExportSettings;
 
 
-#define WEBM_PLUGIN_VERSION_MAJOR	0
-#define WEBM_PLUGIN_VERSION_MINOR	5
+#define WEBM_PLUGIN_VERSION_MAJOR	1
+#define WEBM_PLUGIN_VERSION_MINOR	0
 #define WEBM_PLUGIN_VERSION_BUILD	0
 
 
