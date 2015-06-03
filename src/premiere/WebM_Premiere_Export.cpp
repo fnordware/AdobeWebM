@@ -1663,6 +1663,11 @@ exSDKExport(
 									const int width = bounds.right - bounds.left;
 									const int height = bounds.bottom - bounds.top;
 									
+									assert(width == widthP.value.intValue);
+									assert(height == heightP.value.intValue);
+									assert(parN == pixelAspectRatioP.value.ratioValue.numerator);  // Premiere sometimes screws this up
+									assert(parD == pixelAspectRatioP.value.ratioValue.denominator);
+									
 									
 									// see validate_img() and validate_config() in vp8_cx_iface.c and vp9_cx_iface.c
 									const vpx_img_fmt_t imgfmt8 = chroma == WEBM_444 ? VPX_IMG_FMT_I444 :

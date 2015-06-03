@@ -2650,12 +2650,12 @@ SDKImportAudio7(
 													{
 														const int len = opus_multistream_decode_float(localRecP->opus_dec, data, length, interleaved_buffer, opus_frame_size, 0);
 														
-														int len_to_copy = len - packet_offset;
+														int len_to_copy = len - (int)packet_offset;
 														
-														if(len_to_copy > samples_left)
-															len_to_copy = samples_left;
-														else if(len_to_copy < 0)
+														if(len_to_copy < 0)
 															len_to_copy = 0;
+														else if(len_to_copy > samples_left)
+															len_to_copy = samples_left;
 														
 														for(int i = 0; i < len_to_copy; i++)
 														{
