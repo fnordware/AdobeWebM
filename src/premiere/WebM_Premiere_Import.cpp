@@ -1887,7 +1887,7 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 						else
 							*prUYVY++ = ConvertDepth<unsigned short, unsigned char>(*imgV++, img->bit_depth);
 						
-						*prUYVY++ = *imgY++;
+						*prUYVY++ = ConvertDepth<unsigned short, unsigned char>(*imgY++, img->bit_depth);
 					}
 				}
 			}
