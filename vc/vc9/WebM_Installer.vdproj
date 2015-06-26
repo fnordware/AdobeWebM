@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_03101E89EFE44F46B0058683F6F06A3E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_050A011FC6D34C4C93E75B932839FC82"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -45,6 +51,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0C6A16FB88564BB09E9545351C21375B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_0DEBF5922C6546618498357E6270FE48"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -52,6 +64,12 @@
         "Entry"
         {
         "MsmKey" = "8:_15746891C110429E9A7112197F2F42DB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_17E7784819394FD487932B2FB881A5D0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -177,7 +195,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4B3001D56AE843DC98E339009B98EED5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4F56A04C82FE439ABBB2DBA939C4C0B3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_519AE41318AD4A138CB07ED9F252AD1C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -279,6 +309,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_85B55895F02847B7A3EEF7C0DA159B55"
+        "OwnerKey" = "8:_A112699004FA46408E7FE9C470AC64D6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_868CFC9CE70047D4BF485FB44297B759"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -309,6 +345,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A112699004FA46408E7FE9C470AC64D6"
+        "OwnerKey" = "8:_03101E89EFE44F46B0058683F6F06A3E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A112699004FA46408E7FE9C470AC64D6"
+        "OwnerKey" = "8:_E8785C9FBB7C4078B8FEF5FA4C0FF27A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A112699004FA46408E7FE9C470AC64D6"
+        "OwnerKey" = "8:_17E7784819394FD487932B2FB881A5D0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A1BFE6C69B1C48CA967D9DA34B3A1577"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -327,7 +381,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_ABCBBBCF72F04D679839FB28A608DAC6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AC6B5C09CBE6459D948830D917E2024D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_AD7F780B13524C0FAD0DD12C7F48E6C9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B05F14E0930A4977B5121C9921524AC5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -369,7 +441,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C3FF933D187044898FDCECC29723558F"
+        "MsmKey" = "8:_C730F758C9FA479CA25D48198AB3898C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -382,6 +454,12 @@
         "Entry"
         {
         "MsmKey" = "8:_CAABBF6507F34AD286084C7D0C7151EB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CAC2510305A844A181DEE6DD05D4CFE9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -417,6 +495,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DC038E5A0FD34F6F8407EEFEA1C1408C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_DF77FD52E508487A9965A1CADE530CD0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -436,6 +520,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E1546B614A04492DB52A77FBC885CB71"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E8785C9FBB7C4078B8FEF5FA4C0FF27A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -684,6 +774,26 @@
             "TargetName" = "8:WebM YouTube 2160p 4K 29.97.epr"
             "Tag" = "8:"
             "Folder" = "8:_FF1D350AFEB74A18B6002AB94EFA6C0A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0C6A16FB88564BB09E9545351C21375B"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM 720p HD.epr"
+            "TargetName" = "8:WebM 720p HD.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1138,12 +1248,52 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B3001D56AE843DC98E339009B98EED5"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM YouTube 1080p HD.epr"
+            "TargetName" = "8:WebM YouTube 1080p HD.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4F56A04C82FE439ABBB2DBA939C4C0B3"
             {
             "SourcePath" = "8:..\\..\\src\\premiere\\presets\\normal\\5765624D_5765624D\\WebM 480p SD Wide 29.97.epr"
             "TargetName" = "8:WebM 480p SD Wide 29.97.epr"
             "Tag" = "8:"
             "Folder" = "8:_5295297E1ABD40589DEB0BE1F29BF4F7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_519AE41318AD4A138CB07ED9F252AD1C"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM YouTube 480p SD.epr"
+            "TargetName" = "8:WebM YouTube 480p SD.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1638,12 +1788,72 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ABCBBBCF72F04D679839FB28A608DAC6"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM YouTube 720p HD.epr"
+            "TargetName" = "8:WebM YouTube 720p HD.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AC6B5C09CBE6459D948830D917E2024D"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM YouTube 2160p 4K.epr"
+            "TargetName" = "8:WebM YouTube 2160p 4K.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AD7F780B13524C0FAD0DD12C7F48E6C9"
             {
             "SourcePath" = "8:..\\..\\src\\premiere\\presets\\normal\\5765624D_5765624D\\WebM YouTube 720p HD 25.epr"
             "TargetName" = "8:WebM YouTube 720p HD 25.epr"
             "Tag" = "8:"
             "Folder" = "8:_5295297E1ABD40589DEB0BE1F29BF4F7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B05F14E0930A4977B5121C9921524AC5"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM 1080p HD.epr"
+            "TargetName" = "8:WebM 1080p HD.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1778,6 +1988,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C730F758C9FA479CA25D48198AB3898C"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM 480p SD.epr"
+            "TargetName" = "8:WebM 480p SD.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C815345DCA4544388D57D290E21F3B9A"
             {
             "SourcePath" = "8:..\\..\\src\\premiere\\presets\\normal\\5765624D_5765624D\\WebM YouTube 1080p HD 23.976.epr"
@@ -1804,6 +2034,26 @@
             "TargetName" = "8:WebM YouTube 480p SD 29.97.epr"
             "Tag" = "8:"
             "Folder" = "8:_5BF6D03B01AA40F08987F81BF8D44F64"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CAC2510305A844A181DEE6DD05D4CFE9"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM YouTube 480p SD Wide.epr"
+            "TargetName" = "8:WebM YouTube 480p SD Wide.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1904,6 +2154,26 @@
             "TargetName" = "8:WebM 480p SD 29.97.epr"
             "Tag" = "8:"
             "Folder" = "8:_5BF6D03B01AA40F08987F81BF8D44F64"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DC038E5A0FD34F6F8407EEFEA1C1408C"
+            {
+            "SourcePath" = "8:..\\..\\src\\premiere\\presets\\match_source\\5765624D_5765624D\\WebM 480p SD Wide.epr"
+            "TargetName" = "8:WebM 480p SD Wide.epr"
+            "Tag" = "8:"
+            "Folder" = "8:_7506AAFDE81A47D38340B905F4DE9F67"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -2262,6 +2532,116 @@
                     "Property" = "8:_59274ABF071140179BA4A05B88546C5B"
                         "Folders"
                         {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_B0EEBD08594642E08EC69EE156D7273A"
+                            {
+                            "Name" = "8:Adobe Media Encoder CC 2015"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_FF68FE62D2B14F008522ABE831553C95"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_95A32D3C13A342A098F07B3F3BE54468"
+                                    {
+                                    "Name" = "8:MediaIO"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_03A9A2DDBE3945ADBC3A57D1AA2BE0E7"
+                                        "Folders"
+                                        {
+                                            "{9EF0B969-E518-4E46-987F-47570745A589}:_D6E4D4E1A2484DE295314C99E6DE5E4D"
+                                            {
+                                            "Name" = "8:systempresets"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "Property" = "8:_407D89C3E45C424EB1B7E907F7C1D3CC"
+                                                "Folders"
+                                                {
+                                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_7506AAFDE81A47D38340B905F4DE9F67"
+                                                    {
+                                                    "Name" = "8:5765624D_5765624D"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "Condition" = "8:CC15EXISTS<>\"\""
+                                                    "Transitive" = "11:FALSE"
+                                                    "Property" = "8:_CE7C5A6EC6CB4224AA4A781C87C04C0C"
+                                                        "Folders"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_B79041B6743444669285434E73192A7F"
+                            {
+                            "Name" = "8:Common"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_CCD59E217D0E48F5989172E03A4C1EC0"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_39D9680524DF4D7590CF41AD56D92133"
+                                    {
+                                    "Name" = "8:Plug-ins"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_99ECD73867A74F03AD5FD81DC6BCBCE5"
+                                        "Folders"
+                                        {
+                                            "{9EF0B969-E518-4E46-987F-47570745A589}:_3EC0A1E2B3364691834D0F8D0670D3EE"
+                                            {
+                                            "Name" = "8:CS6"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "Property" = "8:_56023E9E5A06411E88B1E07C67925966"
+                                                "Folders"
+                                                {
+                                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_6EA13B805D574646B13C2DE865C33CE1"
+                                                    {
+                                                    "Name" = "8:MediaCore"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "Property" = "8:_6EE382EF4897473D8ABE16638E7909CF"
+                                                        "Folders"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            "{9EF0B969-E518-4E46-987F-47570745A589}:_EDCD75F993304BB5B5FFEF65AC0E899F"
+                                            {
+                                            "Name" = "8:7.0"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "Property" = "8:_1A41F1C20B7B474EAE1C2AF44FEE2E97"
+                                                "Folders"
+                                                {
+                                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_A8FBB52B0DBF4A52B981B8F15B3DC576"
+                                                    {
+                                                    "Name" = "8:MediaCore"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "Property" = "8:_836E4BE27FBB46E6B929B2F6CBF49DA8"
+                                                        "Folders"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_C87FBD4F4FE6453C9B245068A40A9097"
                             {
                             "Name" = "8:Adobe Media Encoder CC"
@@ -2410,18 +2790,6 @@
                 {
                 }
             }
-            "{994432C3-9487-495D-8656-3E829A8DBDDE}:_C8690EC365D644B3B593C9CC1BCB62E5"
-            {
-            "DefaultLocation" = "8:[ProgramFiles64Folder]\\Adobe\\Common\\Plug-ins\\7.0\\MediaCore"
-            "Name" = "8:MediaCore"
-            "AlwaysCreate" = "11:TRUE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Property" = "8:PLUGINSDIR"
-                "Folders"
-                {
-                }
-            }
         }
         "LaunchCondition"
         {
@@ -2465,6 +2833,21 @@
             "RegKey" = "8:SOFTWARE\\ADOBE\\PREMIERE PRO\\CURRENTVERSION"
             "Value" = "8:Plug-InsDir"
             "Property" = "8:PLUGINSDIR"
+            }
+            "{39E1837C-0DB9-45A2-89C8-438377A77565}:_CE227845E04846AB9716F3526676550E"
+            {
+            "Name" = "8:Search for CC 2015"
+            "Folder" = "8:[ProgramFiles64Folder]\\Adobe\\Adobe Media Encoder CC 2015"
+            "Depth" = "2:0"
+            "FileName" = "8:Adobe Media Encoder.exe"
+            "MinVesion" = "8:"
+            "MaxVersion" = "8:"
+            "MinSize" = "8:"
+            "MaxSize" = "8:"
+            "MinDate" = "8:"
+            "MaxDate" = "8:"
+            "Languages" = "8:"
+            "Property" = "8:CC15EXISTS"
             }
             "{39E1837C-0DB9-45A2-89C8-438377A77565}:_ED814203EADE406A8B51715BA1914226"
             {
@@ -3007,15 +3390,43 @@
         }
         "MergeModule"
         {
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_85B55895F02847B7A3EEF7C0DA159B55"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:microsoft_vc90_crt_x86_x64.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A112699004FA46408E7FE9C470AC64D6"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86_x64.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C3FF933D187044898FDCECC29723558F"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_03101E89EFE44F46B0058683F6F06A3E"
             {
             "SourcePath" = "8:build\\x64\\Release\\WebM.prm"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_C8690EC365D644B3B593C9CC1BCB62E5"
+            "Folder" = "8:_A8FBB52B0DBF4A52B981B8F15B3DC576"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -3030,7 +3441,63 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
+            "OutputConfiguration" = "8:Release|x64"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_17E7784819394FD487932B2FB881A5D0"
+            {
+            "SourcePath" = "8:build\\x64\\Release\\WebM.prm"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_6EA13B805D574646B13C2DE865C33CE1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|x64"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E8785C9FBB7C4078B8FEF5FA4C0FF27A"
+            {
+            "SourcePath" = "8:build\\x64\\Release\\WebM.prm"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_22CA55B7BC8A4882B86FE592E5C81FB9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|x64"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}"
             "ShowKeyOutput" = "11:TRUE"
