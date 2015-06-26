@@ -1,12 +1,12 @@
 [submodule "ext/libvpx"]
 	path = ext/libvpx
-	url = http://git.chromium.org/webm/libvpx.git
+	url = https://chromium.googlesource.com/webm/libvpx.git
 [submodule "ext/libwebp"]
 	path = ext/libwebp
-	url = http://git.chromium.org/webm/libwebp.git
+	url = https://chromium.googlesource.com/webm/libwebp.git
 [submodule "ext/libwebm"]
 	path = ext/libwebm
-	url = http://git.chromium.org/webm/libwebm.git
+	url = https://chromium.googlesource.com/webm/libwebm.git
 [submodule "ext/libvorbis"]
 	path = ext/libvorbis
 	url = https://git.xiph.org/mirrors/vorbis.git
