@@ -5,5 +5,6 @@
 /* tree. An additional intellectual property rights grant can be found */
 /* in the file PATENTS.  All contributing project authors may */
 /* be found in the AUTHORS file in the root of the source tree. */
-static const char* const cfg = "--target=x86_64-win64-vs9 --enable-static-msvcrt --enable-vp9-highbitdepth";
+#include "vpx/vpx_codec.h"
+static const char* const cfg = "--enable-vp9-highbitdepth --target=x86_64-win64-vs9 --enable-static-msvcrt";
 const char *vpx_codec_build_config(void) {return cfg;}
