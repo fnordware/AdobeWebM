@@ -478,7 +478,7 @@ SDKOpenFile8(
 				OSErr err = FSOpenFork(	&fileRef,
 										dataForkName.length,
 										dataForkName.unicode,
-										fsRdWrPerm,
+										fsRdPerm,
 										&refNum);
 			}
 										
