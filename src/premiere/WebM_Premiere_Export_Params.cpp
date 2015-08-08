@@ -1622,9 +1622,6 @@ ConfigureEncoderPre(vpx_codec_enc_cfg_t &config, unsigned long &deadline, const 
 			else if(arg == "--disable-kf")
 			{	config.kf_mode = VPX_KF_DISABLED;	}
 
-			else if(arg == "--periodicity")
-			{	SetValue(config.ts_periodicity, val); i++;	}
-
 			
 			i++;
 		}
@@ -1731,7 +1728,36 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 
 			else if(arg == "--frame_boost")
 			{	ConfigureValue(encoder, VP9E_SET_FRAME_PERIODIC_BOOST, val); i++;	}
+
+			else if(arg == "--noise-sensitivity")
+			{	ConfigureValue(encoder, VP9E_SET_NOISE_SENSITIVITY, val); i++;	}
 			
+			else if(arg == "--tune-content")
+			{
+				unsigned int ival = val == "default" ? VP9E_CONTENT_DEFAULT :
+									val == "screen" ? VP9E_CONTENT_SCREEN :
+									VP9E_CONTENT_DEFAULT;
+			
+				ConfigureValue(encoder, VP9E_SET_TUNE_CONTENT, ival);
+				i++;
+			}
+
+			else if(arg == "--color-space")
+			{
+				unsigned int ival = val == "unknown" ? VPX_CS_UNKNOWN :
+									val == "bt601" ? VPX_CS_BT_601 :
+									val == "bt709" ? VPX_CS_BT_709 :
+									val == "smpte170" ? VPX_CS_SMPTE_170 :
+									val == "smpte240" ? VPX_CS_SMPTE_240 :
+									val == "bt2020" ? VPX_CS_BT_2020 :
+									val == "reserved" ? VPX_CS_RESERVED :
+									val == "sRGB" ? VPX_CS_SRGB :
+									VPX_CS_SRGB;
+			
+				ConfigureValue(encoder, VP9E_SET_COLOR_SPACE, ival);
+				i++;
+			}
+
 			i++;	
 		}
 		

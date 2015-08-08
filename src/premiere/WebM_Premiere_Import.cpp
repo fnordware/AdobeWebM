@@ -191,6 +191,7 @@ typedef struct
 	VideoCodec				video_codec;
 	long long				video_start_tstamp;
 	vpx_img_fmt_t			img_fmt;
+	vpx_color_space_t		color_space;
 	int						audio_track;
 	AudioCodec				audio_codec;
 	long long				audio_start_tstamp;
@@ -1182,6 +1183,20 @@ SDKAnalysis(
 		
 		stream << " video";
 		
+		if(localRecP->color_space != VPX_CS_UNKNOWN)
+		{
+			const std::string color_space = localRecP->color_space == VPX_CS_BT_601 ? "Rec. 601" :
+											localRecP->color_space == VPX_CS_BT_709 ? "Rec. 709" :
+											localRecP->color_space == VPX_CS_SMPTE_170 ? "SMPTE 170" :
+											localRecP->color_space == VPX_CS_SMPTE_240 ? "SMPTE 240" :
+											localRecP->color_space == VPX_CS_BT_2020 ? "Rec. 2020" :
+											localRecP->color_space == VPX_CS_RESERVED ? "Reserved" :
+											localRecP->color_space == VPX_CS_SRGB ? "sRGB" :
+											"Some Weird";
+											
+			stream << " (" << color_space << " color space)";
+		}
+		
 		if(localRecP->audio_track >= 0)
 			stream << ", ";
 	}
@@ -1417,6 +1432,7 @@ SDKGetInfo8(
 														{
 															localRecP->bit_depth = img->bit_depth;
 															localRecP->img_fmt = img->fmt;
+															localRecP->color_space = img->cs;
 														
 															vpx_img_free(img);
 														}
@@ -1438,6 +1454,7 @@ SDKGetInfo8(
 										{
 											localRecP->bit_depth = 8;
 											localRecP->img_fmt = VPX_IMG_FMT_I420;
+											localRecP->color_space = VPX_CS_UNKNOWN;
 										}
 									}
 									
