@@ -885,10 +885,10 @@ exSDKExport(
 	renderParms.inHeight = heightP.value.intValue;
 	renderParms.inPixelAspectRatioNumerator = pixelAspectRatioP.value.ratioValue.numerator;
 	renderParms.inPixelAspectRatioDenominator = pixelAspectRatioP.value.ratioValue.denominator;
-	renderParms.inRenderQuality = kPrRenderQuality_High;
+	renderParms.inRenderQuality = (exportInfoP->maximumRenderQuality ? kPrRenderQuality_Max : kPrRenderQuality_High);
 	renderParms.inFieldType = fieldTypeP.value.intValue;
 	renderParms.inDeinterlace = kPrFalse;
-	renderParms.inDeinterlaceQuality = kPrRenderQuality_High;
+	renderParms.inDeinterlaceQuality = (exportInfoP->maximumRenderQuality ? kPrRenderQuality_Max : kPrRenderQuality_High);
 	renderParms.inCompositeOnBlack = kPrTrue;
 	
 	
