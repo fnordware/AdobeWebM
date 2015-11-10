@@ -11,8 +11,8 @@ Download
 
 [WebM plug-in on fnordware.com](http://www.fnordware.com/WebM/)
 
-**WebP for Photoshop** _v0.5b7, 12 March 2015_
-[Mac](http://www.fnordware.com/downloads/WebP_v0.5b7_mac.zip) | [Win](http://www.fnordware.com/downloads/WebP_v0.5b7_win.zip)
+**WebP for Photoshop** _v0.5b8, 10 November 2015_
+[Mac](http://www.fnordware.com/downloads/WebP_v0.5b8_mac.zip) | [Win](http://www.fnordware.com/downloads/WebP_v0.5b8_win.zip)
 
 
 License
