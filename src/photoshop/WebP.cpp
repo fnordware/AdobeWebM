@@ -70,6 +70,7 @@ static void DoAbout(AboutRecordPtr aboutP)
 #endif
 
 	const int version = WebPGetEncoderVersion();
+	assert(WebPGetDecoderVersion() == WebPGetEncoderVersion());
 	
 	char version_string[32];
 	
