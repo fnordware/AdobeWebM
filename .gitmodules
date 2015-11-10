@@ -9,10 +9,10 @@
 	url = https://chromium.googlesource.com/webm/libwebm.git
 [submodule "ext/libvorbis"]
 	path = ext/libvorbis
-	url = https://git.xiph.org/mirrors/vorbis.git
+	url = https://git.xiph.org/vorbis.git
 [submodule "ext/libogg"]
 	path = ext/libogg
-	url = https://git.xiph.org/mirrors/ogg.git
+	url = https://git.xiph.org/ogg.git
 [submodule "ext/opus"]
 	path = ext/opus
-	url = git://git.opus-codec.org/opus.git
+	url = https://git.xiph.org/opus.git
