@@ -192,6 +192,7 @@ typedef struct
 	long long				video_start_tstamp;
 	vpx_img_fmt_t			img_fmt;
 	vpx_color_space_t		color_space;
+	vpx_color_range_t		color_range;
 	int						audio_track;
 	AudioCodec				audio_codec;
 	long long				audio_start_tstamp;
@@ -481,6 +482,9 @@ SDKOpenFile8(
 										dataForkName.unicode,
 										fsRdPerm,
 										&refNum);
+										
+				if(err != noErr)
+					assert(refNum == CAST_REFNUM(imInvalidHandleValue));
 			}
 										
 			CFRelease(filePathURL);
@@ -1195,7 +1199,18 @@ SDKAnalysis(
 											"Some Weird";
 											
 			stream << " (" << color_space << " color space)";
+			
+			if(localRecP->color_space == VPX_CS_SRGB)
+				assert(localRecP->color_range == VPX_CR_FULL_RANGE);
 		}
+		
+		if(localRecP->color_range == VPX_CR_FULL_RANGE &&
+			localRecP->color_space != VPX_CS_SRGB)
+		{
+			stream << " (full range)";
+		}
+		
+		stream << ")";
 		
 		if(localRecP->audio_track >= 0)
 			stream << ", ";
@@ -1433,6 +1448,7 @@ SDKGetInfo8(
 															localRecP->bit_depth = img->bit_depth;
 															localRecP->img_fmt = img->fmt;
 															localRecP->color_space = img->cs;
+															localRecP->color_range = img->range;
 														
 															vpx_img_free(img);
 														}
@@ -1455,6 +1471,7 @@ SDKGetInfo8(
 											localRecP->bit_depth = 8;
 											localRecP->img_fmt = VPX_IMG_FMT_I420;
 											localRecP->color_space = VPX_CS_UNKNOWN;
+											localRecP->color_range = VPX_CR_STUDIO_RANGE;
 										}
 									}
 									
@@ -1518,17 +1535,14 @@ SDKGetInfo8(
 						SDKFileInfo8->vidInfo.alphaType		= alphaNone;
 						
 						
-						// DisplayUnit could tell us something about PixelAspectRatio
-						// http://www.matroska.org/technical/specs/index.html#DisplayUnit
-						
-						if(pVideoTrack->GetDisplayUnit() == 0)
+						if(pVideoTrack->GetWidth() == pVideoTrack->GetDisplayWidth() &&
+							pVideoTrack->GetHeight() == pVideoTrack->GetDisplayHeight())
 						{
-							assert(pVideoTrack->GetWidth() == pVideoTrack->GetDisplayWidth());
-							assert(pVideoTrack->GetHeight() == pVideoTrack->GetDisplayHeight());
+							// http://www.matroska.org/technical/specs/index.html#DisplayUnit
+							assert(pVideoTrack->GetDisplayUnit() == 0); // doesn't have to be, but probably
 						}
 						else
 						{
-							assert(false); // just shocked to finally see one of these
 							SDKFileInfo8->vidInfo.pixelAspectNum = pVideoTrack->GetHeight() * pVideoTrack->GetDisplayWidth();
 							SDKFileInfo8->vidInfo.pixelAspectDen = pVideoTrack->GetWidth() * pVideoTrack->GetDisplayHeight();
 						}
@@ -1785,6 +1799,10 @@ CopyImgToVUYA(const vpx_image_t * const img, char *frameBufferP, csSDK_int32 row
 static void
 CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPixSuite, PrSDKPPix2Suite *PPix2Suite)
 {
+	assert(img->fmt & VPX_IMG_FMT_PLANAR);
+	assert(img->cs != VPX_CS_SRGB);
+	assert(img->range == VPX_CR_STUDIO_RANGE);
+
 	PrPixelFormat pix_format;
 	PPixSuite->GetPixelFormat(ppix, &pix_format);
 
@@ -2427,7 +2445,7 @@ SDKImportAudio7(
 					if(pTrack->GetCodecId() == std::string("A_VORBIS") && localRecP->vorbis_setup)
 					{
 						vorbis_info &vi = localRecP->vi;
-						vorbis_comment &vc = localRecP->vc;
+						//vorbis_comment &vc = localRecP->vc;
 						
 						vorbis_dsp_state vd;
 						vorbis_block vb;

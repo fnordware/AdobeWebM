@@ -1752,7 +1752,7 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 									val == "bt2020" ? VPX_CS_BT_2020 :
 									val == "reserved" ? VPX_CS_RESERVED :
 									val == "sRGB" ? VPX_CS_SRGB :
-									VPX_CS_SRGB;
+									VPX_CS_UNKNOWN;
 			
 				ConfigureValue(encoder, VP9E_SET_COLOR_SPACE, ival);
 				i++;
@@ -1763,6 +1763,16 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			
 			else if(arg == "--max-gf-interval")
 			{	ConfigureValue(encoder, VP9E_SET_MAX_GF_INTERVAL, val); i++;	}
+
+			else if(arg == "--color-range")
+			{
+				unsigned int ival = val == "studio" ? VPX_CR_STUDIO_RANGE :
+									val == "full" ? VPX_CR_FULL_RANGE :
+									VPX_CR_STUDIO_RANGE;
+			
+				ConfigureValue(encoder, VP9E_SET_COLOR_RANGE, ival);
+				i++;
+			}
 
 			i++;	
 		}

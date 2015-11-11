@@ -102,6 +102,8 @@ PrMkvWriter::PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObjec
 PrMkvWriter::~PrMkvWriter()
 {
 	prSuiteError err = _fileSuite->Close(_fileObject);
+	
+	assert(err == malNoError);
 }
 
 int32
@@ -121,6 +123,9 @@ PrMkvWriter::Position() const
 #define PR_SEEK_CURRENT fileSeekMode_End
 
 	prSuiteError err = _fileSuite->Seek(_fileObject, 0, pos, PR_SEEK_CURRENT);
+	
+	if(err != malNoError)
+		throw err;
 	
 	return pos;
 }
@@ -797,11 +802,9 @@ exSDKExport(
 	prMALError					result					= malNoError;
 	ExportSettings				*mySettings				= reinterpret_cast<ExportSettings*>(exportInfoP->privateData);
 	PrSDKExportParamSuite		*paramSuite				= mySettings->exportParamSuite;
-	PrSDKExportInfoSuite		*exportInfoSuite		= mySettings->exportInfoSuite;
 	PrSDKSequenceRenderSuite	*renderSuite			= mySettings->sequenceRenderSuite;
 	PrSDKSequenceAudioSuite		*audioSuite				= mySettings->sequenceAudioSuite;
 	PrSDKMemoryManagerSuite		*memorySuite			= mySettings->memorySuite;
-	PrSDKPPixCreatorSuite		*pixCreatorSuite		= mySettings->ppixCreatorSuite;
 	PrSDKPPixSuite				*pixSuite				= mySettings->ppixSuite;
 	PrSDKPPix2Suite				*pix2Suite				= mySettings->ppix2Suite;
 
@@ -1312,6 +1315,17 @@ exSDKExport(
 
 					video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
 											mkvmuxer::Tracks::kVp8CodecId);
+											
+					if(renderParms.inPixelAspectRatioNumerator != renderParms.inPixelAspectRatioDenominator)
+					{
+						const uint64 display_width = ((double)renderParms.inWidth *
+														(double)renderParms.inPixelAspectRatioNumerator /
+														(double)renderParms.inPixelAspectRatioDenominator)
+														+ 0.5;
+					
+						video->set_display_width(display_width);
+						video->set_display_height(renderParms.inHeight);
+					}
 					
 					muxer_segment->CuesTrack(vid_track);
 				}
