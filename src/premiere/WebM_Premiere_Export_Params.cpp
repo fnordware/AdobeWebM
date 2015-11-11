@@ -1757,6 +1757,12 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 				ConfigureValue(encoder, VP9E_SET_COLOR_SPACE, ival);
 				i++;
 			}
+			
+			else if(arg == "--min-gf-interval")
+			{	ConfigureValue(encoder, VP9E_SET_MIN_GF_INTERVAL, val); i++;	}
+			
+			else if(arg == "--max-gf-interval")
+			{	ConfigureValue(encoder, VP9E_SET_MAX_GF_INTERVAL, val); i++;	}
 
 			i++;	
 		}
