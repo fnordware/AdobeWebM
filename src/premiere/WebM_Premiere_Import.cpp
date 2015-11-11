@@ -1516,12 +1516,23 @@ SDKGetInfo8(
 						SDKFileInfo8->vidSampleSize			= fps_den;
 
 						SDKFileInfo8->vidInfo.alphaType		= alphaNone;
-
-						// Matroska defined a chunk called DisplayUnit, but libwebm doesn't support it
+						
+						
+						// DisplayUnit could tell us something about PixelAspectRatio
 						// http://www.matroska.org/technical/specs/index.html#DisplayUnit
-						// We'll just let Premiere guess what the pixel aspect ratio is
-						//SDKFileInfo8->vidInfo.pixelAspectNum = 1;
-						//SDKFileInfo8->vidInfo.pixelAspectDen = 1;
+						
+						if(pVideoTrack->GetDisplayUnit() == 0)
+						{
+							assert(pVideoTrack->GetWidth() == pVideoTrack->GetDisplayWidth());
+							assert(pVideoTrack->GetHeight() == pVideoTrack->GetDisplayHeight());
+						}
+						else
+						{
+							assert(false); // just shocked to finally see one of these
+							SDKFileInfo8->vidInfo.pixelAspectNum = pVideoTrack->GetHeight() * pVideoTrack->GetDisplayWidth();
+							SDKFileInfo8->vidInfo.pixelAspectDen = pVideoTrack->GetWidth() * pVideoTrack->GetDisplayHeight();
+						}
+						
 
 						// store some values we want to get without going to the file
 						localRecP->width = SDKFileInfo8->vidInfo.imageWidth;
