@@ -2304,6 +2304,11 @@
 				<key>VERSION</key>
 				<integer>3</integer>
 			</dict>
+			<key>PACKAGE_SCRIPTS</key>
+			<dict>
+				<key>RESOURCES</key>
+				<array/>
+			</dict>
 			<key>PACKAGE_SETTINGS</key>
 			<dict>
 				<key>AUTHENTICATION</key>
@@ -3453,7 +3458,7 @@
 				<key>CONCLUSION_ACTION</key>
 				<integer>0</integer>
 				<key>IDENTIFIER</key>
-				<string>com.fnordware.pkg.WebMPresetsCC14</string>
+				<string>com.fnordware.pkg.WebMPresetsCC15</string>
 				<key>LOCATION</key>
 				<integer>0</integer>
 				<key>NAME</key>
