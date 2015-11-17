@@ -1528,7 +1528,7 @@ SDKGetInfo8(
 						SDKFileInfo8->vidInfo.fieldType		= prFieldsUnknown; // Matroska talks about DefaultDecodedFieldDuration but...
 						SDKFileInfo8->vidInfo.isStill		= kPrFalse;
 						SDKFileInfo8->vidInfo.noDuration	= imNoDurationFalse;
-						SDKFileInfo8->vidDuration			= duration * fps_num / S2NS;
+						SDKFileInfo8->vidDuration			= ((duration * fps_num) + (S2NS / 2)) / S2NS; // rounding up
 						SDKFileInfo8->vidScale				= fps_num;
 						SDKFileInfo8->vidSampleSize			= fps_den;
 
