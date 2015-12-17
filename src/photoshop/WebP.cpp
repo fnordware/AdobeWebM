@@ -656,8 +656,8 @@ static void DoReadContinue(GPtr globals)
 					output_buffer->height = gStuff->imageSize.v;
 					output_buffer->is_external_memory = TRUE;
 					
-					int32 rowbytes = sizeof(unsigned char) * gStuff->planes * gStuff->imageSize.h;
-					int32 buffer_size = rowbytes * gStuff->imageSize.v;
+					const int32 rowbytes = sizeof(unsigned char) * gStuff->planes * gStuff->imageSize.h;
+					const int32 buffer_size = rowbytes * gStuff->imageSize.v;
 					
 					BufferID bufferID = 0;
 					
@@ -667,7 +667,7 @@ static void DoReadContinue(GPtr globals)
 					{
 						gStuff->data = myLockBuffer(globals, bufferID, TRUE);
 						
-						WebPRGBABuffer *buf_info = &output_buffer->u.RGBA;
+						WebPRGBABuffer* const buf_info = &output_buffer->u.RGBA;
 						
 						buf_info->rgba = (uint8_t *)gStuff->data;
 						buf_info->stride = rowbytes;
@@ -704,6 +704,8 @@ static void DoReadContinue(GPtr globals)
 						
 						myFreeBuffer(globals, bufferID);
 					}
+					
+					WebPFreeDecBuffer(output_buffer); // NoOp with output_buffer->is_external_memory = TRUE
 				}
 				
 				WebPDemuxReleaseIterator(&iter);
@@ -1093,9 +1095,10 @@ static void DoWriteStart(GPtr globals)
 						gResult = formatBadParameters;
 					}
 					
-					if(memory_writer.mem)
-						free(memory_writer.mem);
+					WebPMemoryWriterClear(&memory_writer);
 				}
+				
+				WebPPictureFree(&picture);
 			
 				WebPMuxDelete(mux);
 			}

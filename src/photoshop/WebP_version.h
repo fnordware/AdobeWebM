@@ -41,10 +41,10 @@
 
 #define WebP_Major_Version 0
 #define WebP_Minor_Version 5
-#define WebP_Version_String "0.5b8"
+#define WebP_Version_String "0.5b9"
 #define WebP_Build_Date __DATE__
-#define WebP_Build_Date_Manual "10 November 2015"
-#define WebP_Build_Complete_Manual "v0.5b8 - " WebP_Build_Date
+#define WebP_Build_Date_Manual "16 December 2015"
+#define WebP_Build_Complete_Manual "v0.5b9 - " WebP_Build_Date
 #define WebP_Copyright_Year "2013-2015"
 #define WebP_Build_Year "2015"
 
