@@ -981,7 +981,7 @@ static void DoWriteStart(GPtr globals)
 				picture.height = height;
 				picture.use_argb = TRUE;
 				
-				int ok = use_alpha ? WebPPictureImportRGBA(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes) :
+				const int ok = use_alpha ? WebPPictureImportRGBA(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes) :
 										WebPPictureImportRGB(&picture, (const uint8_t *)gStuff->data, gStuff->rowBytes);
 				
 				if(ok)
@@ -994,7 +994,7 @@ static void DoWriteStart(GPtr globals)
 					
 					config.thread_level = TRUE;
 					config.lossless = gOptions.lossless;
-					config.quality = gOptions.quality;
+					config.quality = (gOptions.lossless ? 100 : gOptions.quality); // see WebPConfigLosslessPreset()
 					config.method = 6;
 					config.preprocessing = 4; // https://groups.google.com/a/webmproject.org/forum/#!topic/webp-discuss/7dV1qXrdQ2Y
 					
@@ -1006,7 +1006,7 @@ static void DoWriteStart(GPtr globals)
 					picture.writer = WebPMemoryWrite;
 					picture.custom_ptr = &memory_writer;
 					
-					int success = WebPEncode(&config, &picture);
+					const int success = WebPEncode(&config, &picture);
 					
 					if(success && gResult == noErr)
 					{
@@ -1077,7 +1077,7 @@ static void DoWriteStart(GPtr globals)
 							
 							if(err == WEBP_MUX_OK)
 							{
-								bool ok = my_fwrite(globals, output_data.bytes, output_data.size);
+								const bool ok = my_fwrite(globals, output_data.bytes, output_data.size);
 								
 								WebPDataClear(&output_data);
 								
