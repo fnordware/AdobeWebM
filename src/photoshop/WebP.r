@@ -194,8 +194,8 @@ resource 'PiMI' (ResourceID, plugInName " PiMI", purgeable)
 		  0, 0, 0, 0,
 		  0, 0,  0,  0,
 		   0,  0,  0,  0 },
-		32767,				/* Maximum rows allowed in document */
-		32767,				/* Maximum columns allowed in document */
+		16384,				/* Maximum rows allowed in document */
+		16384,				/* Maximum columns allowed in document */
 		'WebM',				/* The file type if we create a file. */
 		'8BIM',				/* The creator type if we create a file. */
 		{					/* The type-creator pairs supported. */
