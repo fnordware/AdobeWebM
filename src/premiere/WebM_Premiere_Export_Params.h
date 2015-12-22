@@ -47,7 +47,8 @@
 
 typedef enum {
 	WEBM_CODEC_VP8 = 0,
-	WEBM_CODEC_VP9
+	WEBM_CODEC_VP9,
+	WEBM_CODEC_VP10
 } WebM_Video_Codec;
 
 typedef enum {

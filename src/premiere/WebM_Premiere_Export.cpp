@@ -848,10 +848,12 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
 	
-	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
+	const WebM_Video_Codec video_codec = (WebM_Video_Codec)codecP.value.intValue;
+	
+	const bool fancy_formats = (video_codec == WEBM_CODEC_VP9 || video_codec == WEBM_CODEC_VP10);
 	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
-	const WebM_Chroma_Sampling chroma = (use_vp9 ? (WebM_Chroma_Sampling)samplingP.value.intValue : WEBM_420);
-	const int bit_depth = (use_vp9 ? bitDepthP.value.intValue : 8);
+	const WebM_Chroma_Sampling chroma = (fancy_formats ? (WebM_Chroma_Sampling)samplingP.value.intValue : WEBM_420);
+	const int bit_depth = (fancy_formats ? bitDepthP.value.intValue : 8);
 
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
@@ -964,7 +966,9 @@ exSDKExport(
 		
 		if(exportInfoP->exportVideo)
 		{
-			vpx_codec_iface_t *iface = use_vp9 ? vpx_codec_vp9_cx() : vpx_codec_vp8_cx();
+			vpx_codec_iface_t *iface = (video_codec == WEBM_CODEC_VP10 ? vpx_codec_vp10_cx() :
+										video_codec == WEBM_CODEC_VP9 ? vpx_codec_vp9_cx() :
+										vpx_codec_vp8_cx());
 			
 			vpx_codec_enc_cfg_t config;
 			vpx_codec_enc_config_default(iface, &config, 0);
@@ -1061,7 +1065,7 @@ exSDKExport(
 					vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, cq_level);
 				}
 				
-				if(use_vp9)
+				if(video_codec == WEBM_CODEC_VP9 || video_codec == WEBM_CODEC_VP10)
 				{
 					vpx_codec_control(&encoder, VP8E_SET_CPUUSED, 2); // much faster if we do this
 					
@@ -1313,7 +1317,8 @@ exSDKExport(
 					
 					video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
 
-					video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
+					video->set_codec_id(video_codec == WEBM_CODEC_VP10 ? mkvmuxer::Tracks::kVp10CodecId :
+										video_codec == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
 											mkvmuxer::Tracks::kVp8CodecId);
 											
 					if(renderParms.inPixelAspectRatioNumerator != renderParms.inPixelAspectRatioDenominator)
@@ -1755,8 +1760,9 @@ exSDKExport(
 					
 					if(passes == 2)
 					{
-						const float firstpass_frac = (use_vp9 ? 0.1f : 0.3f);
-					
+						const float firstpass_frac = (video_codec == WEBM_CODEC_VP10 ? 0.1f :
+														video_codec == WEBM_CODEC_VP9 ? 0.1f :
+														0.3f);
 						if(pass == 1)
 						{
 							progress = firstpass_frac + (progress * (1.f - firstpass_frac));

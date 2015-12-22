@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		11C3E5200A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r in Rez */ = {isa = PBXBuildFile; fileRef = 11C3E51F0A9AA968003197F4 /* WebM_Premiere_Import_PiPL.r */; };
 		2A06EF73177D75F100233616 /* WebM_Premiere_Export_Params.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A06EF72177D75F100233616 /* WebM_Premiere_Export_Params.cpp */; };
+		2A0C91431C2A0053006F4675 /* liblibvp10.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A0C911B1C29FEB8006F4675 /* liblibvp10.a */; };
 		2A55332F176ADB4D00BE5A72 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A553326176ADB3E00BE5A72 /* libogg.a */; };
 		2A553330176ADB4E00BE5A72 /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A55332E176ADB4800BE5A72 /* libvorbis.a */; };
 		2A553331176ADB4E00BE5A72 /* libvpx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A55331E176ADB3300BE5A72 /* libvpx.a */; };
@@ -21,6 +22,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		2A0C911A1C29FEB8006F4675 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2A0C8F9C1C29FE99006F4675 /* liblibvp10.a */;
+			remoteInfo = libvp10;
+		};
+		2A0C91441C2A005C006F4675 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2A0C8F9B1C29FE99006F4675 /* libvp10 */;
+			remoteInfo = libvp10;
+		};
 		2A55331D176ADB3300BE5A72 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A550EF317681CDB00BE5A72 /* libvpx.xcodeproj */;
@@ -141,6 +156,7 @@
 				2A553331176ADB4E00BE5A72 /* libvpx.a in Frameworks */,
 				2A6E91F717796859003B0F87 /* libwebm.a in Frameworks */,
 				2A8BBBC8187BD305004EC034 /* libopus.a in Frameworks */,
+				2A0C91431C2A0053006F4675 /* liblibvp10.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +215,7 @@
 			isa = PBXGroup;
 			children = (
 				2A55331E176ADB3300BE5A72 /* libvpx.a */,
+				2A0C911B1C29FEB8006F4675 /* liblibvp10.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -270,6 +287,7 @@
 				2A553337176ADB5600BE5A72 /* PBXTargetDependency */,
 				2A6E91F917796863003B0F87 /* PBXTargetDependency */,
 				2A8BBBCA187BD312004EC034 /* PBXTargetDependency */,
+				2A0C91451C2A005C006F4675 /* PBXTargetDependency */,
 			);
 			name = "WebM Premiere";
 			productInstallPath = "$(HOME)/Library/Bundles";
@@ -324,6 +342,14 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		2A0C911B1C29FEB8006F4675 /* liblibvp10.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			name = liblibvp10.a;
+			path = build/Debug/liblibvp10.a;
+			remoteRef = 2A0C911A1C29FEB8006F4675 /* PBXContainerItemProxy */;
+			sourceTree = "<group>";
+		};
 		2A55331E176ADB3300BE5A72 /* libvpx.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -397,6 +423,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		2A0C91451C2A005C006F4675 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libvp10;
+			targetProxy = 2A0C91441C2A005C006F4675 /* PBXContainerItemProxy */;
+		};
 		2A553333176ADB5600BE5A72 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = libvorbis;

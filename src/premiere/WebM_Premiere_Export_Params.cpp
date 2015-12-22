@@ -369,7 +369,7 @@ exSDKGenerateDefaultParams(
 	exParamValues codecValues;
 	codecValues.structVersion = 1;
 	codecValues.rangeMin.intValue = WEBM_CODEC_VP8;
-	codecValues.rangeMax.intValue = WEBM_CODEC_VP9;
+	codecValues.rangeMax.intValue = WEBM_CODEC_VP10;
 	codecValues.value.intValue = WEBM_CODEC_VP9;
 	codecValues.disabled = kPrFalse;
 	codecValues.hidden = kPrFalse;
@@ -875,15 +875,17 @@ exSDKPostProcessParams(
 	
 	
 	WebM_Video_Codec codecs[] = {	WEBM_CODEC_VP8,
-									WEBM_CODEC_VP9 };
+									WEBM_CODEC_VP9,
+									WEBM_CODEC_VP10 };
 	
 	const char *codecStrings[]	= {	"VP8",
-									"VP9" };
+									"VP9",
+									"VP10" };
 
 	exportParamSuite->ClearConstrainedValues(exID, gIdx, WebMVideoCodec);
 	
 	exOneParamValueRec tempCodec;
-	for(int i=0; i < 2; i++)
+	for(int i=0; i < 3; i++)
 	{
 		tempCodec.intValue = codecs[i];
 		utf16ncpy(paramString, codecStrings[i], 255);
@@ -1313,12 +1315,14 @@ exSDKGetParamSummary(
 			stream3 << " VBR";
 	}
 	
-	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" : ", VP8");
+	stream3 << (codecP.value.intValue == WEBM_CODEC_VP9 ? ", VP9" :
+				codecP.value.intValue == WEBM_CODEC_VP10 ? ", VP10" :
+				", VP8");
 	
 	if(twoPassP.value.intValue)
 		stream3 << " 2-pass";
 
-	if(codecP.value.intValue == WEBM_CODEC_VP9)
+	if(codecP.value.intValue == WEBM_CODEC_VP9 || codecP.value.intValue == WEBM_CODEC_VP10)
 	{
 		if(samplingP.value.intValue == WEBM_444)
 			stream3 << " 4:4:4";
@@ -1368,7 +1372,7 @@ exSDKValidateParamChanged (
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingValue);
 		paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
 		
-		bitDepthValue.disabled = samplingValue.disabled = (codecValue.value.intValue != WEBM_CODEC_VP9);
+		bitDepthValue.disabled = samplingValue.disabled = !(codecValue.value.intValue == WEBM_CODEC_VP9 || codecValue.value.intValue == WEBM_CODEC_VP10);
 		
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoSampling, &samplingValue);
 		paramSuite->ChangeParam(exID, gIdx, WebMVideoBitDepth, &bitDepthValue);
