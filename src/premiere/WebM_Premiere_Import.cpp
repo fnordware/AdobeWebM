@@ -1210,8 +1210,6 @@ SDKAnalysis(
 			stream << " (full range)";
 		}
 		
-		stream << ")";
-		
 		if(localRecP->audio_track >= 0)
 			stream << ", ";
 	}
