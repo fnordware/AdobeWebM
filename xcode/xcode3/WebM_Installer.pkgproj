@@ -589,7 +589,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>1.0</string>
+				<string>1.0.2</string>
 			</dict>
 			<key>UUID</key>
 			<string>4C64CBC7-0714-4957-B84E-ACF6D1EE8FAD</string>
@@ -1178,8 +1178,10 @@
 				<string>WebM for Premiere CS6</string>
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
+				<key>RELOCATABLE</key>
+				<false/>
 				<key>VERSION</key>
-				<string>1.0</string>
+				<string>1.0.2</string>
 			</dict>
 			<key>UUID</key>
 			<string>C56E2AA5-F917-4FFC-BCE6-D8E1C573B149</string>
@@ -1271,6 +1273,90 @@
 									<integer>80</integer>
 									<key>PATH</key>
 									<string>Adobe Media Encoder CS6</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>509</integer>
+									<key>TYPE</key>
+									<integer>2</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>80</integer>
+																	<key>PATH</key>
+																	<string>../../src/premiere/presets/normal/5765624D_5765624D</string>
+																	<key>PATH_TYPE</key>
+																	<integer>1</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>493</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+															</array>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>systempresets</string>
+															<key>PATH_TYPE</key>
+															<integer>0</integer>
+															<key>PERMISSIONS</key>
+															<integer>509</integer>
+															<key>TYPE</key>
+															<integer>2</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>GID</key>
+													<integer>80</integer>
+													<key>PATH</key>
+													<string>MediaIO</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>509</integer>
+													<key>TYPE</key>
+													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+											</array>
+											<key>GID</key>
+											<integer>80</integer>
+											<key>PATH</key>
+											<string>Adobe Premiere Pro CS6.app</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>509</integer>
+											<key>TYPE</key>
+											<integer>2</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Adobe Premiere Pro CS6</string>
 									<key>PATH_TYPE</key>
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
@@ -1733,6 +1819,11 @@
 				<key>VERSION</key>
 				<integer>3</integer>
 			</dict>
+			<key>PACKAGE_SCRIPTS</key>
+			<dict>
+				<key>RESOURCES</key>
+				<array/>
+			</dict>
 			<key>PACKAGE_SETTINGS</key>
 			<dict>
 				<key>AUTHENTICATION</key>
@@ -1842,6 +1933,90 @@
 									<integer>80</integer>
 									<key>PATH</key>
 									<string>Adobe Media Encoder CC</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>509</integer>
+									<key>TYPE</key>
+									<integer>2</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array/>
+																	<key>GID</key>
+																	<integer>80</integer>
+																	<key>PATH</key>
+																	<string>../../src/premiere/presets/normal/5765624D_5765624D</string>
+																	<key>PATH_TYPE</key>
+																	<integer>1</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>493</integer>
+																	<key>TYPE</key>
+																	<integer>3</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+															</array>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>systempresets</string>
+															<key>PATH_TYPE</key>
+															<integer>0</integer>
+															<key>PERMISSIONS</key>
+															<integer>509</integer>
+															<key>TYPE</key>
+															<integer>2</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>GID</key>
+													<integer>80</integer>
+													<key>PATH</key>
+													<string>MediaIO</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>509</integer>
+													<key>TYPE</key>
+													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+											</array>
+											<key>GID</key>
+											<integer>80</integer>
+											<key>PATH</key>
+											<string>Adobe Premiere Pro CC.app</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>509</integer>
+											<key>TYPE</key>
+											<integer>2</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Adobe Premiere Pro CC</string>
 									<key>PATH_TYPE</key>
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
@@ -2329,7 +2504,7 @@
 			<key>TYPE</key>
 			<integer>0</integer>
 			<key>UUID</key>
-			<string>4857CA4F-C902-42E5-89B6-7399CA636A81</string>
+			<string>CA3D940B-6A5A-46CB-9190-EE99C78E4EC7</string>
 		</dict>
 		<dict>
 			<key>PACKAGE_FILES</key>
@@ -2429,493 +2604,6 @@
 								</dict>
 								<dict>
 									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>80</integer>
-									<key>PATH</key>
-									<string>Utilities</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-							</array>
-							<key>GID</key>
-							<integer>80</integer>
-							<key>PATH</key>
-							<string>Applications</string>
-							<key>PATH_TYPE</key>
-							<integer>0</integer>
-							<key>PERMISSIONS</key>
-							<integer>509</integer>
-							<key>TYPE</key>
-							<integer>1</integer>
-							<key>UID</key>
-							<integer>0</integer>
-						</dict>
-						<dict>
-							<key>CHILDREN</key>
-							<array>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>80</integer>
-									<key>PATH</key>
-									<string>Application Support</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Automator</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Documentation</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Filesystems</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Frameworks</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Input Methods</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Internet Plug-Ins</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>LaunchAgents</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>LaunchDaemons</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>PreferencePanes</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Preferences</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>80</integer>
-									<key>PATH</key>
-									<string>Printers</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>PrivilegedHelperTools</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>QuickLook</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>QuickTime</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Screen Savers</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Scripts</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Services</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Widgets</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-							</array>
-							<key>GID</key>
-							<integer>0</integer>
-							<key>PATH</key>
-							<string>Library</string>
-							<key>PATH_TYPE</key>
-							<integer>0</integer>
-							<key>PERMISSIONS</key>
-							<integer>493</integer>
-							<key>TYPE</key>
-							<integer>1</integer>
-							<key>UID</key>
-							<integer>0</integer>
-						</dict>
-						<dict>
-							<key>CHILDREN</key>
-							<array>
-								<dict>
-									<key>CHILDREN</key>
-									<array>
-										<dict>
-											<key>CHILDREN</key>
-											<array/>
-											<key>GID</key>
-											<integer>0</integer>
-											<key>PATH</key>
-											<string>Extensions</string>
-											<key>PATH_TYPE</key>
-											<integer>0</integer>
-											<key>PERMISSIONS</key>
-											<integer>493</integer>
-											<key>TYPE</key>
-											<integer>1</integer>
-											<key>UID</key>
-											<integer>0</integer>
-										</dict>
-									</array>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Library</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>493</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-							</array>
-							<key>GID</key>
-							<integer>0</integer>
-							<key>PATH</key>
-							<string>System</string>
-							<key>PATH_TYPE</key>
-							<integer>0</integer>
-							<key>PERMISSIONS</key>
-							<integer>493</integer>
-							<key>TYPE</key>
-							<integer>1</integer>
-							<key>UID</key>
-							<integer>0</integer>
-						</dict>
-						<dict>
-							<key>CHILDREN</key>
-							<array>
-								<dict>
-									<key>CHILDREN</key>
-									<array/>
-									<key>GID</key>
-									<integer>0</integer>
-									<key>PATH</key>
-									<string>Shared</string>
-									<key>PATH_TYPE</key>
-									<integer>0</integer>
-									<key>PERMISSIONS</key>
-									<integer>1023</integer>
-									<key>TYPE</key>
-									<integer>1</integer>
-									<key>UID</key>
-									<integer>0</integer>
-								</dict>
-							</array>
-							<key>GID</key>
-							<integer>80</integer>
-							<key>PATH</key>
-							<string>Users</string>
-							<key>PATH_TYPE</key>
-							<integer>0</integer>
-							<key>PERMISSIONS</key>
-							<integer>493</integer>
-							<key>TYPE</key>
-							<integer>1</integer>
-							<key>UID</key>
-							<integer>0</integer>
-						</dict>
-					</array>
-					<key>GID</key>
-					<integer>0</integer>
-					<key>PATH</key>
-					<string>/</string>
-					<key>PATH_TYPE</key>
-					<integer>0</integer>
-					<key>PERMISSIONS</key>
-					<integer>493</integer>
-					<key>TYPE</key>
-					<integer>1</integer>
-					<key>UID</key>
-					<integer>0</integer>
-				</dict>
-				<key>PAYLOAD_TYPE</key>
-				<integer>0</integer>
-				<key>VERSION</key>
-				<integer>3</integer>
-			</dict>
-			<key>PACKAGE_SETTINGS</key>
-			<dict>
-				<key>AUTHENTICATION</key>
-				<integer>1</integer>
-				<key>CONCLUSION_ACTION</key>
-				<integer>0</integer>
-				<key>IDENTIFIER</key>
-				<string>com.fnordware.pkg.WebMPresetsCC14</string>
-				<key>LOCATION</key>
-				<integer>0</integer>
-				<key>NAME</key>
-				<string>Presets for Premiere CC 2014</string>
-				<key>OVERWRITE_PERMISSIONS</key>
-				<false/>
-				<key>VERSION</key>
-				<string>1.0</string>
-			</dict>
-			<key>TYPE</key>
-			<integer>0</integer>
-			<key>UUID</key>
-			<string>9590FF1E-E544-4EA5-A035-769D33C093E3</string>
-		</dict>
-		<dict>
-			<key>PACKAGE_FILES</key>
-			<dict>
-				<key>DEFAULT_INSTALL_LOCATION</key>
-				<string>/</string>
-				<key>HIERARCHY</key>
-				<dict>
-					<key>CHILDREN</key>
-					<array>
-						<dict>
-							<key>CHILDREN</key>
-							<array>
-								<dict>
-									<key>CHILDREN</key>
 									<array>
 										<dict>
 											<key>CHILDREN</key>
@@ -2932,7 +2620,7 @@
 																	<key>GID</key>
 																	<integer>80</integer>
 																	<key>PATH</key>
-																	<string>../../src/premiere/presets/match_source/5765624D_5765624D</string>
+																	<string>../../src/premiere/presets/normal/5765624D_5765624D</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2974,7 +2662,7 @@
 											<key>GID</key>
 											<integer>80</integer>
 											<key>PATH</key>
-											<string>Adobe Media Encoder CC 2015.app</string>
+											<string>Adobe Premiere Pro CC 2014.app</string>
 											<key>PATH_TYPE</key>
 											<integer>0</integer>
 											<key>PERMISSIONS</key>
@@ -2988,7 +2676,7 @@
 									<key>GID</key>
 									<integer>80</integer>
 									<key>PATH</key>
-									<string>Adobe Media Encoder CC 2015</string>
+									<string>Adobe Premiere Pro CC 2014</string>
 									<key>PATH_TYPE</key>
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
@@ -3451,6 +3139,705 @@
 				<key>VERSION</key>
 				<integer>3</integer>
 			</dict>
+			<key>PACKAGE_SCRIPTS</key>
+			<dict>
+				<key>RESOURCES</key>
+				<array/>
+			</dict>
+			<key>PACKAGE_SETTINGS</key>
+			<dict>
+				<key>AUTHENTICATION</key>
+				<integer>1</integer>
+				<key>CONCLUSION_ACTION</key>
+				<integer>0</integer>
+				<key>IDENTIFIER</key>
+				<string>com.fnordware.pkg.WebMPresetsCC14</string>
+				<key>LOCATION</key>
+				<integer>0</integer>
+				<key>NAME</key>
+				<string>Presets for Premiere CC 2014</string>
+				<key>OVERWRITE_PERMISSIONS</key>
+				<false/>
+				<key>VERSION</key>
+				<string>1.0</string>
+			</dict>
+			<key>TYPE</key>
+			<integer>0</integer>
+			<key>UUID</key>
+			<string>80ED4048-3F61-4F7E-ADFC-25304F6A6B32</string>
+		</dict>
+		<dict>
+			<key>PACKAGE_FILES</key>
+			<dict>
+				<key>DEFAULT_INSTALL_LOCATION</key>
+				<string>/</string>
+				<key>HIERARCHY</key>
+				<dict>
+					<key>CHILDREN</key>
+					<array>
+						<dict>
+							<key>CHILDREN</key>
+							<array>
+								<dict>
+									<key>CHILDREN</key>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array>
+																		<dict>
+																			<key>CHILDREN</key>
+																			<array/>
+																			<key>GID</key>
+																			<integer>80</integer>
+																			<key>PATH</key>
+																			<string>../../src/premiere/presets/match_source/5765624D_5765624D</string>
+																			<key>PATH_TYPE</key>
+																			<integer>1</integer>
+																			<key>PERMISSIONS</key>
+																			<integer>493</integer>
+																			<key>TYPE</key>
+																			<integer>3</integer>
+																			<key>UID</key>
+																			<integer>0</integer>
+																		</dict>
+																	</array>
+																	<key>GID</key>
+																	<integer>80</integer>
+																	<key>PATH</key>
+																	<string>systempresets</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>509</integer>
+																	<key>TYPE</key>
+																	<integer>2</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+															</array>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>MediaIO</string>
+															<key>PATH_TYPE</key>
+															<integer>0</integer>
+															<key>PERMISSIONS</key>
+															<integer>509</integer>
+															<key>TYPE</key>
+															<integer>2</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>GID</key>
+													<integer>80</integer>
+													<key>PATH</key>
+													<string>Contents</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>509</integer>
+													<key>TYPE</key>
+													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+											</array>
+											<key>GID</key>
+											<integer>80</integer>
+											<key>PATH</key>
+											<string>Adobe Media Encoder CC 2015.app</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>509</integer>
+											<key>TYPE</key>
+											<integer>2</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Adobe Media Encoder CC 2015</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>509</integer>
+									<key>TYPE</key>
+									<integer>2</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array>
+																<dict>
+																	<key>CHILDREN</key>
+																	<array>
+																		<dict>
+																			<key>CHILDREN</key>
+																			<array/>
+																			<key>GID</key>
+																			<integer>80</integer>
+																			<key>PATH</key>
+																			<string>../../src/premiere/presets/match_source/5765624D_5765624D</string>
+																			<key>PATH_TYPE</key>
+																			<integer>1</integer>
+																			<key>PERMISSIONS</key>
+																			<integer>493</integer>
+																			<key>TYPE</key>
+																			<integer>3</integer>
+																			<key>UID</key>
+																			<integer>0</integer>
+																		</dict>
+																	</array>
+																	<key>GID</key>
+																	<integer>80</integer>
+																	<key>PATH</key>
+																	<string>systempresets</string>
+																	<key>PATH_TYPE</key>
+																	<integer>0</integer>
+																	<key>PERMISSIONS</key>
+																	<integer>509</integer>
+																	<key>TYPE</key>
+																	<integer>2</integer>
+																	<key>UID</key>
+																	<integer>0</integer>
+																</dict>
+															</array>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>MediaIO</string>
+															<key>PATH_TYPE</key>
+															<integer>0</integer>
+															<key>PERMISSIONS</key>
+															<integer>509</integer>
+															<key>TYPE</key>
+															<integer>2</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>GID</key>
+													<integer>80</integer>
+													<key>PATH</key>
+													<string>Contents</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>509</integer>
+													<key>TYPE</key>
+													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+											</array>
+											<key>GID</key>
+											<integer>80</integer>
+											<key>PATH</key>
+											<string>Adobe Premiere Pro CC 2015.app</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>509</integer>
+											<key>TYPE</key>
+											<integer>2</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Adobe Premiere Pro CC 2015</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>509</integer>
+									<key>TYPE</key>
+									<integer>2</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Utilities</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+							</array>
+							<key>GID</key>
+							<integer>80</integer>
+							<key>PATH</key>
+							<string>Applications</string>
+							<key>PATH_TYPE</key>
+							<integer>0</integer>
+							<key>PERMISSIONS</key>
+							<integer>509</integer>
+							<key>TYPE</key>
+							<integer>1</integer>
+							<key>UID</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>CHILDREN</key>
+							<array>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Application Support</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Automator</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Documentation</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Filesystems</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Frameworks</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Input Methods</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Internet Plug-Ins</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>LaunchAgents</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>LaunchDaemons</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>PreferencePanes</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Preferences</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>80</integer>
+									<key>PATH</key>
+									<string>Printers</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>PrivilegedHelperTools</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>QuickLook</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>QuickTime</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Screen Savers</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Scripts</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Services</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Widgets</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+							</array>
+							<key>GID</key>
+							<integer>0</integer>
+							<key>PATH</key>
+							<string>Library</string>
+							<key>PATH_TYPE</key>
+							<integer>0</integer>
+							<key>PERMISSIONS</key>
+							<integer>493</integer>
+							<key>TYPE</key>
+							<integer>1</integer>
+							<key>UID</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>CHILDREN</key>
+							<array>
+								<dict>
+									<key>CHILDREN</key>
+									<array>
+										<dict>
+											<key>CHILDREN</key>
+											<array/>
+											<key>GID</key>
+											<integer>0</integer>
+											<key>PATH</key>
+											<string>Extensions</string>
+											<key>PATH_TYPE</key>
+											<integer>0</integer>
+											<key>PERMISSIONS</key>
+											<integer>493</integer>
+											<key>TYPE</key>
+											<integer>1</integer>
+											<key>UID</key>
+											<integer>0</integer>
+										</dict>
+									</array>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Library</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+							</array>
+							<key>GID</key>
+							<integer>0</integer>
+							<key>PATH</key>
+							<string>System</string>
+							<key>PATH_TYPE</key>
+							<integer>0</integer>
+							<key>PERMISSIONS</key>
+							<integer>493</integer>
+							<key>TYPE</key>
+							<integer>1</integer>
+							<key>UID</key>
+							<integer>0</integer>
+						</dict>
+						<dict>
+							<key>CHILDREN</key>
+							<array>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Shared</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>1023</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+							</array>
+							<key>GID</key>
+							<integer>80</integer>
+							<key>PATH</key>
+							<string>Users</string>
+							<key>PATH_TYPE</key>
+							<integer>0</integer>
+							<key>PERMISSIONS</key>
+							<integer>493</integer>
+							<key>TYPE</key>
+							<integer>1</integer>
+							<key>UID</key>
+							<integer>0</integer>
+						</dict>
+					</array>
+					<key>GID</key>
+					<integer>0</integer>
+					<key>PATH</key>
+					<string>/</string>
+					<key>PATH_TYPE</key>
+					<integer>0</integer>
+					<key>PERMISSIONS</key>
+					<integer>493</integer>
+					<key>TYPE</key>
+					<integer>1</integer>
+					<key>UID</key>
+					<integer>0</integer>
+				</dict>
+				<key>PAYLOAD_TYPE</key>
+				<integer>0</integer>
+				<key>VERSION</key>
+				<integer>3</integer>
+			</dict>
+			<key>PACKAGE_SCRIPTS</key>
+			<dict>
+				<key>RESOURCES</key>
+				<array/>
+			</dict>
 			<key>PACKAGE_SETTINGS</key>
 			<dict>
 				<key>AUTHENTICATION</key>
@@ -3471,7 +3858,7 @@
 			<key>TYPE</key>
 			<integer>0</integer>
 			<key>UUID</key>
-			<string>0EE92B82-535E-493F-B36D-3160F8CE053C</string>
+			<string>882D7B1E-5A89-47B1-9CB8-0464A69D361F</string>
 		</dict>
 	</array>
 	<key>PROJECT</key>
@@ -3644,7 +4031,7 @@
 									<integer>1</integer>
 								</dict>
 								<key>PACKAGE_UUID</key>
-								<string>0EE92B82-535E-493F-B36D-3160F8CE053C</string>
+								<string>882D7B1E-5A89-47B1-9CB8-0464A69D361F</string>
 								<key>REQUIREMENTS</key>
 								<array>
 									<dict>
@@ -3658,15 +4045,23 @@
 											<integer>0</integer>
 											<key>IC_REQUIREMENT_FILES_LIST</key>
 											<array>
-												<string>/Applications/Adobe Media Encoder CC 2015/Adobe Media Encoder CC 2015.app/MediaIO/systempresets</string>
+												<string>/Applications/Adobe Media Encoder CC 2015/Adobe Media Encoder CC 2015.app/Contents/MediaIO/systempresets</string>
+												<string>/Applications/Adobe Premiere Pro CC 2015/Adobe Premiere Pro CC 2015.app/Contents/MediaIO/systempresets</string>
 											</array>
 											<key>IC_REQUIREMENT_FILES_SELECTOR</key>
-											<integer>0</integer>
+											<integer>1</integer>
 										</dict>
 										<key>IDENTIFIER</key>
 										<string>fr.whitebox.Packages.requirement.files</string>
 										<key>MESSAGE</key>
-										<array/>
+										<array>
+											<dict>
+												<key>LANGUAGE</key>
+												<string>English</string>
+												<key>VALUE</key>
+												<string>Both Adobe Premiere Pro CC 2015 and Adobe Media Encoder CC 2015 must be installed at their default locations.</string>
+											</dict>
+										</array>
 										<key>NAME</key>
 										<string>Files</string>
 										<key>STATE</key>
@@ -3680,7 +4075,7 @@
 								<key>TYPE</key>
 								<integer>0</integer>
 								<key>UUID</key>
-								<string>EBECBA80-2EF6-4C21-B5B9-90ED9CE64B1C</string>
+								<string>5A0A2F42-2138-48B7-8640-54C7DDAD6E51</string>
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
@@ -3700,7 +4095,7 @@
 									<integer>1</integer>
 								</dict>
 								<key>PACKAGE_UUID</key>
-								<string>9590FF1E-E544-4EA5-A035-769D33C093E3</string>
+								<string>80ED4048-3F61-4F7E-ADFC-25304F6A6B32</string>
 								<key>REQUIREMENTS</key>
 								<array>
 									<dict>
@@ -3715,14 +4110,22 @@
 											<key>IC_REQUIREMENT_FILES_LIST</key>
 											<array>
 												<string>/Applications/Adobe Media Encoder CC 2014/Adobe Media Encoder CC 2014.app/MediaIO/systempresets</string>
+												<string>/Applications/Adobe Premiere Pro CC 2014/Adobe Premiere Pro CC 2014.app/MediaIO/systempresets</string>
 											</array>
 											<key>IC_REQUIREMENT_FILES_SELECTOR</key>
-											<integer>0</integer>
+											<integer>1</integer>
 										</dict>
 										<key>IDENTIFIER</key>
 										<string>fr.whitebox.Packages.requirement.files</string>
 										<key>MESSAGE</key>
-										<array/>
+										<array>
+											<dict>
+												<key>LANGUAGE</key>
+												<string>English</string>
+												<key>VALUE</key>
+												<string>Both Adobe Premiere Pro CC 2014 and Adobe Media Encoder CC 2014 must be installed at their default locations.</string>
+											</dict>
+										</array>
 										<key>NAME</key>
 										<string>Files</string>
 										<key>STATE</key>
@@ -3736,7 +4139,7 @@
 								<key>TYPE</key>
 								<integer>0</integer>
 								<key>UUID</key>
-								<string>878F61D2-1667-404A-AFF6-DC8C05BB5711</string>
+								<string>87B6EACF-3E42-4274-8E3F-E31A60FD1158</string>
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
@@ -3756,7 +4159,7 @@
 									<integer>1</integer>
 								</dict>
 								<key>PACKAGE_UUID</key>
-								<string>4857CA4F-C902-42E5-89B6-7399CA636A81</string>
+								<string>CA3D940B-6A5A-46CB-9190-EE99C78E4EC7</string>
 								<key>REQUIREMENTS</key>
 								<array>
 									<dict>
@@ -3771,6 +4174,7 @@
 											<key>IC_REQUIREMENT_FILES_LIST</key>
 											<array>
 												<string>/Applications/Adobe Media Encoder CC/Adobe Media Encoder CC.app/MediaIO/systempresets</string>
+												<string>/Applications/Adobe Premiere Pro CC/Adobe Premiere Pro CC.app/MediaIO/systempresets</string>
 											</array>
 											<key>IC_REQUIREMENT_FILES_SELECTOR</key>
 											<integer>1</integer>
@@ -3778,7 +4182,14 @@
 										<key>IDENTIFIER</key>
 										<string>fr.whitebox.Packages.requirement.files</string>
 										<key>MESSAGE</key>
-										<array/>
+										<array>
+											<dict>
+												<key>LANGUAGE</key>
+												<string>English</string>
+												<key>VALUE</key>
+												<string>Both Adobe Premiere Pro CC and Adobe Media Encoder CC must be installed at their default locations.</string>
+											</dict>
+										</array>
 										<key>NAME</key>
 										<string>Files</string>
 										<key>STATE</key>
@@ -3792,7 +4203,7 @@
 								<key>TYPE</key>
 								<integer>0</integer>
 								<key>UUID</key>
-								<string>AB987352-3FC3-4547-9C96-B24FD85D11F3</string>
+								<string>753DFDA6-EF35-41B1-9E78-C56135F7E70F</string>
 							</dict>
 							<dict>
 								<key>DESCRIPTION</key>
@@ -3827,6 +4238,7 @@
 											<key>IC_REQUIREMENT_FILES_LIST</key>
 											<array>
 												<string>/Applications/Adobe Media Encoder CS6/Adobe Media Encoder CS6.app/MediaIO/systempresets</string>
+												<string>/Applications/Adobe Premiere Pro CS6/Adobe Premiere Pro CS6.app/MediaIO/systempresets</string>
 											</array>
 											<key>IC_REQUIREMENT_FILES_SELECTOR</key>
 											<integer>1</integer>
@@ -3834,7 +4246,14 @@
 										<key>IDENTIFIER</key>
 										<string>fr.whitebox.Packages.requirement.files</string>
 										<key>MESSAGE</key>
-										<array/>
+										<array>
+											<dict>
+												<key>LANGUAGE</key>
+												<string>English</string>
+												<key>VALUE</key>
+												<string>Both Adobe Premiere Pro CS6 and Adobe Media Encoder CS6 must be installed at their default locations.</string>
+											</dict>
+										</array>
 										<key>NAME</key>
 										<string>Files</string>
 										<key>STATE</key>
