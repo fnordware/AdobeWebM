@@ -161,7 +161,8 @@ int PrMkvReader::Length(long long* total, long long* available)
 typedef enum {
 	CODEC_NONE = 0,
 	CODEC_VP8,
-	CODEC_VP9
+	CODEC_VP9,
+	CODEC_VP10
 } VideoCodec;
 
 typedef enum {
@@ -541,6 +542,7 @@ SDKOpenFile8(
 							{
 								localRecP->video_codec = pVideoTrack->GetCodecId() == std::string("V_VP8") ? CODEC_VP8 :
 															pVideoTrack->GetCodecId() == std::string("V_VP9") ? CODEC_VP9 :
+															pVideoTrack->GetCodecId() == std::string("V_VP10") ? CODEC_VP10 :
 															CODEC_NONE;
 							
 								localRecP->video_track = trackNumber;
@@ -592,6 +594,7 @@ SDKOpenFile8(
 						
 							const vpx_codec_iface_t *iface = (codec_id == std::string("V_VP8") ? vpx_codec_vp8_dx() :
 																codec_id == std::string("V_VP9") ? vpx_codec_vp9_dx() :
+																codec_id == std::string("V_VP10") ? vpx_codec_vp10_dx() :
 																NULL);
 							
 							vpx_codec_err_t codec_err = VPX_CODEC_OK;
@@ -1169,7 +1172,7 @@ SDKAnalysis(
 		
 			stream << "VP8";
 		}
-		else if(localRecP->video_codec == CODEC_VP9)
+		else if(localRecP->video_codec == CODEC_VP9 || localRecP->video_codec == CODEC_VP10)
 		{
 			const std::string sampling = localRecP->img_fmt == VPX_IMG_FMT_I422 ? "4:2:2" :
 											localRecP->img_fmt == VPX_IMG_FMT_I444 ? "4:4:4" :
@@ -1178,8 +1181,10 @@ SDKAnalysis(
 											localRecP->img_fmt == VPX_IMG_FMT_I44416 ? "4:4:4" :
 											localRecP->img_fmt == VPX_IMG_FMT_I44016 ? "4:4:0" :
 											"4:2:0";
-									
-			stream << "VP9 " << sampling << " " << (int)localRecP->bit_depth << "-bit";
+			
+			const std::string codec = (localRecP->video_codec == CODEC_VP10 ? "VP10" : "VP9");
+																					
+			stream << codec << " " << sampling << " " << (int)localRecP->bit_depth << "-bit";
 			
 		}
 		else
@@ -1415,7 +1420,7 @@ SDKGetInfo8(
 									{
 										localRecP->video_start_tstamp = pBlock->GetTime(pCluster);
 										
-										if(localRecP->video_codec == CODEC_VP9)
+										if(localRecP->video_codec == CODEC_VP9 || localRecP->video_codec == CODEC_VP10)
 										{
 											vpx_codec_ctx_t &decoder = localRecP->vpx_decoder;
 											
