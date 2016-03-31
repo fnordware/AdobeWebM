@@ -47,7 +47,7 @@
 
 #include "opus_multistream.h"
 
-#include "mkvparser.hpp"
+#include "mkvparser/mkvparser.h"
 
 #include <assert.h>
 #include <math.h>

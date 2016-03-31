@@ -7,43 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A8686271777D62000055B0D /* mkvmuxer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A8686081777D62000055B0D /* mkvmuxer.cpp */; };
-		2A8686281777D62000055B0D /* mkvmuxer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A8686091777D62000055B0D /* mkvmuxer.hpp */; };
-		2A8686291777D62000055B0D /* mkvmuxertypes.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A86860A1777D62000055B0D /* mkvmuxertypes.hpp */; };
-		2A86862A1777D62000055B0D /* mkvmuxerutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A86860B1777D62000055B0D /* mkvmuxerutil.cpp */; };
-		2A86862B1777D62000055B0D /* mkvmuxerutil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A86860C1777D62000055B0D /* mkvmuxerutil.hpp */; };
-		2A86862C1777D62000055B0D /* mkvparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A86860D1777D62000055B0D /* mkvparser.cpp */; };
-		2A86862D1777D62000055B0D /* mkvparser.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A86860E1777D62000055B0D /* mkvparser.hpp */; };
-		2A86862E1777D62000055B0D /* mkvreader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A86860F1777D62000055B0D /* mkvreader.cpp */; };
-		2A86862F1777D62000055B0D /* mkvreader.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A8686101777D62000055B0D /* mkvreader.hpp */; };
-		2A8686301777D62000055B0D /* mkvwriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A8686111777D62000055B0D /* mkvwriter.cpp */; };
-		2A8686311777D62000055B0D /* mkvwriter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A8686121777D62000055B0D /* mkvwriter.hpp */; };
-		2A8686361777D62000055B0D /* vttdemux.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2A86861F1777D62000055B0D /* vttdemux.cc */; };
-		2A8686371777D62000055B0D /* vttreader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2A8686201777D62000055B0D /* vttreader.cc */; };
-		2A8686381777D62000055B0D /* vttreader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8686211777D62000055B0D /* vttreader.h */; };
-		2A8686391777D62000055B0D /* webmids.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2A8686221777D62000055B0D /* webmids.hpp */; };
-		2A86863A1777D62000055B0D /* webvttparser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2A8686231777D62000055B0D /* webvttparser.cc */; };
-		2A86863B1777D62000055B0D /* webvttparser.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8686241777D62000055B0D /* webvttparser.h */; };
+		2AA242411CAD882600AEB6E4 /* mkvmuxer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2AA242351CAD882600AEB6E4 /* mkvmuxer.cc */; };
+		2AA242421CAD882600AEB6E4 /* mkvmuxer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA242361CAD882600AEB6E4 /* mkvmuxer.h */; };
+		2AA242431CAD882600AEB6E4 /* mkvmuxertypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA242371CAD882600AEB6E4 /* mkvmuxertypes.h */; };
+		2AA242441CAD882600AEB6E4 /* mkvmuxerutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2AA242381CAD882600AEB6E4 /* mkvmuxerutil.cc */; };
+		2AA242451CAD882600AEB6E4 /* mkvmuxerutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA242391CAD882600AEB6E4 /* mkvmuxerutil.h */; };
+		2AA242461CAD882600AEB6E4 /* mkvwriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2AA2423A1CAD882600AEB6E4 /* mkvwriter.cc */; };
+		2AA242471CAD882600AEB6E4 /* mkvwriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA2423B1CAD882600AEB6E4 /* mkvwriter.h */; };
+		2AA242481CAD882600AEB6E4 /* mkvparser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2AA2423D1CAD882600AEB6E4 /* mkvparser.cc */; };
+		2AA242491CAD882600AEB6E4 /* mkvparser.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA2423E1CAD882600AEB6E4 /* mkvparser.h */; };
+		2AA2424A1CAD882600AEB6E4 /* mkvreader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2AA2423F1CAD882600AEB6E4 /* mkvreader.cc */; };
+		2AA2424B1CAD882600AEB6E4 /* mkvreader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA242401CAD882600AEB6E4 /* mkvreader.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2A8686081777D62000055B0D /* mkvmuxer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvmuxer.cpp; sourceTree = "<group>"; };
-		2A8686091777D62000055B0D /* mkvmuxer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mkvmuxer.hpp; sourceTree = "<group>"; };
-		2A86860A1777D62000055B0D /* mkvmuxertypes.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mkvmuxertypes.hpp; sourceTree = "<group>"; };
-		2A86860B1777D62000055B0D /* mkvmuxerutil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvmuxerutil.cpp; sourceTree = "<group>"; };
-		2A86860C1777D62000055B0D /* mkvmuxerutil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mkvmuxerutil.hpp; sourceTree = "<group>"; };
-		2A86860D1777D62000055B0D /* mkvparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvparser.cpp; sourceTree = "<group>"; };
-		2A86860E1777D62000055B0D /* mkvparser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mkvparser.hpp; sourceTree = "<group>"; };
-		2A86860F1777D62000055B0D /* mkvreader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvreader.cpp; sourceTree = "<group>"; };
-		2A8686101777D62000055B0D /* mkvreader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mkvreader.hpp; sourceTree = "<group>"; };
-		2A8686111777D62000055B0D /* mkvwriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvwriter.cpp; sourceTree = "<group>"; };
-		2A8686121777D62000055B0D /* mkvwriter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mkvwriter.hpp; sourceTree = "<group>"; };
-		2A86861F1777D62000055B0D /* vttdemux.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vttdemux.cc; sourceTree = "<group>"; };
-		2A8686201777D62000055B0D /* vttreader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vttreader.cc; sourceTree = "<group>"; };
-		2A8686211777D62000055B0D /* vttreader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vttreader.h; sourceTree = "<group>"; };
-		2A8686221777D62000055B0D /* webmids.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = webmids.hpp; sourceTree = "<group>"; };
-		2A8686231777D62000055B0D /* webvttparser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = webvttparser.cc; sourceTree = "<group>"; };
-		2A8686241777D62000055B0D /* webvttparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webvttparser.h; sourceTree = "<group>"; };
+		2AA242351CAD882600AEB6E4 /* mkvmuxer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvmuxer.cc; sourceTree = "<group>"; };
+		2AA242361CAD882600AEB6E4 /* mkvmuxer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkvmuxer.h; sourceTree = "<group>"; };
+		2AA242371CAD882600AEB6E4 /* mkvmuxertypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkvmuxertypes.h; sourceTree = "<group>"; };
+		2AA242381CAD882600AEB6E4 /* mkvmuxerutil.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvmuxerutil.cc; sourceTree = "<group>"; };
+		2AA242391CAD882600AEB6E4 /* mkvmuxerutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkvmuxerutil.h; sourceTree = "<group>"; };
+		2AA2423A1CAD882600AEB6E4 /* mkvwriter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvwriter.cc; sourceTree = "<group>"; };
+		2AA2423B1CAD882600AEB6E4 /* mkvwriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkvwriter.h; sourceTree = "<group>"; };
+		2AA2423D1CAD882600AEB6E4 /* mkvparser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvparser.cc; sourceTree = "<group>"; };
+		2AA2423E1CAD882600AEB6E4 /* mkvparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkvparser.h; sourceTree = "<group>"; };
+		2AA2423F1CAD882600AEB6E4 /* mkvreader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mkvreader.cc; sourceTree = "<group>"; };
+		2AA242401CAD882600AEB6E4 /* mkvreader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mkvreader.h; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* libwebm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwebm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -78,27 +66,37 @@
 		2A8685B11777D62000055B0D /* libwebm */ = {
 			isa = PBXGroup;
 			children = (
-				2A8686081777D62000055B0D /* mkvmuxer.cpp */,
-				2A8686091777D62000055B0D /* mkvmuxer.hpp */,
-				2A86860A1777D62000055B0D /* mkvmuxertypes.hpp */,
-				2A86860B1777D62000055B0D /* mkvmuxerutil.cpp */,
-				2A86860C1777D62000055B0D /* mkvmuxerutil.hpp */,
-				2A86860D1777D62000055B0D /* mkvparser.cpp */,
-				2A86860E1777D62000055B0D /* mkvparser.hpp */,
-				2A86860F1777D62000055B0D /* mkvreader.cpp */,
-				2A8686101777D62000055B0D /* mkvreader.hpp */,
-				2A8686111777D62000055B0D /* mkvwriter.cpp */,
-				2A8686121777D62000055B0D /* mkvwriter.hpp */,
-				2A86861F1777D62000055B0D /* vttdemux.cc */,
-				2A8686201777D62000055B0D /* vttreader.cc */,
-				2A8686211777D62000055B0D /* vttreader.h */,
-				2A8686221777D62000055B0D /* webmids.hpp */,
-				2A8686231777D62000055B0D /* webvttparser.cc */,
-				2A8686241777D62000055B0D /* webvttparser.h */,
+				2AA242341CAD882600AEB6E4 /* mkvmuxer */,
+				2AA2423C1CAD882600AEB6E4 /* mkvparser */,
 			);
 			name = libwebm;
 			path = ../../../ext/libwebm;
 			sourceTree = SOURCE_ROOT;
+		};
+		2AA242341CAD882600AEB6E4 /* mkvmuxer */ = {
+			isa = PBXGroup;
+			children = (
+				2AA242351CAD882600AEB6E4 /* mkvmuxer.cc */,
+				2AA242361CAD882600AEB6E4 /* mkvmuxer.h */,
+				2AA242371CAD882600AEB6E4 /* mkvmuxertypes.h */,
+				2AA242381CAD882600AEB6E4 /* mkvmuxerutil.cc */,
+				2AA242391CAD882600AEB6E4 /* mkvmuxerutil.h */,
+				2AA2423A1CAD882600AEB6E4 /* mkvwriter.cc */,
+				2AA2423B1CAD882600AEB6E4 /* mkvwriter.h */,
+			);
+			path = mkvmuxer;
+			sourceTree = "<group>";
+		};
+		2AA2423C1CAD882600AEB6E4 /* mkvparser */ = {
+			isa = PBXGroup;
+			children = (
+				2AA2423D1CAD882600AEB6E4 /* mkvparser.cc */,
+				2AA2423E1CAD882600AEB6E4 /* mkvparser.h */,
+				2AA2423F1CAD882600AEB6E4 /* mkvreader.cc */,
+				2AA242401CAD882600AEB6E4 /* mkvreader.h */,
+			);
+			path = mkvparser;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -107,15 +105,12 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A8686281777D62000055B0D /* mkvmuxer.hpp in Headers */,
-				2A8686291777D62000055B0D /* mkvmuxertypes.hpp in Headers */,
-				2A86862B1777D62000055B0D /* mkvmuxerutil.hpp in Headers */,
-				2A86862D1777D62000055B0D /* mkvparser.hpp in Headers */,
-				2A86862F1777D62000055B0D /* mkvreader.hpp in Headers */,
-				2A8686311777D62000055B0D /* mkvwriter.hpp in Headers */,
-				2A8686381777D62000055B0D /* vttreader.h in Headers */,
-				2A8686391777D62000055B0D /* webmids.hpp in Headers */,
-				2A86863B1777D62000055B0D /* webvttparser.h in Headers */,
+				2AA242421CAD882600AEB6E4 /* mkvmuxer.h in Headers */,
+				2AA242431CAD882600AEB6E4 /* mkvmuxertypes.h in Headers */,
+				2AA242451CAD882600AEB6E4 /* mkvmuxerutil.h in Headers */,
+				2AA242471CAD882600AEB6E4 /* mkvwriter.h in Headers */,
+				2AA242491CAD882600AEB6E4 /* mkvparser.h in Headers */,
+				2AA2424B1CAD882600AEB6E4 /* mkvreader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,14 +163,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A8686271777D62000055B0D /* mkvmuxer.cpp in Sources */,
-				2A86862A1777D62000055B0D /* mkvmuxerutil.cpp in Sources */,
-				2A86862C1777D62000055B0D /* mkvparser.cpp in Sources */,
-				2A86862E1777D62000055B0D /* mkvreader.cpp in Sources */,
-				2A8686301777D62000055B0D /* mkvwriter.cpp in Sources */,
-				2A8686361777D62000055B0D /* vttdemux.cc in Sources */,
-				2A8686371777D62000055B0D /* vttreader.cc in Sources */,
-				2A86863A1777D62000055B0D /* webvttparser.cc in Sources */,
+				2AA242411CAD882600AEB6E4 /* mkvmuxer.cc in Sources */,
+				2AA242441CAD882600AEB6E4 /* mkvmuxerutil.cc in Sources */,
+				2AA242461CAD882600AEB6E4 /* mkvwriter.cc in Sources */,
+				2AA242481CAD882600AEB6E4 /* mkvparser.cc in Sources */,
+				2AA2424A1CAD882600AEB6E4 /* mkvreader.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,6 +207,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../../../ext/libwebm;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.6;
@@ -228,6 +221,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../../../ext/libwebm;
 				PREBINDING = NO;
 				SDKROOT = macosx10.6;
 			};

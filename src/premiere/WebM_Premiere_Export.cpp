@@ -62,15 +62,8 @@
 
 #include "opus_multistream.h"
 
-#include "mkvmuxer.hpp"
+#include "mkvmuxer/mkvmuxer.h"
 
-
-
-using mkvmuxer::uint8;
-using mkvmuxer::int32;
-using mkvmuxer::uint32;
-using mkvmuxer::int64;
-using mkvmuxer::uint64;
 
 class PrMkvWriter : public mkvmuxer::IMkvWriter
 {
@@ -78,11 +71,11 @@ class PrMkvWriter : public mkvmuxer::IMkvWriter
 	PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObject);
 	virtual ~PrMkvWriter();
 	
-	virtual int32 Write(const void* buf, uint32 len);
-	virtual int64 Position() const;
-	virtual int32 Position(int64 position); // seek
+	virtual int32_t Write(const void* buf, uint32 len);
+	virtual int64_t Position() const;
+	virtual int32_t Position(int64_t position); // seek
 	virtual bool Seekable() const { return true; }
-	virtual void ElementStartNotify(uint64 element_id, int64 position);
+	virtual void ElementStartNotify(uint64 element_id, int64_t position);
 	
   private:
 	const PrSDKExportFileSuite *_fileSuite;
@@ -106,7 +99,7 @@ PrMkvWriter::~PrMkvWriter()
 	assert(err == malNoError);
 }
 
-int32
+int32_t
 PrMkvWriter::Write(const void* buf, uint32 len)
 {
 	prSuiteError err = _fileSuite->Write(_fileObject, (void *)buf, len);
@@ -114,7 +107,7 @@ PrMkvWriter::Write(const void* buf, uint32 len)
 	return err;
 }
 
-int64
+int64_t
 PrMkvWriter::Position() const
 {
 	prInt64 pos = 0;
@@ -130,8 +123,8 @@ PrMkvWriter::Position() const
 	return pos;
 }
 
-int32
-PrMkvWriter::Position(int64 position)
+int32_t
+PrMkvWriter::Position(int64_t position)
 {
 	prInt64 pos = 0;
 
@@ -141,7 +134,7 @@ PrMkvWriter::Position(int64 position)
 }
 
 void
-PrMkvWriter::ElementStartNotify(uint64 element_id, int64 position)
+PrMkvWriter::ElementStartNotify(uint64 element_id, int64_t position)
 {
 	// ummm, should I do something?
 }
@@ -1299,7 +1292,7 @@ exSDKExport(
 				
 				time_t base = mktime(&date_utc_base);
 				
-				info->set_date_utc( (int64)difftime(time(NULL), base) * S2NS );
+				info->set_date_utc( (int64_t)difftime(time(NULL), base) * S2NS );
 				
 				
 				info->set_timecode_scale(timeCodeScale);
@@ -1446,8 +1439,8 @@ exSDKExport(
 									
 									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
 									{
-										const int64 discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
-										const int64 discardPadding = discardPaddingSamples * S2NS / (int64)sampleRateP.value.floatValue;
+										const int64_t discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
+										const int64_t discardPadding = discardPaddingSamples * S2NS / (int64_t)sampleRateP.value.floatValue;
 										
 										added = muxer_segment->AddFrameWithDiscardPadding(opus_compressed_buffer, len,
 																		discardPadding, audio_track, opus_timeStamp, true);
