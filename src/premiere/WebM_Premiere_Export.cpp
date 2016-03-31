@@ -1307,7 +1307,7 @@ exSDKExport(
 					video->set_frame_rate((double)fps.numerator / (double)fps.denominator);
 
 					video->set_codec_id(codecP.value.intValue == WEBM_CODEC_VP9 ? mkvmuxer::Tracks::kVp9CodecId :
-											mkvmuxer::Tracks::kVp8CodecId);
+																					mkvmuxer::Tracks::kVp8CodecId);
 											
 					if(renderParms.inPixelAspectRatioNumerator != renderParms.inPixelAspectRatioDenominator)
 					{
@@ -1338,7 +1338,7 @@ exSDKExport(
 					mkvmuxer::AudioTrack* const audio = static_cast<mkvmuxer::AudioTrack *>(muxer_segment->GetTrackByNumber(audio_track));
 					
 					audio->set_codec_id(audioCodecP.value.intValue == WEBM_CODEC_OPUS ? mkvmuxer::Tracks::kOpusCodecId :
-										mkvmuxer::Tracks::kVorbisCodecId);
+																						mkvmuxer::Tracks::kVorbisCodecId);
 					
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
@@ -1389,6 +1389,22 @@ exSDKExport(
 				
 				const uint64_t timeStamp = timeCode * timeCodeScale;
 			
+				const bool last_frame = (videoTime > (exportInfoP->endTime - frameRateP.value.timeValue));
+				
+				if(last_frame)
+					assert(videoTime == exportInfoP->endTime); // don't think this will be true, actually
+				
+				// This is not accurate enough, so we'll use doubles
+				//const PrTime ticksPerNanosecond = (ticksPerSecond / S2NS);
+				//assert(ticksPerSecond % S2NS == 0);
+				//
+				//const uint64_t frameDuration = (last_frame && videoTime != exportInfoP->endTime ? 
+				//								((exportInfoP->endTime - videoTime) + (ticksPerNanosecond / 2)) / ticksPerNanosecond :
+				//								(frameRateP.value.timeValue + (ticksPerNanosecond / 2)) / ticksPerNanosecond);
+						
+				const uint64_t frameDuration = (last_frame && videoTime != exportInfoP->endTime ? 
+												(((double)(exportInfoP->endTime - videoTime) / (double)ticksPerSecond) * (double)S2NS) + 0.5 :
+												(((double)frameRateP.value.timeValue / (double)ticksPerSecond) * (double)S2NS) + 0.5);
 				
 				// When writing WebM, we want blocks of audio and video interleaved.
 				// But encoders don't always cooperate with our wishes.  We feed them some data,
@@ -1406,8 +1422,6 @@ exSDKExport(
 					const int *swizzle = (audioChannels > 2 ? surround_swizzle : stereo_swizzle);
 					
 					
-					const bool last_frame = (videoTime > (exportInfoP->endTime - frameRateP.value.timeValue));
-							
 					if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 					{
 						assert(opus != NULL);
@@ -1435,21 +1449,31 @@ exSDKExport(
 								
 								if(len > 0)
 								{
-									bool added = false;
+									mkvmuxer::Frame frame;
 									
+									const bool inited = frame.Init(opus_compressed_buffer, len);
+									
+									if(!inited)
+										throw -1;
+									
+									frame.set_track_number(audio_track);
+									frame.set_timestamp(opus_timeStamp);
+									frame.set_is_key(true);
+									
+									if(last_frame)
+										frame.set_duration(frameDuration);
+																																				
 									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
 									{
+										assert(last_frame);
+									
 										const int64_t discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
 										const int64_t discardPadding = discardPaddingSamples * S2NS / (int64_t)sampleRateP.value.floatValue;
 										
-										added = muxer_segment->AddFrameWithDiscardPadding(opus_compressed_buffer, len,
-																		discardPadding, audio_track, opus_timeStamp, true);
+										frame.set_discard_padding(discardPadding);
 									}
-									else
-									{
-										added = muxer_segment->AddFrame(opus_compressed_buffer, len,
-																			audio_track, opus_timeStamp, true);
-									}
+									
+									const bool added = muxer_segment->AddGenericFrame(&frame);
 																			
 									if(!added)
 										result = exportReturn_InternalError;
@@ -1475,12 +1499,23 @@ exSDKExport(
 							// So we'll hold on to that packet and use it next frame.
 							if(packet_waiting && op.packet != NULL && op.bytes > 0)
 							{
-								bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																	audio_track, op_timeStamp, true);
+								mkvmuxer::Frame frame;
+								
+								const bool inited = frame.Init(op.packet, op.bytes);
+								
+								if(!inited)
+									throw -1;
+								
+								frame.set_track_number(audio_track);
+								frame.set_timestamp(op_timeStamp);
+								frame.set_is_key(true);
+								
+								if(last_frame)
+									frame.set_duration(frameDuration);
+								
+								const bool added = muxer_segment->AddGenericFrame(&frame);
 																		
-								if(added)
-									packet_waiting = false;
-								else
+								if(!added)
 									result = exportReturn_InternalError;
 							}
 							
@@ -1499,8 +1534,18 @@ exSDKExport(
 									
 									if(op_timeStamp <= timeStamp || last_frame)
 									{
-										bool added = muxer_segment->AddFrame(op.packet, op.bytes,
-																			audio_track, op_timeStamp, true);
+										mkvmuxer::Frame frame;
+										
+										const bool inited = frame.Init(op.packet, op.bytes);
+										
+										if(!inited)
+											throw -1;
+										
+										frame.set_track_number(audio_track);
+										frame.set_timestamp(op_timeStamp);
+										frame.set_is_key(true);
+										
+										const bool added = muxer_segment->AddGenericFrame(&frame);
 																				
 										if(!added)
 											result = exportReturn_InternalError;
@@ -1594,10 +1639,22 @@ exSDKExport(
 								assert( pkt->data.frame.pts == (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator) );
 								assert( pkt->data.frame.duration == 1 ); // because of how we did the timescale
 							
-								bool added = muxer_segment->AddFrame((const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz,
-																	vid_track, timeStamp,
-																	pkt->data.frame.flags & VPX_FRAME_IS_KEY);
-																	
+								mkvmuxer::Frame frame;
+								
+								const bool inited = frame.Init((uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz);
+								
+								if(!inited)
+									throw -1;
+								
+								frame.set_track_number(vid_track);
+								frame.set_timestamp(timeStamp);
+								frame.set_is_key(pkt->data.frame.flags & VPX_FRAME_IS_KEY);
+								
+								if(last_frame)
+									frame.set_duration(frameDuration);
+								
+								const bool added = muxer_segment->AddGenericFrame(&frame);
+																		
 								if( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) )
 									made_frame = true;
 								
