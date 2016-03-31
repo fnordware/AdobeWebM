@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\ext\libwebm"
+				AdditionalIncludeDirectories=".;..\..\..\ext\libwebm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -108,8 +108,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\ext\libwebm"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				AdditionalIncludeDirectories=".;..\..\..\ext\libwebm"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;__STDC_LIMIT_MACROS;__STDC_CONSTANT_MACROS"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -173,7 +173,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\ext\libwebm"
+				AdditionalIncludeDirectories=".;..\..\..\ext\libwebm"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -237,8 +237,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\ext\libwebm"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				AdditionalIncludeDirectories=".;..\..\..\ext\libwebm"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;__STDC_LIMIT_MACROS;__STDC_CONSTANT_MACROS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -283,23 +283,23 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvmuxer.cpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvmuxer.cc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvmuxerutil.cpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvmuxerutil.cc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvparser.cpp"
+				RelativePath="..\..\..\ext\libwebm\mkvparser\mkvparser.cc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvreader.cpp"
+				RelativePath="..\..\..\ext\libwebm\mkvparser\mkvreader.cc"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvwriter.cpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvwriter.cc"
 				>
 			</File>
 		</Filter>
@@ -309,31 +309,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvmuxer.hpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvmuxer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvmuxertypes.hpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvmuxertypes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvmuxerutil.hpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvmuxerutil.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvparser.hpp"
+				RelativePath="..\..\..\ext\libwebm\mkvparser\mkvparser.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvreader.hpp"
+				RelativePath="..\..\..\ext\libwebm\mkvparser\mkvreader.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\libwebm\mkvwriter.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\ext\libwebm\webmids.hpp"
+				RelativePath="..\..\..\ext\libwebm\mkvmuxer\mkvwriter.h"
 				>
 			</File>
 		</Filter>

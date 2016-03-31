@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)x64\$(ConfigurationName)"
+			IntermediateDirectory="x64\$(ConfigurationName)\vpx"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;.\..\..\..\..\ext\libvpx"
+				AdditionalIncludeDirectories=".;..\..\..\..\ext\libvpx"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -80,8 +80,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="build\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)x64\$(ConfigurationName)"
+			IntermediateDirectory="x64\$(ConfigurationName)\vpx"
 			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
@@ -105,7 +105,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".;.\..\..\..\..\ext\libvpx"
+				AdditionalIncludeDirectories=".;..\..\..\..\ext\libvpx"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -149,7 +149,7 @@
 		<Filter
 			Name="Source Files"
 			Filter="c;cc;cpp;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="871D3DD3-150D-221F-6110-6643FD0D5301"
+			UniqueIdentifier="C3C8B6A4-4D1B-333F-870A-A6D662E672D8"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.c"
@@ -168,6 +168,70 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)\vp8_common_alloccommon.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_dsp\avg.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_dsp_avg.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_dsp_avg.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_dsp\x86\avg_intrin_sse2.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_dsp_x86_avg_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vpx_dsp_x86_avg_intrin_sse2.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vpx_dsp\x86\avg_ssse3_x86_64.asm"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_avg_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vpx_dsp_x86_avg_ssse3_x86_64_asm.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Assembling $(InputFileName)"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_avg_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						Outputs="$(IntDir)\vpx_dsp_x86_avg_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -340,7 +404,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_copy_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -350,7 +414,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_copy_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -364,7 +428,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_copy_sse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -374,7 +438,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_copy_sse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_copy_sse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -428,7 +492,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_dct_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -438,7 +502,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_dct_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -452,7 +516,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_dct_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -462,7 +526,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_dct_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_dct_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -596,7 +660,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_dequantize_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_dequantize_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_dequantize_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -606,7 +670,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_dequantize_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_dequantize_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_dequantize_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -640,7 +704,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_ports_emms_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_ports_emms_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_ports_emms_asm.obj"
 					/>
 				</FileConfiguration>
@@ -650,7 +714,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_ports_emms_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_ports_emms_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_ports_emms_asm.obj"
 					/>
 				</FileConfiguration>
@@ -744,7 +808,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_encodeopt_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_encodeopt_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_encodeopt_asm.obj"
 					/>
 				</FileConfiguration>
@@ -754,7 +818,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_encodeopt_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_encodeopt_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_encodeopt_asm.obj"
 					/>
 				</FileConfiguration>
@@ -948,7 +1012,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_fwalsh_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_fwalsh_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_fwalsh_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -958,7 +1022,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_fwalsh_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_fwalsh_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_fwalsh_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1012,7 +1076,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_fwd_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_fwd_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_fwd_txfm_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1022,7 +1086,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_fwd_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_fwd_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_fwd_txfm_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1056,7 +1120,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_halfpix_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_halfpix_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_halfpix_variance_impl_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1066,7 +1130,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_halfpix_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_halfpix_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_halfpix_variance_impl_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1100,7 +1164,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_intrapred_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_intrapred_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_intrapred_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1110,7 +1174,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_intrapred_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_intrapred_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_intrapred_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1164,7 +1228,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad4d_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad4d_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_sad4d_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1174,7 +1238,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad4d_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad4d_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_sad4d_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1188,7 +1252,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_sad_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1198,7 +1262,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_sad_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_sad_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1212,7 +1276,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_subpel_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_subpel_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_subpel_variance_impl_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1222,7 +1286,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_subpel_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_subpel_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_subpel_variance_impl_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1236,7 +1300,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_variance_impl_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1246,7 +1310,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_highbd_variance_impl_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_highbd_variance_impl_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1360,7 +1424,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_idctllm_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1370,7 +1434,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_idctllm_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1384,7 +1448,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_idctllm_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1394,7 +1458,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_idctllm_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_idctllm_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1428,7 +1492,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_intrapred_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1438,7 +1502,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_intrapred_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1452,7 +1516,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_intrapred_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1462,7 +1526,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_intrapred_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_intrapred_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1516,7 +1580,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_inv_txfm_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1526,7 +1590,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_txfm_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_inv_txfm_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1540,7 +1604,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_wht_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_wht_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_inv_wht_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1550,7 +1614,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_wht_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_inv_wht_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_inv_wht_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1564,7 +1628,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_iwalsh_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1574,7 +1638,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_iwalsh_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1588,7 +1652,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_iwalsh_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1598,7 +1662,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_iwalsh_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_iwalsh_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1652,7 +1716,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1662,7 +1726,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1696,7 +1760,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_loopfilter_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1706,7 +1770,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_loopfilter_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1720,7 +1784,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_loopfilter_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1730,7 +1794,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_loopfilter_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_loopfilter_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1844,7 +1908,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_mfqe_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_mfqe_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_mfqe_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -1854,7 +1918,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_mfqe_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_mfqe_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_mfqe_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2008,7 +2072,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_postproc_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2018,7 +2082,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_postproc_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2032,7 +2096,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_postproc_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2042,7 +2106,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_postproc_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_postproc_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2116,7 +2180,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_quantize_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_quantize_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_quantize_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2126,7 +2190,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_quantize_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_quantize_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_quantize_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2200,7 +2264,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_quantize_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2210,7 +2274,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_quantize_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2264,7 +2328,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_recon_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2274,7 +2338,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_recon_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2288,7 +2352,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_recon_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2298,7 +2362,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_recon_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_recon_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2412,7 +2476,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad4d_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad4d_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad4d_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2422,7 +2486,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad4d_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad4d_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad4d_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2436,7 +2500,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2446,7 +2510,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2460,7 +2524,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2470,7 +2534,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2484,7 +2548,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_sse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2494,7 +2558,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_sse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2508,7 +2572,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse4_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse4_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_sse4_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2518,7 +2582,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse4_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_sse4_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_sse4_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2532,7 +2596,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2542,7 +2606,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_sad_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_sad_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2596,7 +2660,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_ssim_opt_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_ssim_opt_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_ssim_opt_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2606,7 +2670,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_ssim_opt_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_ssim_opt_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_ssim_opt_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2620,7 +2684,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subpel_variance_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subpel_variance_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_subpel_variance_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2630,7 +2694,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subpel_variance_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subpel_variance_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_subpel_variance_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2644,7 +2708,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_subpixel_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2654,7 +2718,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_subpixel_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2668,7 +2732,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_subpixel_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2678,7 +2742,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_subpixel_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2692,7 +2756,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_subpixel_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2702,7 +2766,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_subpixel_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_subpixel_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2736,7 +2800,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subtract_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subtract_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_subtract_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2746,7 +2810,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subtract_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_subtract_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_subtract_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2820,7 +2884,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2830,7 +2894,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_encoder_x86_temporal_filter_apply_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2944,7 +3008,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_variance_impl_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_variance_impl_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_variance_impl_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -2954,7 +3018,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_variance_impl_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_variance_impl_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_variance_impl_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -3128,7 +3192,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_vp8_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_vp8_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_vp8_loopfilter_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -3138,7 +3202,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_vp8_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp8_common_x86_vp8_loopfilter_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp8_common_x86_vp8_loopfilter_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -3204,6 +3268,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_360.c"
+				>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_360.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_360.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.c"
 				>
 				<FileConfiguration
@@ -3260,46 +3344,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)\vp9_encoder_vp9_aq_variance.obj"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_avg.c"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp9_encoder_vp9_avg.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp9_encoder_vp9_avg.obj"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_avg_intrin_sse2.c"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_avg_intrin_sse2.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_avg_intrin_sse2.obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3452,7 +3496,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -3462,7 +3506,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_mmx_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_mmx_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_mmx_asm.obj"
 					/>
 				</FileConfiguration>
@@ -3504,30 +3548,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3.obj"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\x86\vp9_dct_ssse3_x86_64.asm"
-				>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
-						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64_asm.obj"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
-						Outputs="$(IntDir)\vp9_encoder_x86_vp9_dct_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3960,7 +3980,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_highbd_error_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_highbd_error_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_highbd_error_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -3970,7 +3990,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_highbd_error_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_highbd_error_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_highbd_error_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4264,7 +4284,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4274,7 +4294,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_quantize_ssse3_x86_64_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4608,7 +4628,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4618,7 +4638,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vp9_encoder_x86_vp9_temporal_filter_apply_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4704,7 +4724,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\..\..\..\..\ext\libvpx\vpx.def"
+				RelativePath="vpx.def"
 				>
 			</File>
 			<File
@@ -4796,7 +4816,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4806,7 +4826,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4880,7 +4900,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_high_subpixel_8t_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4890,7 +4910,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_high_subpixel_8t_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4904,7 +4924,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_high_subpixel_bilinear_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -4914,7 +4934,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_high_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_high_subpixel_bilinear_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5048,7 +5068,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5058,7 +5078,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5072,7 +5092,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5082,7 +5102,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5096,7 +5116,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5106,7 +5126,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5120,7 +5140,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -g cv8 -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5130,7 +5150,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Assembling $(InputFileName)"
-						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;.\..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj&#x0D;&#x0A;"
+						CommandLine="yasm -Xvc -f win64  -I&quot;.&quot; -I&quot;..\..\..\..\ext\libvpx&quot; &quot;$(InputPath)&quot; -o $(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj&#x0D;&#x0A;"
 						Outputs="$(IntDir)\vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj"
 					/>
 				</FileConfiguration>
@@ -5199,7 +5219,7 @@
 		<Filter
 			Name="Header Files"
 			Filter="h;hm;inl;inc;xsd"
-			UniqueIdentifier="9EDADCAD-2CE1-29C4-44FF-2A74ED4E23BE"
+			UniqueIdentifier="7CD7A14A-AF7F-5622-E6E5-C0690D540985"
 			>
 			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp8\common\alloccommon.h"
@@ -5562,6 +5582,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_360.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\..\..\..\ext\libvpx\vp9\encoder\vp9_aq_complexity.h"
 				>
 			</File>
@@ -5917,13 +5941,13 @@
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="96975346-258A-14D4-B6C1-F33572543EA7"
+			UniqueIdentifier="4A53D16E-E516-DF13-877B-036F6A0E8DF5"
 			>
 		</Filter>
 		<Filter
 			Name="Build Files"
 			Filter="mk"
-			UniqueIdentifier="760AF765-4B2E-8213-22B1-F7634AB11493"
+			UniqueIdentifier="12B963A4-EA9C-FE96-9F53-CCB04EAB2CA5"
 			>
 			<File
 				RelativePath="libs.mk"
