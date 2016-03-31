@@ -71,11 +71,11 @@ class PrMkvWriter : public mkvmuxer::IMkvWriter
 	PrMkvWriter(PrSDKExportFileSuite *fileSuite, csSDK_uint32 fileObject);
 	virtual ~PrMkvWriter();
 	
-	virtual int32_t Write(const void* buf, uint32 len);
+	virtual int32_t Write(const void* buf, uint32_t len);
 	virtual int64_t Position() const;
 	virtual int32_t Position(int64_t position); // seek
 	virtual bool Seekable() const { return true; }
-	virtual void ElementStartNotify(uint64 element_id, int64_t position);
+	virtual void ElementStartNotify(uint64_t element_id, int64_t position);
 	
   private:
 	const PrSDKExportFileSuite *_fileSuite;
@@ -100,7 +100,7 @@ PrMkvWriter::~PrMkvWriter()
 }
 
 int32_t
-PrMkvWriter::Write(const void* buf, uint32 len)
+PrMkvWriter::Write(const void* buf, uint32_t len)
 {
 	prSuiteError err = _fileSuite->Write(_fileObject, (void *)buf, len);
 	
@@ -134,7 +134,7 @@ PrMkvWriter::Position(int64_t position)
 }
 
 void
-PrMkvWriter::ElementStartNotify(uint64 element_id, int64_t position)
+PrMkvWriter::ElementStartNotify(uint64_t element_id, int64_t position)
 {
 	// ummm, should I do something?
 }
@@ -1264,8 +1264,8 @@ exSDKExport(
 			// http://www.webmproject.org/docs/container/#muxer-guidelines
 			const long long timeCodeScale = 1000000LL;
 			
-			uint64 vid_track = 0;
-			uint64 audio_track = 0;
+			uint64_t vid_track = 0;
+			uint64_t audio_track = 0;
 			
 			if(!vbr_pass)
 			{
@@ -1311,7 +1311,7 @@ exSDKExport(
 											
 					if(renderParms.inPixelAspectRatioNumerator != renderParms.inPixelAspectRatioDenominator)
 					{
-						const uint64 display_width = ((double)renderParms.inWidth *
+						const uint64_t display_width = ((double)renderParms.inWidth *
 														(double)renderParms.inPixelAspectRatioNumerator /
 														(double)renderParms.inPixelAspectRatioDenominator)
 														+ 0.5;
@@ -1351,7 +1351,7 @@ exSDKExport(
 
 					if(private_data)
 					{
-						bool copied = audio->SetCodecPrivate((const uint8 *)private_data, private_size);
+						bool copied = audio->SetCodecPrivate((const uint8_t *)private_data, private_size);
 						
 						assert(copied);
 						
@@ -1594,7 +1594,7 @@ exSDKExport(
 								assert( pkt->data.frame.pts == (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator) );
 								assert( pkt->data.frame.duration == 1 ); // because of how we did the timescale
 							
-								bool added = muxer_segment->AddFrame((const uint8 *)pkt->data.frame.buf, pkt->data.frame.sz,
+								bool added = muxer_segment->AddFrame((const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz,
 																	vid_track, timeStamp,
 																	pkt->data.frame.flags & VPX_FRAME_IS_KEY);
 																	
