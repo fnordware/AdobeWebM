@@ -1363,8 +1363,12 @@ exSDKExport(
 				}
 			}
 			
-			PrAudioSample currentAudioSample = 0;
-
+			PrAudioSample currentAudioSample = 0; // this is the sample we'll get from Premiere when we call GetAudio()
+			
+			PrAudioSample encodedAudioSamples = 0; // this is the amount of samples that have actually been saved in the file
+			
+			PrAudioSample lastVorbisBlockSize = 0;
+			
 			// Here's a question: what do we do when the number of audio samples doesn't match evenly
 			// with the number of frames?  This could especially happen when the user changes the frame
 			// rate to something other than what Premiere is using to specify the out time.  So you could
@@ -1377,10 +1381,18 @@ exSDKExport(
 													
 			assert(ticksPerSecond % (PrAudioSample)sampleRateP.value.floatValue == 0);
 			
-		
+			
+			// The way Premiere handles time, a one-frame movie will have startTime = 0 and
+			// endTime = frameRateP.value.timeValue
+			
+			const long long expectedDuration = (((double)(exportInfoP->endTime - exportInfoP->startTime) / (double)ticksPerSecond) * (double)S2NS) + 0.5;
+			
+			
 			PrTime videoTime = exportInfoP->startTime;
 			
-			while(videoTime <= exportInfoP->endTime && result == malNoError)
+			while(((exportInfoP->exportVideo && videoTime < exportInfoP->endTime) ||
+					(exportInfoP->exportAudio && encodedAudioSamples < (endAudioSample + opus_pre_skip))) &&
+					result == malNoError)
 			{
 				const PrTime fileTime = videoTime - exportInfoP->startTime;
 				
@@ -1389,23 +1401,6 @@ exSDKExport(
 				
 				const uint64_t timeStamp = timeCode * timeCodeScale;
 			
-				const bool last_frame = (videoTime > (exportInfoP->endTime - frameRateP.value.timeValue));
-				
-				if(last_frame)
-					assert(videoTime == exportInfoP->endTime); // don't think this will be true, actually
-				
-				// This is not accurate enough, so we'll use doubles
-				//const PrTime ticksPerNanosecond = (ticksPerSecond / S2NS);
-				//assert(ticksPerSecond % S2NS == 0);
-				//
-				//const uint64_t frameDuration = (last_frame && videoTime != exportInfoP->endTime ? 
-				//								((exportInfoP->endTime - videoTime) + (ticksPerNanosecond / 2)) / ticksPerNanosecond :
-				//								(frameRateP.value.timeValue + (ticksPerNanosecond / 2)) / ticksPerNanosecond);
-						
-				const uint64_t frameDuration = (last_frame && videoTime != exportInfoP->endTime ? 
-												(((double)(exportInfoP->endTime - videoTime) / (double)ticksPerSecond) * (double)S2NS) + 0.5 :
-												(((double)frameRateP.value.timeValue / (double)ticksPerSecond) * (double)S2NS) + 0.5);
-				
 				// When writing WebM, we want blocks of audio and video interleaved.
 				// But encoders don't always cooperate with our wishes.  We feed them some data,
 				// but they may not be ready to produce output right away.  So what we do is keep
@@ -1413,6 +1408,8 @@ exSDKExport(
 				
 				if(exportInfoP->exportAudio && !vbr_pass)
 				{
+					assert(encodedAudioSamples < (endAudioSample + opus_pre_skip)); // audio should always take as long or longer than video
+				
 					// Premiere uses Left, Right, Left Rear, Right Rear, Center, LFE
 					// Opus and Vorbis use Left, Center, Right, Left Read, Right Rear, LFE
 					// http://www.xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-800004.3.9
@@ -1426,9 +1423,9 @@ exSDKExport(
 					{
 						assert(opus != NULL);
 						
-						long long opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
+						long long opus_timeStamp = encodedAudioSamples * S2NS / (long long)sampleRateP.value.floatValue;
 						
-						while(((opus_timeStamp <= timeStamp) || last_frame) && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
+						while((opus_timeStamp <= timeStamp) && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
 						{
 							const int samples = opus_frame_size;
 							
@@ -1460,21 +1457,29 @@ exSDKExport(
 									frame.set_timestamp(opus_timeStamp);
 									frame.set_is_key(true);
 									
-									if(last_frame)
-										frame.set_duration(frameDuration);
-																																				
-									if((currentAudioSample + samples) > (endAudioSample + opus_pre_skip))
-									{
-										assert(last_frame);
+									if((encodedAudioSamples + samples) >= (endAudioSample + opus_pre_skip) && expectedDuration > opus_timeStamp) // last audio frame
+										frame.set_duration(expectedDuration - opus_timeStamp);
 									
-										const int64_t discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
+									//const bool last_audio_frame = (currentAudioSample + samples) >= (endAudioSample + opus_pre_skip);
+								
+									//if(last_audio_frame && (expectedDuration > timeStamp))
+									//	frame.set_duration(expectedDuration - timeStamp);
+																																				
+									const int64_t discardPaddingSamples = (currentAudioSample + samples) - (endAudioSample + opus_pre_skip);
+									
+									if(discardPaddingSamples > 0)
+									{
+										//assert(last_audio_frame);
+									
 										const int64_t discardPadding = discardPaddingSamples * S2NS / (int64_t)sampleRateP.value.floatValue;
 										
 										frame.set_discard_padding(discardPadding);
 									}
 									
 									const bool added = muxer_segment->AddGenericFrame(&frame);
-																			
+									
+									encodedAudioSamples += samples;
+									
 									if(!added)
 										result = exportReturn_InternalError;
 								}
@@ -1484,6 +1489,8 @@ exSDKExport(
 								
 								currentAudioSample += samples;
 								
+								assert(encodedAudioSamples == currentAudioSample);
+								
 								opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
 							}
 						}
@@ -1491,8 +1498,10 @@ exSDKExport(
 					else
 					{
 						long long op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
-					
-						while(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
+						
+						assert(opus_pre_skip == 0); // so no need to use (endAudioSample + opus_pre_skip)
+						
+						while(op_timeStamp <= timeStamp && encodedAudioSamples < endAudioSample && result == malNoError)
 						{	
 							// We don't know what samples are in the packet until we get it,
 							// but by then it's too late to decide if we don't want it for this frame.
@@ -1510,12 +1519,24 @@ exSDKExport(
 								frame.set_timestamp(op_timeStamp);
 								frame.set_is_key(true);
 								
-								if(last_frame)
-									frame.set_duration(frameDuration);
+								const long this_blockSize = vorbis_packet_blocksize(&vi, &op);
+								const long num_samples = (lastVorbisBlockSize / 4) + (this_blockSize / 4);
+								lastVorbisBlockSize = this_blockSize;
 								
+								const bool last_audio_frame = ((encodedAudioSamples + num_samples) >= endAudioSample && op.granulepos != 0);
+								
+								if(last_audio_frame && expectedDuration > op_timeStamp) // last audio frame
+									frame.set_duration(expectedDuration - op_timeStamp);
+									
 								const bool added = muxer_segment->AddGenericFrame(&frame);
-																		
-								if(!added)
+								
+								encodedAudioSamples += (op.granulepos != 0 ? num_samples : 0);
+								
+								assert(encodedAudioSamples == op.granulepos || last_audio_frame);
+							
+								if(added)
+									packet_waiting = false;
+								else
 									result = exportReturn_InternalError;
 							}
 							
@@ -1532,7 +1553,7 @@ exSDKExport(
 									
 									op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
 									
-									if(op_timeStamp <= timeStamp || last_frame)
+									if(op_timeStamp <= timeStamp)
 									{
 										mkvmuxer::Frame frame;
 										
@@ -1545,8 +1566,21 @@ exSDKExport(
 										frame.set_timestamp(op_timeStamp);
 										frame.set_is_key(true);
 										
+										const long this_blockSize = vorbis_packet_blocksize(&vi, &op);
+										const long num_samples = (lastVorbisBlockSize / 4) + (this_blockSize / 4);
+										lastVorbisBlockSize = this_blockSize;
+										
+										const bool last_audio_frame = ((encodedAudioSamples + num_samples) >= endAudioSample && op.granulepos != 0);
+										
+										if(last_audio_frame && expectedDuration > op_timeStamp) // last audio frame
+											frame.set_duration(expectedDuration - op_timeStamp);
+										
 										const bool added = muxer_segment->AddGenericFrame(&frame);
-																				
+										
+										encodedAudioSamples += (op.granulepos != 0 ? num_samples : 0);
+								
+										assert(encodedAudioSamples == op.granulepos || last_audio_frame); // because we haven't updated encodedAudioSamples yet
+										
 										if(!added)
 											result = exportReturn_InternalError;
 									}
@@ -1564,7 +1598,7 @@ exSDKExport(
 							
 							
 							// make new packets
-							if(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
+							if(op_timeStamp <= timeStamp && encodedAudioSamples < endAudioSample && result == malNoError)
 							{
 								int samples = opus_frame_size; // opus_frame_size is also the size of our buffer in samples
 								
@@ -1606,8 +1640,13 @@ exSDKExport(
 				}
 				
 				
-				if(exportInfoP->exportVideo && (videoTime < exportInfoP->endTime)) // there will some audio after the last video frame
+				if(exportInfoP->exportVideo && (videoTime < exportInfoP->endTime))
 				{
+					const bool last_video_frame = (videoTime >= (exportInfoP->endTime - frameRateP.value.timeValue));
+					
+					if(last_video_frame)
+						assert(videoTime == (exportInfoP->endTime - frameRateP.value.timeValue)); // don't think this will be true, actually
+				
 					bool made_frame = false;
 					
 					while(!made_frame && result == suiteError_NoError)
@@ -1650,8 +1689,12 @@ exSDKExport(
 								frame.set_timestamp(timeStamp);
 								frame.set_is_key(pkt->data.frame.flags & VPX_FRAME_IS_KEY);
 								
-								if(last_frame)
-									frame.set_duration(frameDuration);
+								if(last_video_frame)
+								{
+									assert(expectedDuration > timeStamp);
+									
+									frame.set_duration(expectedDuration - timeStamp);
+								}
 								
 								const bool added = muxer_segment->AddGenericFrame(&frame);
 																		
