@@ -1449,6 +1449,44 @@ SDKGetInfo8(
 															localRecP->color_range = img->range;
 														
 															vpx_img_free(img);
+															
+															
+															// Color metadata!
+															// https://mailarchive.ietf.org/arch/search/?email_list=cellar&q=colour
+															
+															const mkvparser::Colour * const color = pVideoTrack->GetColour();
+															
+															if(color != NULL)
+															{
+																assert(img->bit_depth == color->bits_per_channel);
+																
+																const int horizontal_subsampling = (img->fmt == VPX_IMG_FMT_I420 ?  2 :
+																									img->fmt == VPX_IMG_FMT_I422 ?  2 :
+																									img->fmt == VPX_IMG_FMT_I444 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I42016 ?  2 :
+																									img->fmt == VPX_IMG_FMT_I42216 ?  2 :
+																									img->fmt == VPX_IMG_FMT_I44416 ?  1 :
+																									2);
+																									
+																const int vertical_subsampling = (img->fmt == VPX_IMG_FMT_I420 ?  2 :
+																									img->fmt == VPX_IMG_FMT_I422 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I444 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I42016 ?  2 :
+																									img->fmt == VPX_IMG_FMT_I42216 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I44416 ?  1 :
+																									2);
+																									
+																assert(horizontal_subsampling == color->chroma_subsampling_horz);
+																assert(vertical_subsampling == color->chroma_subsampling_vert);
+																
+																if(color->mastering_metadata != NULL)
+																{
+																	// chromaticities
+																	assert(color->mastering_metadata->r != NULL);
+																	assert(color->mastering_metadata->g != NULL);
+																	assert(color->mastering_metadata->b != NULL);
+																}
+															}
 														}
 														else
 															assert(false);
