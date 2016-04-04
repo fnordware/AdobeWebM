@@ -1295,7 +1295,7 @@ exSDKExport(
 				info->set_date_utc( (int64_t)difftime(time(NULL), base) * S2NS );
 				
 				
-				info->set_timecode_scale(timeCodeScale);
+				assert(timeCodeScale == info->timecode_scale()); // should be the default
 				
 		
 				if(exportInfoP->exportVideo)
