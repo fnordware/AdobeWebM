@@ -203,6 +203,9 @@ int main(int argumentCount, char* argumentVector[])
 			audio->SetCodecPrivate((uint8_t *)privateData, privateDataSize);
 			
 			
+			assert(segment.estimate_file_duration());
+			
+			
 			// Write video
 			
 			for(int i = 0; i < framesToWrite; i++)
@@ -213,26 +216,10 @@ int main(int argumentCount, char* argumentVector[])
 				const long long timeCode = timeInSeconds * (S2NS / timeCodeScale);
 				const uint64_t timeStamp = timeCode * timeCodeScale;
 			
-				const bool lastFrame = (i == (framesToWrite - 1));
-			
-				
 				// Audio
 				{
-					mkvmuxer::Frame frame;
-					
-					const bool inited = frame.Init((uint8_t *)audioBuffer, audioSize);
-					
-					if(!inited)
-						throw -1;
-					
-					frame.set_track_number(audio_track);
-					frame.set_timestamp(timeStamp);
-					frame.set_is_key(true);
-					
-					//if(lastFrame)
-					//	frame.set_duration(expectedDuration - timeStamp);
-					
-					const bool added = segment.AddGenericFrame(&frame);
+					const bool added = segment.AddFrame((const uint8_t *)audioBuffer, audioSize,
+														audio_track, timeStamp, true);
 					
 					if(!added)
 						throw -1;
@@ -240,23 +227,10 @@ int main(int argumentCount, char* argumentVector[])
 				
 				// Video
 				{
-					mkvmuxer::Frame frame;
-					
-					const bool inited = frame.Init((uint8_t *)videoBuffer, videoSize);
-					
-					if(!inited)
-						throw -1;
-					
-					frame.set_track_number(vid_track);
-					frame.set_timestamp(timeStamp);
-					
 					const bool isKey = (i % 5 == 0); // every 5th frame
-					frame.set_is_key(isKey);
 					
-					if(lastFrame)
-						frame.set_duration(expectedDuration - timeStamp);
-					
-					const bool added = segment.AddGenericFrame(&frame);
+					const bool added = segment.AddFrame((const uint8_t *)videoBuffer, videoSize,
+														vid_track, timeStamp, isKey);
 					
 					if(!added)
 						throw -1;
@@ -264,23 +238,10 @@ int main(int argumentCount, char* argumentVector[])
 				
 				// More Audio
 				{
-					mkvmuxer::Frame frame;
-					
-					const bool inited = frame.Init((uint8_t *)audioBuffer, audioSize);
-					
-					if(!inited)
-						throw -1;
-					
 					const uint64_t thisTimeStamp = timeStamp + (S2NS / (2 * fps));
 					
-					frame.set_track_number(audio_track);
-					frame.set_timestamp(thisTimeStamp);
-					frame.set_is_key(true);
-					
-					if(lastFrame)
-						frame.set_duration(expectedDuration - thisTimeStamp);
-					
-					const bool added = segment.AddGenericFrame(&frame);
+					const bool added = segment.AddFrame((const uint8_t *)audioBuffer, audioSize,
+														audio_track, thisTimeStamp, true);
 					
 					if(!added)
 						throw -1;
@@ -334,7 +295,14 @@ int main(int argumentCount, char* argumentVector[])
 					}
 					else
 					{
-						cout << "Duration was NOT as expected." << endl;
+						const int64_t delta = abs((int64_t)expectedDuration - duration);
+						
+						const double framesDelta = ((double)delta * fps / (double)S2NS);
+					
+						cout << "Duration expected: " << expectedDuration <<
+								"  actual: " << duration <<
+								"  delta: " << delta <<
+								" (" << framesDelta << " frames)" << endl;
 					}
 				}
 				else
