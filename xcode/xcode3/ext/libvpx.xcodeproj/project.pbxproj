@@ -429,7 +429,6 @@
 		2AA242861CAD8B3300AEB6E4 /* vp9_aq_360.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AA242841CAD8B3300AEB6E4 /* vp9_aq_360.c */; };
 		2AA242871CAD8B3300AEB6E4 /* vp9_aq_360.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AA242851CAD8B3300AEB6E4 /* vp9_aq_360.h */; };
 		2AA2428A1CAD8B4F00AEB6E4 /* vp9_diamond_search_sad_avx.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AA242881CAD8B4F00AEB6E4 /* vp9_diamond_search_sad_avx.c */; };
-		2AA2428B1CAD8B4F00AEB6E4 /* vp9_frame_scale_ssse3.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AA242891CAD8B4F00AEB6E4 /* vp9_frame_scale_ssse3.c */; };
 		2AA2428D1CAD8B6B00AEB6E4 /* avg.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AA2428C1CAD8B6B00AEB6E4 /* avg.c */; };
 		2AA242941CAD8B8200AEB6E4 /* avg_intrin_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AA2428E1CAD8B8200AEB6E4 /* avg_intrin_sse2.c */; };
 		2AA242951CAD8B8200AEB6E4 /* avg_ssse3_x86_64.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2AA2428F1CAD8B8200AEB6E4 /* avg_ssse3_x86_64.asm */; };
@@ -2175,7 +2174,6 @@
 				2A65C5581BF2BC79002ABAA8 /* vpx_thread.c in Sources */,
 				2AA242861CAD8B3300AEB6E4 /* vp9_aq_360.c in Sources */,
 				2AA2428A1CAD8B4F00AEB6E4 /* vp9_diamond_search_sad_avx.c in Sources */,
-				2AA2428B1CAD8B4F00AEB6E4 /* vp9_frame_scale_ssse3.c in Sources */,
 				2AA2428D1CAD8B6B00AEB6E4 /* avg.c in Sources */,
 				2AA242941CAD8B8200AEB6E4 /* avg_intrin_sse2.c in Sources */,
 				2AA242951CAD8B8200AEB6E4 /* avg_ssse3_x86_64.asm in Sources */,
