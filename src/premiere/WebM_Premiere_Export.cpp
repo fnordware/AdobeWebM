@@ -152,7 +152,7 @@ extern int g_num_cpus;
 // http://matroska.org/technical/specs/notes.html#TimecodeScale
 // Time (in nanoseconds) = TimeCode * TimeCodeScale
 // When we call finctions like GetTime, we're given Time in Nanoseconds.
-static const long long S2NS = 1000000000LL;
+static const uint64_t S2NS = 1000000000LL;
 
 
 static void
@@ -1262,7 +1262,7 @@ exSDKExport(
 			// but I get some messed up stuff when I do that.  Maybe a bug in the muxer?
 			// The WebM spec says to keep it at one million:
 			// http://www.webmproject.org/docs/container/#muxer-guidelines
-			const long long timeCodeScale = 1000000LL;
+			const uint64_t timeCodeScale = 1000000LL;
 			
 			uint64_t vid_track = 0;
 			uint64_t audio_track = 0;
@@ -1295,7 +1295,9 @@ exSDKExport(
 				info->set_date_utc( (int64_t)difftime(time(NULL), base) * S2NS );
 				
 				
-				info->set_timecode_scale(timeCodeScale);
+				assert(info->timecode_scale() == timeCodeScale);
+				
+				assert(muxer_segment->estimate_file_duration());
 				
 		
 				if(exportInfoP->exportVideo)
@@ -1321,6 +1323,29 @@ exSDKExport(
 					}
 					
 					muxer_segment->CuesTrack(vid_track);
+					
+					
+					
+					// Color metadata!
+					// https://mailarchive.ietf.org/arch/search/?email_list=cellar&q=colour
+					
+					mkvmuxer::Colour color;
+					
+					color.set_bits_per_channel(bit_depth);
+					
+					const uint64_t horizontal_subsampling = (chroma == WEBM_444 ? 0 : 1);
+					const uint64_t vertical_subsampling = (chroma == WEBM_420 ? 1 : 0);
+					
+					color.set_chroma_subsampling_horz(horizontal_subsampling);
+					color.set_chroma_subsampling_vert(vertical_subsampling);
+					
+					// don't want to presume
+					//color.set_matrix_coefficients(mkvmuxer::Colour::kBt709);
+					//color.set_range(mkvmuxer::Colour::kBroadcastRange);
+					//color.set_transfer_characteristics(mkvmuxer::Colour::kIturBt709Tc);
+					//color.set_primaries(mkvmuxer::Colour::kIturBt709P);
+					
+					video->SetColour(color);
 				}
 				
 				
@@ -1385,7 +1410,7 @@ exSDKExport(
 				const PrTime fileTime = videoTime - exportInfoP->startTime;
 				
 				// Time (in nanoseconds) = TimeCode * TimeCodeScale.
-				const long long timeCode = ((fileTime * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+				const uint64_t timeCode = ((fileTime * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
 				
 				const uint64_t timeStamp = timeCode * timeCodeScale;
 			
@@ -1412,7 +1437,7 @@ exSDKExport(
 					{
 						assert(opus != NULL);
 						
-						long long opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
+						uint64_t opus_timeStamp = currentAudioSample * S2NS / (uint64_t)sampleRateP.value.floatValue;
 						
 						while(((opus_timeStamp <= timeStamp) || last_frame) && currentAudioSample < (endAudioSample + opus_pre_skip) && result == malNoError)
 						{
@@ -1460,13 +1485,13 @@ exSDKExport(
 								
 								currentAudioSample += samples;
 								
-								opus_timeStamp = currentAudioSample * S2NS / (long long)sampleRateP.value.floatValue;
+								opus_timeStamp = currentAudioSample * S2NS / (uint64_t)sampleRateP.value.floatValue;
 							}
 						}
 					}
 					else
 					{
-						long long op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
+						uint64_t op_timeStamp = op.granulepos * S2NS / (uint64_t)sampleRateP.value.floatValue;
 					
 						while(op_timeStamp <= timeStamp && op.granulepos < endAudioSample && result == malNoError)
 						{	
@@ -1495,7 +1520,7 @@ exSDKExport(
 								{
 									assert(!packet_waiting);
 									
-									op_timeStamp = op.granulepos * S2NS / (long long)sampleRateP.value.floatValue;
+									op_timeStamp = op.granulepos * S2NS / (uint64_t)sampleRateP.value.floatValue;
 									
 									if(op_timeStamp <= timeStamp || last_frame)
 									{
@@ -1768,6 +1793,23 @@ exSDKExport(
 				
 				
 				videoTime += frameRateP.value.timeValue;
+			}
+			
+			
+			if(muxer_segment != NULL)
+			{
+				assert(!vbr_pass);
+				
+				const PrTime endTime = std::min<PrTime>(videoTime, exportInfoP->endTime);
+				
+				const PrTime fileTimeDuration = endTime - exportInfoP->startTime;
+					
+				const uint64_t timeCodeDuration = ((fileTimeDuration * (S2NS / timeCodeScale)) + (ticksPerSecond / 2)) / ticksPerSecond;
+				
+				// Thanks, Frank!
+				// https://bugs.chromium.org/p/webm/issues/detail?id=1100
+				
+				muxer_segment->set_duration(timeCodeDuration);
 			}
 			
 			
