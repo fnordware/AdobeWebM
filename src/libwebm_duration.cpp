@@ -180,6 +180,8 @@ int main(int argumentCount, char* argumentVector[])
 			
 			assert(timeCodeScale == 1000000); // WebM standard
 			
+			const long long expectedDurationTimeCode = ((double)expectedDuration / (double)timeCodeScale) + 0.5;
+			
 			
 			// Video track
 			const uint64_t vid_track = segment.AddVideoTrack(640, 480, 1);
@@ -203,7 +205,7 @@ int main(int argumentCount, char* argumentVector[])
 			audio->SetCodecPrivate((uint8_t *)privateData, privateDataSize);
 			
 			
-			assert(segment.estimate_file_duration());
+			assert(segment.estimate_file_duration()); // not that we need it
 			
 			
 			// Write video
@@ -247,6 +249,10 @@ int main(int argumentCount, char* argumentVector[])
 						throw -1;
 				}
 			}
+			
+			
+			segment.set_duration(expectedDurationTimeCode);  // YES!
+			
 			
 			const bool final = segment.Finalize();
 			
