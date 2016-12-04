@@ -1460,20 +1460,20 @@ SDKGetInfo8(
 															{
 																assert(img->bit_depth == color->bits_per_channel);
 																
-																const int horizontal_subsampling = (img->fmt == VPX_IMG_FMT_I420 ?  2 :
-																									img->fmt == VPX_IMG_FMT_I422 ?  2 :
-																									img->fmt == VPX_IMG_FMT_I444 ?  1 :
-																									img->fmt == VPX_IMG_FMT_I42016 ?  2 :
-																									img->fmt == VPX_IMG_FMT_I42216 ?  2 :
-																									img->fmt == VPX_IMG_FMT_I44416 ?  1 :
+																const int horizontal_subsampling = (img->fmt == VPX_IMG_FMT_I420 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I422 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I444 ?  0 :
+																									img->fmt == VPX_IMG_FMT_I42016 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I42216 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I44416 ?  0 :
 																									2);
 																									
-																const int vertical_subsampling = (img->fmt == VPX_IMG_FMT_I420 ?  2 :
-																									img->fmt == VPX_IMG_FMT_I422 ?  1 :
-																									img->fmt == VPX_IMG_FMT_I444 ?  1 :
-																									img->fmt == VPX_IMG_FMT_I42016 ?  2 :
-																									img->fmt == VPX_IMG_FMT_I42216 ?  1 :
-																									img->fmt == VPX_IMG_FMT_I44416 ?  1 :
+																const int vertical_subsampling = (img->fmt == VPX_IMG_FMT_I420 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I422 ?  0 :
+																									img->fmt == VPX_IMG_FMT_I444 ?  0 :
+																									img->fmt == VPX_IMG_FMT_I42016 ?  1 :
+																									img->fmt == VPX_IMG_FMT_I42216 ?  0 :
+																									img->fmt == VPX_IMG_FMT_I44416 ?  0 :
 																									2);
 																									
 																assert(horizontal_subsampling == color->chroma_subsampling_horz);
