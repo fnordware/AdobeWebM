@@ -1107,7 +1107,10 @@ exSDKExport(
 				const int mapping_family = (audioChannels > 2 ? 1 : 0);
 				
 				const int streams = (audioChannels > 2 ? 4 : 1);
-				const int coupled_streams = (audioChannels > 2 ? 2 : 1);
+				
+				const int coupled_streams = (audioChannels > 2 ? 2 :
+												audioChannels == 2 ? 1:
+												0);
 				
 				const unsigned char surround_mapping[6] = {0, 4, 1, 2, 3, 5};
 				const unsigned char stereo_mapping[6] = {0, 1, 0, 1, 0, 1};
@@ -1840,7 +1843,8 @@ exSDKExport(
 		{
 			if(audioCodecP.value.intValue == WEBM_CODEC_OPUS)
 			{
-				opus_multistream_encoder_destroy(opus);
+				if(opus)
+					opus_multistream_encoder_destroy(opus);
 				
 				if(opus_buffer)
 					free(opus_buffer);
