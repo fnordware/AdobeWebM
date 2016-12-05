@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebM", "WebM_Premiere.vcxproj", "{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {3A214E06-B95E-4D61-A291-1F8DF2EC10FD}
+		{DB95CD59-543F-4803-AFA8-202AB60468D9} = {DB95CD59-543F-4803-AFA8-202AB60468D9}
+		{5EE2DF79-3BCA-4818-8768-E55EF9AF7A15} = {5EE2DF79-3BCA-4818-8768-E55EF9AF7A15}
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74} = {DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159} = {15CBFEFF-7965-41F5-B4E2-21E8795C9159}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwebm", "ext\libwebm.vcxproj", "{5EE2DF79-3BCA-4818-8768-E55EF9AF7A15}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "ext\libogg_static.vcxproj", "{15CBFEFF-7965-41F5-B4E2-21E8795C9159}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "ext\libvorbis_static.vcxproj", "{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opus", "ext\opus\opus.vcxproj", "{DB95CD59-543F-4803-AFA8-202AB60468D9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vpx", "ext\libvpx_build\vpx.vcxproj", "{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Debug|x64.ActiveCfg = Debug|x64
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Debug|x64.Build.0 = Debug|x64
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Release|x64.ActiveCfg = Release|x64
+		{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}.Release|x64.Build.0 = Release|x64
+		{5EE2DF79-3BCA-4818-8768-E55EF9AF7A15}.Debug|x64.ActiveCfg = Debug|x64
+		{5EE2DF79-3BCA-4818-8768-E55EF9AF7A15}.Debug|x64.Build.0 = Debug|x64
+		{5EE2DF79-3BCA-4818-8768-E55EF9AF7A15}.Release|x64.ActiveCfg = Release|x64
+		{5EE2DF79-3BCA-4818-8768-E55EF9AF7A15}.Release|x64.Build.0 = Release|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.ActiveCfg = Debug|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.Build.0 = Debug|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.ActiveCfg = Release|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.Build.0 = Release|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|x64.ActiveCfg = Debug|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|x64.Build.0 = Debug|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.ActiveCfg = Release|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.Build.0 = Release|x64
+		{DB95CD59-543F-4803-AFA8-202AB60468D9}.Debug|x64.ActiveCfg = Debug|x64
+		{DB95CD59-543F-4803-AFA8-202AB60468D9}.Debug|x64.Build.0 = Debug|x64
+		{DB95CD59-543F-4803-AFA8-202AB60468D9}.Release|x64.ActiveCfg = Release|x64
+		{DB95CD59-543F-4803-AFA8-202AB60468D9}.Release|x64.Build.0 = Release|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Debug|x64.ActiveCfg = Debug|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Debug|x64.Build.0 = Debug|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Release|x64.ActiveCfg = Release|x64
+		{DCE19DAF-69AC-46DB-B14A-39F0FAA5DB74}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

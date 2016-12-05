@@ -46,6 +46,8 @@
 #ifdef PRMAC_ENV
 	#include <mach/mach.h>
 #else
+	#include <algorithm>
+
 	#include <assert.h>
 	#include <time.h>
 	#include <math.h>

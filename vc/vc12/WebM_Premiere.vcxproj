@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>WebM</ProjectName>
+    <ProjectGuid>{8C4F19A7-759E-4D52-BAEC-7ADF50FBFE8F}</ProjectGuid>
+    <RootNamespace>WebM</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC70.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\Debug/WebM.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils;.\ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED=1;_DEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>.\Debug/WebM.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;MSWindows;PRWIN_ENV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <ResourceOutputFileName>$(IntDir)%(Filename).res</ResourceOutputFileName>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>vfw32.lib;msacm32.lib;winmm.lib;comctl32.lib;vpxmtd.lib;libogg_static.lib;libvorbis_static.lib;libwebm.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)WebM.prm</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/WebM.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>.\Debug/WebM.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>$(Platform)\$(Configuration);ext\build\$(Platform)\$(Configuration);ext\opus\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <AdditionalIncludeDirectories>..\..\src\premiere;..\..\ext\libvpx;..\..\ext\libwebm;..\..\ext\libvorbis\include;..\..\ext\libogg\include;..\..\ext\opus\include;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers;..\..\ext\Premiere Pro CS5 Win SDK\Examples\Utils;.\ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED=1;NDEBUG;WIN32;_WIN64;_WINDOWS;PRWIN_ENV;MSWindows;KDU_PENTIUM_MSVC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)WebM.prm</OutputFile>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>$(Platform)\$(Configuration);ext\build\$(Platform)\$(Configuration);ext\opus\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vpxmt.lib;libogg_static.lib;libvorbis_static.lib;libwebm.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\premiere\win\WebM_Import.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAlphaTypes.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAsyncImporter.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKAudioSuite.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKClassData.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKEntry.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKImport.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKImporterShared.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKMALErrors.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPixelFormat.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugMemory.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugPPix.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugSuites.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugUtilities.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPlugWindow.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPPixCacheSuite.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKPPixCreatorSuite.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKTimeSuite.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\PrSDKTypes.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPBasic.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPConfig.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPErrorCodes.h" />
+    <ClInclude Include="..\..\ext\Premiere Pro CS5 Win SDK\Examples\Headers\SPTypes.h" />
+    <ClInclude Include="..\..\src\premiere\WebM_Premiere_Export.h" />
+    <ClInclude Include="..\..\src\premiere\WebM_Premiere_Export_Params.h" />
+    <ClInclude Include="..\..\src\premiere\WebM_Premiere_Import.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\premiere\WebM_Premiere_Export.cpp" />
+    <ClCompile Include="..\..\src\premiere\WebM_Premiere_Export_Params.cpp" />
+    <ClCompile Include="..\..\src\premiere\WebM_Premiere_Import.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
