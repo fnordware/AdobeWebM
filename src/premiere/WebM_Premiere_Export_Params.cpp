@@ -264,7 +264,7 @@ exSDKGenerateDefaultParams(
 	exParamValues widthValues;
 	widthValues.structVersion = 1;
 	widthValues.rangeMin.intValue = 16;
-	widthValues.rangeMax.intValue = 8192;
+	widthValues.rangeMax.intValue = 16384;
 	widthValues.value.intValue = widthP.mInt32;
 	widthValues.disabled = kPrFalse;
 	widthValues.hidden = kPrFalse;
@@ -283,7 +283,7 @@ exSDKGenerateDefaultParams(
 	exParamValues heightValues;
 	heightValues.structVersion = 1;
 	heightValues.rangeMin.intValue = 16;
-	heightValues.rangeMax.intValue = 8192;
+	heightValues.rangeMax.intValue = 16384;
 	heightValues.value.intValue = heightP.mInt32;
 	heightValues.disabled = kPrFalse;
 	heightValues.hidden = kPrFalse;
@@ -742,7 +742,7 @@ exSDKPostProcessParams(
 	exportParamSuite->GetParamValue(exID, gIdx, ADBEVideoWidth, &widthValues);
 
 	widthValues.rangeMin.intValue = 16;
-	widthValues.rangeMax.intValue = 8192;
+	widthValues.rangeMax.intValue = 16384;
 
 	exportParamSuite->ChangeParam(exID, gIdx, ADBEVideoWidth, &widthValues);
 	
@@ -755,7 +755,7 @@ exSDKPostProcessParams(
 	exportParamSuite->GetParamValue(exID, gIdx, ADBEVideoHeight, &heightValues);
 
 	heightValues.rangeMin.intValue = 16;
-	heightValues.rangeMax.intValue = 8192;
+	heightValues.rangeMax.intValue = 16384;
 	
 	exportParamSuite->ChangeParam(exID, gIdx, ADBEVideoHeight, &heightValues);
 	
