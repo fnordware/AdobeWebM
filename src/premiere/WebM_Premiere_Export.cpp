@@ -1046,12 +1046,13 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, twoPassP, samplingP, bitDepthP, customArgsP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, twoPassP, keyframeMaxDistanceP, samplingP, bitDepthP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &bitrateP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoTwoPass, &twoPassP);
+	paramSuite->GetParamValue(exID, gIdx, WebMVideoKeyframeMaxDistance, &keyframeMaxDistanceP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
@@ -1248,7 +1249,12 @@ exSDKExport(
 			config.g_timebase.num = fps.denominator;
 			config.g_timebase.den = fps.numerator;
 			
+			config.kf_max_dist = keyframeMaxDistanceP.value.intValue;
+			
+			
 			ConfigureEncoderPre(config, deadline, customArgs);
+			
+			assert(config.kf_max_dist >= config.kf_min_dist);
 			
 			
 			const vpx_codec_flags_t flags = (config.g_bit_depth == VPX_BITS_8 ? 0 : VPX_CODEC_USE_HIGHBITDEPTH);

@@ -458,6 +458,25 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &twoPassParam);
 	
 	
+	// Keyframe max distance
+	exParamValues videoKeyframeMaxDisanceValues;
+	videoKeyframeMaxDisanceValues.structVersion = 1;
+	videoKeyframeMaxDisanceValues.rangeMin.intValue = 0;
+	videoKeyframeMaxDisanceValues.rangeMax.intValue = 999;
+	videoKeyframeMaxDisanceValues.value.intValue = 128;
+	videoKeyframeMaxDisanceValues.disabled = kPrFalse;
+	videoKeyframeMaxDisanceValues.hidden = kPrFalse;
+	
+	exNewParamInfo videoKeyframeMaxDistanceParam;
+	videoKeyframeMaxDistanceParam.structVersion = 1;
+	strncpy(videoKeyframeMaxDistanceParam.identifier, WebMVideoKeyframeMaxDistance, 255);
+	videoKeyframeMaxDistanceParam.paramType = exParamType_int;
+	videoKeyframeMaxDistanceParam.flags = exParamFlag_none;
+	videoKeyframeMaxDistanceParam.paramValues = videoKeyframeMaxDisanceValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &videoKeyframeMaxDistanceParam);
+
+
 	// Sampling
 	exParamValues samplingValues;
 	samplingValues.structVersion = 1;
@@ -948,6 +967,19 @@ exSDKPostProcessParams(
 	exportParamSuite->SetParamName(exID, gIdx, WebMVideoTwoPass, paramString);
 	
 	
+	// Max Keyframe Distance
+	utf16ncpy(paramString, "Max Keyframe Distance", 255);
+	exportParamSuite->SetParamName(exID, gIdx, WebMVideoKeyframeMaxDistance, paramString);
+	
+	exParamValues maxKeyframeDistanceValues;
+	exportParamSuite->GetParamValue(exID, gIdx, WebMVideoKeyframeMaxDistance, &maxKeyframeDistanceValues);
+
+	maxKeyframeDistanceValues.rangeMin.intValue = 0;
+	maxKeyframeDistanceValues.rangeMax.intValue = 999;
+	
+	exportParamSuite->ChangeParam(exID, gIdx, WebMVideoKeyframeMaxDistance, &maxKeyframeDistanceValues);
+
+
 	// hide old Encoding quality parameter
 #define WebMVideoEncoding "WebMVideoEncoding"
 	exParamValues encodingValues;

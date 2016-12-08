@@ -64,18 +64,19 @@ typedef enum {
 } WebM_Chroma_Sampling;
 
 
-#define WebMPluginVersion	"WebMPluginVersion"
+#define WebMPluginVersion				"WebMPluginVersion"
 
-#define WebMVideoCodec		"WebMVideoCodec"
-#define WebMVideoMethod		"WebMVideoMethod"
-#define WebMVideoQuality	"WebMVideoQuality"
-#define WebMVideoBitrate	"WebMVideoBitrate"
-#define WebMVideoTwoPass	"WebMVideoTwoPass"
-#define WebMVideoSampling	"WebMVideoSampling"
-#define WebMVideoBitDepth	"WebMVideoBitDepth"
+#define WebMVideoCodec					"WebMVideoCodec"
+#define WebMVideoMethod					"WebMVideoMethod"
+#define WebMVideoQuality				"WebMVideoQuality"
+#define WebMVideoBitrate				"WebMVideoBitrate"
+#define WebMVideoTwoPass				"WebMVideoTwoPass"
+#define WebMVideoKeyframeMaxDistance	"WebMVideoKeyframeMaxDistance"
+#define WebMVideoSampling				"WebMVideoSampling"
+#define WebMVideoBitDepth				"WebMVideoBitDepth"
 
-#define WebMCustomGroup		"WebMCustomGroup"
-#define WebMCustomArgs		"WebMCustomArgs"
+#define WebMCustomGroup					"WebMCustomGroup"
+#define WebMCustomArgs					"WebMCustomArgs"
 
 
 typedef enum {
