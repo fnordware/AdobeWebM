@@ -740,6 +740,219 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 }
 
 
+static void
+vorbis_get_limits(int audioChannels, float sampleRate, long &min_bitrate, long &max_bitrate)
+{
+	// must conform to bitrate profiles, see vorbisenc.c
+
+	if(audioChannels == 6)
+	{
+		if(sampleRate < 8000.)
+		{
+			// ve_setup_XX_uncoupled
+		
+			assert(false);
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+		else if(sampleRate < 9000.)
+		{
+			// ve_setup_8_uncoupled
+			
+			min_bitrate = 8000;
+			max_bitrate = 42000;
+		}
+		else if(sampleRate < 15000.)
+		{
+			// ve_setup_11_uncoupled
+			
+			min_bitrate = 12000;
+			max_bitrate = 50000;
+		}
+		else if(sampleRate < 19000.)
+		{
+			// ve_setup_16_uncoupled
+			
+			min_bitrate = 16000;
+			max_bitrate = 100000;
+		}
+		else if(sampleRate < 26000.)
+		{
+			// ve_setup_22_uncoupled
+			
+			min_bitrate = 16000;
+			max_bitrate = 90000;
+		}
+		else if(sampleRate < 40000.)
+		{
+			// ve_setup_32_uncoupled
+			
+			min_bitrate = 30000;
+			max_bitrate = 190000;
+		}
+		else if(sampleRate < 50000.)
+		{
+			// ve_setup_44_51
+			
+			min_bitrate = 14000;
+			max_bitrate = 240001;
+		}
+		else if(sampleRate < 200000.)
+		{
+			// ve_setup_X_uncoupled
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+		else
+		{
+			assert(false);
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+	}
+	else if(audioChannels == 2)
+	{
+		if(sampleRate < 8000.)
+		{
+			// ve_setup_XX_stereo
+		
+			assert(false);
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+		else if(sampleRate < 9000.)
+		{
+			// ve_setup_8_stereo
+			
+			min_bitrate = 6000;
+			max_bitrate = 32000;
+		}
+		else if(sampleRate < 15000.)
+		{
+			// ve_setup_11_stereo
+			
+			min_bitrate = 8000;
+			max_bitrate = 44000;
+		}
+		else if(sampleRate < 19000.)
+		{
+			// ve_setup_16_stereo
+			
+			min_bitrate = 12000;
+			max_bitrate = 86000;
+		}
+		else if(sampleRate < 26000.)
+		{
+			// ve_setup_22_stereo
+			
+			min_bitrate = 15000;
+			max_bitrate = 86000;
+		}
+		else if(sampleRate < 40000.)
+		{
+			// ve_setup_32_stereo
+			
+			min_bitrate = 18000;
+			max_bitrate = 190000;
+		}
+		else if(sampleRate < 50000.)
+		{
+			// ve_setup_44_stereo
+			
+			min_bitrate = 22500;
+			max_bitrate = 250001;
+		}
+		else if(sampleRate < 200000.)
+		{
+			// ve_setup_X_stereo
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+		else
+		{
+			assert(false);
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+	}
+	else
+	{
+		assert(audioChannels == 1);
+		
+		if(sampleRate < 8000.)
+		{
+			// ve_setup_XX_uncoupled
+		
+			assert(false);
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+		else if(sampleRate < 9000.)
+		{
+			// ve_setup_8_uncoupled
+			
+			min_bitrate = 8000;
+			max_bitrate = 42000;
+		}
+		else if(sampleRate < 15000.)
+		{
+			// ve_setup_11_uncoupled
+			
+			min_bitrate = 12000;
+			max_bitrate = 50000;
+		}
+		else if(sampleRate < 19000.)
+		{
+			// ve_setup_16_uncoupled
+			
+			min_bitrate = 16000;
+			max_bitrate = 100000;
+		}
+		else if(sampleRate < 26000.)
+		{
+			// ve_setup_22_uncoupled
+			
+			min_bitrate = 16000;
+			max_bitrate = 90000;
+		}
+		else if(sampleRate < 40000.)
+		{
+			// ve_setup_32_uncoupled
+			
+			min_bitrate = 30000;
+			max_bitrate = 190000;
+		}
+		else if(sampleRate < 50000.)
+		{
+			// ve_setup_44_uncoupled
+			
+			min_bitrate = 32000;
+			max_bitrate = 240001;
+		}
+		else if(sampleRate < 200000.)
+		{
+			// ve_setup_X_uncoupled
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+		else
+		{
+			assert(false);
+			
+			min_bitrate = -1;
+			max_bitrate = -1;
+		}
+	}
+}
+
 static int
 xiph_len(int l)
 {
@@ -1216,13 +1429,30 @@ exSDKExport(
 			{
 				vorbis_info_init(&vi);
 				
-				if(audioMethodP.value.intValue == OGG_BITRATE)
+				
+				long min_bitrate = -1, max_bitrate = -1;
+				
+				vorbis_get_limits(audioChannels, sampleRateP.value.floatValue,
+									min_bitrate, max_bitrate);
+				
+				const bool qualityOnly = (min_bitrate < 0 || max_bitrate < 0); // user should have use Quality
+				
+									
+				if(audioMethodP.value.intValue == OGG_BITRATE && !qualityOnly)
 				{
+					long bitrate = audioBitrateP.value.intValue * 1000;
+					
+					if(bitrate < min_bitrate)
+						bitrate = min_bitrate;
+					else if(bitrate > max_bitrate)
+						bitrate = max_bitrate;
+					
+				
 					v_err = vorbis_encode_init(&vi,
 												audioChannels,
 												sampleRateP.value.floatValue,
 												-1,
-												audioBitrateP.value.intValue * 1000,
+												bitrate,
 												-1);
 				}
 				else
