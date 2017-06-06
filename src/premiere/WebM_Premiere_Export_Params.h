@@ -78,6 +78,10 @@ typedef enum {
 #define WebMCustomGroup					"WebMCustomGroup"
 #define WebMCustomArgs					"WebMCustomArgs"
 
+#ifndef ADBEVideoAlpha
+#define ADBEVideoAlpha					"ADBEVideoAlpha"
+#endif
+
 
 typedef enum {
 	WEBM_CODEC_VORBIS = 0,

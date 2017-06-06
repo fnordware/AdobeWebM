@@ -498,7 +498,7 @@ DepthConvert<unsigned char, unsigned char>(const unsigned char &val, const int &
 
 template <typename VUYA_PIX, typename IMG_PIX>
 static void
-CopyVUYAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowbytes)
+CopyVUYAToImg(vpx_image_t *img, vpx_image_t *alpha_img, const char *frameBufferP, const csSDK_int32 rowbytes)
 {
 	const unsigned int sub_x = img->x_chroma_shift + 1;
 	const unsigned int sub_y = img->y_chroma_shift + 1;
@@ -530,12 +530,44 @@ CopyVUYAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowb
 			prV += 4;
 		}
 	}
+	
+	if(alpha_img != NULL)
+	{
+		assert(sub_x == alpha_img->x_chroma_shift + 1);
+		assert(sub_y == alpha_img->y_chroma_shift + 1);
+		
+		for(int y = 0; y < img->d_h; y++)
+		{
+			IMG_PIX *imgY = (IMG_PIX *)(alpha_img->planes[VPX_PLANE_Y] + (alpha_img->stride[VPX_PLANE_Y] * y));
+			IMG_PIX *imgU = (IMG_PIX *)(alpha_img->planes[VPX_PLANE_U] + (alpha_img->stride[VPX_PLANE_U] * (y / sub_y)));
+			IMG_PIX *imgV = (IMG_PIX *)(alpha_img->planes[VPX_PLANE_V] + (alpha_img->stride[VPX_PLANE_V] * (y / sub_y)));
+		
+			const VUYA_PIX *prVUYA = (VUYA_PIX *)(frameBufferP + (rowbytes * (alpha_img->d_h - 1 - y)));
+			
+			const VUYA_PIX *prA = prVUYA + 3;
+			
+			const int Yadd = (sizeof(VUYA_PIX) > 1 ? 2056500 : 16500);    // to be divided by 1000
+			
+			for(int x=0; x < img->d_w; x++)
+			{
+				*imgY++ = DepthConvert<VUYA_PIX, IMG_PIX>( ((859 * (int)*prA) + Yadd) / 1000, img->bit_depth);
+				
+				if( (y % sub_y == 0) && (x % sub_x == 0) )
+				{
+					*imgU++ = DepthConvert<unsigned char, IMG_PIX>(128, alpha_img->bit_depth);
+					*imgV++ = DepthConvert<unsigned char, IMG_PIX>(128, alpha_img->bit_depth);
+				}
+				
+				prA += 4;
+			}
+		}
+	}
 }
 
 
 template <typename BGRA_PIX, typename IMG_PIX, bool isARGB>
 static void
-CopyBGRAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowbytes)
+CopyBGRAToImg(vpx_image_t *img, vpx_image_t *alpha_img, const char *frameBufferP, const csSDK_int32 rowbytes)
 {
 	const unsigned int sub_x = img->x_chroma_shift + 1;
 	const unsigned int sub_y = img->y_chroma_shift + 1;
@@ -613,11 +645,49 @@ CopyBGRAToImg(vpx_image_t *img, const char *frameBufferP, const csSDK_int32 rowb
 			prB += 4;
 		}
 	}
+	
+	
+	if(alpha_img != NULL)
+	{
+		assert(sub_x == alpha_img->x_chroma_shift + 1);
+		assert(sub_y == alpha_img->y_chroma_shift + 1);
+		
+		for(int y = 0; y < img->d_h; y++)
+		{
+			IMG_PIX *imgY = (IMG_PIX *)(alpha_img->planes[VPX_PLANE_Y] + (alpha_img->stride[VPX_PLANE_Y] * y));
+			IMG_PIX *imgU = (IMG_PIX *)(alpha_img->planes[VPX_PLANE_U] + (alpha_img->stride[VPX_PLANE_U] * (y / sub_y)));
+			IMG_PIX *imgV = (IMG_PIX *)(alpha_img->planes[VPX_PLANE_V] + (alpha_img->stride[VPX_PLANE_V] * (y / sub_y)));
+			
+			const BGRA_PIX *prBGRA = (BGRA_PIX *)(frameBufferP + (rowbytes * (alpha_img->d_h - 1 - y)));
+			
+			const BGRA_PIX *prA = prBGRA + 3;
+			
+			if(isARGB)
+			{
+				prA = prBGRA + 0;
+			}
+			
+			const int Yadd = (sizeof(BGRA_PIX) > 1 ? 2056500 : 16500);    // to be divided by 1000
+			
+			for(int x=0; x < img->d_w; x++)
+			{
+				*imgY++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((859 * (int)*prA) + Yadd) / 1000, img->bit_depth);
+				
+				if( (y % sub_y == 0) && (x % sub_x == 0) )
+				{
+					*imgV++ = DepthConvert<unsigned char, IMG_PIX>(128, img->bit_depth);
+					*imgU++ = DepthConvert<unsigned char, IMG_PIX>(128, img->bit_depth);
+				}
+				
+				prA += 4;
+			}
+		}
+	}
 }
 
 
 static void
-CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuite, PrSDKPPix2Suite *pix2Suite)
+CopyPixToImg(vpx_image_t *img, vpx_image_t *alpha_img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuite, PrSDKPPix2Suite *pix2Suite)
 {
 	prRect boundsRect;
 	pixSuite->GetBounds(outFrame, &boundsRect);
@@ -634,6 +704,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 	{
 		assert(sub_x == 2 && sub_y == 2);
 		assert(img->bit_depth == 8);
+		assert(alpha_img == NULL);
 		
 		char *Y_PixelAddress, *U_PixelAddress, *V_PixelAddress;
 		csSDK_uint32 Y_RowBytes, U_RowBytes, V_RowBytes;
@@ -680,6 +751,7 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 		{
 			assert(sub_x == 2 && sub_y == 1);
 			assert(img->bit_depth == 8);
+			assert(alpha_img == NULL);
 			
 			for(int y = 0; y < img->d_h; y++)
 			{
@@ -704,35 +776,36 @@ CopyPixToImg(vpx_image_t *img, const PPixHand &outFrame, PrSDKPPixSuite *pixSuit
 		{
 			assert(sub_x == 1 && sub_y == 1);
 			assert(img->bit_depth == 8);
+			assert(alpha_img == NULL);
 			
-			CopyVUYAToImg<unsigned char, unsigned char>(img, frameBufferP, rowbytes);
+			CopyVUYAToImg<unsigned char, unsigned char>(img, alpha_img, frameBufferP, rowbytes);
 		}
 		else if(pixFormat == PrPixelFormat_VUYA_4444_16u)
 		{
 			assert(img->bit_depth > 8);
 			
-			CopyVUYAToImg<unsigned short, unsigned short>(img, frameBufferP, rowbytes);
+			CopyVUYAToImg<unsigned short, unsigned short>(img, alpha_img, frameBufferP, rowbytes);
 		}
 		else if(pixFormat == PrPixelFormat_BGRA_4444_16u)
 		{
 			if(img->bit_depth > 8)
-				CopyBGRAToImg<unsigned short, unsigned short, false>(img, frameBufferP, rowbytes);
+				CopyBGRAToImg<unsigned short, unsigned short, false>(img, alpha_img, frameBufferP, rowbytes);
 			else
-				CopyBGRAToImg<unsigned short, unsigned char, false>(img, frameBufferP, rowbytes);
+				CopyBGRAToImg<unsigned short, unsigned char, false>(img, alpha_img, frameBufferP, rowbytes);
 		}
 		else if(pixFormat == PrPixelFormat_BGRA_4444_8u)
 		{
 			if(img->bit_depth > 8)
-				CopyBGRAToImg<unsigned char, unsigned short, false>(img, frameBufferP, rowbytes);
+				CopyBGRAToImg<unsigned char, unsigned short, false>(img, alpha_img, frameBufferP, rowbytes);
 			else
-				CopyBGRAToImg<unsigned char, unsigned char, false>(img, frameBufferP, rowbytes);
+				CopyBGRAToImg<unsigned char, unsigned char, false>(img, alpha_img, frameBufferP, rowbytes);
 		}
 		else if(pixFormat == PrPixelFormat_ARGB_4444_8u)
 		{
 			if(img->bit_depth > 8)
-				CopyBGRAToImg<unsigned char, unsigned short, true>(img, frameBufferP, rowbytes);
+				CopyBGRAToImg<unsigned char, unsigned short, true>(img, alpha_img, frameBufferP, rowbytes);
 			else
-				CopyBGRAToImg<unsigned char, unsigned char, true>(img, frameBufferP, rowbytes);
+				CopyBGRAToImg<unsigned char, unsigned char, true>(img, alpha_img, frameBufferP, rowbytes);
 		}
 		else
 			assert(false);
@@ -1046,7 +1119,7 @@ exSDKExport(
 								audioFormat == kPrAudioChannelType_Mono ? 1 :
 								2);
 	
-	exParamValues codecP, methodP, videoQualityP, bitrateP, twoPassP, keyframeMaxDistanceP, samplingP, bitDepthP, customArgsP;
+	exParamValues codecP, methodP, videoQualityP, bitrateP, twoPassP, keyframeMaxDistanceP, samplingP, bitDepthP, alphaP, customArgsP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
@@ -1055,12 +1128,14 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoKeyframeMaxDistance, &keyframeMaxDistanceP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEVideoAlpha, &alphaP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
 	
 	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
 	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
 	const WebM_Chroma_Sampling chroma = (use_vp9 ? (WebM_Chroma_Sampling)samplingP.value.intValue : WEBM_420);
 	const int bit_depth = (use_vp9 ? bitDepthP.value.intValue : 8);
+	const bool use_alpha = alphaP.value.intValue;
 
 	char customArgs[256];
 	ncpyUTF16(customArgs, customArgsP.paramString, 255);
@@ -1078,7 +1153,8 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMOpusBitrate, &opusBitrateP);
 	
 	
-	const PrPixelFormat yuv_format8 = (chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
+	const PrPixelFormat yuv_format8 = (use_alpha ? PrPixelFormat_BGRA_4444_16u :
+										chroma == WEBM_444 ? PrPixelFormat_VUYX_4444_8u :
 										chroma == WEBM_422 ? PrPixelFormat_UYVY_422_8u_601 :
 										PrPixelFormat_YUV_420_MPEG2_FRAME_PICTURE_PLANAR_8u_601);
 
@@ -1126,6 +1202,9 @@ exSDKExport(
 	
 	PrMemoryPtr vbr_buffer = NULL;
 	size_t vbr_buffer_size = 0;
+	
+	PrMemoryPtr alpha_vbr_buffer = NULL;
+	size_t alpha_vbr_buffer_size = 0;
 
 
 	PrMkvWriter *writer = NULL;
@@ -1165,6 +1244,10 @@ exSDKExport(
 		
 		vpx_codec_ctx_t encoder;
 		vpx_codec_iter_t encoder_iter = NULL;
+		
+		const uint64_t alpha_id = 1;
+		vpx_codec_ctx_t alpha_encoder;
+		vpx_codec_iter_t alpha_encoder_iter = NULL;
 		
 		unsigned long deadline = VPX_DL_GOOD_QUALITY;
 
@@ -1257,9 +1340,32 @@ exSDKExport(
 			assert(config.kf_max_dist >= config.kf_min_dist);
 			
 			
+			vpx_codec_enc_cfg_t alpha_config = config;
+			
+			if(use_alpha)
+			{
+				alpha_config.kf_min_dist = alpha_config.kf_max_dist = config.kf_min_dist = config.kf_max_dist;
+				
+				alpha_config.rc_target_bitrate = config.rc_target_bitrate / 3;
+				
+				config.rc_target_bitrate = config.rc_target_bitrate * 2 / 3;
+				
+				if(passes == 2 && !vbr_pass)
+				{
+					config.rc_twopass_stats_in.buf = alpha_vbr_buffer;
+					config.rc_twopass_stats_in.sz = alpha_vbr_buffer_size;
+				}
+			}
+			
+			
 			const vpx_codec_flags_t flags = (config.g_bit_depth == VPX_BITS_8 ? 0 : VPX_CODEC_USE_HIGHBITDEPTH);
 			
 			codec_err = vpx_codec_enc_init(&encoder, iface, &config, flags);
+			
+			if(use_alpha && codec_err == VPX_CODEC_OK)
+			{
+				codec_err = vpx_codec_enc_init(&alpha_encoder, iface, &alpha_config, flags);
+			}
 			
 			
 			if(codec_err == VPX_CODEC_OK)
@@ -1273,6 +1379,9 @@ exSDKExport(
 					const int cq_level = (min_q + max_q) / 2;
 				
 					vpx_codec_control(&encoder, VP8E_SET_CQ_LEVEL, cq_level);
+					
+					if(use_alpha)
+						vpx_codec_control(&alpha_encoder, VP8E_SET_CQ_LEVEL, cq_level);
 				}
 				
 				if(use_vp9)
@@ -1281,9 +1390,20 @@ exSDKExport(
 					
 					vpx_codec_control(&encoder, VP9E_SET_TILE_COLUMNS, mylog2(g_num_cpus)); // this gives us some multithreading
 					vpx_codec_control(&encoder, VP9E_SET_FRAME_PARALLEL_DECODING, 1);
+					
+					if(use_alpha)
+					{
+						vpx_codec_control(&alpha_encoder, VP8E_SET_CPUUSED, 2);
+						
+						vpx_codec_control(&alpha_encoder, VP9E_SET_TILE_COLUMNS, mylog2(g_num_cpus));
+						vpx_codec_control(&alpha_encoder, VP9E_SET_FRAME_PARALLEL_DECODING, 1);
+					}
 				}
 			
 				ConfigureEncoderPost(&encoder, customArgs);
+				
+				if(use_alpha)
+					ConfigureEncoderPost(&alpha_encoder, customArgs);
 			}
 		}
 		
@@ -1563,6 +1683,12 @@ exSDKExport(
 						video->set_display_height(renderParms.inHeight);
 					}
 					
+					if(use_alpha)
+					{
+						video->SetAlphaMode(mkvmuxer::VideoTrack::kAlpha);
+						video->set_max_block_additional_id(alpha_id);
+					}
+					
 					muxer_segment->CuesTrack(vid_track);
 					
 					
@@ -1831,11 +1957,18 @@ exSDKExport(
 				{
 					bool made_frame = false;
 					
+					const vpx_codec_cx_pkt_t *pkt = NULL;
+					const vpx_codec_cx_pkt_t *alpha_pkt = NULL;
+					
 					while(!made_frame && result == suiteError_NoError)
 					{
-						const vpx_codec_cx_pkt_t *pkt = NULL;
-						
-						if( (pkt = vpx_codec_get_cx_data(&encoder, &encoder_iter)) )
+						if(pkt == NULL)
+							pkt = vpx_codec_get_cx_data(&encoder, &encoder_iter);
+							
+						if(use_alpha && alpha_pkt == NULL)
+							alpha_pkt = vpx_codec_get_cx_data(&alpha_encoder, &alpha_encoder_iter);
+					
+						if(pkt != NULL && (!use_alpha || alpha_pkt != NULL))
 						{
 							if(pkt->kind == VPX_CODEC_STATS_PKT)
 							{
@@ -1851,6 +1984,20 @@ exSDKExport(
 								vbr_buffer_size += pkt->data.twopass_stats.sz;
 								
 								made_frame = true;
+								
+								if(use_alpha)
+								{
+									assert(alpha_pkt->kind == VPX_CODEC_STATS_PKT);
+									
+									if(alpha_vbr_buffer_size == 0)
+										alpha_vbr_buffer = memorySuite->NewPtr(alpha_pkt->data.twopass_stats.sz);
+									else
+										memorySuite->SetPtrSize(&alpha_vbr_buffer, alpha_vbr_buffer_size + alpha_pkt->data.twopass_stats.sz);
+									
+									memcpy(&alpha_vbr_buffer[alpha_vbr_buffer_size], alpha_pkt->data.twopass_stats.buf, alpha_pkt->data.twopass_stats.sz);
+									
+									alpha_vbr_buffer_size += alpha_pkt->data.twopass_stats.sz;
+								}
 							}
 							else if(pkt->kind == VPX_CODEC_CX_FRAME_PKT)
 							{
@@ -1860,15 +2007,41 @@ exSDKExport(
 								assert( pkt->data.frame.pts == (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator) );
 								assert( pkt->data.frame.duration == 1 ); // because of how we did the timescale
 							
-								bool added = muxer_segment->AddFrame((const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz,
-																	vid_track, timeStamp,
-																	pkt->data.frame.flags & VPX_FRAME_IS_KEY);
-																	
-								if( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) )
-									made_frame = true;
-								
-								if(!added)
-									result = exportReturn_InternalError;
+								if(use_alpha)
+								{
+									assert( !(alpha_pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) );
+									assert( !(alpha_pkt->data.frame.flags & VPX_FRAME_IS_FRAGMENT) );
+									assert( alpha_pkt->data.frame.pts == (videoTime - exportInfoP->startTime) * fps.numerator / (ticksPerSecond * fps.denominator) );
+									assert( alpha_pkt->data.frame.duration == 1 );
+									
+									assert(alpha_pkt->kind == VPX_CODEC_CX_FRAME_PKT);
+									
+									if(pkt->data.frame.flags & VPX_FRAME_IS_KEY)
+										assert(alpha_pkt->data.frame.flags & VPX_FRAME_IS_KEY);
+									
+									bool added = muxer_segment->AddFrameWithAdditional((const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz,
+																						(const uint8_t *)alpha_pkt->data.frame.buf, alpha_pkt->data.frame.sz, alpha_id,
+																						vid_track, timeStamp,
+																						pkt->data.frame.flags & VPX_FRAME_IS_KEY);
+																		
+									if( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) )
+										made_frame = true;
+									
+									if(!added)
+										result = exportReturn_InternalError;
+								}
+								else
+								{
+									bool added = muxer_segment->AddFrame((const uint8_t *)pkt->data.frame.buf, pkt->data.frame.sz,
+																		vid_track, timeStamp,
+																		pkt->data.frame.flags & VPX_FRAME_IS_KEY);
+																		
+									if( !(pkt->data.frame.flags & VPX_FRAME_IS_INVISIBLE) )
+										made_frame = true;
+									
+									if(!added)
+										result = exportReturn_InternalError;
+								}
 							}
 							
 							assert(pkt->kind != VPX_CODEC_FPMB_STATS_PKT); // don't know what to do with this
@@ -1879,7 +2052,12 @@ exSDKExport(
 							// if that was the last VBR packet, we have to finalize and write a summary packet,
 							// so go through the loop once more
 							if(videoEncoderTime >= exportInfoP->endTime)
+							{
 								made_frame = false;
+								
+								pkt = NULL;
+								alpha_pkt = NULL;
+							}
 							
 							// the final packet was just written, so break
 							if(videoEncoderTime == LONG_LONG_MAX)
@@ -1957,15 +2135,28 @@ exSDKExport(
 									vpx_image_t img_data;
 									vpx_image_t *img = vpx_img_alloc(&img_data, imgfmt, width, height, 32);
 									
-									if(img)
+									vpx_image_t alpha_img_data;
+									vpx_image_t *alpha_img = NULL;
+									
+									if(use_alpha)
+										alpha_img = vpx_img_alloc(&alpha_img_data, imgfmt, width, height, 32);
+									
+									
+									if(img && (!use_alpha || alpha_img))
 									{
 										if(bit_depth > 8)
 										{
 											img->bit_depth = bit_depth;
 											img->bps = img->bps * bit_depth / 16;
+											
+											if(use_alpha)
+											{
+												alpha_img->bit_depth = bit_depth;
+												alpha_img->bps = alpha_img->bps * bit_depth / 16;
+											}
 										}
 									
-										CopyPixToImg(img, renderResult.outFrame, pixSuite, pix2Suite);
+										CopyPixToImg(img, alpha_img, renderResult.outFrame, pixSuite, pix2Suite);
 										
 										
 										vpx_codec_err_t encode_err = vpx_codec_encode(&encoder, img, encoder_FrameNumber, encoder_FrameDuration, 0, deadline);
@@ -1979,8 +2170,22 @@ exSDKExport(
 										else
 											result = exportReturn_InternalError;
 										
-										
 										vpx_img_free(img);
+										
+										
+										if(use_alpha)
+										{
+											vpx_codec_err_t alpha_encode_err = vpx_codec_encode(&alpha_encoder, alpha_img, encoder_FrameNumber, encoder_FrameDuration, 0, deadline);
+											
+											if(alpha_encode_err == VPX_CODEC_OK)
+											{
+												alpha_encoder_iter = NULL;
+											}
+											else
+												result = exportReturn_InternalError;
+											
+											vpx_img_free(alpha_img);
+										}
 									}
 									else
 										result = exportReturn_ErrMemory;
@@ -2002,6 +2207,19 @@ exSDKExport(
 								}
 								else
 									result = exportReturn_InternalError;
+								
+								
+								if(use_alpha)
+								{
+									vpx_codec_err_t alpha_encode_err = vpx_codec_encode(&alpha_encoder, NULL, encoder_FrameNumber, encoder_FrameDuration, 0, deadline);
+									
+									if(alpha_encode_err == VPX_CODEC_OK)
+									{
+										alpha_encoder_iter = NULL;
+									}
+									else
+										result = exportReturn_InternalError;
+								}
 							}
 						}
 					}
@@ -2075,6 +2293,12 @@ exSDKExport(
 		
 			vpx_codec_err_t destroy_err = vpx_codec_destroy(&encoder);
 			assert(destroy_err == VPX_CODEC_OK);
+			
+			if(use_alpha)
+			{
+				vpx_codec_err_t alpha_destroy_err = vpx_codec_destroy(&alpha_encoder);
+				assert(alpha_destroy_err == VPX_CODEC_OK);
+			}
 		}
 			
 		if(exportInfoP->exportAudio && !vbr_pass)
@@ -2129,6 +2353,9 @@ exSDKExport(
 	
 	if(vbr_buffer != NULL)
 		memorySuite->PrDisposePtr(vbr_buffer);
+
+	if(alpha_vbr_buffer != NULL)
+		memorySuite->PrDisposePtr(alpha_vbr_buffer);
 	
 	
 	if(exportInfoP->exportVideo)

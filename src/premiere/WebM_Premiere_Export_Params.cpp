@@ -515,6 +515,23 @@ exSDKGenerateDefaultParams(
 	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &bitDepthParam);
 	
 	
+	// Alpha channel
+	exParamValues alphaValues;
+	alphaValues.structVersion = 1;
+	alphaValues.value.intValue = kPrFalse;
+	alphaValues.disabled = kPrFalse;
+	alphaValues.hidden = kPrFalse;
+	
+	exNewParamInfo alphaParam;
+	alphaParam.structVersion = 1;
+	strncpy(alphaParam.identifier, ADBEVideoAlpha, 255);
+	alphaParam.paramType = exParamType_bool;
+	alphaParam.flags = exParamFlag_none;
+	alphaParam.paramValues = alphaValues;
+	
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &alphaParam);
+
+
 	// Version
 	exParamValues versionValues;
 	versionValues.structVersion = 1;
@@ -1034,6 +1051,11 @@ exSDKPostProcessParams(
 		utf16ncpy(paramString, vidBitDepthStrings[i], 255);
 		exportParamSuite->AddConstrainedValuePair(exID, gIdx, WebMVideoBitDepth, &tempBitDepthMethod, paramString);
 	}
+	
+	
+	// Alpha channel
+	utf16ncpy(paramString, "Include Alpha Channel", 255);
+	exportParamSuite->SetParamName(exID, gIdx, ADBEVideoAlpha, paramString);
 	
 
 	// Custom settings
