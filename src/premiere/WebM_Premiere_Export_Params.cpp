@@ -1238,13 +1238,14 @@ exSDKGetParamSummary(
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioRatePerSecond, &sampleRateP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEAudioNumChannels, &channelTypeP);
 
-	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, twoPassP;
+	exParamValues codecP, methodP, samplingP, bitDepthP, videoQualityP, videoBitrateP, alphaP, twoPassP;
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoSampling, &samplingP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitrate, &videoBitrateP);
+	paramSuite->GetParamValue(exID, gIdx, ADBEVideoAlpha, &alphaP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoTwoPass, &twoPassP);
 	
 
@@ -1388,6 +1389,9 @@ exSDKGetParamSummary(
 		else
 			stream3 << " 8-bit";
 	}
+	
+	if(alphaP.value.intValue)
+		stream3 << ", Alpha";
 	
 	summary3 = stream3.str();
 	
