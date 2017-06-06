@@ -1177,7 +1177,7 @@ exSDKExport(
 	renderParms.inFieldType = fieldTypeP.value.intValue;
 	renderParms.inDeinterlace = kPrFalse;
 	renderParms.inDeinterlaceQuality = (exportInfoP->maximumRenderQuality ? kPrRenderQuality_Max : kPrRenderQuality_High);
-	renderParms.inCompositeOnBlack = kPrTrue;
+	renderParms.inCompositeOnBlack = (use_alpha ? kPrFalse : kPrTrue);;
 	
 	
 	csSDK_uint32 videoRenderID = 0;
