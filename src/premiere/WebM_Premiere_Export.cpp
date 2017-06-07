@@ -546,11 +546,9 @@ CopyVUYAToImg(vpx_image_t *img, vpx_image_t *alpha_img, const char *frameBufferP
 			
 			const VUYA_PIX *prA = prVUYA + 3;
 			
-			const int Yadd = (sizeof(VUYA_PIX) > 1 ? 2056500 : 16500);    // to be divided by 1000
-			
 			for(int x=0; x < img->d_w; x++)
 			{
-				*imgY++ = DepthConvert<VUYA_PIX, IMG_PIX>( ((859 * (int)*prA) + Yadd) / 1000, img->bit_depth);
+				*imgY++ = DepthConvert<VUYA_PIX, IMG_PIX>(*prA, img->bit_depth);
 				
 				if( (y % sub_y == 0) && (x % sub_x == 0) )
 				{
@@ -667,11 +665,9 @@ CopyBGRAToImg(vpx_image_t *img, vpx_image_t *alpha_img, const char *frameBufferP
 				prA = prBGRA + 0;
 			}
 			
-			const int Yadd = (sizeof(BGRA_PIX) > 1 ? 2056500 : 16500);    // to be divided by 1000
-			
 			for(int x=0; x < img->d_w; x++)
 			{
-				*imgY++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((859 * (int)*prA) + Yadd) / 1000, img->bit_depth);
+				*imgY++ = DepthConvert<BGRA_PIX, IMG_PIX>(*prA, img->bit_depth);
 				
 				if( (y % sub_y == 0) && (x % sub_x == 0) )
 				{
