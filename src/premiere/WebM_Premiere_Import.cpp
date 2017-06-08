@@ -2029,9 +2029,9 @@ CopyImgToPix(const vpx_image_t * const img, PPixHand &ppix, PrSDKPPixSuite *PPix
 					const int subY = ConvertDepth<unsigned short, unsigned short>(16, 8);
 					const int subUV = ConvertDepth<unsigned short, unsigned short>(128, 8);
 					
-					*prB = Clamp16( ((1164 * (prY - subY)) + (2018 * (prU - subUV)) + 500) / 1000 );
-					*prG = Clamp16( ((1164 * (prY - subY)) - (813 * (prV - subUV)) - (391 * (prU - subUV)) + 500) / 1000 );
-					*prR = Clamp16( ((1164 * (prY - subY)) + (1596 * (prV - subUV)) + 500) / 1000 );
+					*prB = Clamp16( ((11644 * (prY - subY)) + (20172 * (prU - subUV)) + 5000) / 10000 );
+					*prG = Clamp16( ((11644 * (prY - subY)) - (8130 * (prV - subUV)) - (3918 * (prU - subUV)) + 5000) / 10000 );
+					*prR = Clamp16( ((11644 * (prY - subY)) + (15960 * (prV - subUV)) + 5000) / 10000 );
 					*prA = PF_MAX_CHAN16;
 					
 					prB += 4;

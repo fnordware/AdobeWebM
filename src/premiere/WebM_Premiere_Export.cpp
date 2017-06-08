@@ -606,23 +606,24 @@ CopyBGRAToImg(vpx_image_t *img, vpx_image_t *alpha_img, const char *frameBufferP
 		
 		
 		// using the conversion found here: http://www.fourcc.org/fccyvrgb.php
+		// and 601 spec here: http://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.601-7-201103-I!!PDF-E.pdf
 		
 		// these are part of the RGBtoYUV math (uses Adobe 16-bit)
-		const int Yadd = (sizeof(BGRA_PIX) > 1 ? 2056500 : 16500);    // to be divided by 1000
-		const int UVadd = (sizeof(BGRA_PIX) > 1 ? 16449500 : 128500); // includes extra 500 for rounding
+		const int Yadd = (sizeof(BGRA_PIX) > 1 ? 20565000 : 165000);    // to be divided by 10000
+		const int UVadd = (sizeof(BGRA_PIX) > 1 ? 164495000 : 1285000); // includes extra 5000 for rounding
 		
 		for(int x=0; x < img->d_w; x++)
 		{
-			*imgY++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((257 * (int)*prR) + (504 * (int)*prG) + ( 98 * (int)*prB) + Yadd) / 1000, img->bit_depth);
+			*imgY++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((2568 * (int)*prR) + (5041 * (int)*prG) + ( 979 * (int)*prB) + Yadd) / 10000, img->bit_depth);
 			
 			if(sub_y > 1)
 			{
 				if( (y % sub_y == 0) && (x % sub_x == 0) )
 				{
-					*imgV++ = DepthConvert<BGRA_PIX, IMG_PIX>( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + UVadd) +
-										((439 * (int)*prRb) - (368 * (int)*prGb) - ( 71 * (int)*prBb) + UVadd)) / 2000, img->bit_depth);
-					*imgU++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + UVadd) +
-										(-(148 * (int)*prRb) - (291 * (int)*prGb) + (439 * (int)*prBb) + UVadd)) / 2000, img->bit_depth);
+					*imgV++ = DepthConvert<BGRA_PIX, IMG_PIX>( (((4392 * (int)*prR) - (3678 * (int)*prG) - ( 714 * (int)*prB) + UVadd) +
+										((4392 * (int)*prRb) - (3678 * (int)*prGb) - ( 714 * (int)*prBb) + UVadd)) / 20000, img->bit_depth);
+					*imgU++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((-(1482 * (int)*prR) - (2910 * (int)*prG) + (4392 * (int)*prB) + UVadd) +
+										(-(1482 * (int)*prRb) - (2910 * (int)*prGb) + (4392 * (int)*prBb) + UVadd)) / 20000, img->bit_depth);
 				}
 				
 				prRb += 4;
@@ -633,8 +634,8 @@ CopyBGRAToImg(vpx_image_t *img, vpx_image_t *alpha_img, const char *frameBufferP
 			{
 				if(x % sub_x == 0)
 				{
-					*imgV++ = DepthConvert<BGRA_PIX, IMG_PIX>( (((439 * (int)*prR) - (368 * (int)*prG) - ( 71 * (int)*prB) + UVadd)) / 1000, img->bit_depth);
-					*imgU++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((-(148 * (int)*prR) - (291 * (int)*prG) + (439 * (int)*prB) + UVadd) ) / 1000, img->bit_depth);
+					*imgV++ = DepthConvert<BGRA_PIX, IMG_PIX>( (((4392 * (int)*prR) - (3678 * (int)*prG) - ( 714 * (int)*prB) + UVadd)) / 10000, img->bit_depth);
+					*imgU++ = DepthConvert<BGRA_PIX, IMG_PIX>( ((-(1482 * (int)*prR) - (2910 * (int)*prG) + (4392 * (int)*prB) + UVadd) ) / 10000, img->bit_depth);
 				}
 			}
 			
