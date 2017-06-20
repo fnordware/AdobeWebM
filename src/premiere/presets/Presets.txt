@@ -1,0 +1,22 @@
+
+Presets for Premiere and Media Encoder
+======================================
+
+These are WebM presets for Media Encoder and Premiere.
+
+Probably the easiest way to get them into their respective programs is simply to import them one at a time.  In the output settings dialog next to the Preset menu you'll find a button for importing presets.
+
+Alternately, you can copy the entire 5765624D_5765624D folder into the presets folder for each version of the applications you have installed.  For Mac and Windows these folders would typically wind up at locations like these:
+
+Mac:
+/Applications/Adobe Media Encoder CC 2014/Adobe Media Encoder CC 2014.app/MediaIO/systempresets/5765624D_5765624D
+/Applications/Adobe Premiere Pro CC 2014/Adobe Premiere Pro CC 2014.app/MediaIO/systempresets/5765624D_5765624D
+
+(Right click on the application icon and select Show Package Contents to access the MediaIO folder.)
+
+Win:
+C:\Program Files\Adobe\Adobe Media Encoder CC 2014\MediaIO\systempresets\ 5765624D_5765624D
+C:\Program Files\Adobe\Adobe Premiere Pro CC 2014\MediaIO\systempresets\ 5765624D_5765624D
+
+
+Presets in the "normal" folder can be used in any version of the Adobe programs, while the "match_source" presets should only be used in CC 2015 and later.
