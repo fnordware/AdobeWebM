@@ -82,7 +82,7 @@
       <ResourceOutputFileName>$(IntDir)%(Filename).res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>vfw32.lib;msacm32.lib;winmm.lib;comctl32.lib;vpxmtd.lib;libogg_static.lib;libvorbis_static.lib;libwebm.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msacm32.lib;winmm.lib;comctl32.lib;vpxmdd.lib;libogg_static.lib;libvorbis_static.lib;libwebm.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)WebM.prm</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -92,7 +92,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>.\Debug/WebM.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>$(Platform)\$(Configuration);ext\build\$(Platform)\$(Configuration);ext\opus\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(Platform)\$(Configuration);ext\build\$(Platform)\$(Configuration);ext\libvpx_build\build\$(Platform)\$(Configuration);ext\opus\build\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -105,8 +105,8 @@
     <Link>
       <OutputFile>$(OutDir)WebM.prm</OutputFile>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>$(Platform)\$(Configuration);ext\build\$(Platform)\$(Configuration);ext\opus\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vpxmt.lib;libogg_static.lib;libvorbis_static.lib;libwebm.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Platform)\$(Configuration);ext\build\$(Platform)\$(Configuration);ext\libvpx_build\build\$(Platform)\$(Configuration);ext\opus\build\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vpxmd.lib;libogg_static.lib;libvorbis_static.lib;libwebm.lib;opus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

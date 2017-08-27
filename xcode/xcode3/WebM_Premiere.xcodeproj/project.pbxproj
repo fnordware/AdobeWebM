@@ -489,7 +489,7 @@
 				);
 				PREBINDING = NO;
 				PREMIERE_SDK = "\"../../ext/Premiere Pro CS5 Mac SDK\"";
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 			};
 			name = Debug;
 		};
@@ -515,7 +515,7 @@
 				);
 				PREBINDING = NO;
 				PREMIERE_SDK = "\"../../ext/Premiere Pro CS5 Mac SDK\"";
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 			};
 			name = Release;
 		};

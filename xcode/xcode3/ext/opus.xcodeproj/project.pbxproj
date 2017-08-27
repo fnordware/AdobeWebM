@@ -11,7 +11,6 @@
 		2A24698A18790CA80086B772 /* warped_autocorrelation_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192681871EF72004CDE6F /* warped_autocorrelation_FLP.c */; };
 		2A24698B18790CA80086B772 /* structs_FLP.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF192671871EF72004CDE6F /* structs_FLP.h */; };
 		2A24698C18790CA90086B772 /* sort_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192661871EF72004CDE6F /* sort_FLP.c */; };
-		2A24698D18790CAA0086B772 /* solve_LS_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192651871EF72004CDE6F /* solve_LS_FLP.c */; };
 		2A24698E18790CAA0086B772 /* SigProc_FLP.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF192641871EF72004CDE6F /* SigProc_FLP.h */; };
 		2A24698F18790CAB0086B772 /* schur_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192631871EF72004CDE6F /* schur_FLP.c */; };
 		2A24699018790CAB0086B772 /* scale_vector_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192621871EF72004CDE6F /* scale_vector_FLP.c */; };
@@ -19,7 +18,6 @@
 		2A24699218790CAE0086B772 /* residual_energy_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192601871EF72004CDE6F /* residual_energy_FLP.c */; };
 		2A24699318790CAE0086B772 /* regularize_correlations_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1925F1871EF72004CDE6F /* regularize_correlations_FLP.c */; };
 		2A24699418790CAF0086B772 /* process_gains_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1925E1871EF72004CDE6F /* process_gains_FLP.c */; };
-		2A24699518790CAF0086B772 /* prefilter_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1925D1871EF72004CDE6F /* prefilter_FLP.c */; };
 		2A24699618790CB00086B772 /* pitch_analysis_core_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1925C1871EF72004CDE6F /* pitch_analysis_core_FLP.c */; };
 		2A24699718790CB10086B772 /* noise_shape_analysis_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1925B1871EF72004CDE6F /* noise_shape_analysis_FLP.c */; };
 		2A24699818790CB20086B772 /* main_FLP.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF1925A1871EF72004CDE6F /* main_FLP.h */; };
@@ -27,7 +25,6 @@
 		2A24699A18790CB30086B772 /* LTP_analysis_filter_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192581871EF72004CDE6F /* LTP_analysis_filter_FLP.c */; };
 		2A24699B18790CB40086B772 /* LPC_inv_pred_gain_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192571871EF72004CDE6F /* LPC_inv_pred_gain_FLP.c */; };
 		2A24699C18790CB50086B772 /* LPC_analysis_filter_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192561871EF72004CDE6F /* LPC_analysis_filter_FLP.c */; };
-		2A24699D18790CB60086B772 /* levinsondurbin_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192551871EF72004CDE6F /* levinsondurbin_FLP.c */; };
 		2A24699E18790CB60086B772 /* k2a_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192541871EF72004CDE6F /* k2a_FLP.c */; };
 		2A24699F18790CB80086B772 /* inner_product_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192531871EF72004CDE6F /* inner_product_FLP.c */; };
 		2A2469A018790CB90086B772 /* find_pred_coefs_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192521871EF72004CDE6F /* find_pred_coefs_FLP.c */; };
@@ -41,6 +38,8 @@
 		2A2469A818790CBF0086B772 /* burg_modified_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1924A1871EF72004CDE6F /* burg_modified_FLP.c */; };
 		2A2469A918790CC00086B772 /* autocorrelation_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192491871EF72004CDE6F /* autocorrelation_FLP.c */; };
 		2A2469AA18790CC00086B772 /* apply_sine_window_FLP.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192481871EF72004CDE6F /* apply_sine_window_FLP.c */; };
+		2AD7E7651EF260B000B97A95 /* LPC_fit.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7E7631EF260B000B97A95 /* LPC_fit.c */; };
+		2AD7E7661EF260B000B97A95 /* NSQ.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AD7E7641EF260B000B97A95 /* NSQ.h */; };
 		2AF192E41871EF72004CDE6F /* _kiss_fft_guts.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF191951871EF72004CDE6F /* _kiss_fft_guts.h */; };
 		2AF192E51871EF72004CDE6F /* arch.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF191961871EF72004CDE6F /* arch.h */; };
 		2AF192EF1871EF72004CDE6F /* bands.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF191A31871EF72004CDE6F /* bands.c */; };
@@ -139,14 +138,12 @@
 		2AF1935C1871EF72004CDE6F /* main_FIX.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF192391871EF72004CDE6F /* main_FIX.h */; };
 		2AF1935D1871EF72004CDE6F /* noise_shape_analysis_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1923A1871EF72004CDE6F /* noise_shape_analysis_FIX.c */; };
 		2AF1935E1871EF72004CDE6F /* pitch_analysis_core_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1923B1871EF72004CDE6F /* pitch_analysis_core_FIX.c */; };
-		2AF1935F1871EF72004CDE6F /* prefilter_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1923C1871EF72004CDE6F /* prefilter_FIX.c */; };
 		2AF193601871EF72004CDE6F /* process_gains_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1923D1871EF72004CDE6F /* process_gains_FIX.c */; };
 		2AF193611871EF72004CDE6F /* regularize_correlations_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1923E1871EF72004CDE6F /* regularize_correlations_FIX.c */; };
 		2AF193621871EF72004CDE6F /* residual_energy16_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF1923F1871EF72004CDE6F /* residual_energy16_FIX.c */; };
 		2AF193631871EF72004CDE6F /* residual_energy_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192401871EF72004CDE6F /* residual_energy_FIX.c */; };
 		2AF193641871EF72004CDE6F /* schur64_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192411871EF72004CDE6F /* schur64_FIX.c */; };
 		2AF193651871EF72004CDE6F /* schur_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192421871EF72004CDE6F /* schur_FIX.c */; };
-		2AF193661871EF72004CDE6F /* solve_LS_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192431871EF72004CDE6F /* solve_LS_FIX.c */; };
 		2AF193671871EF72004CDE6F /* structs_FIX.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AF192441871EF72004CDE6F /* structs_FIX.h */; };
 		2AF193681871EF72004CDE6F /* vector_ops_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192451871EF72004CDE6F /* vector_ops_FIX.c */; };
 		2AF193691871EF72004CDE6F /* warped_autocorrelation_FIX.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AF192461871EF72004CDE6F /* warped_autocorrelation_FIX.c */; };
@@ -236,6 +233,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2AD7E7631EF260B000B97A95 /* LPC_fit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LPC_fit.c; sourceTree = "<group>"; };
+		2AD7E7641EF260B000B97A95 /* NSQ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSQ.h; sourceTree = "<group>"; };
 		2AF191951871EF72004CDE6F /* _kiss_fft_guts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _kiss_fft_guts.h; sourceTree = "<group>"; };
 		2AF191961871EF72004CDE6F /* arch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arch.h; sourceTree = "<group>"; };
 		2AF191A31871EF72004CDE6F /* bands.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bands.c; sourceTree = "<group>"; };
@@ -335,14 +334,12 @@
 		2AF192391871EF72004CDE6F /* main_FIX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main_FIX.h; sourceTree = "<group>"; };
 		2AF1923A1871EF72004CDE6F /* noise_shape_analysis_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = noise_shape_analysis_FIX.c; sourceTree = "<group>"; };
 		2AF1923B1871EF72004CDE6F /* pitch_analysis_core_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pitch_analysis_core_FIX.c; sourceTree = "<group>"; };
-		2AF1923C1871EF72004CDE6F /* prefilter_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = prefilter_FIX.c; sourceTree = "<group>"; };
 		2AF1923D1871EF72004CDE6F /* process_gains_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = process_gains_FIX.c; sourceTree = "<group>"; };
 		2AF1923E1871EF72004CDE6F /* regularize_correlations_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = regularize_correlations_FIX.c; sourceTree = "<group>"; };
 		2AF1923F1871EF72004CDE6F /* residual_energy16_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = residual_energy16_FIX.c; sourceTree = "<group>"; };
 		2AF192401871EF72004CDE6F /* residual_energy_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = residual_energy_FIX.c; sourceTree = "<group>"; };
 		2AF192411871EF72004CDE6F /* schur64_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = schur64_FIX.c; sourceTree = "<group>"; };
 		2AF192421871EF72004CDE6F /* schur_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = schur_FIX.c; sourceTree = "<group>"; };
-		2AF192431871EF72004CDE6F /* solve_LS_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = solve_LS_FIX.c; sourceTree = "<group>"; };
 		2AF192441871EF72004CDE6F /* structs_FIX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = structs_FIX.h; sourceTree = "<group>"; };
 		2AF192451871EF72004CDE6F /* vector_ops_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vector_ops_FIX.c; sourceTree = "<group>"; };
 		2AF192461871EF72004CDE6F /* warped_autocorrelation_FIX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = warped_autocorrelation_FIX.c; sourceTree = "<group>"; };
@@ -359,7 +356,6 @@
 		2AF192521871EF72004CDE6F /* find_pred_coefs_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = find_pred_coefs_FLP.c; sourceTree = "<group>"; };
 		2AF192531871EF72004CDE6F /* inner_product_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inner_product_FLP.c; sourceTree = "<group>"; };
 		2AF192541871EF72004CDE6F /* k2a_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = k2a_FLP.c; sourceTree = "<group>"; };
-		2AF192551871EF72004CDE6F /* levinsondurbin_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = levinsondurbin_FLP.c; sourceTree = "<group>"; };
 		2AF192561871EF72004CDE6F /* LPC_analysis_filter_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LPC_analysis_filter_FLP.c; sourceTree = "<group>"; };
 		2AF192571871EF72004CDE6F /* LPC_inv_pred_gain_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LPC_inv_pred_gain_FLP.c; sourceTree = "<group>"; };
 		2AF192581871EF72004CDE6F /* LTP_analysis_filter_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LTP_analysis_filter_FLP.c; sourceTree = "<group>"; };
@@ -367,7 +363,6 @@
 		2AF1925A1871EF72004CDE6F /* main_FLP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main_FLP.h; sourceTree = "<group>"; };
 		2AF1925B1871EF72004CDE6F /* noise_shape_analysis_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = noise_shape_analysis_FLP.c; sourceTree = "<group>"; };
 		2AF1925C1871EF72004CDE6F /* pitch_analysis_core_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pitch_analysis_core_FLP.c; sourceTree = "<group>"; };
-		2AF1925D1871EF72004CDE6F /* prefilter_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = prefilter_FLP.c; sourceTree = "<group>"; };
 		2AF1925E1871EF72004CDE6F /* process_gains_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = process_gains_FLP.c; sourceTree = "<group>"; };
 		2AF1925F1871EF72004CDE6F /* regularize_correlations_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = regularize_correlations_FLP.c; sourceTree = "<group>"; };
 		2AF192601871EF72004CDE6F /* residual_energy_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = residual_energy_FLP.c; sourceTree = "<group>"; };
@@ -375,7 +370,6 @@
 		2AF192621871EF72004CDE6F /* scale_vector_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scale_vector_FLP.c; sourceTree = "<group>"; };
 		2AF192631871EF72004CDE6F /* schur_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = schur_FLP.c; sourceTree = "<group>"; };
 		2AF192641871EF72004CDE6F /* SigProc_FLP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SigProc_FLP.h; sourceTree = "<group>"; };
-		2AF192651871EF72004CDE6F /* solve_LS_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = solve_LS_FLP.c; sourceTree = "<group>"; };
 		2AF192661871EF72004CDE6F /* sort_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sort_FLP.c; sourceTree = "<group>"; };
 		2AF192671871EF72004CDE6F /* structs_FLP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = structs_FLP.h; sourceTree = "<group>"; };
 		2AF192681871EF72004CDE6F /* warped_autocorrelation_FLP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = warped_autocorrelation_FLP.c; sourceTree = "<group>"; };
@@ -599,6 +593,8 @@
 		2AF192091871EF72004CDE6F /* silk */ = {
 			isa = PBXGroup;
 			children = (
+				2AD7E7631EF260B000B97A95 /* LPC_fit.c */,
+				2AD7E7641EF260B000B97A95 /* NSQ.h */,
 				2AF1920A1871EF72004CDE6F /* A2NLSF.c */,
 				2AF1920B1871EF72004CDE6F /* ana_filt_bank_1.c */,
 				2AF1920C1871EF72004CDE6F /* API.h */,
@@ -720,14 +716,12 @@
 				2AF192391871EF72004CDE6F /* main_FIX.h */,
 				2AF1923A1871EF72004CDE6F /* noise_shape_analysis_FIX.c */,
 				2AF1923B1871EF72004CDE6F /* pitch_analysis_core_FIX.c */,
-				2AF1923C1871EF72004CDE6F /* prefilter_FIX.c */,
 				2AF1923D1871EF72004CDE6F /* process_gains_FIX.c */,
 				2AF1923E1871EF72004CDE6F /* regularize_correlations_FIX.c */,
 				2AF1923F1871EF72004CDE6F /* residual_energy16_FIX.c */,
 				2AF192401871EF72004CDE6F /* residual_energy_FIX.c */,
 				2AF192411871EF72004CDE6F /* schur64_FIX.c */,
 				2AF192421871EF72004CDE6F /* schur_FIX.c */,
-				2AF192431871EF72004CDE6F /* solve_LS_FIX.c */,
 				2AF192441871EF72004CDE6F /* structs_FIX.h */,
 				2AF192451871EF72004CDE6F /* vector_ops_FIX.c */,
 				2AF192461871EF72004CDE6F /* warped_autocorrelation_FIX.c */,
@@ -751,7 +745,6 @@
 				2AF192521871EF72004CDE6F /* find_pred_coefs_FLP.c */,
 				2AF192531871EF72004CDE6F /* inner_product_FLP.c */,
 				2AF192541871EF72004CDE6F /* k2a_FLP.c */,
-				2AF192551871EF72004CDE6F /* levinsondurbin_FLP.c */,
 				2AF192561871EF72004CDE6F /* LPC_analysis_filter_FLP.c */,
 				2AF192571871EF72004CDE6F /* LPC_inv_pred_gain_FLP.c */,
 				2AF192581871EF72004CDE6F /* LTP_analysis_filter_FLP.c */,
@@ -759,7 +752,6 @@
 				2AF1925A1871EF72004CDE6F /* main_FLP.h */,
 				2AF1925B1871EF72004CDE6F /* noise_shape_analysis_FLP.c */,
 				2AF1925C1871EF72004CDE6F /* pitch_analysis_core_FLP.c */,
-				2AF1925D1871EF72004CDE6F /* prefilter_FLP.c */,
 				2AF1925E1871EF72004CDE6F /* process_gains_FLP.c */,
 				2AF1925F1871EF72004CDE6F /* regularize_correlations_FLP.c */,
 				2AF192601871EF72004CDE6F /* residual_energy_FLP.c */,
@@ -767,7 +759,6 @@
 				2AF192621871EF72004CDE6F /* scale_vector_FLP.c */,
 				2AF192631871EF72004CDE6F /* schur_FLP.c */,
 				2AF192641871EF72004CDE6F /* SigProc_FLP.h */,
-				2AF192651871EF72004CDE6F /* solve_LS_FLP.c */,
 				2AF192661871EF72004CDE6F /* sort_FLP.c */,
 				2AF192671871EF72004CDE6F /* structs_FLP.h */,
 				2AF192681871EF72004CDE6F /* warped_autocorrelation_FLP.c */,
@@ -882,6 +873,7 @@
 				2A24698B18790CA80086B772 /* structs_FLP.h in Headers */,
 				2A24698E18790CAA0086B772 /* SigProc_FLP.h in Headers */,
 				2A24699818790CB20086B772 /* main_FLP.h in Headers */,
+				2AD7E7661EF260B000B97A95 /* NSQ.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -990,14 +982,12 @@
 				2AF1935B1871EF72004CDE6F /* LTP_scale_ctrl_FIX.c in Sources */,
 				2AF1935D1871EF72004CDE6F /* noise_shape_analysis_FIX.c in Sources */,
 				2AF1935E1871EF72004CDE6F /* pitch_analysis_core_FIX.c in Sources */,
-				2AF1935F1871EF72004CDE6F /* prefilter_FIX.c in Sources */,
 				2AF193601871EF72004CDE6F /* process_gains_FIX.c in Sources */,
 				2AF193611871EF72004CDE6F /* regularize_correlations_FIX.c in Sources */,
 				2AF193621871EF72004CDE6F /* residual_energy16_FIX.c in Sources */,
 				2AF193631871EF72004CDE6F /* residual_energy_FIX.c in Sources */,
 				2AF193641871EF72004CDE6F /* schur64_FIX.c in Sources */,
 				2AF193651871EF72004CDE6F /* schur_FIX.c in Sources */,
-				2AF193661871EF72004CDE6F /* solve_LS_FIX.c in Sources */,
 				2AF193681871EF72004CDE6F /* vector_ops_FIX.c in Sources */,
 				2AF193691871EF72004CDE6F /* warped_autocorrelation_FIX.c in Sources */,
 				2AF1938C1871EF72004CDE6F /* gain_quant.c in Sources */,
@@ -1066,21 +1056,18 @@
 				2A24698918790CA70086B772 /* wrappers_FLP.c in Sources */,
 				2A24698A18790CA80086B772 /* warped_autocorrelation_FLP.c in Sources */,
 				2A24698C18790CA90086B772 /* sort_FLP.c in Sources */,
-				2A24698D18790CAA0086B772 /* solve_LS_FLP.c in Sources */,
 				2A24698F18790CAB0086B772 /* schur_FLP.c in Sources */,
 				2A24699018790CAB0086B772 /* scale_vector_FLP.c in Sources */,
 				2A24699118790CAC0086B772 /* scale_copy_vector_FLP.c in Sources */,
 				2A24699218790CAE0086B772 /* residual_energy_FLP.c in Sources */,
 				2A24699318790CAE0086B772 /* regularize_correlations_FLP.c in Sources */,
 				2A24699418790CAF0086B772 /* process_gains_FLP.c in Sources */,
-				2A24699518790CAF0086B772 /* prefilter_FLP.c in Sources */,
 				2A24699618790CB00086B772 /* pitch_analysis_core_FLP.c in Sources */,
 				2A24699718790CB10086B772 /* noise_shape_analysis_FLP.c in Sources */,
 				2A24699918790CB20086B772 /* LTP_scale_ctrl_FLP.c in Sources */,
 				2A24699A18790CB30086B772 /* LTP_analysis_filter_FLP.c in Sources */,
 				2A24699B18790CB40086B772 /* LPC_inv_pred_gain_FLP.c in Sources */,
 				2A24699C18790CB50086B772 /* LPC_analysis_filter_FLP.c in Sources */,
-				2A24699D18790CB60086B772 /* levinsondurbin_FLP.c in Sources */,
 				2A24699E18790CB60086B772 /* k2a_FLP.c in Sources */,
 				2A24699F18790CB80086B772 /* inner_product_FLP.c in Sources */,
 				2A2469A018790CB90086B772 /* find_pred_coefs_FLP.c in Sources */,
@@ -1094,6 +1081,7 @@
 				2A2469A818790CBF0086B772 /* burg_modified_FLP.c in Sources */,
 				2A2469A918790CC00086B772 /* autocorrelation_FLP.c in Sources */,
 				2A2469AA18790CC00086B772 /* apply_sine_window_FLP.c in Sources */,
+				2AD7E7651EF260B000B97A95 /* LPC_fit.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -540,7 +540,7 @@ exSDKGenerateDefaultParams(
 	versionValues.value.intValue = WEBM_PLUGIN_VERSION_MAJOR << 16 |
 									WEBM_PLUGIN_VERSION_MINOR << 8 |
 									WEBM_PLUGIN_VERSION_BUILD;
-	versionValues.disabled = kPrTrue;
+	versionValues.disabled = kPrFalse;
 	versionValues.hidden = kPrTrue;
 	
 	exNewParamInfo versionParam;
@@ -550,7 +550,7 @@ exSDKGenerateDefaultParams(
 	versionParam.flags = exParamFlag_none;
 	versionParam.paramValues = versionValues;
 	
-	exportParamSuite->AddParam(exID, gIdx, WebMPluginVersion, &versionParam);
+	exportParamSuite->AddParam(exID, gIdx, ADBEVideoCodecGroup, &versionParam);
 	
 		
 	// Custom Settings Group
@@ -1821,6 +1821,12 @@ ConfigureEncoderPost(vpx_codec_ctx_t *encoder, const char *txt)
 			
 			else if(arg == "--max-gf-interval")
 			{	ConfigureValue(encoder, VP9E_SET_MAX_GF_INTERVAL, val); i++;	}
+
+			else if(arg == "--target-level")
+			{	ConfigureValue(encoder, VP9E_SET_TARGET_LEVEL, val); i++;	}
+
+			else if(arg == "--row-mt")
+			{	ConfigureValue(encoder, VP9E_SET_ROW_MT, 1);	}
 
 			else if(arg == "--color-range")
 			{

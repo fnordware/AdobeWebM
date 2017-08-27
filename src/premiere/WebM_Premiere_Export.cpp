@@ -1117,6 +1117,7 @@ exSDKExport(
 								2);
 	
 	exParamValues codecP, methodP, videoQualityP, bitrateP, twoPassP, keyframeMaxDistanceP, samplingP, bitDepthP, alphaP, customArgsP;
+		
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoCodec, &codecP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoMethod, &methodP);
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoQuality, &videoQualityP);
@@ -1127,6 +1128,16 @@ exSDKExport(
 	paramSuite->GetParamValue(exID, gIdx, WebMVideoBitDepth, &bitDepthP);
 	paramSuite->GetParamValue(exID, gIdx, ADBEVideoAlpha, &alphaP);
 	paramSuite->GetParamValue(exID, gIdx, WebMCustomArgs, &customArgsP);
+	
+	exParamValues versionP;
+	paramSuite->GetParamValue(exID, gIdx, WebMPluginVersion, &versionP);
+	
+	if(versionP.value.intValue < 0x00010100)
+		keyframeMaxDistanceP.value.intValue = 128;
+	
+	if(bitDepthP.value.intValue < 8)
+		bitDepthP.value.intValue = 8;
+	
 	
 	const bool use_vp9 = (codecP.value.intValue == WEBM_CODEC_VP9);
 	const WebM_Video_Method method = (WebM_Video_Method)methodP.value.intValue;
@@ -1655,7 +1666,7 @@ exSDKExport(
 				
 				assert(info->timecode_scale() == timeCodeScale);
 				
-				assert(muxer_segment->estimate_file_duration());
+				assert(!muxer_segment->estimate_file_duration());
 				
 		
 				if(exportInfoP->exportVideo)

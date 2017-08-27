@@ -65,31 +65,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <OutDir>build\$(PlatformName)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <OutDir>build\$(PlatformName)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <OutDir>build\$(PlatformName)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
-    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <OutDir>build\$(PlatformName)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>HAVE_CONFIG_H;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..\..\..\..\ext\opus\silk;..\..\..\..\ext\opus\silk\float;..\..\..\..\ext\opus\celt;..\..\..\..\ext\opus\include;..\..\..\..\ext\opus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -121,7 +121,7 @@
     <ClCompile>
       <PreprocessorDefinitions>HAVE_CONFIG_H;WIN32;WIN64;_DEBUG;_CONSOLE;USE_ALLOCA;OPUS_BUILD;__SSE__%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..\..\..\..\ext\opus\silk;..\..\..\..\ext\opus\silk\float;..\..\..\..\ext\opus\celt;..\..\..\..\ext\opus\include;..\..\..\..\ext\opus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -152,7 +152,7 @@
     <ClCompile>
       <PreprocessorDefinitions>HAVE_CONFIG_H;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..\..\..\..\ext\opus\silk;..\..\..\..\ext\opus\silk\float;..\..\..\..\ext\opus\celt;..\..\..\..\ext\opus\include;..\..\..\..\ext\opus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -187,7 +187,7 @@
     <ClCompile>
       <PreprocessorDefinitions>HAVE_CONFIG_H;WIN32;WIN64;NDEBUG;_CONSOLE;USE_ALLOCA;OPUS_BUILD;__SSE__%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..\..\..\..\ext\opus\silk;..\..\..\..\ext\opus\silk\float;..\..\..\..\ext\opus\celt;..\..\..\..\ext\opus\include;..\..\..\..\ext\opus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -243,6 +243,7 @@
     <ClInclude Include="..\..\..\..\ext\opus\celt\vq.h" />
     <ClInclude Include="..\..\..\..\ext\opus\celt\x86\celt_lpc_sse.h" />
     <ClInclude Include="..\..\..\..\ext\opus\celt\x86\pitch_sse.h" />
+    <ClInclude Include="..\..\..\..\ext\opus\celt\x86\vq_sse.h" />
     <ClInclude Include="..\..\..\..\ext\opus\celt\x86\x86cpu.h" />
     <ClInclude Include="..\..\..\..\ext\opus\celt\_kiss_fft_guts.h" />
     <ClInclude Include="..\..\..\..\ext\opus\silk\API.h" />
@@ -309,6 +310,7 @@
     <ClCompile Include="..\..\..\..\ext\opus\celt\x86\pitch_sse.c" />
     <ClCompile Include="..\..\..\..\ext\opus\celt\x86\pitch_sse2.c" />
     <ClCompile Include="..\..\..\..\ext\opus\celt\x86\pitch_sse4_1.c" />
+    <ClCompile Include="..\..\..\..\ext\opus\celt\x86\vq_sse2.c" />
     <ClCompile Include="..\..\..\..\ext\opus\celt\x86\x86cpu.c" />
     <ClCompile Include="..\..\..\..\ext\opus\celt\x86\x86_celt_map.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\A2NLSF.c" />
@@ -347,21 +349,18 @@
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\find_pred_coefs_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\inner_product_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\k2a_FLP.c" />
-    <ClCompile Include="..\..\..\..\ext\opus\silk\float\levinsondurbin_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\LPC_analysis_filter_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\LPC_inv_pred_gain_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\LTP_analysis_filter_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\LTP_scale_ctrl_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\noise_shape_analysis_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\pitch_analysis_core_FLP.c" />
-    <ClCompile Include="..\..\..\..\ext\opus\silk\float\prefilter_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\process_gains_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\regularize_correlations_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\residual_energy_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\scale_copy_vector_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\scale_vector_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\schur_FLP.c" />
-    <ClCompile Include="..\..\..\..\ext\opus\silk\float\solve_LS_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\sort_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\warped_autocorrelation_FLP.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\float\wrappers_FLP.c" />
@@ -374,6 +373,7 @@
     <ClCompile Include="..\..\..\..\ext\opus\silk\lin2log.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\log2lin.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\LPC_analysis_filter.c" />
+    <ClCompile Include="..\..\..\..\ext\opus\silk\LPC_fit.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\LPC_inv_pred_gain.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\LP_variable_cutoff.c" />
     <ClCompile Include="..\..\..\..\ext\opus\silk\NLSF2A.c" />
