@@ -14,7 +14,8 @@
 #define ARCH_MIPS 0
 #define ARCH_X86 0
 #define ARCH_X86_64 1
-#define ARCH_PPC 0
+#define HAVE_EDSP 0
+#define HAVE_MEDIA 0
 #define HAVE_NEON 0
 #define HAVE_NEON_ASM 0
 #define HAVE_MIPS32 0
@@ -29,7 +30,6 @@
 #define HAVE_SSE4_1 1
 #define HAVE_AVX 0
 #define HAVE_AVX2 0
-#define HAVE_VSX 0
 #define HAVE_VPX_PORTS 1
 #define HAVE_PTHREAD_H 1
 #define HAVE_UNISTD_H 1
@@ -39,6 +39,7 @@
 #define CONFIG_INSTALL_BINS 1
 #define CONFIG_INSTALL_LIBS 1
 #define CONFIG_INSTALL_SRCS 0
+#define CONFIG_USE_X86INC 1
 #define CONFIG_DEBUG 0
 #define CONFIG_GPROF 0
 #define CONFIG_GCOV 0
@@ -60,8 +61,11 @@
 #define CONFIG_VP8_DECODER 1
 #define CONFIG_VP9_ENCODER 1
 #define CONFIG_VP9_DECODER 1
+#define CONFIG_VP10_ENCODER 0
+#define CONFIG_VP10_DECODER 0
 #define CONFIG_VP8 1
 #define CONFIG_VP9 1
+#define CONFIG_VP10 0
 #define CONFIG_ENCODERS 1
 #define CONFIG_DECODERS 1
 #define CONFIG_STATIC_MSVCRT 0
@@ -90,4 +94,5 @@
 #define CONFIG_SPATIAL_SVC 0
 #define CONFIG_FP_MB_STATS 0
 #define CONFIG_EMULATE_HARDWARE 0
+#define CONFIG_MISC_FIXES 0
 #endif /* VPX_CONFIG_H */
