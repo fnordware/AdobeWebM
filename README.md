@@ -23,3 +23,5 @@ BSD
 Author
 ------
 Brendan Bolles
+
+Adobe takes part in the HACKTOBERFEST every year 
