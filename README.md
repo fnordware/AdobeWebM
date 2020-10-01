@@ -1,12 +1,13 @@
-AdobeWebM
+AdobeWebM 
 =========
+Creative way to use Premiere Pro.
 
-This is a project where I'm building plug-ins for Google's [WebM](http://www.webmproject.org/) format to be used inside the various Adobe applications.
+This is an amazing project where I'm building plug-ins for Google's [WebM](http://www.webmproject.org/) format to be used inside the various Adobe applications.
 
 Right now there's a working WebM plug-in for Premiere Pro, along with a beta [WebP](https://developers.google.com/speed/webp/) plug-in for Photoshop.
 
 
-Download
+Download Here
 --------
 
 [WebM plug-in on fnordware.com](http://www.fnordware.com/WebM/)
